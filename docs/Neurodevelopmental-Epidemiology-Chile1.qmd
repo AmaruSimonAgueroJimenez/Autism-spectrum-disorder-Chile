@@ -1,0 +1,1227 @@
+---
+title: "Neurodevelopmental Disorders"
+author:
+  - name: "Amaru Simón Agüero Jiménez"
+    email: "a.agueroj@udd.cl"
+    orcid: "0000-0001-7336-1833"
+date: "today"
+format:
+  html:
+    embed-resources: false
+    smooth-scroll: true
+    toc: true
+    toc-depth: 6
+    toc-location: right
+    number-sections: true
+    number-depth: 6
+    code-fold: true
+    theme: cosmo
+    fig-cap-location: bottom
+execute:
+  warning: false
+  message: false
+  fig-width: 12
+  fig-height: 10
+---
+
+# Results - Neurodevelopmental Disorders Analysis
+
+```{python}
+#| label: setup
+#| include: false
+
+import sys
+import subprocess
+import importlib
+from subprocess import DEVNULL
+
+def _pip_install(requirement: str):
+    subprocess.check_call([sys.executable, "-m", "pip", "install", "--upgrade", requirement],
+                          stdout=DEVNULL, stderr=DEVNULL)
+
+try:
+    from packaging.requirements import Requirement
+except Exception:
+    _pip_install("packaging")
+    from packaging.requirements import Requirement
+
+def ensure(requirement: str, import_name: str = None):
+    req = Requirement(requirement)
+    name = import_name or req.name
+    try:
+        mod = importlib.import_module(name)
+        ver = getattr(mod, "__version__", None)
+        if ver is not None and req.specifier and not req.specifier.contains(ver, prereleases=True):
+            raise ImportError()
+        return mod
+    except Exception:
+        _pip_install(requirement)
+        return importlib.import_module(name)
+
+ensure("numpy")
+ensure("scipy")
+ensure("pandas>=2.0.0", "pandas")
+ensure("pyarrow>=10.0.0", "pyarrow")
+ensure("matplotlib")
+ensure("seaborn")
+ensure("requests")
+ensure("geopandas")
+ensure("libpysal")
+ensure("esda")
+ensure("splot")
+
+import pandas as pd
+import numpy as np
+import os
+import glob
+import warnings
+import matplotlib.pyplot as plt
+import seaborn as sns
+import geopandas as gpd
+from IPython.display import display
+
+warnings.filterwarnings('ignore')
+plt.rcParams['figure.dpi'] = 100
+plt.rcParams['savefig.dpi'] = 150
+sns.set_style("whitegrid")
+pd.set_option('display.max_columns', None)
+pd.set_option('display.precision', 2)
+
+base_path = os.path.dirname(os.getcwd())
+data_path = os.path.join(base_path, 'data')
+output_path = os.path.join(base_path, 'output_files')
+figures_path = os.path.join(output_path, 'figures')
+
+os.makedirs(output_path, exist_ok=True)
+os.makedirs(figures_path, exist_ok=True)
+```
+
+```{python}
+#| label: constants
+#| include: false
+
+# WHO Standard Population for direct standardization
+WHO_STANDARD_POPULATION = {
+    '0-4': 8860, '5-9': 8690, '10-14': 8600, '15-19': 8470,
+    '20-24': 8220, '25-29': 7930, '30-34': 7610, '35-39': 7150,
+    '40-44': 6590, '45-49': 6040, '50-54': 5370, '55-59': 4550,
+    '60-64': 3720, '65-69': 2960, '70-74': 2210, '75-79': 1520,
+    '80+': 1540
+}
+
+TOTAL_WHO_WEIGHT = sum(WHO_STANDARD_POPULATION.values())
+
+# =============================================================================
+# SPECIFIC ICD-10 CODES FOR NEURODEVELOPMENTAL DISORDERS ANALYSIS
+# =============================================================================
+
+# F84: Pervasive Developmental Disorders (Autism Spectrum)
+NEURODEV_CODES_F84 = {
+    'F84': 'Pervasive developmental disorders',
+    'F84.0': 'Childhood autism',
+    'F84.1': 'Atypical autism',
+    'F84.2': 'Rett syndrome',
+    'F84.3': 'Other childhood disintegrative disorder',
+    'F84.4': 'Overactive disorder with mental retardation and stereotyped movements',
+    'F84.5': 'Asperger syndrome',
+    'F84.8': 'Other pervasive developmental disorders',
+    'F84.9': 'Pervasive developmental disorder, unspecified'
+}
+
+# F90: Hyperkinetic Disorders (ADHD)
+NEURODEV_CODES_F90 = {
+    'F90': 'Hyperkinetic disorders',
+    'F90.0': 'Disturbance of activity and attention',
+    'F90.1': 'Hyperkinetic conduct disorder',
+    'F90.8': 'Other hyperkinetic disorders',
+    'F90.9': 'Hyperkinetic disorder, unspecified'
+}
+
+# F88-F89: Other developmental disorders
+NEURODEV_CODES_OTHER = {
+    'F88': 'Other disorders of psychological development',
+    'F89': 'Unspecified disorder of psychological development'
+}
+
+# F80-F83: Specific developmental disorders
+NEURODEV_CODES_SPECIFIC = {
+    'F80': 'Specific developmental disorders of speech and language',
+    'F80.0': 'Specific speech articulation disorder',
+    'F80.1': 'Expressive language disorder',
+    'F80.2': 'Receptive language disorder',
+    'F80.3': 'Acquired aphasia with epilepsy (Landau-Kleffner)',
+    'F80.8': 'Other developmental disorders of speech and language',
+    'F80.9': 'Developmental disorder of speech and language, unspecified',
+    'F81': 'Specific developmental disorders of scholastic skills',
+    'F81.0': 'Specific reading disorder',
+    'F81.1': 'Specific spelling disorder',
+    'F81.2': 'Specific disorder of arithmetical skills',
+    'F81.3': 'Mixed disorder of scholastic skills',
+    'F81.8': 'Other developmental disorders of scholastic skills',
+    'F81.9': 'Developmental disorder of scholastic skills, unspecified',
+    'F82': 'Specific developmental disorder of motor function',
+    'F83': 'Mixed specific developmental disorders'
+}
+
+# Combine all neurodevelopmental codes
+ALL_NEURODEV_CODES = {
+    **NEURODEV_CODES_F84, 
+    **NEURODEV_CODES_F90, 
+    **NEURODEV_CODES_OTHER,
+    **NEURODEV_CODES_SPECIFIC
+}
+
+# Lists for filtering - main categories
+F84_CODES_LIST = ['F84', 'F84.0', 'F84.1', 'F84.2', 'F84.3', 'F84.4', 'F84.5', 'F84.8', 'F84.9']
+F90_CODES_LIST = ['F90', 'F90.0', 'F90.1', 'F90.8', 'F90.9']
+F80_CODES_LIST = ['F80', 'F80.0', 'F80.1', 'F80.2', 'F80.3', 'F80.8', 'F80.9']
+F81_CODES_LIST = ['F81', 'F81.0', 'F81.1', 'F81.2', 'F81.3', 'F81.8', 'F81.9']
+OTHER_CODES_LIST = ['F82', 'F83', 'F88', 'F89']
+
+AGE_GROUPS_TUPLES = [
+    (0, 4), (5, 9), (10, 14), (15, 19), (20, 24), (25, 29),
+    (30, 34), (35, 39), (40, 44), (45, 49), (50, 54), (55, 59),
+    (60, 64), (65, 69), (70, 74), (75, 79)
+]
+
+YEARS = [2019, 2020, 2021, 2022, 2023, 2024]
+```
+
+```{python}
+#| label: functions
+#| include: false
+
+def assign_age_group(age):
+    if pd.isna(age) or age is None:
+        return None
+    try:
+        age = int(float(age))
+    except (ValueError, TypeError):
+        return None
+    if age < 0:
+        return None
+    if age >= 80:
+        return '80+'
+    for start, end in AGE_GROUPS_TUPLES:
+        if start <= age <= end:
+            return f"{start}-{end}"
+    return None
+
+
+def parse_date(date_str, year=None):
+    if pd.isna(date_str) or date_str == '':
+        return pd.NaT
+    date_str = str(date_str).strip()
+    for fmt in ['%Y-%m-%d', '%d-%m-%Y']:
+        try:
+            return pd.to_datetime(date_str, format=fmt)
+        except:
+            pass
+    try:
+        return pd.to_datetime(date_str)
+    except:
+        return pd.NaT
+
+
+def calculate_age(birth_date_str, admission_date_str, year=None):
+    birth_date = parse_date(birth_date_str)
+    admission_date = parse_date(admission_date_str, year)
+    if pd.isna(birth_date) or pd.isna(admission_date):
+        return None
+    age = (admission_date - birth_date).days / 365.25
+    if age < 0 or age > 120:
+        return None
+    return int(round(age))
+
+
+def is_valid_neurodev_code(code_str):
+    """
+    Validate ICD-10 codes for neurodevelopmental disorders:
+    - F84.x: Pervasive developmental disorders (ASD, Asperger, etc.)
+    - F90.x: Hyperkinetic disorders (ADHD)
+    - F80.x: Speech and language developmental disorders
+    - F81.x: Scholastic skills developmental disorders
+    - F82: Motor function developmental disorder
+    - F83: Mixed specific developmental disorders
+    - F88: Other psychological development disorders
+    - F89: Unspecified psychological development disorder
+    
+    Returns: (is_valid, code_group)
+    """
+    if pd.isna(code_str) or code_str == '':
+        return False, None
+    
+    code = str(code_str).upper().strip().replace('.', '')
+    code_3char = code[:3]
+    
+    # F84: Pervasive developmental disorders (ASD spectrum)
+    if code_3char == 'F84':
+        if len(code) >= 4:
+            subcode = code[:4]
+            if subcode in ['F840', 'F841', 'F842', 'F843', 'F844', 'F845', 'F848', 'F849']:
+                # Return specific subcode with dot notation
+                return True, f'F84.{code[3]}'
+        return True, 'F84'
+    
+    # F90: Hyperkinetic disorders (ADHD)
+    if code_3char == 'F90':
+        if len(code) >= 4:
+            subcode = code[:4]
+            if subcode in ['F900', 'F901', 'F908', 'F909']:
+                return True, f'F90.{code[3]}'
+        return True, 'F90'
+    
+    # F80: Speech and language disorders
+    if code_3char == 'F80':
+        if len(code) >= 4:
+            subcode = code[:4]
+            if subcode in ['F800', 'F801', 'F802', 'F803', 'F808', 'F809']:
+                return True, f'F80.{code[3]}'
+        return True, 'F80'
+    
+    # F81: Scholastic skills disorders
+    if code_3char == 'F81':
+        if len(code) >= 4:
+            subcode = code[:4]
+            if subcode in ['F810', 'F811', 'F812', 'F813', 'F818', 'F819']:
+                return True, f'F81.{code[3]}'
+        return True, 'F81'
+    
+    # F82, F83, F88, F89: Other developmental disorders (no subcodes)
+    if code_3char in ['F82', 'F83', 'F88', 'F89']:
+        return True, code_3char
+    
+    return False, None
+
+
+def get_neurodev_codes_from_row(row, diag_cols):
+    codes_found = set()
+    for col in diag_cols:
+        v = row.get(col)
+        is_valid, code_group = is_valid_neurodev_code(v)
+        if is_valid:
+            codes_found.add(code_group)
+    return codes_found
+
+
+def load_and_filter_neurodev_data(years=YEARS, chunksize=100000):
+    all_records = []
+    
+    for year in years:
+        pattern = f"GRD_PUBLICO_*{year}*.csv"
+        files = glob.glob(os.path.join(data_path, pattern))
+        if not files:
+            continue
+        
+        for chunk in pd.read_csv(files[0], delimiter='|', dtype=str, 
+                                  low_memory=False, chunksize=chunksize):
+            diag_cols = [col for col in chunk.columns if col.startswith('DIAGNOSTICO')]
+            if not diag_cols:
+                continue
+            
+            for _, row in chunk.iterrows():
+                codes_found = get_neurodev_codes_from_row(row, diag_cols)
+                if not codes_found:
+                    continue
+                
+                age = calculate_age(row.get('FECHA_NACIMIENTO'), row.get('FECHA_INGRESO'), year)
+                sex_val = str(row.get('SEXO', '')).strip().upper()
+                sex = 'Male' if sex_val in ['1', 'HOMBRE'] else ('Female' if sex_val in ['2', 'MUJER'] else None)
+                age_group = assign_age_group(age)
+                
+                for code in codes_found:
+                    all_records.append({
+                        'year': year,
+                        'age': age,
+                        'age_group': age_group,
+                        'sex': sex,
+                        'icd_code': code
+                    })
+    
+    if not all_records:
+        return pd.DataFrame(columns=['year', 'age', 'age_group', 'sex', 'icd_code', 'hospitalizations'])
+    
+    df = pd.DataFrame(all_records)
+    df_counts = df.groupby(['year', 'age_group', 'sex', 'icd_code']).size().reset_index(name='hospitalizations')
+    return df_counts
+
+
+def _normalize_txt(x):
+    if pd.isna(x):
+        return None
+    s = str(x).strip().lower()
+    repl = str.maketrans({'á': 'a', 'é': 'e', 'í': 'i', 'ó': 'o', 'ú': 'u', 'ñ': 'n'})
+    return s.translate(repl)
+
+
+def _standardize_sex(x):
+    if pd.isna(x):
+        return None
+    v = _normalize_txt(x)
+    if v is None:
+        return None
+    v = v.replace('.', '').replace('-', ' ').replace('_', ' ').strip()
+    if v in {'1', 'm', 'male', 'masculino', 'hombre', 'hombres', 'varon', 'varones'}:
+        return 'Male'
+    if v in {'2', 'f', 'female', 'femenino', 'mujer', 'mujeres'}:
+        return 'Female'
+    return None
+
+
+def _find_first_existing(paths):
+    for p in paths:
+        if p and os.path.exists(p):
+            return p
+    return None
+
+
+PARQUET_TO_STANDARD_REGION = {
+    'Arica y Parinacota': 'Arica y Parinacota',
+    'Tarapacá': 'Tarapacá',
+    'Antofagasta': 'Antofagasta',
+    'Atacama': 'Atacama',
+    'Coquimbo': 'Coquimbo',
+    'Valparaíso': 'Valparaíso',
+    'Metropolitana de Santiago': 'Metropolitana',
+    "Libertador General Bernardo O'Higgins": "O'Higgins",
+    'Maule': 'Maule',
+    'Ñuble': 'Ñuble',
+    'Biobío': 'Biobío',
+    'La Araucanía': 'La Araucanía',
+    'Los Ríos': 'Los Ríos',
+    'Los Lagos': 'Los Lagos',
+    'Aysén del General Carlos Ibáñez del Campo': 'Aysén',
+    'Magallanes y de la Antártica Chilena': 'Magallanes'
+}
+
+
+def normalize_region_to_standard(region_name):
+    if pd.isna(region_name):
+        return None
+    name = str(region_name).strip()
+    return PARQUET_TO_STANDARD_REGION.get(name, name)
+
+
+def load_population_data(years=YEARS):
+    candidate_paths = [
+        os.path.join(data_path, 'censo_proyecciones_ano_edad_genero.parquet'),
+        os.path.join(data_path, 'censo_proyecciones_año_edad_genero.parquet'),
+        os.path.join(base_path, 'censo_proyecciones_ano_edad_genero.parquet'),
+        os.path.join(base_path, 'censo_proyecciones_año_edad_genero.parquet'),
+    ]
+    
+    pop_file = _find_first_existing(candidate_paths)
+    if pop_file is None:
+        patterns = [os.path.join(data_path, '**', 'censo_proyecciones*edad_genero*.parquet')]
+        matches = []
+        for pat in patterns:
+            matches.extend(glob.glob(pat, recursive=True))
+        pop_file = matches[0] if matches else None
+    
+    if pop_file is None:
+        raise FileNotFoundError("Population projections file not found.")
+    
+    df = pd.read_parquet(pop_file, engine="pyarrow")
+    df.columns = [str(c).strip() for c in df.columns]
+    cols_norm = {_normalize_txt(c): c for c in df.columns}
+    
+    year_col = cols_norm.get('ano') or cols_norm.get('anio') or cols_norm.get('year')
+    age_col = cols_norm.get('edad') or cols_norm.get('age')
+    sex_col = cols_norm.get('genero') or cols_norm.get('sexo') or cols_norm.get('sex')
+    pop_col = cols_norm.get('poblacion') or cols_norm.get('population')
+    region_col = cols_norm.get('region')
+    comuna_col = cols_norm.get('comuna')
+    
+    keep_cols = [year_col, age_col, sex_col, pop_col]
+    if region_col:
+        keep_cols.append(region_col)
+    if comuna_col:
+        keep_cols.append(comuna_col)
+    
+    pop = df[keep_cols].copy()
+    rename_map = {year_col: 'year', age_col: 'age', sex_col: 'sex', pop_col: 'population'}
+    if region_col:
+        rename_map[region_col] = 'region'
+    if comuna_col:
+        rename_map[comuna_col] = 'comuna'
+    pop.rename(columns=rename_map, inplace=True)
+    
+    pop['year'] = pd.to_numeric(pop['year'], errors='coerce').astype('Int64')
+    pop = pop[pop['year'].isin(years)]
+    pop['population'] = pd.to_numeric(pop['population'], errors='coerce')
+    pop['sex'] = pop['sex'].apply(_standardize_sex)
+    pop['age_group'] = pop['age'].apply(assign_age_group)
+    pop = pop.dropna(subset=['year', 'sex', 'age_group', 'population'])
+    pop = pop[pop['population'] > 0]
+    
+    if 'region' in pop.columns:
+        pop['region'] = pop['region'].apply(normalize_region_to_standard)
+    
+    group_cols = [c for c in ['region', 'comuna', 'year', 'age_group', 'sex'] if c in pop.columns]
+    pop_agg = pop.groupby(group_cols, as_index=False)['population'].sum()
+    return pop_agg
+
+
+def calculate_asr_by_sex(hosp, pop, per=100000):
+    who_weights = pd.DataFrame([
+        {'age_group': k, 'who_weight': v} for k, v in WHO_STANDARD_POPULATION.items()
+    ])
+    
+    hosp_agg = hosp.groupby(['year', 'age_group', 'sex'])['hospitalizations'].sum().reset_index()
+    pop_agg = pop.groupby(['year', 'age_group', 'sex'])['population'].sum().reset_index()
+    
+    merged = hosp_agg.merge(pop_agg, on=['year', 'age_group', 'sex'], how='left')
+    merged = merged.dropna(subset=['population'])
+    merged = merged[merged['population'] > 0]
+    merged['age_specific_rate'] = (merged['hospitalizations'] / merged['population']) * per
+    merged = merged.merge(who_weights, on='age_group', how='left')
+    merged['weighted_rate'] = merged['age_specific_rate'] * merged['who_weight']
+    
+    result = merged.groupby(['year', 'sex']).agg({
+        'hospitalizations': 'sum',
+        'population': 'sum',
+        'weighted_rate': 'sum'
+    }).reset_index()
+    
+    result['crude_rate'] = ((result['hospitalizations'] / result['population']) * per).round(2)
+    result['asr'] = (result['weighted_rate'] / TOTAL_WHO_WEIGHT).round(2)
+    result.drop(columns=['weighted_rate'], inplace=True)
+    
+    return result[['year', 'sex', 'hospitalizations', 'population', 'crude_rate', 'asr']]
+
+
+def calculate_asr_sex_columns(hosp, pop, per=100000):
+    who_weights = pd.DataFrame([
+        {'age_group': k, 'who_weight': v} for k, v in WHO_STANDARD_POPULATION.items()
+    ])
+    
+    hosp_agg = hosp.groupby(['year', 'age_group', 'sex'])['hospitalizations'].sum().reset_index()
+    pop_agg = pop.groupby(['year', 'age_group', 'sex'])['population'].sum().reset_index()
+    
+    merged = hosp_agg.merge(pop_agg, on=['year', 'age_group', 'sex'], how='left')
+    merged = merged.dropna(subset=['population'])
+    merged = merged[merged['population'] > 0]
+    merged['age_specific_rate'] = (merged['hospitalizations'] / merged['population']) * per
+    merged = merged.merge(who_weights, on='age_group', how='left')
+    merged['weighted_rate'] = merged['age_specific_rate'] * merged['who_weight']
+    
+    by_sex = merged.groupby(['year', 'sex']).agg({
+        'hospitalizations': 'sum',
+        'population': 'sum',
+        'weighted_rate': 'sum'
+    }).reset_index()
+    
+    by_sex['crude_rate'] = ((by_sex['hospitalizations'] / by_sex['population']) * per).round(2)
+    by_sex['asr'] = (by_sex['weighted_rate'] / TOTAL_WHO_WEIGHT).round(2)
+    
+    hosp_total = hosp.groupby(['year', 'age_group'])['hospitalizations'].sum().reset_index()
+    pop_total = pop.groupby(['year', 'age_group'])['population'].sum().reset_index()
+    
+    merged_total = hosp_total.merge(pop_total, on=['year', 'age_group'], how='left')
+    merged_total = merged_total.dropna(subset=['population'])
+    merged_total = merged_total[merged_total['population'] > 0]
+    merged_total['age_specific_rate'] = (merged_total['hospitalizations'] / merged_total['population']) * per
+    merged_total = merged_total.merge(who_weights, on='age_group', how='left')
+    merged_total['weighted_rate'] = merged_total['age_specific_rate'] * merged_total['who_weight']
+    
+    total_agg = merged_total.groupby('year').agg({
+        'hospitalizations': 'sum',
+        'population': 'sum',
+        'weighted_rate': 'sum'
+    }).reset_index()
+    
+    total_agg['crude_rate'] = ((total_agg['hospitalizations'] / total_agg['population']) * per).round(2)
+    total_agg['asr'] = (total_agg['weighted_rate'] / TOTAL_WHO_WEIGHT).round(2)
+    
+    male = by_sex[by_sex['sex'] == 'Male'][['year', 'hospitalizations', 'population', 'crude_rate', 'asr']].copy()
+    male.columns = ['year', 'hosp_male', 'pop_male', 'crude_rate_male', 'asr_male']
+    
+    female = by_sex[by_sex['sex'] == 'Female'][['year', 'hospitalizations', 'population', 'crude_rate', 'asr']].copy()
+    female.columns = ['year', 'hosp_female', 'pop_female', 'crude_rate_female', 'asr_female']
+    
+    total = total_agg[['year', 'hospitalizations', 'population', 'crude_rate', 'asr']].copy()
+    total.columns = ['year', 'hosp_total', 'pop_total', 'crude_rate_total', 'asr_total']
+    
+    result = male.merge(female, on='year', how='outer').merge(total, on='year', how='outer')
+    result.sort_values('year', inplace=True)
+    result.reset_index(drop=True, inplace=True)
+    
+    return result
+
+
+def calculate_asr_by_icd(hosp, pop, per=100000):
+    who_weights = pd.DataFrame([
+        {'age_group': k, 'who_weight': v} for k, v in WHO_STANDARD_POPULATION.items()
+    ])
+    
+    hosp_agg = hosp.groupby(['year', 'age_group', 'sex', 'icd_code'])['hospitalizations'].sum().reset_index()
+    pop_agg = pop.groupby(['year', 'age_group', 'sex'])['population'].sum().reset_index()
+    
+    merged = hosp_agg.merge(pop_agg, on=['year', 'age_group', 'sex'], how='left')
+    merged = merged.dropna(subset=['population'])
+    merged = merged[merged['population'] > 0]
+    merged['age_specific_rate'] = (merged['hospitalizations'] / merged['population']) * per
+    merged = merged.merge(who_weights, on='age_group', how='left')
+    merged['weighted_rate'] = merged['age_specific_rate'] * merged['who_weight']
+    
+    by_sex = merged.groupby(['year', 'icd_code', 'sex']).agg({
+        'hospitalizations': 'sum',
+        'weighted_rate': 'sum'
+    }).reset_index()
+    by_sex['asr'] = (by_sex['weighted_rate'] / TOTAL_WHO_WEIGHT).round(2)
+    
+    hosp_total = hosp.groupby(['year', 'age_group', 'icd_code'])['hospitalizations'].sum().reset_index()
+    pop_total = pop.groupby(['year', 'age_group'])['population'].sum().reset_index()
+    
+    merged_total = hosp_total.merge(pop_total, on=['year', 'age_group'], how='left')
+    merged_total = merged_total.dropna(subset=['population'])
+    merged_total = merged_total[merged_total['population'] > 0]
+    merged_total['age_specific_rate'] = (merged_total['hospitalizations'] / merged_total['population']) * per
+    merged_total = merged_total.merge(who_weights, on='age_group', how='left')
+    merged_total['weighted_rate'] = merged_total['age_specific_rate'] * merged_total['who_weight']
+    
+    total_agg = merged_total.groupby(['year', 'icd_code']).agg({
+        'hospitalizations': 'sum',
+        'weighted_rate': 'sum'
+    }).reset_index()
+    total_agg['asr'] = (total_agg['weighted_rate'] / TOTAL_WHO_WEIGHT).round(2)
+    
+    male = by_sex[by_sex['sex'] == 'Male'][['year', 'icd_code', 'hospitalizations', 'asr']].copy()
+    male.columns = ['year', 'icd_code', 'hosp_male', 'asr_male']
+    
+    female = by_sex[by_sex['sex'] == 'Female'][['year', 'icd_code', 'hospitalizations', 'asr']].copy()
+    female.columns = ['year', 'icd_code', 'hosp_female', 'asr_female']
+    
+    total = total_agg[['year', 'icd_code', 'hospitalizations', 'asr']].copy()
+    total.columns = ['year', 'icd_code', 'hosp_total', 'asr_total']
+    
+    result = male.merge(female, on=['year', 'icd_code'], how='outer')
+    result = result.merge(total, on=['year', 'icd_code'], how='outer')
+    result['description'] = result['icd_code'].map(ALL_NEURODEV_CODES)
+    
+    cols = ['year', 'icd_code', 'description', 'hosp_male', 'hosp_female', 'hosp_total',
+            'asr_male', 'asr_female', 'asr_total']
+    result = result[cols]
+    result.sort_values(['year', 'icd_code'], inplace=True)
+    result.reset_index(drop=True, inplace=True)
+    
+    return result
+
+
+def save_figure(fig, filename):
+    filepath = os.path.join(figures_path, filename)
+    fig.savefig(filepath, dpi=150, bbox_inches='tight', facecolor='white')
+```
+
+```{python}
+#| label: load-data
+#| include: false
+
+hospitalizations = load_and_filter_neurodev_data(years=YEARS, chunksize=100000)
+population_detail = load_population_data(years=YEARS)
+population = population_detail.groupby(['year', 'age_group', 'sex'])['population'].sum().reset_index()
+
+if 'region' in population_detail.columns:
+    population_regional = population_detail.groupby(['region', 'year', 'age_group', 'sex'])['population'].sum().reset_index()
+else:
+    population_regional = None
+
+hospitalizations.to_csv(os.path.join(output_path, 'hospitalizations_neurodev.csv'), index=False)
+population.to_csv(os.path.join(output_path, 'population_chile.csv'), index=False)
+if population_regional is not None:
+    population_regional.to_csv(os.path.join(output_path, 'population_chile_by_region.csv'), index=False)
+
+asr_by_sex = calculate_asr_by_sex(hospitalizations, population)
+asr_sex_cols = calculate_asr_sex_columns(hospitalizations, population)
+asr_by_icd = calculate_asr_by_icd(hospitalizations, population)
+
+asr_by_sex.to_csv(os.path.join(output_path, 'asr_by_sex.csv'), index=False)
+asr_sex_cols.to_csv(os.path.join(output_path, 'asr_sex_columns.csv'), index=False)
+asr_by_icd.to_csv(os.path.join(output_path, 'asr_by_icd.csv'), index=False)
+```
+
+## Age-Standardized Rates Analysis
+
+### Standardized Rates by Sex and Age
+
+```{python}
+#| label: tbl-asr-by-sex
+#| tbl-cap: "Age-standardized hospitalization rates by sex (per 100,000)"
+#| tbl-cap-location: bottom
+
+asr_by_sex.style.format({
+    'hospitalizations': '{:,.0f}',
+    'population': '{:,.0f}',
+    'crude_rate': '{:.2f}',
+    'asr': '{:.2f}'
+}).hide(axis="index")
+```
+
+```{python}
+#| label: tbl-asr-sex-columns
+#| tbl-cap: "Hospitalizations and ASR by Sex (columnar format)"
+#| tbl-cap-location: bottom
+
+display_df = asr_sex_cols.copy()
+display_df.columns = ['Year', 'Hosp. Male', 'Pop. Male', 'Crude Male', 'ASR Male',
+                      'Hosp. Female', 'Pop. Female', 'Crude Female', 'ASR Female',
+                      'Hosp. Total', 'Pop. Total', 'Crude Total', 'ASR Total']
+
+display_df.style.format({
+    'Hosp. Male': '{:,.0f}', 'Pop. Male': '{:,.0f}', 'Crude Male': '{:.2f}', 'ASR Male': '{:.2f}',
+    'Hosp. Female': '{:,.0f}', 'Pop. Female': '{:,.0f}', 'Crude Female': '{:.2f}', 'ASR Female': '{:.2f}',
+    'Hosp. Total': '{:,.0f}', 'Pop. Total': '{:,.0f}', 'Crude Total': '{:.2f}', 'ASR Total': '{:.2f}'
+}).hide(axis="index")
+```
+
+### ASR Time Series
+
+```{python}
+#| label: fig-asr-time-series
+#| fig-cap: "Age-Standardized Hospitalization Rates Over Time"
+#| fig-width: 14
+#| fig-height: 6
+
+fig, axes = plt.subplots(1, 2, figsize=(14, 6))
+
+# Left plot: By sex
+ax1 = axes[0]
+for sex, color in [('Male', 'steelblue'), ('Female', 'coral')]:
+    data = asr_by_sex[asr_by_sex['sex'] == sex]
+    ax1.plot(data['year'], data['asr'], marker='o', linewidth=2, label=sex, color=color)
+ax1.set_xlabel('Year')
+ax1.set_ylabel('ASR (per 100,000)')
+ax1.set_title('ASR by Sex', fontweight='bold')
+ax1.legend()
+ax1.grid(True, alpha=0.3)
+
+# Right plot: Total
+ax2 = axes[1]
+ax2.plot(asr_sex_cols['year'], asr_sex_cols['asr_total'], marker='s', linewidth=2, color='darkgreen')
+ax2.fill_between(asr_sex_cols['year'], asr_sex_cols['asr_total'], alpha=0.3, color='green')
+ax2.set_xlabel('Year')
+ax2.set_ylabel('ASR (per 100,000)')
+ax2.set_title('Total ASR Trend', fontweight='bold')
+ax2.grid(True, alpha=0.3)
+
+plt.suptitle('Neurodevelopmental Disorders - Age-Standardized Hospitalization Rates (2019-2024)', 
+             fontsize=14, fontweight='bold', y=1.02)
+plt.tight_layout()
+save_figure(fig, 'asr_time_series_neurodev.png')
+plt.show()
+```
+
+### ASR by ICD-10 Code
+
+```{python}
+#| label: tbl-asr-by-icd
+#| tbl-cap: "Age-standardized rates by ICD-10 code and sex"
+#| tbl-cap-location: bottom
+
+# Summary by ICD code across all years
+icd_summary = asr_by_icd.groupby(['icd_code', 'description']).agg({
+    'hosp_male': 'sum',
+    'hosp_female': 'sum',
+    'hosp_total': 'sum',
+    'asr_male': 'mean',
+    'asr_female': 'mean',
+    'asr_total': 'mean'
+}).reset_index()
+
+icd_summary.columns = ['ICD Code', 'Description', 'Hosp. Male', 'Hosp. Female', 'Hosp. Total',
+                       'Mean ASR Male', 'Mean ASR Female', 'Mean ASR Total']
+
+icd_summary = icd_summary.sort_values('Hosp. Total', ascending=False)
+
+display(icd_summary.style.format({
+    'Hosp. Male': '{:,.0f}',
+    'Hosp. Female': '{:,.0f}',
+    'Hosp. Total': '{:,.0f}',
+    'Mean ASR Male': '{:.2f}',
+    'Mean ASR Female': '{:.2f}',
+    'Mean ASR Total': '{:.2f}'
+}).hide(axis="index"))
+```
+
+```{python}
+#| label: fig-icd-distribution
+#| fig-cap: "Hospitalization Distribution by Neurodevelopmental Disorder Type"
+#| fig-width: 14
+#| fig-height: 8
+
+# Group by main categories
+def categorize_icd(code):
+    if code.startswith('F84'):
+        return 'ASD (F84)'
+    elif code.startswith('F90'):
+        return 'ADHD (F90)'
+    elif code.startswith('F80'):
+        return 'Speech/Language (F80)'
+    elif code.startswith('F81'):
+        return 'Scholastic (F81)'
+    else:
+        return 'Other (F82-F89)'
+
+hosp_by_category = hospitalizations.copy()
+hosp_by_category['category'] = hosp_by_category['icd_code'].apply(categorize_icd)
+category_totals = hosp_by_category.groupby('category')['hospitalizations'].sum().sort_values(ascending=False)
+
+fig, axes = plt.subplots(1, 2, figsize=(14, 6))
+
+# Pie chart
+ax1 = axes[0]
+colors = plt.cm.Set2(np.linspace(0, 1, len(category_totals)))
+wedges, texts, autotexts = ax1.pie(category_totals.values, labels=category_totals.index, 
+                                    autopct='%1.1f%%', colors=colors, startangle=90)
+ax1.set_title('Distribution by Disorder Category', fontweight='bold', fontsize=12)
+
+# Bar chart by year
+ax2 = axes[1]
+yearly_category = hosp_by_category.groupby(['year', 'category'])['hospitalizations'].sum().unstack(fill_value=0)
+yearly_category.plot(kind='bar', ax=ax2, colormap='Set2', width=0.8)
+ax2.set_xlabel('Year')
+ax2.set_ylabel('Hospitalizations')
+ax2.set_title('Hospitalizations by Category and Year', fontweight='bold', fontsize=12)
+ax2.legend(title='Category', bbox_to_anchor=(1.02, 1), loc='upper left')
+ax2.tick_params(axis='x', rotation=0)
+ax2.grid(True, alpha=0.3, axis='y')
+
+plt.suptitle('Neurodevelopmental Disorders - Distribution Analysis', fontsize=14, fontweight='bold', y=1.02)
+plt.tight_layout()
+save_figure(fig, 'neurodev_distribution.png')
+plt.show()
+```
+
+\newpage
+
+## Sex Ratio Analysis
+
+```{python}
+#| label: fig-sex-ratio
+#| fig-cap: "Male to Female Ratio in Neurodevelopmental Disorders"
+#| fig-width: 14
+#| fig-height: 6
+
+# Calculate sex ratio
+sex_ratio = asr_sex_cols.copy()
+sex_ratio['sex_ratio'] = sex_ratio['hosp_male'] / sex_ratio['hosp_female'].replace(0, np.nan)
+
+fig, axes = plt.subplots(1, 2, figsize=(14, 6))
+
+# Overall sex ratio over time
+ax1 = axes[0]
+ax1.bar(sex_ratio['year'], sex_ratio['sex_ratio'], color='purple', alpha=0.7)
+ax1.axhline(y=1, color='red', linestyle='--', linewidth=2, label='Equal ratio')
+ax1.set_xlabel('Year')
+ax1.set_ylabel('Male:Female Ratio')
+ax1.set_title('Sex Ratio Over Time (All Disorders)', fontweight='bold')
+ax1.legend()
+ax1.grid(True, alpha=0.3, axis='y')
+
+# Sex ratio by disorder category
+ax2 = axes[1]
+sex_by_category = hosp_by_category.groupby(['category', 'sex'])['hospitalizations'].sum().unstack(fill_value=0)
+sex_by_category['ratio'] = sex_by_category['Male'] / sex_by_category['Female'].replace(0, np.nan)
+sex_by_category = sex_by_category.sort_values('ratio', ascending=True)
+
+colors = ['coral' if r < 1 else 'steelblue' for r in sex_by_category['ratio']]
+ax2.barh(sex_by_category.index, sex_by_category['ratio'], color=colors)
+ax2.axvline(x=1, color='red', linestyle='--', linewidth=2)
+ax2.set_xlabel('Male:Female Ratio')
+ax2.set_title('Sex Ratio by Disorder Category', fontweight='bold')
+ax2.grid(True, alpha=0.3, axis='x')
+
+plt.suptitle('Sex Differences in Neurodevelopmental Disorders', fontsize=14, fontweight='bold', y=1.02)
+plt.tight_layout()
+save_figure(fig, 'sex_ratio_neurodev.png')
+plt.show()
+```
+
+```{python}
+#| label: tbl-sex-ratio
+#| tbl-cap: "Sex Ratio Summary by Disorder Category"
+#| tbl-cap-location: bottom
+
+sex_summary = sex_by_category[['Male', 'Female', 'ratio']].copy()
+sex_summary.columns = ['Male Hospitalizations', 'Female Hospitalizations', 'M:F Ratio']
+sex_summary = sex_summary.sort_values('M:F Ratio', ascending=False)
+
+display(sex_summary.style.format({
+    'Male Hospitalizations': '{:,.0f}',
+    'Female Hospitalizations': '{:,.0f}',
+    'M:F Ratio': '{:.2f}'
+}))
+```
+
+\newpage
+
+## Age Distribution Analysis
+
+```{python}
+#| label: fig-age-distribution
+#| fig-cap: "Age Distribution of Neurodevelopmental Disorder Hospitalizations"
+#| fig-width: 16
+#| fig-height: 10
+
+fig, axes = plt.subplots(2, 2, figsize=(16, 10))
+
+# Age group distribution - all disorders
+ax1 = axes[0, 0]
+age_dist = hospitalizations.groupby('age_group')['hospitalizations'].sum()
+age_order = ['0-4', '5-9', '10-14', '15-19', '20-24', '25-29', '30-34', '35-39', 
+             '40-44', '45-49', '50-54', '55-59', '60-64', '65-69', '70-74', '75-79', '80+']
+age_dist = age_dist.reindex([a for a in age_order if a in age_dist.index])
+
+ax1.bar(age_dist.index, age_dist.values, color='teal', alpha=0.7)
+ax1.set_xlabel('Age Group')
+ax1.set_ylabel('Hospitalizations')
+ax1.set_title('Overall Age Distribution', fontweight='bold')
+ax1.tick_params(axis='x', rotation=45)
+ax1.grid(True, alpha=0.3, axis='y')
+
+# Age by sex
+ax2 = axes[0, 1]
+age_sex = hospitalizations.groupby(['age_group', 'sex'])['hospitalizations'].sum().unstack(fill_value=0)
+age_sex = age_sex.reindex([a for a in age_order if a in age_sex.index])
+age_sex.plot(kind='bar', ax=ax2, color=['steelblue', 'coral'], width=0.8)
+ax2.set_xlabel('Age Group')
+ax2.set_ylabel('Hospitalizations')
+ax2.set_title('Age Distribution by Sex', fontweight='bold')
+ax2.tick_params(axis='x', rotation=45)
+ax2.legend(title='Sex')
+ax2.grid(True, alpha=0.3, axis='y')
+
+# Age distribution by category
+ax3 = axes[1, 0]
+age_category = hosp_by_category.groupby(['age_group', 'category'])['hospitalizations'].sum().unstack(fill_value=0)
+age_category = age_category.reindex([a for a in age_order if a in age_category.index])
+age_category.plot(kind='bar', ax=ax3, colormap='Set2', width=0.8, stacked=True)
+ax3.set_xlabel('Age Group')
+ax3.set_ylabel('Hospitalizations')
+ax3.set_title('Age Distribution by Disorder Category', fontweight='bold')
+ax3.tick_params(axis='x', rotation=45)
+ax3.legend(title='Category', bbox_to_anchor=(1.02, 1), loc='upper left')
+ax3.grid(True, alpha=0.3, axis='y')
+
+# Pediatric focus (0-17)
+ax4 = axes[1, 1]
+pediatric_groups = ['0-4', '5-9', '10-14', '15-19']
+pediatric_data = hosp_by_category[hosp_by_category['age_group'].isin(pediatric_groups)]
+ped_by_cat = pediatric_data.groupby('category')['hospitalizations'].sum().sort_values(ascending=True)
+
+colors = plt.cm.Set2(np.linspace(0, 1, len(ped_by_cat)))
+ax4.barh(ped_by_cat.index, ped_by_cat.values, color=colors)
+ax4.set_xlabel('Hospitalizations')
+ax4.set_title('Pediatric Population (0-19 years) by Category', fontweight='bold')
+ax4.grid(True, alpha=0.3, axis='x')
+
+plt.suptitle('Age Patterns in Neurodevelopmental Disorders', fontsize=14, fontweight='bold', y=1.02)
+plt.tight_layout()
+save_figure(fig, 'age_distribution_neurodev.png')
+plt.show()
+```
+
+```{python}
+#| label: tbl-age-summary
+#| tbl-cap: "Hospitalization Summary by Age Group"
+#| tbl-cap-location: bottom
+
+age_summary = hospitalizations.groupby('age_group').agg({
+    'hospitalizations': 'sum'
+}).reset_index()
+
+# Add percentage
+total_hosp = age_summary['hospitalizations'].sum()
+age_summary['percentage'] = (age_summary['hospitalizations'] / total_hosp * 100).round(2)
+
+# Reorder
+age_summary['age_order'] = age_summary['age_group'].apply(lambda x: age_order.index(x) if x in age_order else 99)
+age_summary = age_summary.sort_values('age_order').drop(columns='age_order')
+
+age_summary.columns = ['Age Group', 'Hospitalizations', 'Percentage (%)']
+
+display(age_summary.style.format({
+    'Hospitalizations': '{:,.0f}',
+    'Percentage (%)': '{:.2f}'
+}).hide(axis="index"))
+```
+
+\newpage
+
+## Detailed Analysis by Disorder Type
+
+### Autism Spectrum Disorders (F84)
+
+```{python}
+#| label: fig-asd-analysis
+#| fig-cap: "Autism Spectrum Disorders (F84) - Detailed Analysis"
+#| fig-width: 16
+#| fig-height: 10
+
+asd_data = hospitalizations[hospitalizations['icd_code'].str.startswith('F84')]
+
+if len(asd_data) > 0:
+    fig, axes = plt.subplots(2, 2, figsize=(16, 10))
+    
+    # Trend over time
+    ax1 = axes[0, 0]
+    asd_yearly = asd_data.groupby('year')['hospitalizations'].sum()
+    ax1.plot(asd_yearly.index, asd_yearly.values, marker='o', linewidth=2, color='darkred')
+    ax1.fill_between(asd_yearly.index, asd_yearly.values, alpha=0.3, color='red')
+    ax1.set_xlabel('Year')
+    ax1.set_ylabel('Hospitalizations')
+    ax1.set_title('ASD Hospitalizations Over Time', fontweight='bold')
+    ax1.grid(True, alpha=0.3)
+    
+    # By specific diagnosis
+    ax2 = axes[0, 1]
+    asd_by_code = asd_data.groupby('icd_code')['hospitalizations'].sum().sort_values(ascending=True)
+    asd_labels = [ALL_NEURODEV_CODES.get(c, c)[:30] for c in asd_by_code.index]
+    colors = plt.cm.Reds(np.linspace(0.3, 0.9, len(asd_by_code)))
+    ax2.barh(asd_labels, asd_by_code.values, color=colors)
+    ax2.set_xlabel('Hospitalizations')
+    ax2.set_title('ASD by Specific Diagnosis', fontweight='bold')
+    ax2.grid(True, alpha=0.3, axis='x')
+    
+    # By sex
+    ax3 = axes[1, 0]
+    asd_sex = asd_data.groupby('sex')['hospitalizations'].sum()
+    colors_sex = ['steelblue', 'coral']
+    ax3.pie(asd_sex.values, labels=asd_sex.index, autopct='%1.1f%%', colors=colors_sex, startangle=90)
+    ax3.set_title('ASD by Sex', fontweight='bold')
+    
+    # By age
+    ax4 = axes[1, 1]
+    asd_age = asd_data.groupby('age_group')['hospitalizations'].sum()
+    asd_age = asd_age.reindex([a for a in age_order if a in asd_age.index])
+    ax4.bar(asd_age.index, asd_age.values, color='darkred', alpha=0.7)
+    ax4.set_xlabel('Age Group')
+    ax4.set_ylabel('Hospitalizations')
+    ax4.set_title('ASD by Age Group', fontweight='bold')
+    ax4.tick_params(axis='x', rotation=45)
+    ax4.grid(True, alpha=0.3, axis='y')
+    
+    plt.suptitle('Autism Spectrum Disorders (F84) - Comprehensive Analysis', fontsize=14, fontweight='bold', y=1.02)
+    plt.tight_layout()
+    save_figure(fig, 'asd_detailed_analysis.png')
+    plt.show()
+else:
+    print("No ASD data available for analysis.")
+```
+
+### ADHD (F90)
+
+```{python}
+#| label: fig-adhd-analysis
+#| fig-cap: "ADHD (F90) - Detailed Analysis"
+#| fig-width: 16
+#| fig-height: 10
+
+adhd_data = hospitalizations[hospitalizations['icd_code'].str.startswith('F90')]
+
+if len(adhd_data) > 0:
+    fig, axes = plt.subplots(2, 2, figsize=(16, 10))
+    
+    # Trend over time
+    ax1 = axes[0, 0]
+    adhd_yearly = adhd_data.groupby('year')['hospitalizations'].sum()
+    ax1.plot(adhd_yearly.index, adhd_yearly.values, marker='o', linewidth=2, color='darkblue')
+    ax1.fill_between(adhd_yearly.index, adhd_yearly.values, alpha=0.3, color='blue')
+    ax1.set_xlabel('Year')
+    ax1.set_ylabel('Hospitalizations')
+    ax1.set_title('ADHD Hospitalizations Over Time', fontweight='bold')
+    ax1.grid(True, alpha=0.3)
+    
+    # By specific diagnosis
+    ax2 = axes[0, 1]
+    adhd_by_code = adhd_data.groupby('icd_code')['hospitalizations'].sum().sort_values(ascending=True)
+    adhd_labels = [ALL_NEURODEV_CODES.get(c, c)[:30] for c in adhd_by_code.index]
+    colors = plt.cm.Blues(np.linspace(0.3, 0.9, len(adhd_by_code)))
+    ax2.barh(adhd_labels, adhd_by_code.values, color=colors)
+    ax2.set_xlabel('Hospitalizations')
+    ax2.set_title('ADHD by Specific Diagnosis', fontweight='bold')
+    ax2.grid(True, alpha=0.3, axis='x')
+    
+    # By sex
+    ax3 = axes[1, 0]
+    adhd_sex = adhd_data.groupby('sex')['hospitalizations'].sum()
+    colors_sex = ['steelblue', 'coral']
+    ax3.pie(adhd_sex.values, labels=adhd_sex.index, autopct='%1.1f%%', colors=colors_sex, startangle=90)
+    ax3.set_title('ADHD by Sex', fontweight='bold')
+    
+    # By age
+    ax4 = axes[1, 1]
+    adhd_age = adhd_data.groupby('age_group')['hospitalizations'].sum()
+    adhd_age = adhd_age.reindex([a for a in age_order if a in adhd_age.index])
+    ax4.bar(adhd_age.index, adhd_age.values, color='darkblue', alpha=0.7)
+    ax4.set_xlabel('Age Group')
+    ax4.set_ylabel('Hospitalizations')
+    ax4.set_title('ADHD by Age Group', fontweight='bold')
+    ax4.tick_params(axis='x', rotation=45)
+    ax4.grid(True, alpha=0.3, axis='y')
+    
+    plt.suptitle('Attention Deficit Hyperactivity Disorder (F90) - Comprehensive Analysis', fontsize=14, fontweight='bold', y=1.02)
+    plt.tight_layout()
+    save_figure(fig, 'adhd_detailed_analysis.png')
+    plt.show()
+else:
+    print("No ADHD data available for analysis.")
+```
+
+\newpage
+
+## ICD-10 Code Reference
+
+```{python}
+#| label: tbl-icd-reference
+#| tbl-cap: "ICD-10 Codes for Neurodevelopmental Disorders"
+#| tbl-cap-location: bottom
+
+icd_ref = pd.DataFrame([
+    {'ICD Code': k, 'Description': v} for k, v in ALL_NEURODEV_CODES.items()
+])
+
+# Add category
+def get_category(code):
+    if code.startswith('F84'):
+        return 'Autism Spectrum Disorders'
+    elif code.startswith('F90'):
+        return 'ADHD/Hyperkinetic Disorders'
+    elif code.startswith('F80'):
+        return 'Speech/Language Disorders'
+    elif code.startswith('F81'):
+        return 'Scholastic Skills Disorders'
+    elif code in ['F82', 'F83']:
+        return 'Motor/Mixed Disorders'
+    else:
+        return 'Other Developmental Disorders'
+
+icd_ref['Category'] = icd_ref['ICD Code'].apply(get_category)
+icd_ref = icd_ref[['Category', 'ICD Code', 'Description']]
+icd_ref = icd_ref.sort_values(['Category', 'ICD Code'])
+
+display(icd_ref.style.hide(axis="index"))
+```
+
+\newpage
+
+## Summary Statistics
+
+```{python}
+#| label: tbl-summary-stats
+#| tbl-cap: "Overall Summary Statistics"
+#| tbl-cap-location: bottom
+
+total_hosp = hospitalizations['hospitalizations'].sum()
+total_years = len(hospitalizations['year'].unique())
+unique_codes = hospitalizations['icd_code'].nunique()
+
+# Calculate male/female totals
+sex_totals = hospitalizations.groupby('sex')['hospitalizations'].sum()
+male_total = sex_totals.get('Male', 0)
+female_total = sex_totals.get('Female', 0)
+
+# Most common diagnosis
+most_common = hospitalizations.groupby('icd_code')['hospitalizations'].sum().idxmax()
+most_common_desc = ALL_NEURODEV_CODES.get(most_common, most_common)
+
+summary_stats = pd.DataFrame({
+    'Metric': [
+        'Total Hospitalizations',
+        'Years Analyzed',
+        'Unique ICD-10 Codes',
+        'Male Hospitalizations',
+        'Female Hospitalizations',
+        'Male:Female Ratio',
+        'Most Common Diagnosis',
+        'Average Annual Hospitalizations'
+    ],
+    'Value': [
+        f'{total_hosp:,.0f}',
+        total_years,
+        unique_codes,
+        f'{male_total:,.0f}',
+        f'{female_total:,.0f}',
+        f'{male_total/female_total:.2f}' if female_total > 0 else 'N/A',
+        f'{most_common} - {most_common_desc}',
+        f'{total_hosp/total_years:,.0f}'
+    ]
+})
+
+display(summary_stats.style.hide(axis="index"))
+```
+
+```{python}
+#| label: fig-summary-dashboard
+#| fig-cap: "Neurodevelopmental Disorders - Summary Dashboard"
+#| fig-width: 16
+#| fig-height: 12
+
+fig, axes = plt.subplots(2, 3, figsize=(16, 12))
+
+# 1. Total trend
+ax1 = axes[0, 0]
+yearly_total = hospitalizations.groupby('year')['hospitalizations'].sum()
+ax1.plot(yearly_total.index, yearly_total.values, marker='o', linewidth=3, color='darkgreen')
+ax1.fill_between(yearly_total.index, yearly_total.values, alpha=0.3, color='green')
+ax1.set_xlabel('Year')
+ax1.set_ylabel('Hospitalizations')
+ax1.set_title('Total Hospitalizations Trend', fontweight='bold')
+ax1.grid(True, alpha=0.3)
+
+# 2. By category pie
+ax2 = axes[0, 1]
+cat_totals = hosp_by_category.groupby('category')['hospitalizations'].sum()
+colors = plt.cm.Set2(np.linspace(0, 1, len(cat_totals)))
+ax2.pie(cat_totals.values, labels=cat_totals.index, autopct='%1.1f%%', colors=colors)
+ax2.set_title('Distribution by Category', fontweight='bold')
+
+# 3. Sex distribution
+ax3 = axes[0, 2]
+sex_totals = hospitalizations.groupby('sex')['hospitalizations'].sum()
+ax3.bar(sex_totals.index, sex_totals.values, color=['steelblue', 'coral'])
+ax3.set_ylabel('Hospitalizations')
+ax3.set_title('Hospitalizations by Sex', fontweight='bold')
+ax3.grid(True, alpha=0.3, axis='y')
+
+# 4. Age distribution
+ax4 = axes[1, 0]
+age_dist = hospitalizations.groupby('age_group')['hospitalizations'].sum()
+age_dist = age_dist.reindex([a for a in age_order if a in age_dist.index])
+ax4.bar(age_dist.index, age_dist.values, color='teal', alpha=0.7)
+ax4.set_xlabel('Age Group')
+ax4.set_ylabel('Hospitalizations')
+ax4.set_title('Age Distribution', fontweight='bold')
+ax4.tick_params(axis='x', rotation=45)
+ax4.grid(True, alpha=0.3, axis='y')
+
+# 5. Top 10 diagnoses
+ax5 = axes[1, 1]
+top_diag = hospitalizations.groupby('icd_code')['hospitalizations'].sum().nlargest(10)
+top_labels = [ALL_NEURODEV_CODES.get(c, c)[:25] for c in top_diag.index]
+ax5.barh(top_labels, top_diag.values, color=plt.cm.viridis(np.linspace(0.2, 0.8, 10)))
+ax5.set_xlabel('Hospitalizations')
+ax5.set_title('Top 10 Diagnoses', fontweight='bold')
+ax5.grid(True, alpha=0.3, axis='x')
+
+# 6. ASR comparison Male vs Female
+ax6 = axes[1, 2]
+width = 0.35
+x = np.arange(len(asr_sex_cols))
+ax6.bar(x - width/2, asr_sex_cols['asr_male'], width, label='Male', color='steelblue')
+ax6.bar(x + width/2, asr_sex_cols['asr_female'], width, label='Female', color='coral')
+ax6.set_xlabel('Year')
+ax6.set_ylabel('ASR (per 100,000)')
+ax6.set_title('ASR Comparison by Sex', fontweight='bold')
+ax6.set_xticks(x)
+ax6.set_xticklabels(asr_sex_cols['year'])
+ax6.legend()
+ax6.grid(True, alpha=0.3, axis='y')
+
+plt.suptitle('Neurodevelopmental Disorders in Chile - Summary Dashboard (2019-2024)', 
+             fontsize=16, fontweight='bold', y=1.02)
+plt.tight_layout()
+save_figure(fig, 'neurodev_summary_dashboard.png')
+plt.show()
+```
+

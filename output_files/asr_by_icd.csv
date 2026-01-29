@@ -1,0 +1,109 @@
+year,icd_code,description,hosp_male,hosp_female,hosp_total,asr_male,asr_female,asr_total
+2019,F80,Specific developmental disorders of speech and language,528,279.0,807,6.9,3.66,5.29
+2019,F81,Specific developmental disorders of scholastic skills,78,46.0,124,1.03,0.62,0.83
+2019,F82,Specific developmental disorder of motor function,280,192.0,472,3.87,2.74,3.31
+2019,F83,Mixed specific developmental disorders,194,164.0,358,2.72,2.36,2.55
+2019,F84.0,Childhood autism,1095,304.0,1399,14.63,4.2,9.5
+2019,F84.1,Atypical autism,72,29.0,101,0.86,0.37,0.62
+2019,F84.2,Rett syndrome,2,53.0,55,0.03,0.72,0.37
+2019,F84.3,Other childhood disintegrative disorder,4,1.0,5,0.06,0.01,0.04
+2019,F84.4,Overactive disorder with mental retardation and stereotyped movements,7,2.0,9,0.09,0.03,0.06
+2019,F84.5,Asperger syndrome,343,66.0,409,4.42,0.86,2.67
+2019,F84.8,Other pervasive developmental disorders,129,60.0,189,1.76,0.87,1.32
+2019,F84.9,"Pervasive developmental disorder, unspecified",169,90.0,259,2.31,1.3,1.81
+2019,F88,Other disorders of psychological development,8,11.0,19,0.1,0.15,0.12
+2019,F89,Unspecified disorder of psychological development,57,64.0,121,0.75,0.89,0.82
+2019,F90.0,Disturbance of activity and attention,865,261.0,1126,11.63,3.61,7.7
+2019,F90.1,Hyperkinetic conduct disorder,43,10.0,53,0.57,0.14,0.36
+2019,F90.8,Other hyperkinetic disorders,6,2.0,8,0.08,0.03,0.05
+2019,F90.9,"Hyperkinetic disorder, unspecified",68,17.0,85,0.92,0.24,0.58
+2020,F80,Specific developmental disorders of speech and language,379,185.0,564,4.93,2.38,3.67
+2020,F81,Specific developmental disorders of scholastic skills,46,47.0,93,0.59,0.63,0.61
+2020,F82,Specific developmental disorder of motor function,169,131.0,300,2.36,1.91,2.14
+2020,F83,Mixed specific developmental disorders,96,62.0,158,1.34,0.9,1.13
+2020,F84.0,Childhood autism,833,251.0,1084,11.04,3.41,7.29
+2020,F84.1,Atypical autism,45,18.0,63,0.54,0.23,0.39
+2020,F84.2,Rett syndrome,2,25.0,27,0.03,0.34,0.18
+2020,F84.3,Other childhood disintegrative disorder,4,,4,0.06,,0.03
+2020,F84.4,Overactive disorder with mental retardation and stereotyped movements,4,4.0,8,0.05,0.06,0.05
+2020,F84.5,Asperger syndrome,165,49.0,214,2.12,0.63,1.39
+2020,F84.8,Other pervasive developmental disorders,57,38.0,95,0.76,0.53,0.65
+2020,F84.9,"Pervasive developmental disorder, unspecified",114,51.0,165,1.53,0.74,1.14
+2020,F88,Other disorders of psychological development,6,6.0,12,0.08,0.08,0.08
+2020,F89,Unspecified disorder of psychological development,28,40.0,68,0.37,0.52,0.44
+2020,F90.0,Disturbance of activity and attention,512,171.0,683,6.78,2.34,4.6
+2020,F90.1,Hyperkinetic conduct disorder,21,4.0,25,0.28,0.06,0.17
+2020,F90.8,Other hyperkinetic disorders,6,4.0,10,0.08,0.05,0.07
+2020,F90.9,"Hyperkinetic disorder, unspecified",36,12.0,48,0.48,0.17,0.33
+2021,F80,Specific developmental disorders of speech and language,493,238.0,731,6.58,3.15,4.89
+2021,F81,Specific developmental disorders of scholastic skills,55,59.0,114,0.71,0.79,0.75
+2021,F82,Specific developmental disorder of motor function,169,122.0,291,2.36,1.77,2.07
+2021,F83,Mixed specific developmental disorders,182,146.0,328,2.53,2.13,2.33
+2021,F84.0,Childhood autism,1422,425.0,1847,18.75,5.85,12.41
+2021,F84.1,Atypical autism,53,23.0,76,0.66,0.29,0.48
+2021,F84.2,Rett syndrome,2,34.0,36,0.03,0.46,0.24
+2021,F84.3,Other childhood disintegrative disorder,2,2.0,4,0.03,0.03,0.03
+2021,F84.4,Overactive disorder with mental retardation and stereotyped movements,7,3.0,10,0.09,0.04,0.07
+2021,F84.5,Asperger syndrome,182,54.0,236,2.29,0.68,1.5
+2021,F84.8,Other pervasive developmental disorders,62,22.0,84,0.79,0.29,0.54
+2021,F84.9,"Pervasive developmental disorder, unspecified",97,36.0,133,1.28,0.5,0.9
+2021,F88,Other disorders of psychological development,11,13.0,24,0.13,0.17,0.15
+2021,F89,Unspecified disorder of psychological development,33,52.0,85,0.43,0.7,0.56
+2021,F90.0,Disturbance of activity and attention,493,242.0,735,6.47,3.29,4.91
+2021,F90.1,Hyperkinetic conduct disorder,19,6.0,25,0.25,0.08,0.17
+2021,F90.8,Other hyperkinetic disorders,2,2.0,4,0.03,0.03,0.03
+2021,F90.9,"Hyperkinetic disorder, unspecified",33,15.0,48,0.45,0.2,0.33
+2022,F80,Specific developmental disorders of speech and language,690,280.0,970,9.36,3.76,6.61
+2022,F81,Specific developmental disorders of scholastic skills,59,48.0,107,0.76,0.64,0.7
+2022,F82,Specific developmental disorder of motor function,221,165.0,386,3.12,2.4,2.77
+2022,F83,Mixed specific developmental disorders,405,245.0,650,5.7,3.59,4.66
+2022,F84.0,Childhood autism,2302,759.0,3061,30.88,10.51,20.88
+2022,F84.1,Atypical autism,81,30.0,111,0.97,0.38,0.68
+2022,F84.2,Rett syndrome,1,56.0,57,0.01,0.77,0.39
+2022,F84.3,Other childhood disintegrative disorder,3,2.0,5,0.04,0.03,0.03
+2022,F84.4,Overactive disorder with mental retardation and stereotyped movements,6,1.0,7,0.08,0.01,0.05
+2022,F84.5,Asperger syndrome,174,36.0,210,2.18,0.46,1.34
+2022,F84.8,Other pervasive developmental disorders,85,49.0,134,1.07,0.64,0.86
+2022,F84.9,"Pervasive developmental disorder, unspecified",257,106.0,363,3.46,1.43,2.46
+2022,F88,Other disorders of psychological development,9,20.0,29,0.12,0.27,0.2
+2022,F89,Unspecified disorder of psychological development,36,74.0,110,0.48,1.01,0.74
+2022,F90.0,Disturbance of activity and attention,593,313.0,906,7.82,4.25,6.06
+2022,F90.1,Hyperkinetic conduct disorder,25,12.0,37,0.34,0.16,0.25
+2022,F90.8,Other hyperkinetic disorders,7,,7,0.09,,0.05
+2022,F90.9,"Hyperkinetic disorder, unspecified",41,20.0,61,0.54,0.28,0.41
+2023,F80,Specific developmental disorders of speech and language,778,369.0,1147,10.54,4.96,7.8
+2023,F81,Specific developmental disorders of scholastic skills,92,79.0,171,1.2,1.08,1.14
+2023,F82,Specific developmental disorder of motor function,237,152.0,389,3.35,2.23,2.8
+2023,F83,Mixed specific developmental disorders,469,356.0,825,6.63,5.22,5.94
+2023,F84.0,Childhood autism,3780,1543.0,5323,50.98,21.24,36.38
+2023,F84.1,Atypical autism,144,74.0,218,1.8,0.92,1.37
+2023,F84.2,Rett syndrome,2,56.0,58,0.03,0.76,0.39
+2023,F84.3,Other childhood disintegrative disorder,3,2.0,5,0.04,0.03,0.04
+2023,F84.4,Overactive disorder with mental retardation and stereotyped movements,10,4.0,14,0.13,0.05,0.09
+2023,F84.5,Asperger syndrome,117,44.0,161,1.43,0.54,0.99
+2023,F84.8,Other pervasive developmental disorders,122,95.0,217,1.59,1.25,1.42
+2023,F84.9,"Pervasive developmental disorder, unspecified",356,172.0,528,4.81,2.34,3.59
+2023,F88,Other disorders of psychological development,7,23.0,30,0.09,0.31,0.2
+2023,F89,Unspecified disorder of psychological development,51,71.0,122,0.66,0.98,0.81
+2023,F90.0,Disturbance of activity and attention,1074,516.0,1590,14.12,6.94,10.59
+2023,F90.1,Hyperkinetic conduct disorder,47,10.0,57,0.62,0.14,0.38
+2023,F90.8,Other hyperkinetic disorders,12,8.0,20,0.15,0.1,0.13
+2023,F90.9,"Hyperkinetic disorder, unspecified",96,47.0,143,1.28,0.65,0.97
+2024,F80,Specific developmental disorders of speech and language,920,438.0,1358,12.46,5.93,9.25
+2024,F81,Specific developmental disorders of scholastic skills,89,122.0,211,1.16,1.62,1.39
+2024,F82,Specific developmental disorder of motor function,261,186.0,447,3.68,2.71,3.21
+2024,F83,Mixed specific developmental disorders,665,463.0,1128,9.45,6.81,8.16
+2024,F84.0,Childhood autism,4911,2316.0,7227,66.36,31.53,49.27
+2024,F84.1,Atypical autism,188,147.0,335,2.3,1.83,2.07
+2024,F84.2,Rett syndrome,12,82.0,94,0.17,1.11,0.63
+2024,F84.3,Other childhood disintegrative disorder,3,,3,0.04,,0.02
+2024,F84.4,Overactive disorder with mental retardation and stereotyped movements,6,9.0,15,0.08,0.12,0.1
+2024,F84.5,Asperger syndrome,98,41.0,139,1.23,0.51,0.88
+2024,F84.8,Other pervasive developmental disorders,201,142.0,343,2.63,1.8,2.22
+2024,F84.9,"Pervasive developmental disorder, unspecified",470,247.0,717,6.34,3.35,4.87
+2024,F88,Other disorders of psychological development,10,27.0,37,0.14,0.37,0.25
+2024,F89,Unspecified disorder of psychological development,55,64.0,119,0.73,0.86,0.8
+2024,F90.0,Disturbance of activity and attention,1745,993.0,2738,23.12,13.3,18.3
+2024,F90.1,Hyperkinetic conduct disorder,58,34.0,92,0.75,0.46,0.61
+2024,F90.8,Other hyperkinetic disorders,12,7.0,19,0.16,0.09,0.12
+2024,F90.9,"Hyperkinetic disorder, unspecified",139,66.0,205,1.85,0.9,1.38
