@@ -32,5 +32,6 @@ execute:
 
 - [Epidemiology Hosp](https://amarusimonaguerojimenez.github.io/Autism-spectrum-disorder-Chile/Neurodevelopmental-Epidemiology-Chile1.html).
 
-- [Epidemiology Hosp Geo](https://amarusimonaguerojimenez.github.io/Autism-spectrum-disorder-Chile/Neurodevelopmental-Epidemiology-Chile2.html).
+- [Epidemiology Hosp Geo RM](https://amarusimonaguerojimenez.github.io/Autism-spectrum-disorder-Chile/Neurodevelopmental-Epidemiology-Chile2.html).
 
+- [Epidemiology Hosp Geo ALL](https://amarusimonaguerojimenez.github.io/Autism-spectrum-disorder-Chile/Neurodevelopmental-Epidemiology-Chile3.html).
