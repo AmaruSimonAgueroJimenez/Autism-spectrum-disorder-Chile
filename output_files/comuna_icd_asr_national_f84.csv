@@ -1,0 +1,870 @@
+comuna,comuna_norm,icd_code,description,hospitalizations,asr
+ALGARROBO,ALGARROBO,F84.0,Childhood autism,5,85.35
+ALGARROBO,ALGARROBO,F84.1,Atypical autism,1,19.65
+ALGARROBO,ALGARROBO,F84.5,Asperger syndrome,2,26.15
+ALGARROBO,ALGARROBO,F84.8,Other pervasive developmental disorders,1,6.98
+ALGARROBO,ALGARROBO,F84.9,"Pervasive developmental disorder, unspecified",1,19.93
+ALHUÉ,ALHUE,F84.0,Childhood autism,5,186.89
+ALTO BIOBÍO,ALTO BIOBIO,F84.0,Childhood autism,2,53.34
+ALTO BIOBÍO,ALTO BIOBIO,F84.5,Asperger syndrome,1,28.21
+ALTO BIOBÍO,ALTO BIOBIO,F84.8,Other pervasive developmental disorders,1,26.13
+ALTO BIOBÍO,ALTO BIOBIO,F84.9,"Pervasive developmental disorder, unspecified",1,24.54
+ALTO DEL CARMEN,ALTO DEL CARMEN,F84.0,Childhood autism,4,199.76
+ALTO HOSPICIO,ALTO HOSPICIO,F84.0,Childhood autism,130,182.88
+ALTO HOSPICIO,ALTO HOSPICIO,F84.1,Atypical autism,15,21.65
+ALTO HOSPICIO,ALTO HOSPICIO,F84.2,Rett syndrome,4,6.2
+ALTO HOSPICIO,ALTO HOSPICIO,F84.4,Overactive disorder with mental retardation and stereotyped movements,1,1.31
+ALTO HOSPICIO,ALTO HOSPICIO,F84.5,Asperger syndrome,18,26.48
+ALTO HOSPICIO,ALTO HOSPICIO,F84.8,Other pervasive developmental disorders,28,40.08
+ALTO HOSPICIO,ALTO HOSPICIO,F84.9,"Pervasive developmental disorder, unspecified",14,20.24
+ANDACOLLO,ANDACOLLO,F84.0,Childhood autism,10,224.48
+ANGOL,ANGOL,F84.0,Childhood autism,1,4.69
+ANTÁRTICA,ANTARTICA,F84.0,Childhood autism,1,2865.81
+ANTOFAGASTA,ANTOFAGASTA,F84.0,Childhood autism,714,413.6
+ANTOFAGASTA,ANTOFAGASTA,F84.1,Atypical autism,156,85.02
+ANTOFAGASTA,ANTOFAGASTA,F84.2,Rett syndrome,4,2.18
+ANTOFAGASTA,ANTOFAGASTA,F84.3,Other childhood disintegrative disorder,1,0.55
+ANTOFAGASTA,ANTOFAGASTA,F84.5,Asperger syndrome,28,15.98
+ANTOFAGASTA,ANTOFAGASTA,F84.8,Other pervasive developmental disorders,28,16.01
+ANTOFAGASTA,ANTOFAGASTA,F84.9,"Pervasive developmental disorder, unspecified",33,18.74
+ANTUCO,ANTUCO,F84.0,Childhood autism,2,122.72
+ANTUCO,ANTUCO,F84.5,Asperger syndrome,1,54.76
+ANTUCO,ANTUCO,F84.9,"Pervasive developmental disorder, unspecified",2,172.86
+ARAUCO,ARAUCO,F84.0,Childhood autism,1,7.09
+ARICA,ARICA,F84.0,Childhood autism,518,495.05
+ARICA,ARICA,F84.1,Atypical autism,22,18.69
+ARICA,ARICA,F84.4,Overactive disorder with mental retardation and stereotyped movements,2,1.67
+ARICA,ARICA,F84.5,Asperger syndrome,30,27.37
+ARICA,ARICA,F84.8,Other pervasive developmental disorders,4,3.53
+ARICA,ARICA,F84.9,"Pervasive developmental disorder, unspecified",22,21.32
+BUIN,BUIN,F84.0,Childhood autism,104,223.28
+BUIN,BUIN,F84.2,Rett syndrome,3,5.3
+BUIN,BUIN,F84.3,Other childhood disintegrative disorder,1,2.36
+BUIN,BUIN,F84.5,Asperger syndrome,7,14.74
+BUIN,BUIN,F84.8,Other pervasive developmental disorders,5,9.43
+BUIN,BUIN,F84.9,"Pervasive developmental disorder, unspecified",27,58.11
+BULNES,BULNES,F84.0,Childhood autism,33,406.1
+BULNES,BULNES,F84.1,Atypical autism,4,46.81
+BULNES,BULNES,F84.5,Asperger syndrome,2,23.95
+BULNES,BULNES,F84.9,"Pervasive developmental disorder, unspecified",1,11.6
+CABILDO,CABILDO,F84.0,Childhood autism,23,283.64
+CABO DE HORNOS,CABO DE HORNOS,F84.0,Childhood autism,3,317.31
+CABRERO,CABRERO,F84.0,Childhood autism,20,183.59
+CABRERO,CABRERO,F84.5,Asperger syndrome,2,15.6
+CABRERO,CABRERO,F84.8,Other pervasive developmental disorders,1,9.01
+CABRERO,CABRERO,F84.9,"Pervasive developmental disorder, unspecified",9,82.03
+CALAMA,CALAMA,F84.0,Childhood autism,372,467.74
+CALAMA,CALAMA,F84.1,Atypical autism,5,5.65
+CALAMA,CALAMA,F84.2,Rett syndrome,7,8.77
+CALAMA,CALAMA,F84.3,Other childhood disintegrative disorder,1,1.32
+CALAMA,CALAMA,F84.4,Overactive disorder with mental retardation and stereotyped movements,1,0.88
+CALAMA,CALAMA,F84.5,Asperger syndrome,11,13.04
+CALAMA,CALAMA,F84.8,Other pervasive developmental disorders,11,13.94
+CALAMA,CALAMA,F84.9,"Pervasive developmental disorder, unspecified",12,15.13
+CALDERA,CALDERA,F84.0,Childhood autism,5,59.36
+CALERA,CALERA,F84.0,Childhood autism,44,215.83
+CALERA,CALERA,F84.3,Other childhood disintegrative disorder,1,4.48
+CALERA,CALERA,F84.5,Asperger syndrome,1,4.36
+CALERA,CALERA,F84.8,Other pervasive developmental disorders,1,3.68
+CALERA,CALERA,F84.9,"Pervasive developmental disorder, unspecified",6,28.78
+CALERA DE TANGO,CALERA DE TANGO,F84.0,Childhood autism,18,155.91
+CALERA DE TANGO,CALERA DE TANGO,F84.5,Asperger syndrome,2,16.89
+CALERA DE TANGO,CALERA DE TANGO,F84.9,"Pervasive developmental disorder, unspecified",1,8.3
+CALLE LARGA,CALLE LARGA,F84.0,Childhood autism,7,101.42
+CALLE LARGA,CALLE LARGA,F84.2,Rett syndrome,1,14.12
+CALLE LARGA,CALLE LARGA,F84.5,Asperger syndrome,1,11.98
+CALLE LARGA,CALLE LARGA,F84.9,"Pervasive developmental disorder, unspecified",2,27.78
+CAMIÑA,CAMINA,F84.0,Childhood autism,1,158.49
+CARTAGENA,CARTAGENA,F84.0,Childhood autism,12,133.26
+CARTAGENA,CARTAGENA,F84.5,Asperger syndrome,3,28.6
+CARTAGENA,CARTAGENA,F84.8,Other pervasive developmental disorders,4,48.16
+CARTAGENA,CARTAGENA,F84.9,"Pervasive developmental disorder, unspecified",4,37.0
+CASABLANCA,CASABLANCA,F84.0,Childhood autism,23,197.92
+CASABLANCA,CASABLANCA,F84.1,Atypical autism,2,17.79
+CASABLANCA,CASABLANCA,F84.5,Asperger syndrome,1,9.05
+CASABLANCA,CASABLANCA,F84.8,Other pervasive developmental disorders,1,9.85
+CASABLANCA,CASABLANCA,F84.9,"Pervasive developmental disorder, unspecified",2,17.19
+CATEMU,CATEMU,F84.0,Childhood autism,3,51.02
+CATEMU,CATEMU,F84.1,Atypical autism,1,14.47
+CATEMU,CATEMU,F84.9,"Pervasive developmental disorder, unspecified",1,18.11
+CAUQUENES,CAUQUENES,F84.0,Childhood autism,26,165.02
+CAUQUENES,CAUQUENES,F84.1,Atypical autism,1,4.88
+CAUQUENES,CAUQUENES,F84.8,Other pervasive developmental disorders,1,6.55
+CERRILLOS,CERRILLOS,F84.0,Childhood autism,68,196.98
+CERRILLOS,CERRILLOS,F84.1,Atypical autism,2,4.54
+CERRILLOS,CERRILLOS,F84.2,Rett syndrome,11,31.05
+CERRILLOS,CERRILLOS,F84.5,Asperger syndrome,1,2.34
+CERRILLOS,CERRILLOS,F84.8,Other pervasive developmental disorders,9,27.14
+CERRILLOS,CERRILLOS,F84.9,"Pervasive developmental disorder, unspecified",11,33.81
+CERRO NAVIA,CERRO NAVIA,F84.0,Childhood autism,76,147.16
+CERRO NAVIA,CERRO NAVIA,F84.1,Atypical autism,1,2.03
+CERRO NAVIA,CERRO NAVIA,F84.2,Rett syndrome,10,20.07
+CERRO NAVIA,CERRO NAVIA,F84.3,Other childhood disintegrative disorder,1,2.01
+CERRO NAVIA,CERRO NAVIA,F84.4,Overactive disorder with mental retardation and stereotyped movements,1,2.1
+CERRO NAVIA,CERRO NAVIA,F84.5,Asperger syndrome,5,9.68
+CERRO NAVIA,CERRO NAVIA,F84.8,Other pervasive developmental disorders,2,3.27
+CERRO NAVIA,CERRO NAVIA,F84.9,"Pervasive developmental disorder, unspecified",3,5.18
+CHAÑARAL,CHANARAL,F84.0,Childhood autism,2,37.21
+CHAÑARAL,CHANARAL,F84.5,Asperger syndrome,1,21.91
+CHANCO,CHANCO,F84.0,Childhood autism,4,131.28
+CHIGUAYANTE,CHIGUAYANTE,F84.0,Childhood autism,1,2.96
+CHILE CHICO,CHILE CHICO,F84.0,Childhood autism,5,300.63
+CHILE CHICO,CHILE CHICO,F84.5,Asperger syndrome,1,22.27
+CHILE CHICO,CHILE CHICO,F84.9,"Pervasive developmental disorder, unspecified",2,119.83
+CHILLAN,CHILLAN,F84.0,Childhood autism,601,793.19
+CHILLAN,CHILLAN,F84.1,Atypical autism,40,50.61
+CHILLAN,CHILLAN,F84.2,Rett syndrome,7,9.73
+CHILLAN,CHILLAN,F84.5,Asperger syndrome,28,34.16
+CHILLAN,CHILLAN,F84.8,Other pervasive developmental disorders,6,8.32
+CHILLAN,CHILLAN,F84.9,"Pervasive developmental disorder, unspecified",5,6.11
+CHILLAN VIEJO,CHILLAN VIEJO,F84.0,Childhood autism,24,161.76
+CHILLAN VIEJO,CHILLAN VIEJO,F84.1,Atypical autism,3,19.57
+CHILLAN VIEJO,CHILLAN VIEJO,F84.5,Asperger syndrome,5,35.17
+CHILLAN VIEJO,CHILLAN VIEJO,F84.8,Other pervasive developmental disorders,1,6.48
+CHILLAN VIEJO,CHILLAN VIEJO,F84.9,"Pervasive developmental disorder, unspecified",2,13.14
+CISNES,CISNES,F84.0,Childhood autism,2,82.36
+CISNES,CISNES,F84.1,Atypical autism,1,61.79
+CISNES,CISNES,F84.5,Asperger syndrome,1,36.66
+CISNES,CISNES,F84.9,"Pervasive developmental disorder, unspecified",2,79.59
+COBQUECURA,COBQUECURA,F84.0,Childhood autism,7,511.71
+COBQUECURA,COBQUECURA,F84.1,Atypical autism,1,65.63
+COBQUECURA,COBQUECURA,F84.8,Other pervasive developmental disorders,1,74.09
+COCHRANE,COCHRANE,F84.0,Childhood autism,2,132.76
+COCHRANE,COCHRANE,F84.8,Other pervasive developmental disorders,1,59.12
+COCHRANE,COCHRANE,F84.9,"Pervasive developmental disorder, unspecified",1,70.63
+COELEMU,COELEMU,F84.0,Childhood autism,23,390.69
+COELEMU,COELEMU,F84.1,Atypical autism,1,15.46
+COIHUECO,COIHUECO,F84.0,Childhood autism,36,321.77
+COIHUECO,COIHUECO,F84.1,Atypical autism,5,45.61
+COIHUECO,COIHUECO,F84.5,Asperger syndrome,2,15.93
+COIHUECO,COIHUECO,F84.8,Other pervasive developmental disorders,1,8.71
+COIHUECO,COIHUECO,F84.9,"Pervasive developmental disorder, unspecified",2,17.35
+COLBÚN,COLBUN,F84.0,Childhood autism,52,588.33
+COLBÚN,COLBUN,F84.1,Atypical autism,1,12.32
+COLBÚN,COLBUN,F84.5,Asperger syndrome,3,35.6
+COLBÚN,COLBUN,F84.8,Other pervasive developmental disorders,1,13.3
+COLINA,COLINA,F84.0,Childhood autism,40,44.71
+COLINA,COLINA,F84.1,Atypical autism,1,1.33
+COLINA,COLINA,F84.2,Rett syndrome,2,2.17
+COLINA,COLINA,F84.4,Overactive disorder with mental retardation and stereotyped movements,1,1.16
+COLINA,COLINA,F84.5,Asperger syndrome,5,6.1
+COLINA,COLINA,F84.8,Other pervasive developmental disorders,4,4.49
+COLINA,COLINA,F84.9,"Pervasive developmental disorder, unspecified",49,53.99
+COMBARBALÁ,COMBARBALA,F84.0,Childhood autism,11,244.51
+COMBARBALÁ,COMBARBALA,F84.8,Other pervasive developmental disorders,3,81.02
+COMBARBALÁ,COMBARBALA,F84.9,"Pervasive developmental disorder, unspecified",2,54.34
+CONCEPCIÓN,CONCEPCION,F84.0,Childhood autism,7,9.16
+CONCHALÍ,CONCHALI,F84.0,Childhood autism,39,79.52
+CONCHALÍ,CONCHALI,F84.1,Atypical autism,3,4.69
+CONCHALÍ,CONCHALI,F84.2,Rett syndrome,5,11.05
+CONCHALÍ,CONCHALI,F84.3,Other childhood disintegrative disorder,1,2.24
+CONCHALÍ,CONCHALI,F84.5,Asperger syndrome,9,18.35
+CONCHALÍ,CONCHALI,F84.8,Other pervasive developmental disorders,5,9.93
+CONCHALÍ,CONCHALI,F84.9,"Pervasive developmental disorder, unspecified",52,111.22
+CONSTITUCIÓN,CONSTITUCION,F84.0,Childhood autism,39,190.19
+CONSTITUCIÓN,CONSTITUCION,F84.2,Rett syndrome,10,56.5
+CONSTITUCIÓN,CONSTITUCION,F84.5,Asperger syndrome,7,35.24
+CONSTITUCIÓN,CONSTITUCION,F84.8,Other pervasive developmental disorders,4,19.86
+COPIAPO,COPIAPO,F84.0,Childhood autism,126,167.63
+COPIAPO,COPIAPO,F84.1,Atypical autism,2,2.3
+COPIAPO,COPIAPO,F84.2,Rett syndrome,1,1.28
+COPIAPO,COPIAPO,F84.4,Overactive disorder with mental retardation and stereotyped movements,4,5.35
+COPIAPO,COPIAPO,F84.5,Asperger syndrome,13,16.32
+COPIAPO,COPIAPO,F84.8,Other pervasive developmental disorders,6,6.98
+COPIAPO,COPIAPO,F84.9,"Pervasive developmental disorder, unspecified",33,42.35
+COQUIMBO,COQUIMBO,F84.0,Childhood autism,542,499.54
+COQUIMBO,COQUIMBO,F84.1,Atypical autism,19,15.52
+COQUIMBO,COQUIMBO,F84.2,Rett syndrome,4,4.16
+COQUIMBO,COQUIMBO,F84.4,Overactive disorder with mental retardation and stereotyped movements,5,4.43
+COQUIMBO,COQUIMBO,F84.5,Asperger syndrome,22,19.74
+COQUIMBO,COQUIMBO,F84.8,Other pervasive developmental disorders,12,11.13
+COQUIMBO,COQUIMBO,F84.9,"Pervasive developmental disorder, unspecified",34,30.41
+CORONEL,CORONEL,F84.0,Childhood autism,1,1.86
+CORRAL,CORRAL,F84.0,Childhood autism,7,416.41
+CORRAL,CORRAL,F84.5,Asperger syndrome,1,58.7
+CORRAL,CORRAL,F84.8,Other pervasive developmental disorders,1,42.62
+CURACAVÍ,CURACAVI,F84.0,Childhood autism,21,149.01
+CURACAVÍ,CURACAVI,F84.8,Other pervasive developmental disorders,3,21.39
+CURACAVÍ,CURACAVI,F84.9,"Pervasive developmental disorder, unspecified",4,25.15
+CUREPTO,CUREPTO,F84.0,Childhood autism,2,78.47
+CURICO,CURICO,F84.0,Childhood autism,123,191.48
+CURICO,CURICO,F84.1,Atypical autism,3,3.99
+CURICO,CURICO,F84.2,Rett syndrome,10,15.88
+CURICO,CURICO,F84.4,Overactive disorder with mental retardation and stereotyped movements,2,2.4
+CURICO,CURICO,F84.5,Asperger syndrome,9,13.29
+CURICO,CURICO,F84.8,Other pervasive developmental disorders,8,12.35
+DALCAHUE,DALCAHUE,F84.0,Childhood autism,1,15.22
+DIEGO DE ALMAGRO,DIEGO DE ALMAGRO,F84.0,Childhood autism,5,89.93
+DIEGO DE ALMAGRO,DIEGO DE ALMAGRO,F84.9,"Pervasive developmental disorder, unspecified",1,14.34
+EL BOSQUE,EL BOSQUE,F84.0,Childhood autism,199,311.76
+EL BOSQUE,EL BOSQUE,F84.1,Atypical autism,12,16.45
+EL BOSQUE,EL BOSQUE,F84.3,Other childhood disintegrative disorder,3,4.57
+EL BOSQUE,EL BOSQUE,F84.5,Asperger syndrome,15,20.93
+EL BOSQUE,EL BOSQUE,F84.8,Other pervasive developmental disorders,19,27.2
+EL BOSQUE,EL BOSQUE,F84.9,"Pervasive developmental disorder, unspecified",40,61.7
+EL CARMEN,EL CARMEN,F84.0,Childhood autism,12,253.45
+EL CARMEN,EL CARMEN,F84.1,Atypical autism,2,31.83
+EL CARMEN,EL CARMEN,F84.5,Asperger syndrome,2,42.47
+EL CARMEN,EL CARMEN,F84.8,Other pervasive developmental disorders,1,19.99
+EL CARMEN,EL CARMEN,F84.9,"Pervasive developmental disorder, unspecified",1,32.8
+EL MONTE,EL MONTE,F84.0,Childhood autism,38,219.86
+EL MONTE,EL MONTE,F84.5,Asperger syndrome,1,6.44
+EL MONTE,EL MONTE,F84.8,Other pervasive developmental disorders,2,10.77
+EL QUISCO,EL QUISCO,F84.0,Childhood autism,17,284.88
+EL QUISCO,EL QUISCO,F84.1,Atypical autism,1,13.03
+EL QUISCO,EL QUISCO,F84.2,Rett syndrome,4,63.28
+EL QUISCO,EL QUISCO,F84.4,Overactive disorder with mental retardation and stereotyped movements,1,16.31
+EL QUISCO,EL QUISCO,F84.5,Asperger syndrome,1,17.64
+EL QUISCO,EL QUISCO,F84.8,Other pervasive developmental disorders,1,13.03
+EL TABO,EL TABO,F84.0,Childhood autism,9,210.38
+EL TABO,EL TABO,F84.9,"Pervasive developmental disorder, unspecified",1,23.75
+ERCILLA,ERCILLA,F84.5,Asperger syndrome,1,33.21
+ESTACIÓN CENTRAL,ESTACION CENTRAL,F84.0,Childhood autism,163,240.63
+ESTACIÓN CENTRAL,ESTACION CENTRAL,F84.1,Atypical autism,14,20.64
+ESTACIÓN CENTRAL,ESTACION CENTRAL,F84.2,Rett syndrome,3,4.77
+ESTACIÓN CENTRAL,ESTACION CENTRAL,F84.5,Asperger syndrome,6,6.99
+ESTACIÓN CENTRAL,ESTACION CENTRAL,F84.8,Other pervasive developmental disorders,19,29.99
+ESTACIÓN CENTRAL,ESTACION CENTRAL,F84.9,"Pervasive developmental disorder, unspecified",15,22.05
+FREIRINA,FREIRINA,F84.0,Childhood autism,11,360.36
+FREIRINA,FREIRINA,F84.9,"Pervasive developmental disorder, unspecified",11,353.94
+FRUTILLAR,FRUTILLAR,F84.0,Childhood autism,5,64.23
+FUTRONO,FUTRONO,F84.0,Childhood autism,8,131.6
+FUTRONO,FUTRONO,F84.2,Rett syndrome,1,15.57
+FUTRONO,FUTRONO,F84.8,Other pervasive developmental disorders,2,32.35
+FUTRONO,FUTRONO,F84.9,"Pervasive developmental disorder, unspecified",1,17.79
+HIJUELAS,HIJUELAS,F84.0,Childhood autism,21,296.0
+HUALAÑÉ,HUALANE,F84.0,Childhood autism,7,200.52
+HUALAÑÉ,HUALANE,F84.5,Asperger syndrome,1,28.13
+HUALPÉN,HUALPEN,F84.0,Childhood autism,231,666.56
+HUALPÉN,HUALPEN,F84.1,Atypical autism,5,11.77
+HUALPÉN,HUALPEN,F84.2,Rett syndrome,2,6.16
+HUALPÉN,HUALPEN,F84.4,Overactive disorder with mental retardation and stereotyped movements,1,2.05
+HUALPÉN,HUALPEN,F84.5,Asperger syndrome,18,43.32
+HUALPÉN,HUALPEN,F84.8,Other pervasive developmental disorders,7,19.77
+HUALPÉN,HUALPEN,F84.9,"Pervasive developmental disorder, unspecified",1,3.13
+HUARA,HUARA,F84.0,Childhood autism,1,70.63
+HUASCO,HUASCO,F84.0,Childhood autism,10,242.87
+HUASCO,HUASCO,F84.1,Atypical autism,1,28.05
+HUASCO,HUASCO,F84.8,Other pervasive developmental disorders,1,26.68
+HUASCO,HUASCO,F84.9,"Pervasive developmental disorder, unspecified",1,26.71
+HUECHURABA,HUECHURABA,F84.0,Childhood autism,44,87.2
+HUECHURABA,HUECHURABA,F84.5,Asperger syndrome,6,12.34
+HUECHURABA,HUECHURABA,F84.8,Other pervasive developmental disorders,1,2.15
+HUECHURABA,HUECHURABA,F84.9,"Pervasive developmental disorder, unspecified",38,76.41
+ILLAPEL,ILLAPEL,F84.0,Childhood autism,15,121.8
+ILLAPEL,ILLAPEL,F84.4,Overactive disorder with mental retardation and stereotyped movements,1,9.47
+INDEPENDENCIA,INDEPENDENCIA,F84.0,Childhood autism,54,110.98
+INDEPENDENCIA,INDEPENDENCIA,F84.1,Atypical autism,4,5.63
+INDEPENDENCIA,INDEPENDENCIA,F84.4,Overactive disorder with mental retardation and stereotyped movements,1,2.42
+INDEPENDENCIA,INDEPENDENCIA,F84.5,Asperger syndrome,8,19.52
+INDEPENDENCIA,INDEPENDENCIA,F84.8,Other pervasive developmental disorders,7,15.79
+INDEPENDENCIA,INDEPENDENCIA,F84.9,"Pervasive developmental disorder, unspecified",64,140.97
+IQUIQUE,IQUIQUE,F84.0,Childhood autism,205,235.17
+IQUIQUE,IQUIQUE,F84.1,Atypical autism,22,22.36
+IQUIQUE,IQUIQUE,F84.2,Rett syndrome,1,1.16
+IQUIQUE,IQUIQUE,F84.4,Overactive disorder with mental retardation and stereotyped movements,2,1.93
+IQUIQUE,IQUIQUE,F84.5,Asperger syndrome,54,60.8
+IQUIQUE,IQUIQUE,F84.8,Other pervasive developmental disorders,32,31.69
+IQUIQUE,IQUIQUE,F84.9,"Pervasive developmental disorder, unspecified",39,37.86
+ISLA DE MAIPO,ISLA DE MAIPO,F84.0,Childhood autism,23,133.83
+ISLA DE MAIPO,ISLA DE MAIPO,F84.2,Rett syndrome,1,6.04
+ISLA DE MAIPO,ISLA DE MAIPO,F84.5,Asperger syndrome,1,6.34
+ISLA DE MAIPO,ISLA DE MAIPO,F84.8,Other pervasive developmental disorders,3,18.11
+ISLA DE MAIPO,ISLA DE MAIPO,F84.9,"Pervasive developmental disorder, unspecified",1,6.18
+ISLA DE PASCUA,ISLA DE PASCUA,F84.0,Childhood autism,8,210.86
+ISLA DE PASCUA,ISLA DE PASCUA,F84.8,Other pervasive developmental disorders,1,17.09
+LA CISTERNA,LA CISTERNA,F84.0,Childhood autism,69,204.41
+LA CISTERNA,LA CISTERNA,F84.1,Atypical autism,2,5.42
+LA CISTERNA,LA CISTERNA,F84.5,Asperger syndrome,5,12.31
+LA CISTERNA,LA CISTERNA,F84.8,Other pervasive developmental disorders,6,16.01
+LA CISTERNA,LA CISTERNA,F84.9,"Pervasive developmental disorder, unspecified",20,61.72
+LA CRUZ,LA CRUZ,F84.0,Childhood autism,17,155.38
+LA CRUZ,LA CRUZ,F84.1,Atypical autism,1,6.82
+LA CRUZ,LA CRUZ,F84.9,"Pervasive developmental disorder, unspecified",2,20.22
+LA FLORIDA,LA FLORIDA,F84.0,Childhood autism,444,318.36
+LA FLORIDA,LA FLORIDA,F84.1,Atypical autism,30,17.49
+LA FLORIDA,LA FLORIDA,F84.2,Rett syndrome,7,5.23
+LA FLORIDA,LA FLORIDA,F84.4,Overactive disorder with mental retardation and stereotyped movements,2,1.45
+LA FLORIDA,LA FLORIDA,F84.5,Asperger syndrome,30,19.88
+LA FLORIDA,LA FLORIDA,F84.8,Other pervasive developmental disorders,11,5.97
+LA FLORIDA,LA FLORIDA,F84.9,"Pervasive developmental disorder, unspecified",11,6.43
+LA GRANJA,LA GRANJA,F84.0,Childhood autism,140,322.44
+LA GRANJA,LA GRANJA,F84.1,Atypical autism,2,3.63
+LA GRANJA,LA GRANJA,F84.2,Rett syndrome,2,4.82
+LA GRANJA,LA GRANJA,F84.5,Asperger syndrome,5,10.55
+LA GRANJA,LA GRANJA,F84.8,Other pervasive developmental disorders,4,8.32
+LA GRANJA,LA GRANJA,F84.9,"Pervasive developmental disorder, unspecified",19,42.94
+LA HIGUERA,LA HIGUERA,F84.0,Childhood autism,1,58.3
+LA LIGUA,LA LIGUA,F84.0,Childhood autism,21,153.05
+LA LIGUA,LA LIGUA,F84.2,Rett syndrome,1,7.61
+LA LIGUA,LA LIGUA,F84.8,Other pervasive developmental disorders,3,21.66
+LA LIGUA,LA LIGUA,F84.9,"Pervasive developmental disorder, unspecified",2,14.35
+LA PINTANA,LA PINTANA,F84.0,Childhood autism,168,211.09
+LA PINTANA,LA PINTANA,F84.1,Atypical autism,8,9.45
+LA PINTANA,LA PINTANA,F84.2,Rett syndrome,4,4.71
+LA PINTANA,LA PINTANA,F84.4,Overactive disorder with mental retardation and stereotyped movements,2,2.49
+LA PINTANA,LA PINTANA,F84.5,Asperger syndrome,3,3.68
+LA PINTANA,LA PINTANA,F84.8,Other pervasive developmental disorders,10,12.01
+LA PINTANA,LA PINTANA,F84.9,"Pervasive developmental disorder, unspecified",13,16.23
+LA REINA,LA REINA,F84.0,Childhood autism,37,102.13
+LA REINA,LA REINA,F84.1,Atypical autism,1,2.21
+LA REINA,LA REINA,F84.9,"Pervasive developmental disorder, unspecified",3,8.86
+LA SERENA,LA SERENA,F84.0,Childhood autism,448,451.01
+LA SERENA,LA SERENA,F84.1,Atypical autism,9,8.16
+LA SERENA,LA SERENA,F84.2,Rett syndrome,2,2.43
+LA SERENA,LA SERENA,F84.3,Other childhood disintegrative disorder,1,0.97
+LA SERENA,LA SERENA,F84.4,Overactive disorder with mental retardation and stereotyped movements,1,1.19
+LA SERENA,LA SERENA,F84.5,Asperger syndrome,33,30.12
+LA SERENA,LA SERENA,F84.8,Other pervasive developmental disorders,8,8.16
+LA SERENA,LA SERENA,F84.9,"Pervasive developmental disorder, unspecified",17,16.54
+LA UNIÓN,LA UNION,F84.0,Childhood autism,10,69.22
+LA UNIÓN,LA UNION,F84.4,Overactive disorder with mental retardation and stereotyped movements,1,7.1
+LA UNIÓN,LA UNION,F84.5,Asperger syndrome,1,6.05
+LA UNIÓN,LA UNION,F84.8,Other pervasive developmental disorders,5,33.16
+LA UNIÓN,LA UNION,F84.9,"Pervasive developmental disorder, unspecified",2,15.37
+LAGO RANCO,LAGO RANCO,F84.0,Childhood autism,6,172.1
+LAGO RANCO,LAGO RANCO,F84.5,Asperger syndrome,1,26.73
+LAGO RANCO,LAGO RANCO,F84.9,"Pervasive developmental disorder, unspecified",1,22.87
+LAJA,LAJA,F84.0,Childhood autism,29,319.46
+LAJA,LAJA,F84.1,Atypical autism,1,10.35
+LAJA,LAJA,F84.5,Asperger syndrome,8,85.89
+LAJA,LAJA,F84.9,"Pervasive developmental disorder, unspecified",9,108.69
+LAMPA,LAMPA,F84.0,Childhood autism,56,86.51
+LAMPA,LAMPA,F84.1,Atypical autism,2,3.77
+LAMPA,LAMPA,F84.5,Asperger syndrome,10,16.87
+LAMPA,LAMPA,F84.8,Other pervasive developmental disorders,3,5.11
+LAMPA,LAMPA,F84.9,"Pervasive developmental disorder, unspecified",73,112.36
+LANCO,LANCO,F84.0,Childhood autism,8,111.36
+LANCO,LANCO,F84.8,Other pervasive developmental disorders,1,14.88
+LANCO,LANCO,F84.9,"Pervasive developmental disorder, unspecified",1,12.39
+LAS CONDES,LAS CONDES,F84.0,Childhood autism,42,42.06
+LAS CONDES,LAS CONDES,F84.2,Rett syndrome,2,2.25
+LAS CONDES,LAS CONDES,F84.5,Asperger syndrome,2,1.08
+LAS CONDES,LAS CONDES,F84.8,Other pervasive developmental disorders,7,5.65
+LAS CONDES,LAS CONDES,F84.9,"Pervasive developmental disorder, unspecified",5,4.27
+LICANTÉN,LICANTEN,F84.0,Childhood autism,1,39.49
+LIMACHE,LIMACHE,F84.0,Childhood autism,27,136.88
+LIMACHE,LIMACHE,F84.5,Asperger syndrome,6,31.06
+LIMACHE,LIMACHE,F84.8,Other pervasive developmental disorders,7,37.96
+LIMACHE,LIMACHE,F84.9,"Pervasive developmental disorder, unspecified",1,5.22
+LINARES,LINARES,F84.0,Childhood autism,245,623.35
+LINARES,LINARES,F84.1,Atypical autism,4,9.46
+LINARES,LINARES,F84.5,Asperger syndrome,15,37.01
+LINARES,LINARES,F84.8,Other pervasive developmental disorders,2,5.25
+LINARES,LINARES,F84.9,"Pervasive developmental disorder, unspecified",1,2.89
+LLAILLAY,LLAILLAY,F84.0,Childhood autism,14,129.46
+LLAILLAY,LLAILLAY,F84.2,Rett syndrome,1,9.62
+LLAILLAY,LLAILLAY,F84.4,Overactive disorder with mental retardation and stereotyped movements,1,9.48
+LLAILLAY,LLAILLAY,F84.5,Asperger syndrome,2,20.27
+LLAILLAY,LLAILLAY,F84.9,"Pervasive developmental disorder, unspecified",2,20.42
+LO BARNECHEA,LO BARNECHEA,F84.0,Childhood autism,27,48.08
+LO BARNECHEA,LO BARNECHEA,F84.3,Other childhood disintegrative disorder,1,2.06
+LO BARNECHEA,LO BARNECHEA,F84.8,Other pervasive developmental disorders,2,4.38
+LO ESPEJO,LO ESPEJO,F84.0,Childhood autism,130,348.15
+LO ESPEJO,LO ESPEJO,F84.1,Atypical autism,1,1.98
+LO ESPEJO,LO ESPEJO,F84.2,Rett syndrome,10,28.32
+LO ESPEJO,LO ESPEJO,F84.3,Other childhood disintegrative disorder,1,2.8
+LO ESPEJO,LO ESPEJO,F84.5,Asperger syndrome,7,17.41
+LO ESPEJO,LO ESPEJO,F84.8,Other pervasive developmental disorders,2,5.09
+LO ESPEJO,LO ESPEJO,F84.9,"Pervasive developmental disorder, unspecified",29,79.55
+LO PRADO,LO PRADO,F84.0,Childhood autism,56,154.57
+LO PRADO,LO PRADO,F84.5,Asperger syndrome,3,8.39
+LO PRADO,LO PRADO,F84.8,Other pervasive developmental disorders,4,10.43
+LO PRADO,LO PRADO,F84.9,"Pervasive developmental disorder, unspecified",1,3.07
+LONGAVÍ,LONGAVI,F84.0,Childhood autism,22,189.43
+LONGAVÍ,LONGAVI,F84.2,Rett syndrome,3,24.73
+LONGAVÍ,LONGAVI,F84.5,Asperger syndrome,1,7.81
+LOS ANDES,LOS ANDES,F84.0,Childhood autism,59,228.81
+LOS ANDES,LOS ANDES,F84.1,Atypical autism,2,6.85
+LOS ANDES,LOS ANDES,F84.2,Rett syndrome,3,11.93
+LOS ANDES,LOS ANDES,F84.4,Overactive disorder with mental retardation and stereotyped movements,3,11.32
+LOS ANDES,LOS ANDES,F84.5,Asperger syndrome,8,29.53
+LOS ANDES,LOS ANDES,F84.8,Other pervasive developmental disorders,1,4.37
+LOS ANDES,LOS ANDES,F84.9,"Pervasive developmental disorder, unspecified",2,8.41
+LOS ÁNGELES,LOS ANGELES,F84.0,Childhood autism,355,402.41
+LOS ÁNGELES,LOS ANGELES,F84.1,Atypical autism,12,13.9
+LOS ÁNGELES,LOS ANGELES,F84.2,Rett syndrome,9,10.81
+LOS ÁNGELES,LOS ANGELES,F84.5,Asperger syndrome,44,48.03
+LOS ÁNGELES,LOS ANGELES,F84.8,Other pervasive developmental disorders,12,13.01
+LOS ÁNGELES,LOS ANGELES,F84.9,"Pervasive developmental disorder, unspecified",116,136.18
+LOS LAGOS,LOS LAGOS,F84.0,Childhood autism,14,178.59
+LOS LAGOS,LOS LAGOS,F84.2,Rett syndrome,2,23.95
+LOS LAGOS,LOS LAGOS,F84.8,Other pervasive developmental disorders,2,27.71
+LOS LAGOS,LOS LAGOS,F84.9,"Pervasive developmental disorder, unspecified",1,12.85
+LOS VILOS,LOS VILOS,F84.0,Childhood autism,11,112.0
+LOS VILOS,LOS VILOS,F84.5,Asperger syndrome,1,10.96
+LOS VILOS,LOS VILOS,F84.8,Other pervasive developmental disorders,1,13.09
+LOTA,LOTA,F84.0,Childhood autism,1,6.1
+MACUL,MACUL,F84.0,Childhood autism,86,196.78
+MACUL,MACUL,F84.1,Atypical autism,4,6.91
+MACUL,MACUL,F84.5,Asperger syndrome,3,7.1
+MACUL,MACUL,F84.8,Other pervasive developmental disorders,2,4.25
+MACUL,MACUL,F84.9,"Pervasive developmental disorder, unspecified",3,7.27
+MÁFIL,MAFIL,F84.0,Childhood autism,9,310.99
+MÁFIL,MAFIL,F84.1,Atypical autism,1,38.84
+MÁFIL,MAFIL,F84.5,Asperger syndrome,3,109.27
+MAIPU,MAIPU,F84.0,Childhood autism,372,171.33
+MAIPU,MAIPU,F84.1,Atypical autism,11,4.51
+MAIPU,MAIPU,F84.2,Rett syndrome,19,8.83
+MAIPU,MAIPU,F84.4,Overactive disorder with mental retardation and stereotyped movements,1,0.43
+MAIPU,MAIPU,F84.5,Asperger syndrome,23,9.66
+MAIPU,MAIPU,F84.8,Other pervasive developmental disorders,32,15.43
+MAIPU,MAIPU,F84.9,"Pervasive developmental disorder, unspecified",46,22.52
+MARIA ELENA,MARIA ELENA,F84.0,Childhood autism,2,88.2
+MARIA PINTO,MARIA PINTO,F84.0,Childhood autism,7,126.42
+MARIA PINTO,MARIA PINTO,F84.5,Asperger syndrome,2,37.14
+MARIQUINA,MARIQUINA,F84.0,Childhood autism,14,142.6
+MARIQUINA,MARIQUINA,F84.5,Asperger syndrome,1,8.29
+MARIQUINA,MARIQUINA,F84.9,"Pervasive developmental disorder, unspecified",1,10.87
+MAULE,MAULE,F84.0,Childhood autism,38,119.92
+MAULE,MAULE,F84.1,Atypical autism,1,2.46
+MAULE,MAULE,F84.2,Rett syndrome,2,6.46
+MAULE,MAULE,F84.5,Asperger syndrome,1,3.11
+MAULE,MAULE,F84.9,"Pervasive developmental disorder, unspecified",2,7.3
+MEJILLONES,MEJILLONES,F84.0,Childhood autism,19,323.22
+MEJILLONES,MEJILLONES,F84.1,Atypical autism,4,64.57
+MEJILLONES,MEJILLONES,F84.5,Asperger syndrome,1,19.03
+MEJILLONES,MEJILLONES,F84.9,"Pervasive developmental disorder, unspecified",2,34.5
+MELIPILLA,MELIPILLA,F84.0,Childhood autism,117,206.6
+MELIPILLA,MELIPILLA,F84.2,Rett syndrome,6,10.32
+MELIPILLA,MELIPILLA,F84.5,Asperger syndrome,7,12.59
+MELIPILLA,MELIPILLA,F84.8,Other pervasive developmental disorders,11,18.41
+MELIPILLA,MELIPILLA,F84.9,"Pervasive developmental disorder, unspecified",9,15.75
+MOLINA,MOLINA,F84.0,Childhood autism,42,216.82
+MOLINA,MOLINA,F84.1,Atypical autism,4,16.55
+MOLINA,MOLINA,F84.5,Asperger syndrome,5,20.87
+MOLINA,MOLINA,F84.8,Other pervasive developmental disorders,3,16.37
+MONTE PATRIA,MONTE PATRIA,F84.0,Childhood autism,27,212.1
+MONTE PATRIA,MONTE PATRIA,F84.1,Atypical autism,1,7.97
+MONTE PATRIA,MONTE PATRIA,F84.5,Asperger syndrome,2,14.94
+MONTE PATRIA,MONTE PATRIA,F84.8,Other pervasive developmental disorders,1,8.74
+MOSTAZAL,MOSTAZAL,F84.0,Childhood autism,1,9.41
+MOSTAZAL,MOSTAZAL,F84.1,Atypical autism,1,9.66
+MULCHÉN,MULCHEN,F84.0,Childhood autism,28,239.74
+MULCHÉN,MULCHEN,F84.1,Atypical autism,1,7.72
+MULCHÉN,MULCHEN,F84.5,Asperger syndrome,4,32.13
+MULCHÉN,MULCHEN,F84.9,"Pervasive developmental disorder, unspecified",15,130.11
+NACIMIENTO,NACIMIENTO,F84.0,Childhood autism,17,163.18
+NACIMIENTO,NACIMIENTO,F84.5,Asperger syndrome,3,25.13
+NACIMIENTO,NACIMIENTO,F84.9,"Pervasive developmental disorder, unspecified",4,42.57
+NATALES,NATALES,F84.0,Childhood autism,16,191.26
+NATALES,NATALES,F84.5,Asperger syndrome,1,12.71
+NATALES,NATALES,F84.8,Other pervasive developmental disorders,1,12.42
+NATALES,NATALES,F84.9,"Pervasive developmental disorder, unspecified",3,39.08
+NAVIDAD,NAVIDAD,F84.0,Childhood autism,1,51.48
+NEGRETE,NEGRETE,F84.0,Childhood autism,14,366.26
+NEGRETE,NEGRETE,F84.1,Atypical autism,3,83.07
+NEGRETE,NEGRETE,F84.3,Other childhood disintegrative disorder,1,24.82
+NINHUE,NINHUE,F84.0,Childhood autism,8,488.51
+NINHUE,NINHUE,F84.9,"Pervasive developmental disorder, unspecified",1,72.01
+ÑIQUÉN,NIQUEN,F84.0,Childhood autism,16,424.53
+ÑIQUÉN,NIQUEN,F84.1,Atypical autism,2,61.49
+ÑIQUÉN,NIQUEN,F84.5,Asperger syndrome,1,21.93
+NOGALES,NOGALES,F84.0,Childhood autism,24,261.32
+NOGALES,NOGALES,F84.9,"Pervasive developmental disorder, unspecified",2,21.72
+ÑUÑOA,NUNOA,F84.0,Childhood autism,114,162.91
+ÑUÑOA,NUNOA,F84.1,Atypical autism,3,3.34
+ÑUÑOA,NUNOA,F84.2,Rett syndrome,4,6.32
+ÑUÑOA,NUNOA,F84.5,Asperger syndrome,7,8.44
+ÑUÑOA,NUNOA,F84.8,Other pervasive developmental disorders,11,12.71
+ÑUÑOA,NUNOA,F84.9,"Pervasive developmental disorder, unspecified",10,12.0
+OLMUÉ,OLMUE,F84.0,Childhood autism,9,129.51
+OLMUÉ,OLMUE,F84.1,Atypical autism,1,15.0
+OLMUÉ,OLMUE,F84.8,Other pervasive developmental disorders,5,75.24
+OLMUÉ,OLMUE,F84.9,"Pervasive developmental disorder, unspecified",2,32.1
+OSORNO,OSORNO,F84.0,Childhood autism,309,480.44
+OSORNO,OSORNO,F84.1,Atypical autism,14,18.4
+OSORNO,OSORNO,F84.2,Rett syndrome,3,4.38
+OSORNO,OSORNO,F84.5,Asperger syndrome,23,32.27
+OSORNO,OSORNO,F84.8,Other pervasive developmental disorders,6,9.39
+OSORNO,OSORNO,F84.9,"Pervasive developmental disorder, unspecified",13,19.1
+OVALLE,OVALLE,F84.0,Childhood autism,184,376.54
+OVALLE,OVALLE,F84.1,Atypical autism,1,1.78
+OVALLE,OVALLE,F84.2,Rett syndrome,6,13.31
+OVALLE,OVALLE,F84.5,Asperger syndrome,10,19.85
+OVALLE,OVALLE,F84.9,"Pervasive developmental disorder, unspecified",5,10.04
+PADRE HURTADO,PADRE HURTADO,F84.0,Childhood autism,31,97.56
+PADRE HURTADO,PADRE HURTADO,F84.5,Asperger syndrome,1,3.28
+PADRE HURTADO,PADRE HURTADO,F84.8,Other pervasive developmental disorders,3,9.13
+PADRE HURTADO,PADRE HURTADO,F84.9,"Pervasive developmental disorder, unspecified",1,2.32
+PAILLACO,PAILLACO,F84.0,Childhood autism,12,149.94
+PAILLACO,PAILLACO,F84.8,Other pervasive developmental disorders,1,11.15
+PAINE,PAINE,F84.0,Childhood autism,78,222.45
+PAINE,PAINE,F84.1,Atypical autism,1,2.91
+PAINE,PAINE,F84.2,Rett syndrome,5,14.26
+PAINE,PAINE,F84.5,Asperger syndrome,3,8.85
+PAINE,PAINE,F84.8,Other pervasive developmental disorders,3,7.02
+PAINE,PAINE,F84.9,"Pervasive developmental disorder, unspecified",18,50.64
+PANGUIPULLI,PANGUIPULLI,F84.0,Childhood autism,15,110.93
+PANGUIPULLI,PANGUIPULLI,F84.2,Rett syndrome,1,5.43
+PANGUIPULLI,PANGUIPULLI,F84.5,Asperger syndrome,1,7.78
+PANQUEHUE,PANQUEHUE,F84.0,Childhood autism,4,126.46
+PANQUEHUE,PANQUEHUE,F84.5,Asperger syndrome,1,32.32
+PAPUDO,PAPUDO,F84.0,Childhood autism,8,341.21
+PAPUDO,PAPUDO,F84.5,Asperger syndrome,1,50.51
+PARRAL,PARRAL,F84.0,Childhood autism,70,422.4
+PARRAL,PARRAL,F84.1,Atypical autism,1,5.65
+PARRAL,PARRAL,F84.2,Rett syndrome,1,2.86
+PARRAL,PARRAL,F84.4,Overactive disorder with mental retardation and stereotyped movements,1,5.43
+PARRAL,PARRAL,F84.5,Asperger syndrome,3,19.34
+PARRAL,PARRAL,F84.8,Other pervasive developmental disorders,12,75.12
+PARRAL,PARRAL,F84.9,"Pervasive developmental disorder, unspecified",3,17.67
+PEDRO AGUIRRE CERDA,PEDRO AGUIRRE CERDA,F84.0,Childhood autism,101,286.7
+PEDRO AGUIRRE CERDA,PEDRO AGUIRRE CERDA,F84.1,Atypical autism,2,4.99
+PEDRO AGUIRRE CERDA,PEDRO AGUIRRE CERDA,F84.2,Rett syndrome,1,2.96
+PEDRO AGUIRRE CERDA,PEDRO AGUIRRE CERDA,F84.5,Asperger syndrome,10,26.47
+PEDRO AGUIRRE CERDA,PEDRO AGUIRRE CERDA,F84.8,Other pervasive developmental disorders,6,14.22
+PEDRO AGUIRRE CERDA,PEDRO AGUIRRE CERDA,F84.9,"Pervasive developmental disorder, unspecified",31,87.74
+PELARCO,PELARCO,F84.0,Childhood autism,6,188.46
+PELARCO,PELARCO,F84.1,Atypical autism,1,31.13
+PELARCO,PELARCO,F84.4,Overactive disorder with mental retardation and stereotyped movements,1,31.25
+PELARCO,PELARCO,F84.8,Other pervasive developmental disorders,1,31.41
+PELLUHUE,PELLUHUE,F84.0,Childhood autism,2,65.72
+PELLUHUE,PELLUHUE,F84.8,Other pervasive developmental disorders,1,36.91
+PEMUCO,PEMUCO,F84.0,Childhood autism,10,307.53
+PEÑAFLOR,PENAFLOR,F84.0,Childhood autism,52,122.61
+PEÑAFLOR,PENAFLOR,F84.1,Atypical autism,1,1.96
+PEÑAFLOR,PENAFLOR,F84.2,Rett syndrome,7,17.24
+PEÑAFLOR,PENAFLOR,F84.5,Asperger syndrome,5,11.38
+PEÑAFLOR,PENAFLOR,F84.8,Other pervasive developmental disorders,2,4.74
+PEÑAFLOR,PENAFLOR,F84.9,"Pervasive developmental disorder, unspecified",1,2.46
+PEÑALOLÉN,PENALOLEN,F84.0,Childhood autism,182,174.07
+PEÑALOLÉN,PENALOLEN,F84.1,Atypical autism,2,1.68
+PEÑALOLÉN,PENALOLEN,F84.2,Rett syndrome,1,0.77
+PEÑALOLÉN,PENALOLEN,F84.5,Asperger syndrome,17,15.67
+PEÑALOLÉN,PENALOLEN,F84.8,Other pervasive developmental disorders,10,8.13
+PEÑALOLÉN,PENALOLEN,F84.9,"Pervasive developmental disorder, unspecified",12,11.34
+PENCAHUE,PENCAHUE,F84.0,Childhood autism,6,208.88
+PENCAHUE,PENCAHUE,F84.8,Other pervasive developmental disorders,1,39.37
+PENCO,PENCO,F84.0,Childhood autism,103,557.76
+PENCO,PENCO,F84.1,Atypical autism,3,13.46
+PENCO,PENCO,F84.2,Rett syndrome,2,10.75
+PENCO,PENCO,F84.5,Asperger syndrome,8,41.68
+PETORCA,PETORCA,F84.0,Childhood autism,4,116.42
+PICA,PICA,F84.0,Childhood autism,9,356.98
+PICA,PICA,F84.1,Atypical autism,1,51.32
+PICA,PICA,F84.5,Asperger syndrome,1,52.27
+PICA,PICA,F84.8,Other pervasive developmental disorders,1,35.38
+PICHILEMU,PICHILEMU,F84.2,Rett syndrome,1,15.38
+PINTO,PINTO,F84.0,Childhood autism,11,257.96
+PINTO,PINTO,F84.8,Other pervasive developmental disorders,1,17.74
+PIRQUE,PIRQUE,F84.0,Childhood autism,21,171.59
+PIRQUE,PIRQUE,F84.1,Atypical autism,1,8.72
+PIRQUE,PIRQUE,F84.5,Asperger syndrome,12,99.39
+PORTEZUELO,PORTEZUELO,F84.0,Childhood autism,6,349.92
+PORVENIR,PORVENIR,F84.0,Childhood autism,10,388.43
+POZO ALMONTE,POZO ALMONTE,F84.0,Childhood autism,21,249.3
+POZO ALMONTE,POZO ALMONTE,F84.1,Atypical autism,4,44.66
+POZO ALMONTE,POZO ALMONTE,F84.9,"Pervasive developmental disorder, unspecified",2,22.49
+PROVIDENCIA,PROVIDENCIA,F84.0,Childhood autism,72,191.55
+PROVIDENCIA,PROVIDENCIA,F84.1,Atypical autism,1,0.84
+PROVIDENCIA,PROVIDENCIA,F84.5,Asperger syndrome,5,5.23
+PROVIDENCIA,PROVIDENCIA,F84.8,Other pervasive developmental disorders,5,9.15
+PROVIDENCIA,PROVIDENCIA,F84.9,"Pervasive developmental disorder, unspecified",4,6.77
+PUCHUNCAVÍ,PUCHUNCAVI,F84.0,Childhood autism,13,167.34
+PUCHUNCAVÍ,PUCHUNCAVI,F84.1,Atypical autism,1,13.88
+PUCHUNCAVÍ,PUCHUNCAVI,F84.5,Asperger syndrome,2,25.65
+PUCHUNCAVÍ,PUCHUNCAVI,F84.9,"Pervasive developmental disorder, unspecified",2,27.08
+PUDAHUEL,PUDAHUEL,F84.0,Childhood autism,166,161.03
+PUDAHUEL,PUDAHUEL,F84.1,Atypical autism,6,5.03
+PUDAHUEL,PUDAHUEL,F84.2,Rett syndrome,2,2.04
+PUDAHUEL,PUDAHUEL,F84.5,Asperger syndrome,6,5.94
+PUDAHUEL,PUDAHUEL,F84.8,Other pervasive developmental disorders,9,7.49
+PUDAHUEL,PUDAHUEL,F84.9,"Pervasive developmental disorder, unspecified",7,7.09
+PUENTE ALTO,PUENTE ALTO,F84.0,Childhood autism,1165,434.97
+PUENTE ALTO,PUENTE ALTO,F84.1,Atypical autism,30,9.32
+PUENTE ALTO,PUENTE ALTO,F84.2,Rett syndrome,6,2.22
+PUENTE ALTO,PUENTE ALTO,F84.3,Other childhood disintegrative disorder,1,0.4
+PUENTE ALTO,PUENTE ALTO,F84.4,Overactive disorder with mental retardation and stereotyped movements,4,1.48
+PUENTE ALTO,PUENTE ALTO,F84.5,Asperger syndrome,68,24.91
+PUENTE ALTO,PUENTE ALTO,F84.8,Other pervasive developmental disorders,31,11.13
+PUENTE ALTO,PUENTE ALTO,F84.9,"Pervasive developmental disorder, unspecified",36,13.23
+PUERTO MONTT,PUERTO MONTT,F84.0,Childhood autism,9,9.02
+PUERTO MONTT,PUERTO MONTT,F84.9,"Pervasive developmental disorder, unspecified",1,0.97
+PUERTO OCTAY,PUERTO OCTAY,F84.0,Childhood autism,9,272.27
+PUERTO OCTAY,PUERTO OCTAY,F84.9,"Pervasive developmental disorder, unspecified",1,30.32
+PUNITAQUI,PUNITAQUI,F84.0,Childhood autism,13,271.55
+PUNTA ARENAS,PUNTA ARENAS,F84.0,Childhood autism,292,533.13
+PUNTA ARENAS,PUNTA ARENAS,F84.2,Rett syndrome,1,1.77
+PUNTA ARENAS,PUNTA ARENAS,F84.5,Asperger syndrome,23,38.83
+PUNTA ARENAS,PUNTA ARENAS,F84.8,Other pervasive developmental disorders,18,35.14
+PUNTA ARENAS,PUNTA ARENAS,F84.9,"Pervasive developmental disorder, unspecified",10,17.1
+PURRANQUE,PURRANQUE,F84.0,Childhood autism,20,272.59
+PUTAENDO,PUTAENDO,F84.0,Childhood autism,12,182.98
+PUTAENDO,PUTAENDO,F84.5,Asperger syndrome,1,15.22
+PUTAENDO,PUTAENDO,F84.9,"Pervasive developmental disorder, unspecified",1,14.7
+PUYEHUE,PUYEHUE,F84.0,Childhood autism,19,456.9
+QUILACO,QUILACO,F84.9,"Pervasive developmental disorder, unspecified",1,74.12
+QUILICURA,QUILICURA,F84.0,Childhood autism,89,78.83
+QUILICURA,QUILICURA,F84.1,Atypical autism,4,3.68
+QUILICURA,QUILICURA,F84.2,Rett syndrome,5,4.55
+QUILICURA,QUILICURA,F84.4,Overactive disorder with mental retardation and stereotyped movements,1,0.88
+QUILICURA,QUILICURA,F84.5,Asperger syndrome,5,4.06
+QUILICURA,QUILICURA,F84.8,Other pervasive developmental disorders,8,7.18
+QUILICURA,QUILICURA,F84.9,"Pervasive developmental disorder, unspecified",90,79.12
+QUILLECO,QUILLECO,F84.0,Childhood autism,10,286.65
+QUILLECO,QUILLECO,F84.5,Asperger syndrome,1,24.99
+QUILLECO,QUILLECO,F84.9,"Pervasive developmental disorder, unspecified",5,177.52
+QUILLÓN,QUILLON,F84.0,Childhood autism,22,355.52
+QUILLÓN,QUILLON,F84.1,Atypical autism,2,31.14
+QUILLÓN,QUILLON,F84.8,Other pervasive developmental disorders,1,18.77
+QUILLOTA,QUILLOTA,F84.0,Childhood autism,136,363.82
+QUILLOTA,QUILLOTA,F84.1,Atypical autism,1,2.55
+QUILLOTA,QUILLOTA,F84.5,Asperger syndrome,6,15.76
+QUILLOTA,QUILLOTA,F84.8,Other pervasive developmental disorders,2,5.74
+QUILLOTA,QUILLOTA,F84.9,"Pervasive developmental disorder, unspecified",8,20.42
+QUILPUE,QUILPUE,F84.0,Childhood autism,126,210.32
+QUILPUE,QUILPUE,F84.1,Atypical autism,9,14.97
+QUILPUE,QUILPUE,F84.2,Rett syndrome,1,1.59
+QUILPUE,QUILPUE,F84.5,Asperger syndrome,15,23.59
+QUILPUE,QUILPUE,F84.8,Other pervasive developmental disorders,59,93.71
+QUILPUE,QUILPUE,F84.9,"Pervasive developmental disorder, unspecified",24,41.6
+QUINTA NORMAL,QUINTA NORMAL,F84.0,Childhood autism,82,165.82
+QUINTA NORMAL,QUINTA NORMAL,F84.1,Atypical autism,2,3.52
+QUINTA NORMAL,QUINTA NORMAL,F84.5,Asperger syndrome,2,4.55
+QUINTA NORMAL,QUINTA NORMAL,F84.8,Other pervasive developmental disorders,4,7.4
+QUINTA NORMAL,QUINTA NORMAL,F84.9,"Pervasive developmental disorder, unspecified",3,5.82
+QUINTERO,QUINTERO,F84.0,Childhood autism,37,243.8
+QUINTERO,QUINTERO,F84.1,Atypical autism,1,5.5
+QUINTERO,QUINTERO,F84.8,Other pervasive developmental disorders,2,14.09
+QUINTERO,QUINTERO,F84.9,"Pervasive developmental disorder, unspecified",4,27.84
+QUIRIHUE,QUIRIHUE,F84.0,Childhood autism,11,281.82
+QUIRIHUE,QUIRIHUE,F84.1,Atypical autism,1,21.77
+QUIRIHUE,QUIRIHUE,F84.5,Asperger syndrome,1,22.51
+QUIRIHUE,QUIRIHUE,F84.8,Other pervasive developmental disorders,1,20.97
+RANCAGUA,RANCAGUA,F84.0,Childhood autism,2,2.0
+RANCAGUA,RANCAGUA,F84.2,Rett syndrome,1,1.04
+RANCAGUA,RANCAGUA,F84.8,Other pervasive developmental disorders,1,0.96
+RÁNQUIL,RANQUIL,F84.0,Childhood autism,7,367.94
+RAUCO,RAUCO,F84.0,Childhood autism,5,118.76
+RAUCO,RAUCO,F84.1,Atypical autism,1,18.88
+RAUCO,RAUCO,F84.9,"Pervasive developmental disorder, unspecified",1,25.52
+RECOLETA,RECOLETA,F84.0,Childhood autism,62,94.37
+RECOLETA,RECOLETA,F84.2,Rett syndrome,1,1.54
+RECOLETA,RECOLETA,F84.5,Asperger syndrome,9,11.15
+RECOLETA,RECOLETA,F84.8,Other pervasive developmental disorders,3,4.67
+RECOLETA,RECOLETA,F84.9,"Pervasive developmental disorder, unspecified",77,120.78
+RENCA,RENCA,F84.0,Childhood autism,106,159.6
+RENCA,RENCA,F84.1,Atypical autism,1,1.49
+RENCA,RENCA,F84.5,Asperger syndrome,6,9.13
+RENCA,RENCA,F84.8,Other pervasive developmental disorders,4,6.1
+RENCA,RENCA,F84.9,"Pervasive developmental disorder, unspecified",8,12.04
+RENGO,RENGO,F84.1,Atypical autism,1,3.89
+RETIRO,RETIRO,F84.0,Childhood autism,17,217.62
+RETIRO,RETIRO,F84.5,Asperger syndrome,2,26.82
+RETIRO,RETIRO,F84.8,Other pervasive developmental disorders,3,39.07
+RINCONADA,RINCONADA,F84.0,Childhood autism,6,123.27
+RÍO BUENO,RIO BUENO,F84.0,Childhood autism,4,34.36
+RÍO BUENO,RIO BUENO,F84.2,Rett syndrome,3,24.11
+RÍO BUENO,RIO BUENO,F84.5,Asperger syndrome,4,33.89
+RÍO BUENO,RIO BUENO,F84.8,Other pervasive developmental disorders,1,10.13
+RÍO BUENO,RIO BUENO,F84.9,"Pervasive developmental disorder, unspecified",3,25.39
+RÍO CLARO,RIO CLARO,F84.0,Childhood autism,7,136.78
+RÍO CLARO,RIO CLARO,F84.2,Rett syndrome,1,20.11
+RÍO CLARO,RIO CLARO,F84.4,Overactive disorder with mental retardation and stereotyped movements,1,17.8
+RÍO HURTADO,RIO HURTADO,F84.0,Childhood autism,1,73.62
+RÍO NEGRO,RIO NEGRO,F84.0,Childhood autism,10,203.54
+ROMERAL,ROMERAL,F84.0,Childhood autism,16,267.99
+ROMERAL,ROMERAL,F84.1,Atypical autism,1,19.05
+ROMERAL,ROMERAL,F84.5,Asperger syndrome,1,17.48
+ROMERAL,ROMERAL,F84.8,Other pervasive developmental disorders,3,53.28
+SAGRADA FAMILIA,SAGRADA FAMILIA,F84.0,Childhood autism,8,114.16
+SAGRADA FAMILIA,SAGRADA FAMILIA,F84.1,Atypical autism,1,11.37
+SAGRADA FAMILIA,SAGRADA FAMILIA,F84.8,Other pervasive developmental disorders,2,36.6
+SALAMANCA,SALAMANCA,F84.0,Childhood autism,7,68.36
+SALAMANCA,SALAMANCA,F84.3,Other childhood disintegrative disorder,1,7.77
+SALAMANCA,SALAMANCA,F84.5,Asperger syndrome,1,10.96
+SALAMANCA,SALAMANCA,F84.9,"Pervasive developmental disorder, unspecified",1,8.97
+SAN ANTONIO,SAN ANTONIO,F84.0,Childhood autism,102,278.69
+SAN ANTONIO,SAN ANTONIO,F84.1,Atypical autism,2,4.21
+SAN ANTONIO,SAN ANTONIO,F84.2,Rett syndrome,9,24.24
+SAN ANTONIO,SAN ANTONIO,F84.3,Other childhood disintegrative disorder,1,2.51
+SAN ANTONIO,SAN ANTONIO,F84.5,Asperger syndrome,5,11.78
+SAN ANTONIO,SAN ANTONIO,F84.8,Other pervasive developmental disorders,3,7.6
+SAN ANTONIO,SAN ANTONIO,F84.9,"Pervasive developmental disorder, unspecified",6,15.32
+SAN BERNARDO,SAN BERNARDO,F84.0,Childhood autism,349,242.27
+SAN BERNARDO,SAN BERNARDO,F84.1,Atypical autism,7,4.44
+SAN BERNARDO,SAN BERNARDO,F84.2,Rett syndrome,11,7.73
+SAN BERNARDO,SAN BERNARDO,F84.5,Asperger syndrome,18,12.03
+SAN BERNARDO,SAN BERNARDO,F84.8,Other pervasive developmental disorders,22,14.54
+SAN BERNARDO,SAN BERNARDO,F84.9,"Pervasive developmental disorder, unspecified",85,58.81
+SAN CARLOS,SAN CARLOS,F84.0,Childhood autism,171,829.69
+SAN CARLOS,SAN CARLOS,F84.1,Atypical autism,9,41.79
+SAN CARLOS,SAN CARLOS,F84.2,Rett syndrome,1,4.89
+SAN CARLOS,SAN CARLOS,F84.5,Asperger syndrome,16,70.86
+SAN CARLOS,SAN CARLOS,F84.8,Other pervasive developmental disorders,3,15.57
+SAN CARLOS,SAN CARLOS,F84.9,"Pervasive developmental disorder, unspecified",2,9.91
+SAN CLEMENTE,SAN CLEMENTE,F84.0,Childhood autism,38,209.95
+SAN CLEMENTE,SAN CLEMENTE,F84.4,Overactive disorder with mental retardation and stereotyped movements,1,5.09
+SAN CLEMENTE,SAN CLEMENTE,F84.5,Asperger syndrome,3,16.56
+SAN CLEMENTE,SAN CLEMENTE,F84.8,Other pervasive developmental disorders,6,35.58
+SAN CLEMENTE,SAN CLEMENTE,F84.9,"Pervasive developmental disorder, unspecified",1,5.78
+SAN ESTEBAN,SAN ESTEBAN,F84.0,Childhood autism,10,123.48
+SAN ESTEBAN,SAN ESTEBAN,F84.5,Asperger syndrome,2,23.84
+SAN ESTEBAN,SAN ESTEBAN,F84.9,"Pervasive developmental disorder, unspecified",1,11.62
+SAN FABIÁN,SAN FABIAN,F84.0,Childhood autism,9,614.33
+SAN FELIPE,SAN FELIPE,F84.0,Childhood autism,69,206.68
+SAN FELIPE,SAN FELIPE,F84.1,Atypical autism,1,2.34
+SAN FELIPE,SAN FELIPE,F84.2,Rett syndrome,1,2.97
+SAN FELIPE,SAN FELIPE,F84.3,Other childhood disintegrative disorder,1,2.83
+SAN FELIPE,SAN FELIPE,F84.4,Overactive disorder with mental retardation and stereotyped movements,1,2.83
+SAN FELIPE,SAN FELIPE,F84.5,Asperger syndrome,4,11.6
+SAN FELIPE,SAN FELIPE,F84.8,Other pervasive developmental disorders,2,6.24
+SAN FELIPE,SAN FELIPE,F84.9,"Pervasive developmental disorder, unspecified",5,15.93
+SAN FERNANDO,SAN FERNANDO,F84.0,Childhood autism,1,3.18
+SAN GREGORIO,SAN GREGORIO,F84.0,Childhood autism,1,846.75
+SAN IGNACIO,SAN IGNACIO,F84.0,Childhood autism,14,230.3
+SAN IGNACIO,SAN IGNACIO,F84.1,Atypical autism,3,50.58
+SAN JAVIER,SAN JAVIER,F84.0,Childhood autism,51,276.57
+SAN JAVIER,SAN JAVIER,F84.5,Asperger syndrome,1,5.24
+SAN JAVIER,SAN JAVIER,F84.9,"Pervasive developmental disorder, unspecified",1,5.9
+SAN JOAQUÍN,SAN JOAQUIN,F84.0,Childhood autism,105,317.14
+SAN JOAQUÍN,SAN JOAQUIN,F84.1,Atypical autism,2,3.75
+SAN JOAQUÍN,SAN JOAQUIN,F84.3,Other childhood disintegrative disorder,1,3.18
+SAN JOAQUÍN,SAN JOAQUIN,F84.5,Asperger syndrome,3,8.27
+SAN JOAQUÍN,SAN JOAQUIN,F84.8,Other pervasive developmental disorders,2,4.3
+SAN JOAQUÍN,SAN JOAQUIN,F84.9,"Pervasive developmental disorder, unspecified",24,70.19
+SAN JOSÉ DE MAIPO,SAN JOSE DE MAIPO,F84.0,Childhood autism,25,359.61
+SAN JOSÉ DE MAIPO,SAN JOSE DE MAIPO,F84.5,Asperger syndrome,1,12.98
+SAN JOSÉ DE MAIPO,SAN JOSE DE MAIPO,F84.9,"Pervasive developmental disorder, unspecified",2,28.33
+SAN JUAN DE LA COSTA,SAN JUAN DE LA COSTA,F84.0,Childhood autism,15,660.3
+SAN MIGUEL,SAN MIGUEL,F84.0,Childhood autism,78,186.56
+SAN MIGUEL,SAN MIGUEL,F84.4,Overactive disorder with mental retardation and stereotyped movements,1,1.87
+SAN MIGUEL,SAN MIGUEL,F84.5,Asperger syndrome,2,3.6
+SAN MIGUEL,SAN MIGUEL,F84.8,Other pervasive developmental disorders,2,1.95
+SAN MIGUEL,SAN MIGUEL,F84.9,"Pervasive developmental disorder, unspecified",30,64.54
+SAN NICOLÁS,SAN NICOLAS,F84.0,Childhood autism,33,794.14
+SAN NICOLÁS,SAN NICOLAS,F84.5,Asperger syndrome,1,24.75
+SAN NICOLÁS,SAN NICOLAS,F84.8,Other pervasive developmental disorders,3,71.73
+SAN NICOLÁS,SAN NICOLAS,F84.9,"Pervasive developmental disorder, unspecified",1,20.28
+SAN PABLO,SAN PABLO,F84.0,Childhood autism,9,260.74
+SAN PEDRO,SAN PEDRO,F84.0,Childhood autism,5,113.8
+SAN PEDRO DE ATACAMA,SAN PEDRO DE ATACAMA,F84.0,Childhood autism,10,239.77
+SAN RAFAEL,SAN RAFAEL,F84.0,Childhood autism,7,182.85
+SAN RAFAEL,SAN RAFAEL,F84.8,Other pervasive developmental disorders,2,53.52
+SAN RAMÓN,SAN RAMON,F84.0,Childhood autism,100,330.61
+SAN RAMÓN,SAN RAMON,F84.1,Atypical autism,3,7.66
+SAN RAMÓN,SAN RAMON,F84.2,Rett syndrome,1,2.43
+SAN RAMÓN,SAN RAMON,F84.5,Asperger syndrome,1,3.27
+SAN RAMÓN,SAN RAMON,F84.8,Other pervasive developmental disorders,3,9.0
+SAN RAMÓN,SAN RAMON,F84.9,"Pervasive developmental disorder, unspecified",13,40.69
+SAN ROSENDO,SAN ROSENDO,F84.0,Childhood autism,1,73.62
+SAN VICENTE,SAN VICENTE,F84.2,Rett syndrome,1,6.88
+SANTA BÁRBARA,SANTA BARBARA,F84.0,Childhood autism,15,278.5
+SANTA BÁRBARA,SANTA BARBARA,F84.1,Atypical autism,1,14.71
+SANTA BÁRBARA,SANTA BARBARA,F84.5,Asperger syndrome,2,33.68
+SANTA BÁRBARA,SANTA BARBARA,F84.9,"Pervasive developmental disorder, unspecified",1,17.31
+SANTA CRUZ,SANTA CRUZ,F84.8,Other pervasive developmental disorders,1,6.51
+SANTA MARIA,SANTA MARIA,F84.0,Childhood autism,6,94.07
+SANTA MARIA,SANTA MARIA,F84.9,"Pervasive developmental disorder, unspecified",1,13.21
+SANTIAGO,SANTIAGO,F84.0,Childhood autism,445,391.85
+SANTIAGO,SANTIAGO,F84.1,Atypical autism,60,49.48
+SANTIAGO,SANTIAGO,F84.2,Rett syndrome,15,14.87
+SANTIAGO,SANTIAGO,F84.3,Other childhood disintegrative disorder,2,1.89
+SANTIAGO,SANTIAGO,F84.4,Overactive disorder with mental retardation and stereotyped movements,3,2.91
+SANTIAGO,SANTIAGO,F84.5,Asperger syndrome,10,6.52
+SANTIAGO,SANTIAGO,F84.8,Other pervasive developmental disorders,26,19.2
+SANTIAGO,SANTIAGO,F84.9,"Pervasive developmental disorder, unspecified",32,25.84
+SANTO DOMINGO,SANTO DOMINGO,F84.0,Childhood autism,9,185.97
+SANTO DOMINGO,SANTO DOMINGO,F84.9,"Pervasive developmental disorder, unspecified",1,19.76
+SIERRA GORDA,SIERRA GORDA,F84.5,Asperger syndrome,1,156.32
+TALAGANTE,TALAGANTE,F84.0,Childhood autism,67,196.12
+TALAGANTE,TALAGANTE,F84.1,Atypical autism,1,2.14
+TALAGANTE,TALAGANTE,F84.3,Other childhood disintegrative disorder,1,3.08
+TALAGANTE,TALAGANTE,F84.5,Asperger syndrome,4,10.37
+TALAGANTE,TALAGANTE,F84.8,Other pervasive developmental disorders,11,33.48
+TALAGANTE,TALAGANTE,F84.9,"Pervasive developmental disorder, unspecified",1,3.05
+TALCA,TALCA,F84.0,Childhood autism,185,210.72
+TALCA,TALCA,F84.1,Atypical autism,7,6.7
+TALCA,TALCA,F84.2,Rett syndrome,4,4.67
+TALCA,TALCA,F84.3,Other childhood disintegrative disorder,1,1.27
+TALCA,TALCA,F84.4,Overactive disorder with mental retardation and stereotyped movements,1,0.86
+TALCA,TALCA,F84.5,Asperger syndrome,9,9.11
+TALCA,TALCA,F84.8,Other pervasive developmental disorders,24,29.66
+TALCA,TALCA,F84.9,"Pervasive developmental disorder, unspecified",3,3.42
+TALCAHUANO,TALCAHUANO,F84.0,Childhood autism,383,671.12
+TALCAHUANO,TALCAHUANO,F84.1,Atypical autism,3,3.67
+TALCAHUANO,TALCAHUANO,F84.5,Asperger syndrome,34,52.01
+TALCAHUANO,TALCAHUANO,F84.8,Other pervasive developmental disorders,4,7.62
+TALCAHUANO,TALCAHUANO,F84.9,"Pervasive developmental disorder, unspecified",1,2.05
+TALTAL,TALTAL,F84.0,Childhood autism,9,160.16
+TALTAL,TALTAL,F84.1,Atypical autism,3,49.82
+TEMUCO,TEMUCO,F84.0,Childhood autism,1,0.79
+TENO,TENO,F84.0,Childhood autism,26,219.46
+TENO,TENO,F84.5,Asperger syndrome,1,4.66
+TENO,TENO,F84.8,Other pervasive developmental disorders,2,16.21
+TIERRA AMARILLA,TIERRA AMARILLA,F84.0,Childhood autism,11,178.12
+TIERRA AMARILLA,TIERRA AMARILLA,F84.1,Atypical autism,1,14.08
+TIERRA AMARILLA,TIERRA AMARILLA,F84.8,Other pervasive developmental disorders,1,14.08
+TIERRA AMARILLA,TIERRA AMARILLA,F84.9,"Pervasive developmental disorder, unspecified",2,33.69
+TILTIL,TILTIL,F84.0,Childhood autism,5,54.93
+TILTIL,TILTIL,F84.5,Asperger syndrome,1,7.88
+TILTIL,TILTIL,F84.9,"Pervasive developmental disorder, unspecified",10,117.05
+TOCOPILLA,TOCOPILLA,F84.0,Childhood autism,33,272.77
+TOCOPILLA,TOCOPILLA,F84.1,Atypical autism,6,53.74
+TOCOPILLA,TOCOPILLA,F84.2,Rett syndrome,4,34.36
+TOCOPILLA,TOCOPILLA,F84.8,Other pervasive developmental disorders,1,8.23
+TOCOPILLA,TOCOPILLA,F84.9,"Pervasive developmental disorder, unspecified",4,34.85
+TOME,TOME,F84.0,Childhood autism,116,563.31
+TOME,TOME,F84.1,Atypical autism,1,3.99
+TOME,TOME,F84.2,Rett syndrome,1,4.09
+TOME,TOME,F84.5,Asperger syndrome,6,27.99
+TOME,TOME,F84.8,Other pervasive developmental disorders,2,9.06
+TOME,TOME,F84.9,"Pervasive developmental disorder, unspecified",8,38.13
+TREGUACO,TREGUACO,F84.0,Childhood autism,9,440.84
+TREGUACO,TREGUACO,F84.5,Asperger syndrome,1,46.27
+TUCAPEL,TUCAPEL,F84.0,Childhood autism,16,299.19
+TUCAPEL,TUCAPEL,F84.2,Rett syndrome,2,32.37
+TUCAPEL,TUCAPEL,F84.5,Asperger syndrome,1,16.22
+TUCAPEL,TUCAPEL,F84.8,Other pervasive developmental disorders,1,18.89
+TUCAPEL,TUCAPEL,F84.9,"Pervasive developmental disorder, unspecified",11,219.35
+VALDIVIA,VALDIVIA,F84.0,Childhood autism,173,273.01
+VALDIVIA,VALDIVIA,F84.1,Atypical autism,6,7.86
+VALDIVIA,VALDIVIA,F84.2,Rett syndrome,6,9.1
+VALDIVIA,VALDIVIA,F84.5,Asperger syndrome,34,46.9
+VALDIVIA,VALDIVIA,F84.8,Other pervasive developmental disorders,11,19.08
+VALDIVIA,VALDIVIA,F84.9,"Pervasive developmental disorder, unspecified",30,45.06
+VALLENAR,VALLENAR,F84.0,Childhood autism,90,383.7
+VALLENAR,VALLENAR,F84.1,Atypical autism,1,5.07
+VALLENAR,VALLENAR,F84.4,Overactive disorder with mental retardation and stereotyped movements,1,3.9
+VALLENAR,VALLENAR,F84.5,Asperger syndrome,5,20.97
+VALLENAR,VALLENAR,F84.8,Other pervasive developmental disorders,2,8.34
+VALLENAR,VALLENAR,F84.9,"Pervasive developmental disorder, unspecified",11,52.88
+VALPARAISO,VALPARAISO,F84.0,Childhood autism,464,420.14
+VALPARAISO,VALPARAISO,F84.1,Atypical autism,16,10.65
+VALPARAISO,VALPARAISO,F84.3,Other childhood disintegrative disorder,1,0.99
+VALPARAISO,VALPARAISO,F84.4,Overactive disorder with mental retardation and stereotyped movements,1,0.96
+VALPARAISO,VALPARAISO,F84.5,Asperger syndrome,16,12.32
+VALPARAISO,VALPARAISO,F84.8,Other pervasive developmental disorders,42,37.03
+VALPARAISO,VALPARAISO,F84.9,"Pervasive developmental disorder, unspecified",13,12.1
+VICHUQUÉN,VICHUQUEN,F84.0,Childhood autism,1,81.96
+VICUÑA,VICUNA,F84.0,Childhood autism,21,179.93
+VICUÑA,VICUNA,F84.5,Asperger syndrome,1,8.15
+VICUÑA,VICUNA,F84.9,"Pervasive developmental disorder, unspecified",1,7.46
+VILLA ALEGRE,VILLA ALEGRE,F84.0,Childhood autism,11,179.04
+VILLA ALEGRE,VILLA ALEGRE,F84.2,Rett syndrome,2,30.67
+VILLA ALEGRE,VILLA ALEGRE,F84.5,Asperger syndrome,1,15.06
+VILLA ALEMANA,VILLA ALEMANA,F84.0,Childhood autism,107,196.49
+VILLA ALEMANA,VILLA ALEMANA,F84.1,Atypical autism,5,9.5
+VILLA ALEMANA,VILLA ALEMANA,F84.2,Rett syndrome,2,3.68
+VILLA ALEMANA,VILLA ALEMANA,F84.5,Asperger syndrome,5,8.74
+VILLA ALEMANA,VILLA ALEMANA,F84.8,Other pervasive developmental disorders,41,74.55
+VILLA ALEMANA,VILLA ALEMANA,F84.9,"Pervasive developmental disorder, unspecified",14,26.12
+VIÑA DEL MAR,VINA DEL MAR,F84.0,Childhood autism,424,350.71
+VIÑA DEL MAR,VINA DEL MAR,F84.1,Atypical autism,9,6.86
+VIÑA DEL MAR,VINA DEL MAR,F84.2,Rett syndrome,9,7.62
+VIÑA DEL MAR,VINA DEL MAR,F84.4,Overactive disorder with mental retardation and stereotyped movements,1,0.91
+VIÑA DEL MAR,VINA DEL MAR,F84.5,Asperger syndrome,15,11.22
+VIÑA DEL MAR,VINA DEL MAR,F84.8,Other pervasive developmental disorders,24,18.59
+VIÑA DEL MAR,VINA DEL MAR,F84.9,"Pervasive developmental disorder, unspecified",74,58.32
+VITACURA,VITACURA,F84.0,Childhood autism,10,30.01
+VITACURA,VITACURA,F84.1,Atypical autism,2,4.33
+VITACURA,VITACURA,F84.5,Asperger syndrome,2,4.48
+YERBAS BUENAS,YERBAS BUENAS,F84.0,Childhood autism,23,312.22
+YERBAS BUENAS,YERBAS BUENAS,F84.5,Asperger syndrome,1,14.42
+YERBAS BUENAS,YERBAS BUENAS,F84.8,Other pervasive developmental disorders,1,14.81
+YUMBEL,YUMBEL,F84.0,Childhood autism,36,489.28
+YUMBEL,YUMBEL,F84.5,Asperger syndrome,2,26.16
+YUMBEL,YUMBEL,F84.9,"Pervasive developmental disorder, unspecified",2,24.46
+YUNGAY,YUNGAY,F84.0,Childhood autism,31,446.84
+YUNGAY,YUNGAY,F84.1,Atypical autism,1,14.8
