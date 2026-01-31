@@ -131,13 +131,34 @@ AGE_GROUPS_TUPLES = [
     (60, 64), (65, 69), (70, 74), (75, 79)
 ]
 
+AGE_ORDER = ['0-4', '5-9', '10-14', '15-19', '20-24', '25-29', '30-34', '35-39', 
+             '40-44', '45-49', '50-54', '55-59', '60-64', '65-69', '70-74', '75-79', '80+']
+
 YEARS = [2019, 2020, 2021, 2022, 2023, 2024]
 
-# Comunas no continentales a excluir de tablas y mapas
 EXCLUDED_COMUNAS = [
     'ISLA DE PASCUA', 'JUAN FERNANDEZ', 'ANTARTICA', 
     'CABO DE HORNOS', 'CABO DE HORNOS Y ANTARTICA'
 ]
+
+REGION_CODES = {
+    15: 'Arica y Parinacota',
+    1: 'Tarapacá',
+    2: 'Antofagasta',
+    3: 'Atacama',
+    4: 'Coquimbo',
+    5: 'Valparaíso',
+    13: 'Metropolitana',
+    6: "O'Higgins",
+    7: 'Maule',
+    16: 'Ñuble',
+    8: 'Biobío',
+    9: 'La Araucanía',
+    14: 'Los Ríos',
+    10: 'Los Lagos',
+    11: 'Aysén',
+    12: 'Magallanes'
+}
 
 def is_excluded_comuna(comuna_name):
     if pd.isna(comuna_name):
@@ -524,7 +545,20 @@ asr_by_icd.to_csv(os.path.join(output_path, 'asr_by_icd_f84.csv'), index=False)
 
 ## Age-Standardized Rates Analysis
 
-### Standardized Rates by Age
+### Standardized Rates by Sex and Year
+
+```{python}
+#| label: tbl-asr-by-sex
+#| tbl-cap: "Age-standardized hospitalization rates by sex (per 100,000)"
+#| tbl-cap-location: bottom
+
+asr_by_sex.style.format({
+    'hospitalizations': '{:,.0f}',
+    'population': '{:,.0f}',
+    'crude_rate': '{:.2f}',
+    'asr': '{:.2f}'
+}).hide(axis="index")
+```
 
 ```{python}
 #| label: tbl-asr-sex-columns
@@ -671,31 +705,6 @@ save_figure(fig, 'asr_f84_codes.png')
 plt.show()
 ```
 
-\newpage
-
-### Summary Table - All ICD Codes by Year
-
-```{python}
-#| label: tbl-summary-pivot
-#| tbl-cap: "ASR summary by ICD code and year (Total)"
-#| tbl-cap-location: bottom
-
-summary_pivot = asr_by_icd.pivot_table(
-    index=['icd_code', 'description'],
-    columns='year',
-    values='asr_total',
-    aggfunc='first'
-).reset_index()
-
-summary_pivot.columns.name = None
-summary_pivot.to_csv(os.path.join(output_path, 'asr_summary_pivot_f84.csv'), index=False)
-
-year_cols = [c for c in summary_pivot.columns if isinstance(c, int) or (isinstance(c, str) and c.isdigit())]
-format_dict = {col: '{:.2f}' for col in year_cols}
-
-summary_pivot.style.format(format_dict, na_rep='-').hide(axis="index")
-```
-
 ```{python}
 #| label: fig-heatmap-asr
 #| fig-cap: "Heatmap of ASR by ICD code and year"
@@ -721,66 +730,196 @@ save_figure(fig, 'asr_heatmap_f84.png')
 plt.show()
 ```
 
+\newpage
+
+## Sex Ratio Analysis
+
 ```{python}
-#| label: fig-total-trend
-#| fig-cap: "Overall ASD hospitalization trends"
-#| fig-width: 10
+#| label: sex-ratio-calculation
+#| include: false
+
+sex_ratio = asr_sex_cols.copy()
+sex_ratio['sex_ratio'] = sex_ratio['hosp_male'] / sex_ratio['hosp_female'].replace(0, np.nan)
+sex_ratio['asr_ratio'] = sex_ratio['asr_male'] / sex_ratio['asr_female'].replace(0, np.nan)
+
+sex_by_icd = asr_by_icd.groupby('icd_code').agg({
+    'hosp_male': 'sum',
+    'hosp_female': 'sum',
+    'asr_male': 'mean',
+    'asr_female': 'mean'
+}).reset_index()
+sex_by_icd['sex_ratio'] = sex_by_icd['hosp_male'] / sex_by_icd['hosp_female'].replace(0, np.nan)
+sex_by_icd['asr_ratio'] = sex_by_icd['asr_male'] / sex_by_icd['asr_female'].replace(0, np.nan)
+sex_by_icd['description'] = sex_by_icd['icd_code'].map(ALL_ASD_CODES)
+```
+
+```{python}
+#| label: tbl-sex-ratio
+#| tbl-cap: "Male to Female Ratio by Year"
+#| tbl-cap-location: bottom
+
+sex_ratio_display = sex_ratio[['year', 'hosp_male', 'hosp_female', 'sex_ratio', 'asr_male', 'asr_female', 'asr_ratio']].copy()
+sex_ratio_display.columns = ['Year', 'Male Hosp.', 'Female Hosp.', 'M:F Ratio (N)', 'ASR Male', 'ASR Female', 'M:F Ratio (ASR)']
+
+sex_ratio_display.style.format({
+    'Male Hosp.': '{:,.0f}',
+    'Female Hosp.': '{:,.0f}',
+    'M:F Ratio (N)': '{:.2f}',
+    'ASR Male': '{:.2f}',
+    'ASR Female': '{:.2f}',
+    'M:F Ratio (ASR)': '{:.2f}'
+}).hide(axis="index")
+```
+
+```{python}
+#| label: fig-sex-ratio
+#| fig-cap: "Male to Female Ratio in ASD Hospitalizations"
+#| fig-width: 14
 #| fig-height: 6
 
-total_by_year = asr_by_icd.groupby('year').agg({
-    'hosp_total': 'sum',
-    'asr_total': 'mean'
-}).reset_index()
+fig, axes = plt.subplots(1, 2, figsize=(14, 6))
 
-fig, ax1 = plt.subplots(figsize=(10, 6))
-
-color1 = 'steelblue'
+ax1 = axes[0]
+ax1.bar(sex_ratio['year'], sex_ratio['sex_ratio'], color='purple', alpha=0.7, label='Hospitalizations')
+ax1.plot(sex_ratio['year'], sex_ratio['asr_ratio'], marker='o', linewidth=2, color='darkred', label='ASR')
+ax1.axhline(y=1, color='gray', linestyle='--', linewidth=2, label='Equal ratio')
 ax1.set_xlabel('Year')
-ax1.set_ylabel('Total Hospitalizations', color=color1)
-ax1.bar(total_by_year['year'], total_by_year['hosp_total'], color=color1, alpha=0.7)
-ax1.tick_params(axis='y', labelcolor=color1)
+ax1.set_ylabel('Male:Female Ratio')
+ax1.set_title('Sex Ratio Over Time', fontweight='bold')
+ax1.legend()
+ax1.grid(True, alpha=0.3, axis='y')
 ax1.set_xticks(YEARS)
 
-ax2 = ax1.twinx()
-color2 = 'darkred'
-ax2.set_ylabel('Mean ASR', color=color2)
-ax2.plot(total_by_year['year'], total_by_year['asr_total'], color=color2, 
-         marker='o', linewidth=3, markersize=10)
-ax2.tick_params(axis='y', labelcolor=color2)
+ax2 = axes[1]
+sex_by_icd_sorted = sex_by_icd.sort_values('sex_ratio', ascending=True)
+colors = ['coral' if r < 1 else 'steelblue' for r in sex_by_icd_sorted['sex_ratio']]
+labels = [f"{row['icd_code']}: {row['description'][:25]}" for _, row in sex_by_icd_sorted.iterrows()]
+ax2.barh(labels, sex_by_icd_sorted['sex_ratio'], color=colors)
+ax2.axvline(x=1, color='gray', linestyle='--', linewidth=2)
+ax2.set_xlabel('Male:Female Ratio')
+ax2.set_title('Sex Ratio by Diagnosis (F84.x)', fontweight='bold')
+ax2.grid(True, alpha=0.3, axis='x')
 
-plt.title('Autism Spectrum Disorders (F84): Hospitalizations and ASR Trends', fontweight='bold', fontsize=14)
-fig.tight_layout()
-save_figure(fig, 'total_trend_f84.png')
+plt.suptitle('Sex Differences in Autism Spectrum Disorders', fontsize=14, fontweight='bold', y=1.02)
+plt.tight_layout()
+save_figure(fig, 'sex_ratio_f84.png')
 plt.show()
 ```
 
 ```{python}
-#| label: tbl-summary-stats
-#| tbl-cap: "Summary statistics of ASD hospitalizations"
+#| label: tbl-sex-ratio-by-icd
+#| tbl-cap: "Sex Ratio Summary by F84 Subcode"
 #| tbl-cap-location: bottom
 
-total_hosp = hospitalizations['hospitalizations'].sum()
-unique_codes = hospitalizations['icd_code'].nunique()
-years_covered = hospitalizations['year'].nunique()
+sex_summary = sex_by_icd[['icd_code', 'description', 'hosp_male', 'hosp_female', 'sex_ratio', 'asr_ratio']].copy()
+sex_summary.columns = ['ICD Code', 'Description', 'Male Hosp.', 'Female Hosp.', 'M:F Ratio (N)', 'M:F Ratio (ASR)']
+sex_summary = sex_summary.sort_values('M:F Ratio (N)', ascending=False)
 
-summary_stats = pd.DataFrame({
-    'Metric': [
-        'Total Hospitalizations',
-        'Years Covered',
-        'ICD Codes Analyzed',
-        'Mean Hospitalizations/Year',
-        'F84 subcodes present'
-    ],
-    'Value': [
-        f"{total_hosp:,.0f}",
-        f"{years_covered} ({hospitalizations['year'].min()}-{hospitalizations['year'].max()})",
-        unique_codes,
-        f"{total_hosp/years_covered:,.0f}",
-        len([c for c in hospitalizations['icd_code'].unique() if c.startswith('F84')])
-    ]
-})
+sex_summary.style.format({
+    'Male Hosp.': '{:,.0f}',
+    'Female Hosp.': '{:,.0f}',
+    'M:F Ratio (N)': '{:.2f}',
+    'M:F Ratio (ASR)': '{:.2f}'
+}, na_rep='-').hide(axis="index")
+```
 
-summary_stats.style.hide(axis="index")
+\newpage
+
+## Age Distribution Analysis
+
+```{python}
+#| label: fig-age-distribution
+#| fig-cap: "Age Distribution of ASD Hospitalizations"
+#| fig-width: 16
+#| fig-height: 10
+
+fig, axes = plt.subplots(2, 2, figsize=(16, 10))
+
+age_dist = hospitalizations.groupby('age_group')['hospitalizations'].sum()
+age_dist = age_dist.reindex([a for a in AGE_ORDER if a in age_dist.index])
+
+ax1 = axes[0, 0]
+ax1.bar(age_dist.index, age_dist.values, color='teal', alpha=0.7)
+ax1.set_xlabel('Age Group')
+ax1.set_ylabel('Hospitalizations')
+ax1.set_title('Overall Age Distribution', fontweight='bold')
+ax1.tick_params(axis='x', rotation=45)
+ax1.grid(True, alpha=0.3, axis='y')
+
+ax2 = axes[0, 1]
+age_sex = hospitalizations.groupby(['age_group', 'sex'])['hospitalizations'].sum().unstack(fill_value=0)
+age_sex = age_sex.reindex([a for a in AGE_ORDER if a in age_sex.index])
+age_sex.plot(kind='bar', ax=ax2, color=['steelblue', 'coral'], width=0.8)
+ax2.set_xlabel('Age Group')
+ax2.set_ylabel('Hospitalizations')
+ax2.set_title('Age Distribution by Sex', fontweight='bold')
+ax2.tick_params(axis='x', rotation=45)
+ax2.legend(title='Sex')
+ax2.grid(True, alpha=0.3, axis='y')
+
+ax3 = axes[1, 0]
+age_icd = hospitalizations.groupby(['age_group', 'icd_code'])['hospitalizations'].sum().unstack(fill_value=0)
+age_icd = age_icd.reindex([a for a in AGE_ORDER if a in age_icd.index])
+age_icd.plot(kind='bar', ax=ax3, colormap='tab10', width=0.8, stacked=True)
+ax3.set_xlabel('Age Group')
+ax3.set_ylabel('Hospitalizations')
+ax3.set_title('Age Distribution by F84 Subcode', fontweight='bold')
+ax3.tick_params(axis='x', rotation=45)
+ax3.legend(title='ICD Code', bbox_to_anchor=(1.02, 1), loc='upper left', fontsize=8)
+ax3.grid(True, alpha=0.3, axis='y')
+
+ax4 = axes[1, 1]
+pediatric_groups = ['0-4', '5-9', '10-14', '15-19']
+pediatric_data = hospitalizations[hospitalizations['age_group'].isin(pediatric_groups)]
+ped_by_sex = pediatric_data.groupby('sex')['hospitalizations'].sum()
+colors = ['steelblue', 'coral']
+wedges, texts, autotexts = ax4.pie(ped_by_sex.values, labels=ped_by_sex.index, 
+                                    autopct='%1.1f%%', colors=colors, startangle=90)
+ax4.set_title('Pediatric Population (0-19 years) by Sex', fontweight='bold')
+
+plt.suptitle('Age Patterns in Autism Spectrum Disorders', fontsize=14, fontweight='bold', y=1.02)
+plt.tight_layout()
+save_figure(fig, 'age_distribution_f84.png')
+plt.show()
+```
+
+```{python}
+#| label: tbl-age-summary
+#| tbl-cap: "Hospitalization Summary by Age Group"
+#| tbl-cap-location: bottom
+
+age_summary = hospitalizations.groupby('age_group').agg({
+    'hospitalizations': 'sum'
+}).reset_index()
+
+total_hosp = age_summary['hospitalizations'].sum()
+age_summary['percentage'] = (age_summary['hospitalizations'] / total_hosp * 100).round(2)
+age_summary['age_order'] = age_summary['age_group'].apply(lambda x: AGE_ORDER.index(x) if x in AGE_ORDER else 99)
+age_summary = age_summary.sort_values('age_order').drop(columns='age_order')
+age_summary.columns = ['Age Group', 'Hospitalizations', 'Percentage (%)']
+
+age_summary.style.format({
+    'Hospitalizations': '{:,.0f}',
+    'Percentage (%)': '{:.2f}'
+}).hide(axis="index")
+```
+
+```{python}
+#| label: tbl-age-sex-cross
+#| tbl-cap: "Hospitalizations by Age Group and Sex"
+#| tbl-cap-location: bottom
+
+age_sex_table = hospitalizations.groupby(['age_group', 'sex'])['hospitalizations'].sum().unstack(fill_value=0)
+age_sex_table = age_sex_table.reindex([a for a in AGE_ORDER if a in age_sex_table.index])
+age_sex_table['Total'] = age_sex_table.sum(axis=1)
+age_sex_table['M:F Ratio'] = (age_sex_table['Male'] / age_sex_table['Female'].replace(0, np.nan)).round(2)
+
+age_sex_table.style.format({
+    'Male': '{:,.0f}',
+    'Female': '{:,.0f}',
+    'Total': '{:,.0f}',
+    'M:F Ratio': '{:.2f}'
+}, na_rep='-')
 ```
 
 \newpage
@@ -945,11 +1084,11 @@ def calculate_regional_asr(regional_df, population_df, per=100000):
     return result[['region', 'year', 'hospitalizations', 'asr']]
 
 
-def calculate_regional_icd_asr(regional_df, population_df, per=100000):
+def calculate_regional_asr_by_sex(regional_df, population_df, per=100000):
     who_weights = pd.DataFrame([
         {'age_group': k, 'who_weight': v} for k, v in WHO_STANDARD_POPULATION.items()
     ])
-    hosp_agg = regional_df.groupby(['region', 'icd_code', 'year', 'age_group', 'sex']).size().reset_index(name='hospitalizations')
+    hosp_agg = regional_df.groupby(['region', 'sex', 'year', 'age_group']).size().reset_index(name='hospitalizations')
     if population_df is not None and 'region' in population_df.columns:
         pop_agg = population_df.groupby(['region', 'year', 'age_group', 'sex'])['population'].sum().reset_index()
         hosp_agg['region_norm'] = hosp_agg['region'].apply(_normalize_region_basic)
@@ -967,17 +1106,16 @@ def calculate_regional_icd_asr(regional_df, population_df, per=100000):
     merged['age_specific_rate'] = (merged['hospitalizations'] / merged['population']) * per
     merged = merged.merge(who_weights, on='age_group', how='left')
     merged['weighted_rate'] = merged['age_specific_rate'] * merged['who_weight']
-    result = merged.groupby(['region', 'icd_code']).agg({
+    result = merged.groupby(['region', 'sex']).agg({
         'hospitalizations': 'sum',
         'weighted_rate': 'sum'
     }).reset_index()
     result['asr'] = (result['weighted_rate'] / TOTAL_WHO_WEIGHT).round(2)
-    result['description'] = result['icd_code'].map(ALL_ASD_CODES)
-    return result[['region', 'icd_code', 'description', 'hospitalizations', 'asr']]
+    return result[['region', 'sex', 'hospitalizations', 'asr']]
 
 
 regional_asr = calculate_regional_asr(regional_data, population_regional if population_regional is not None else population)
-regional_icd_asr = calculate_regional_icd_asr(regional_data, population_regional if population_regional is not None else population)
+regional_asr_sex = calculate_regional_asr_by_sex(regional_data, population_regional if population_regional is not None else population)
 
 total_by_region = regional_data.groupby('region').size().reset_index(name='total_hospitalizations')
 total_by_region = total_by_region.sort_values('total_hospitalizations', ascending=False)
@@ -986,9 +1124,8 @@ mean_asr_region = regional_asr.groupby('region')['asr'].mean().reset_index()
 mean_asr_region.columns = ['region', 'mean_asr']
 mean_asr_region = mean_asr_region.sort_values('mean_asr', ascending=False)
 
-main_disease_region = regional_icd_asr.loc[
-    regional_icd_asr.groupby('region')['hospitalizations'].idxmax()
-][['region', 'icd_code', 'description', 'hospitalizations', 'asr']]
+regional_sex_ratio = regional_asr_sex.pivot(index='region', columns='sex', values='hospitalizations').reset_index()
+regional_sex_ratio['sex_ratio'] = regional_sex_ratio['Male'] / regional_sex_ratio['Female'].replace(0, np.nan)
 ```
 
 ### Age-Standardized Rates by Region
@@ -1051,24 +1188,102 @@ save_figure(fig, 'regional_asr_trends_f84.png')
 plt.show()
 ```
 
+### Regional Sex Ratio Analysis
+
 ```{python}
-#| label: tbl-regional-summary-complete
-#| tbl-cap: "Complete regional summary with ASR and top diagnosis"
+#| label: tbl-regional-sex-ratio
+#| tbl-cap: "Sex Ratio by Region"
 #| tbl-cap-location: bottom
 
-regional_complete = total_by_region.merge(mean_asr_region, on='region', how='left')
-regional_complete = regional_complete.merge(
-    main_disease_region[['region', 'icd_code', 'description']], 
-    on='region', 
-    how='left'
-)
-regional_complete.columns = ['Region', 'Total Hosp.', 'Mean ASR', 'Main ICD', 'Main Diagnosis']
-regional_complete = regional_complete.sort_values('Mean ASR', ascending=False)
+regional_sex_display = regional_sex_ratio.merge(mean_asr_region, on='region')
+regional_sex_display = regional_sex_display[['region', 'Male', 'Female', 'sex_ratio', 'mean_asr']]
+regional_sex_display.columns = ['Region', 'Male Hosp.', 'Female Hosp.', 'M:F Ratio', 'Mean ASR']
+regional_sex_display = regional_sex_display.sort_values('M:F Ratio', ascending=False)
 
-regional_complete.style.format({
-    'Total Hosp.': '{:,.0f}',
+regional_sex_display.style.format({
+    'Male Hosp.': '{:,.0f}',
+    'Female Hosp.': '{:,.0f}',
+    'M:F Ratio': '{:.2f}',
     'Mean ASR': '{:.2f}'
-}).hide(axis="index")
+}, na_rep='-').hide(axis="index")
+```
+
+```{python}
+#| label: fig-regional-sex-ratio
+#| fig-cap: "Regional Sex Ratio Comparison"
+#| fig-width: 14
+#| fig-height: 8
+
+fig, axes = plt.subplots(1, 2, figsize=(14, 8))
+
+ax1 = axes[0]
+reg_sorted = regional_sex_ratio.sort_values('sex_ratio', ascending=True)
+colors = ['coral' if r < 2 else ('steelblue' if r < 4 else 'darkblue') for r in reg_sorted['sex_ratio']]
+ax1.barh(reg_sorted['region'], reg_sorted['sex_ratio'], color=colors)
+ax1.axvline(x=1, color='gray', linestyle='--', linewidth=2, label='Equal ratio')
+ax1.axvline(x=4, color='red', linestyle=':', linewidth=2, label='Literature avg (4:1)')
+ax1.set_xlabel('Male:Female Ratio')
+ax1.set_title('Sex Ratio by Region', fontweight='bold')
+ax1.legend()
+ax1.grid(True, alpha=0.3, axis='x')
+
+ax2 = axes[1]
+regional_sex_pivot = regional_asr_sex.pivot(index='region', columns='sex', values='asr').reset_index()
+regional_sex_pivot = regional_sex_pivot.sort_values('Male', ascending=False)
+x = np.arange(len(regional_sex_pivot))
+width = 0.35
+ax2.barh(x - width/2, regional_sex_pivot['Male'], width, label='Male', color='steelblue')
+ax2.barh(x + width/2, regional_sex_pivot['Female'], width, label='Female', color='coral')
+ax2.set_yticks(x)
+ax2.set_yticklabels(regional_sex_pivot['region'])
+ax2.set_xlabel('ASR (per 100,000)')
+ax2.set_title('ASR by Sex and Region', fontweight='bold')
+ax2.legend()
+ax2.grid(True, alpha=0.3, axis='x')
+
+plt.tight_layout()
+save_figure(fig, 'regional_sex_ratio_f84.png')
+plt.show()
+```
+
+### Regional Age Distribution
+
+```{python}
+#| label: fig-regional-age-dist
+#| fig-cap: "Age Distribution by Region"
+#| fig-width: 16
+#| fig-height: 10
+
+regional_age = regional_data.groupby(['region', 'age_group']).size().reset_index(name='hospitalizations')
+regional_age_pivot = regional_age.pivot(index='region', columns='age_group', values='hospitalizations').fillna(0)
+regional_age_pivot = regional_age_pivot[[c for c in AGE_ORDER if c in regional_age_pivot.columns]]
+
+fig, axes = plt.subplots(1, 2, figsize=(16, 10))
+
+ax1 = axes[0]
+sns.heatmap(regional_age_pivot, annot=True, fmt='.0f', cmap='YlOrRd', ax=ax1,
+            cbar_kws={'label': 'Hospitalizations'})
+ax1.set_title('Hospitalizations by Region and Age Group', fontweight='bold')
+ax1.set_xlabel('Age Group')
+ax1.set_ylabel('Region')
+
+ax2 = axes[1]
+pediatric = ['0-4', '5-9', '10-14', '15-19']
+adult = ['20-24', '25-29', '30-34', '35-39', '40-44', '45-49', '50-54', '55-59', '60-64', '65-69', '70-74', '75-79', '80+']
+regional_age_pivot['Pediatric'] = regional_age_pivot[[c for c in pediatric if c in regional_age_pivot.columns]].sum(axis=1)
+regional_age_pivot['Adult'] = regional_age_pivot[[c for c in adult if c in regional_age_pivot.columns]].sum(axis=1)
+regional_age_pivot['Pediatric_pct'] = (regional_age_pivot['Pediatric'] / (regional_age_pivot['Pediatric'] + regional_age_pivot['Adult']) * 100).round(1)
+
+ped_sorted = regional_age_pivot.sort_values('Pediatric_pct', ascending=True)
+ax2.barh(ped_sorted.index, ped_sorted['Pediatric_pct'], color='teal', alpha=0.7)
+ax2.axvline(x=50, color='gray', linestyle='--', linewidth=2)
+ax2.set_xlabel('Pediatric Percentage (%)')
+ax2.set_title('Proportion of Pediatric Cases (0-19 years) by Region', fontweight='bold')
+ax2.grid(True, alpha=0.3, axis='x')
+
+plt.tight_layout()
+save_figure(fig, 'regional_age_distribution_f84.png')
+plt.show()
 ```
 
 \newpage
@@ -1079,27 +1294,17 @@ regional_complete.style.format({
 #| label: filter-national-comuna-data
 #| include: false
 
-# Obtener todas las comunas del archivo de población
 all_comunas_pop = population_detail['comuna'].unique().tolist() if 'comuna' in population_detail.columns else []
-
-# Normalizar comunas de población
 all_comunas_norm = set(normalize_comuna(c) for c in all_comunas_pop if pd.notna(c))
 
-# Normalizar comunas en datos regionales
 regional_data['comuna_norm'] = regional_data['comuna'].apply(normalize_comuna)
-
-# Filtrar datos a comunas que existen en el archivo de población
 national_comuna_data = regional_data[regional_data['comuna_norm'].isin(all_comunas_norm)].copy()
 
-# Preparar población por comuna (todas las comunas de Chile)
 pop_nacional = population_detail.copy()
 pop_nacional['comuna_norm'] = pop_nacional['comuna'].apply(normalize_comuna)
 
-# Total por comuna (sin filtrar aún las excluidas)
 total_by_comuna_all = national_comuna_data.groupby('comuna').size().reset_index(name='total_hospitalizations')
 total_by_comuna_all = total_by_comuna_all.sort_values('total_hospitalizations', ascending=False)
-
-comuna_counts = national_comuna_data.groupby(['year', 'comuna']).size().reset_index(name='hospitalizations')
 
 
 def calculate_comuna_asr_national(df, pop_df, per=100000):
@@ -1126,48 +1331,45 @@ def calculate_comuna_asr_national(df, pop_df, per=100000):
     return result[['comuna', 'comuna_norm', 'hospitalizations', 'asr']]
 
 
-def calculate_comuna_icd_asr_national(df, pop_df, per=100000):
+def calculate_comuna_icd_asr_national(df, pop_df, icd_code, per=100000):
     who_weights = pd.DataFrame([
         {'age_group': k, 'who_weight': v} for k, v in WHO_STANDARD_POPULATION.items()
     ])
-    df = df.copy()
-    df['comuna_norm'] = df['comuna'].apply(normalize_comuna)
-    hosp_agg = df.groupby(['comuna_norm', 'icd_code', 'year', 'age_group', 'sex']).size().reset_index(name='hospitalizations')
+    df_filtered = df[df['icd_code'] == icd_code].copy()
+    if len(df_filtered) == 0:
+        return pd.DataFrame(columns=['comuna', 'comuna_norm', 'hospitalizations', 'asr'])
+    df_filtered['comuna_norm'] = df_filtered['comuna'].apply(normalize_comuna)
+    hosp_agg = df_filtered.groupby(['comuna_norm', 'year', 'age_group', 'sex']).size().reset_index(name='hospitalizations')
     pop_agg = pop_df.groupby(['comuna_norm', 'year', 'age_group', 'sex'])['population'].sum().reset_index()
     merged = hosp_agg.merge(pop_agg, on=['comuna_norm', 'year', 'age_group', 'sex'], how='left')
     merged = merged.dropna(subset=['population'])
     merged = merged[merged['population'] > 0]
+    if len(merged) == 0:
+        return pd.DataFrame(columns=['comuna', 'comuna_norm', 'hospitalizations', 'asr'])
     merged['age_specific_rate'] = (merged['hospitalizations'] / merged['population']) * per
     merged = merged.merge(who_weights, on='age_group', how='left')
     merged['weighted_rate'] = merged['age_specific_rate'] * merged['who_weight']
-    result = merged.groupby(['comuna_norm', 'icd_code']).agg({
+    result = merged.groupby('comuna_norm').agg({
         'hospitalizations': 'sum',
         'weighted_rate': 'sum'
     }).reset_index()
     result['asr'] = (result['weighted_rate'] / TOTAL_WHO_WEIGHT).round(2)
-    result['description'] = result['icd_code'].map(ALL_ASD_CODES)
-    comuna_map = df.drop_duplicates('comuna_norm')[['comuna', 'comuna_norm']]
+    comuna_map = df_filtered.drop_duplicates('comuna_norm')[['comuna', 'comuna_norm']]
     result = result.merge(comuna_map, on='comuna_norm', how='left')
-    return result[['comuna', 'comuna_norm', 'icd_code', 'description', 'hospitalizations', 'asr']]
+    return result[['comuna', 'comuna_norm', 'hospitalizations', 'asr']]
 
 
-# Calcular ASR para todas las comunas
 comuna_asr_all = calculate_comuna_asr_national(national_comuna_data, pop_nacional)
-comuna_icd_asr_all = calculate_comuna_icd_asr_national(national_comuna_data, pop_nacional)
 
-# Guardar datos completos (incluyendo territorios no continentales)
+icd_codes_present = national_comuna_data['icd_code'].unique().tolist()
+comuna_asr_by_icd = {}
+for icd in icd_codes_present:
+    comuna_asr_by_icd[icd] = calculate_comuna_icd_asr_national(national_comuna_data, pop_nacional, icd)
+
 comuna_asr_all.to_csv(os.path.join(output_path, 'comuna_asr_national_f84.csv'), index=False)
-comuna_icd_asr_all.to_csv(os.path.join(output_path, 'comuna_icd_asr_national_f84.csv'), index=False)
 
-# Filtrar territorios no continentales para tablas y mapas
 comuna_asr = comuna_asr_all[~comuna_asr_all['comuna'].apply(is_excluded_comuna)].copy()
-comuna_icd_asr = comuna_icd_asr_all[~comuna_icd_asr_all['comuna'].apply(is_excluded_comuna)].copy()
 total_by_comuna = total_by_comuna_all[~total_by_comuna_all['comuna'].apply(is_excluded_comuna)].copy()
-
-# Calcular diagnóstico principal por comuna (sin territorios excluidos)
-main_disease_comuna = comuna_icd_asr.loc[
-    comuna_icd_asr.groupby('comuna')['hospitalizations'].idxmax()
-][['comuna', 'icd_code', 'description', 'hospitalizations', 'asr']]
 
 mean_asr_comuna = comuna_asr.sort_values('asr', ascending=False)
 ```
@@ -1176,19 +1378,15 @@ mean_asr_comuna = comuna_asr.sort_values('asr', ascending=False)
 
 ```{python}
 #| label: tbl-national-summary
-#| tbl-cap: "Top 50 comunas by ASR - Chile Continental (excluding Isla de Pascua, Juan Fernández, Antártica)"
+#| tbl-cap: "Top 50 comunas by ASR - Chile Continental"
 #| tbl-cap-location: bottom
 
 national_summary = total_by_comuna.merge(
     mean_asr_comuna[['comuna', 'asr']], 
     on='comuna', 
     how='left'
-).merge(
-    main_disease_comuna[['comuna', 'icd_code', 'description']], 
-    on='comuna', 
-    how='left'
 )
-national_summary.columns = ['Comuna', 'Total Hosp.', 'ASR', 'Main ICD', 'Main Diagnosis']
+national_summary.columns = ['Comuna', 'Total Hosp.', 'ASR']
 national_summary = national_summary.sort_values('ASR', ascending=False)
 
 national_summary.head(50).style.format({
@@ -1205,7 +1403,6 @@ national_summary.head(50).style.format({
 
 fig, axes = plt.subplots(1, 2, figsize=(16, 10))
 
-# Top 30 comunas por hospitalizaciones
 top30_hosp = total_by_comuna.head(30)
 
 ax1 = axes[0]
@@ -1216,7 +1413,6 @@ ax1.set_xlabel('Total Hospitalizations')
 ax1.set_title('Top 30 Comunas by Hospitalizations', fontweight='bold')
 ax1.grid(True, alpha=0.3, axis='x')
 
-# Top 30 comunas por ASR
 top30_asr = mean_asr_comuna.head(30)
 
 ax2 = axes[1]
@@ -1233,26 +1429,6 @@ save_figure(fig, 'national_comunas_f84.png')
 plt.show()
 ```
 
-### Most Prevalent Diagnosis by Comuna
-
-```{python}
-#| label: tbl-top-disease-comuna-national
-#| tbl-cap: "Most prevalent diagnosis by comuna - Top 50 comunas by ASR"
-#| tbl-cap-location: bottom
-
-main_disease_display = main_disease_comuna.merge(total_by_comuna, on='comuna')
-main_disease_display = main_disease_display.merge(mean_asr_comuna[['comuna', 'asr']], on='comuna', how='left', suffixes=('_icd', '_total'))
-main_disease_display = main_disease_display.sort_values('asr_total', ascending=False)
-main_disease_display = main_disease_display[['comuna', 'total_hospitalizations', 'asr_total', 'icd_code', 'description', 'asr_icd']]
-main_disease_display.columns = ['Comuna', 'Total Hosp.', 'Mean ASR', 'Main ICD', 'Diagnosis', 'ICD ASR']
-
-main_disease_display.head(50).style.format({
-    'Total Hosp.': '{:,.0f}',
-    'Mean ASR': '{:.2f}',
-    'ICD ASR': '{:.2f}'
-}, na_rep='-').hide(axis="index")
-```
-
 ```{python}
 #| label: tbl-national-stats
 #| tbl-cap: "National Comunal Analysis Summary Statistics"
@@ -1261,7 +1437,6 @@ main_disease_display.head(50).style.format({
 main_icd_national = national_comuna_data['icd_code'].value_counts().idxmax() if len(national_comuna_data) > 0 else 'N/A'
 main_icd_desc = ALL_ASD_CODES.get(main_icd_national, 'N/A')
 
-# Contar comunas excluidas
 excluded_count = len(total_by_comuna_all) - len(total_by_comuna)
 
 national_stats = pd.DataFrame({
@@ -1303,7 +1478,6 @@ from esda.moran import Moran, Moran_Local
 from splot.esda import moran_scatterplot
 from matplotlib.patches import Patch
 
-# Buscar shapefile de comunas
 shp_candidates = [
     os.path.join(data_path, 'comunas.shp'),
     os.path.join(os.getcwd(), 'comunas.shp'),
@@ -1319,9 +1493,13 @@ for candidate in shp_candidates:
         break
 
 has_spatial_data = False
+gdf_chile = None
+gdf_continental = None
 gdf_f84 = None
 pesos = None
 has_f84_data = False
+COMUNA_COL = None
+REGION_CODE_COL = None
 
 if shp_path:
     gdf_chile = gpd.read_file(shp_path)
@@ -1341,27 +1519,25 @@ if shp_path:
         s = ''.join(c for c in s if c.isalnum() or c == ' ')
         return s.strip()
     
-    # Detectar columna de comuna
-    COMUNA_COL = None
     for col in ['Comuna', 'COMUNA', 'NOM_COMUNA', 'nom_comuna', 'NAME']:
         if col in gdf_chile.columns:
             COMUNA_COL = col
             break
-    
     if COMUNA_COL is None:
         COMUNA_COL = gdf_chile.columns[0]
     
+    for col in ['codregion', 'CODREGION', 'COD_REGION', 'Region', 'REGION']:
+        if col in gdf_chile.columns:
+            REGION_CODE_COL = col
+            break
+    
     gdf_chile["comuna_norm"] = gdf_chile[COMUNA_COL].apply(normalize_comuna_spatial)
     
-    # Excluir territorios no continentales del shapefile
+    if REGION_CODE_COL:
+        gdf_chile[REGION_CODE_COL] = pd.to_numeric(gdf_chile[REGION_CODE_COL], errors='coerce')
+    
     gdf_continental = gdf_chile[~gdf_chile[COMUNA_COL].apply(is_excluded_comuna)].copy()
     
-    # También filtrar por codregion si existe (excluir Antártica = 12 o similar)
-    if 'codregion' in gdf_continental.columns:
-        gdf_continental['codregion'] = pd.to_numeric(gdf_continental['codregion'], errors='coerce')
-        # Mantener solo Chile continental (regiones 1-16, excluyendo territorios especiales)
-    
-    # Preparar datos de ASR para merge
     comuna_asr_copy = comuna_asr.copy()
     comuna_asr_copy['comuna_norm'] = comuna_asr_copy['comuna'].apply(normalize_comuna_spatial)
     
@@ -1376,14 +1552,13 @@ if shp_path:
     has_f84_data = gdf_f84['asr_f84'].sum() > 0
     has_spatial_data = True
     
-    # Crear pesos espaciales (Queen contiguity)
     try:
         pesos = Queen.from_dataframe(gdf_f84)
     except:
         pesos = None
 ```
 
-### Choropleth Maps - ASR Distribution
+### Choropleth Map - Total F84 ASR
 
 ```{python}
 #| label: fig-spatial-choropleth-national
@@ -1415,6 +1590,87 @@ else:
     plt.show()
 ```
 
+### Choropleth Maps by F84 Subcode
+
+```{python}
+#| label: fig-spatial-choropleth-by-subcode
+#| fig-cap: "ASR Distribution by F84 Subcode - Chile Continental"
+#| fig-width: 18
+#| fig-height: 20
+
+if has_spatial_data:
+    disease_labels = {
+        'F84': ('Pervasive developmental disorders', 'Blues'),
+        'F84.0': ('Childhood autism', 'Reds'),
+        'F84.1': ('Atypical autism', 'Oranges'),
+        'F84.2': ('Rett syndrome', 'Purples'),
+        'F84.3': ('Childhood disintegrative disorder', 'Greens'),
+        'F84.4': ('Overactive disorder with MR', 'YlOrBr'),
+        'F84.5': ('Asperger syndrome', 'RdPu'),
+        'F84.8': ('Other PDD', 'BuGn'),
+        'F84.9': ('PDD unspecified', 'GnBu')
+    }
+    
+    icd_codes_with_data = []
+    gdf_by_icd = {}
+    
+    for icd in icd_codes_present:
+        if icd in comuna_asr_by_icd and len(comuna_asr_by_icd[icd]) > 0:
+            asr_data = comuna_asr_by_icd[icd].copy()
+            asr_data = asr_data[~asr_data['comuna'].apply(is_excluded_comuna)]
+            if len(asr_data) > 0 and asr_data['asr'].sum() > 0:
+                asr_data['comuna_norm'] = asr_data['comuna'].apply(normalize_comuna_spatial)
+                gdf_icd = gdf_continental.copy()
+                gdf_icd = gdf_icd.merge(
+                    asr_data[['comuna_norm', 'asr']], 
+                    on='comuna_norm', 
+                    how='left'
+                )
+                gdf_icd['asr'] = gdf_icd['asr'].fillna(0)
+                gdf_by_icd[icd] = gdf_icd
+                icd_codes_with_data.append(icd)
+    
+    n_codes = len(icd_codes_with_data)
+    
+    if n_codes > 0:
+        ncols = 3
+        nrows = max(1, (n_codes + ncols - 1) // ncols)
+        
+        fig, axes = plt.subplots(nrows, ncols, figsize=(18, 6*nrows))
+        axes = axes.flatten() if n_codes > 1 else [axes]
+        
+        for idx, icd in enumerate(icd_codes_with_data):
+            ax = axes[idx]
+            gdf = gdf_by_icd[icd]
+            label, cmap = disease_labels.get(icd, (icd, 'viridis'))
+            
+            gdf.plot(column='asr', cmap=cmap, linewidth=0.2, ax=ax, edgecolor='0.7',
+                     legend=True, legend_kwds={'label': 'ASR', 'shrink': 0.4, 'pad': 0.01})
+            ax.set_title(f'{icd}: {label[:30]}', fontweight='bold', fontsize=10)
+            ax.set_axis_off()
+        
+        for idx in range(len(icd_codes_with_data), len(axes)):
+            axes[idx].set_visible(False)
+        
+        plt.suptitle('F84 Subcode-Specific ASR Distribution - Chile Continental (2019-2024)', 
+                     fontsize=14, fontweight='bold', y=1.01)
+        plt.tight_layout()
+        save_figure(fig, 'spatial_choropleth_by_subcode_f84.png')
+        plt.show()
+    else:
+        fig, ax = plt.subplots(figsize=(8, 6))
+        ax.text(0.5, 0.5, 'No subcode data available for mapping', ha='center', va='center', fontsize=14)
+        ax.set_axis_off()
+        plt.show()
+else:
+    fig, ax = plt.subplots(figsize=(8, 6))
+    ax.text(0.5, 0.5, 'Spatial data not available', ha='center', va='center', fontsize=14)
+    ax.set_axis_off()
+    plt.show()
+```
+
+\newpage
+
 ### Global Moran's I - Spatial Autocorrelation
 
 ```{python}
@@ -1422,6 +1678,7 @@ else:
 #| include: false
 
 moran_f84 = None
+moran_by_icd = {}
 
 if has_spatial_data and pesos is not None:
     if has_f84_data and gdf_f84['asr_f84'].var() > 0:
@@ -1429,6 +1686,14 @@ if has_spatial_data and pesos is not None:
             moran_f84 = Moran(gdf_f84['asr_f84'], pesos)
         except:
             moran_f84 = None
+    
+    for icd in icd_codes_with_data:
+        gdf = gdf_by_icd[icd]
+        if gdf['asr'].var() > 0:
+            try:
+                moran_by_icd[icd] = Moran(gdf['asr'], pesos)
+            except:
+                pass
 ```
 
 ```{python}
@@ -1440,13 +1705,23 @@ moran_results = []
 
 if moran_f84 is not None:
     moran_results.append({
-        'Variable': 'ASD codes (F84)',
+        'Variable': 'Total F84',
         "Moran's I": round(moran_f84.I, 4),
         'E[I]': round(moran_f84.EI, 4),
-        'Variance': round(moran_f84.VI_norm, 6),
         'Z-score': round(moran_f84.z_norm, 4),
         'P-value': round(moran_f84.p_norm, 4),
         'Interpretation': 'Clustered' if moran_f84.I > 0 and moran_f84.p_norm < 0.05 else ('Dispersed' if moran_f84.I < 0 and moran_f84.p_norm < 0.05 else 'Random')
+    })
+
+for icd in moran_by_icd:
+    m = moran_by_icd[icd]
+    moran_results.append({
+        'Variable': icd,
+        "Moran's I": round(m.I, 4),
+        'E[I]': round(m.EI, 4),
+        'Z-score': round(m.z_norm, 4),
+        'P-value': round(m.p_norm, 4),
+        'Interpretation': 'Clustered' if m.I > 0 and m.p_norm < 0.05 else ('Dispersed' if m.I < 0 and m.p_norm < 0.05 else 'Random')
     })
 
 if moran_results:
@@ -1454,7 +1729,6 @@ if moran_results:
     display(moran_df.style.format({
         "Moran's I": '{:.4f}',
         'E[I]': '{:.4f}',
-        'Variance': '{:.6f}',
         'Z-score': '{:.4f}',
         'P-value': '{:.4f}'
     }).hide(axis="index"))
@@ -1472,7 +1746,7 @@ fig, ax = plt.subplots(figsize=(8, 6))
 
 if moran_f84 is not None:
     moran_scatterplot(moran_f84, zstandard=True, ax=ax)
-    ax.set_title(f"ASD (F84) - Moran's I = {moran_f84.I:.4f} (p = {moran_f84.p_norm:.4f})", fontweight='bold')
+    ax.set_title(f"Total F84 - Moran's I = {moran_f84.I:.4f} (p = {moran_f84.p_norm:.4f})", fontweight='bold')
 else:
     ax.text(0.5, 0.5, 'Insufficient F84 data\nfor Moran analysis', ha='center', va='center', transform=ax.transAxes, fontsize=12)
     ax.set_title('ASD codes (F84)', fontweight='bold')
@@ -1508,6 +1782,7 @@ def clasificar_lisa(lisa, data):
     return cluster_labels
 
 lisa_f84 = None
+lisa_by_icd = {}
 
 if has_spatial_data and pesos is not None:
     if has_f84_data and gdf_f84['asr_f84'].var() > 0:
@@ -1521,11 +1796,23 @@ if has_spatial_data and pesos is not None:
     else:
         gdf_f84['cluster_f84'] = 'No data'
         gdf_f84['lisa_p_f84'] = 1.0
+    
+    for icd in icd_codes_with_data:
+        gdf = gdf_by_icd[icd]
+        if gdf['asr'].var() > 0:
+            try:
+                lisa = Moran_Local(gdf['asr'], pesos)
+                gdf_by_icd[icd]['cluster'] = clasificar_lisa(lisa, gdf)
+                gdf_by_icd[icd]['lisa_p'] = lisa.p_sim
+                lisa_by_icd[icd] = lisa
+            except:
+                gdf_by_icd[icd]['cluster'] = 'No data'
+                gdf_by_icd[icd]['lisa_p'] = 1.0
 ```
 
 ```{python}
 #| label: tbl-lisa-clusters-f84-national
-#| tbl-cap: "LISA Clusters - ASD codes (F84) - Chile Continental"
+#| tbl-cap: "LISA Clusters - Total F84 - Chile Continental"
 #| tbl-cap-location: bottom
 
 if has_spatial_data and 'cluster_f84' in gdf_f84.columns:
@@ -1539,7 +1826,7 @@ else:
 
 ```{python}
 #| label: fig-lisa-maps-national
-#| fig-cap: "LISA Cluster Map - ASD codes (F84) - Chile Continental"
+#| fig-cap: "LISA Cluster Map - Total F84 - Chile Continental"
 #| fig-width: 10
 #| fig-height: 14
 
@@ -1556,7 +1843,7 @@ if has_spatial_data and 'cluster_f84' in gdf_f84.columns:
     fig, ax = plt.subplots(figsize=(10, 14))
     
     gdf_f84.plot(ax=ax, color=gdf_f84['cluster_f84'].map(colors_dict), edgecolor='gray', linewidth=0.3)
-    ax.set_title('LISA Clusters - ASD codes (F84)\nChile Continental', fontsize=12, fontweight='bold')
+    ax.set_title('LISA Clusters - Total F84\nChile Continental', fontsize=12, fontweight='bold')
     ax.set_axis_off()
     
     legend_elements = [Patch(facecolor=color, edgecolor='black', label=label) 
@@ -1564,7 +1851,7 @@ if has_spatial_data and 'cluster_f84' in gdf_f84.columns:
     fig.legend(handles=legend_elements, loc='lower center', ncol=5, fontsize=9, 
                frameon=True, bbox_to_anchor=(0.5, 0.02))
     
-    plt.suptitle('Local Indicators of Spatial Association (LISA)\nASR (2019-2024) - Excluding Non-Continental Territories', 
+    plt.suptitle('Local Indicators of Spatial Association (LISA)\nASR (2019-2024)', 
                  fontsize=14, fontweight='bold', y=0.98)
     plt.tight_layout()
     save_figure(fig, 'lisa_clusters_national_f84.png')
@@ -1576,9 +1863,62 @@ else:
     plt.show()
 ```
 
+### LISA Clusters by F84 Subcode
+
+```{python}
+#| label: fig-lisa-by-subcode
+#| fig-cap: "LISA Cluster Maps by F84 Subcode"
+#| fig-width: 18
+#| fig-height: 20
+
+if has_spatial_data and len(lisa_by_icd) > 0:
+    icd_with_lisa = [icd for icd in icd_codes_with_data if icd in lisa_by_icd]
+    n_codes = len(icd_with_lisa)
+    
+    if n_codes > 0:
+        ncols = 3
+        nrows = max(1, (n_codes + ncols - 1) // ncols)
+        
+        fig, axes = plt.subplots(nrows, ncols, figsize=(18, 6*nrows))
+        axes = axes.flatten() if n_codes > 1 else [axes]
+        
+        for idx, icd in enumerate(icd_with_lisa):
+            ax = axes[idx]
+            gdf = gdf_by_icd[icd]
+            label = ALL_ASD_CODES.get(icd, icd)[:30]
+            
+            gdf.plot(ax=ax, color=gdf['cluster'].map(colors_dict), edgecolor='gray', linewidth=0.2)
+            ax.set_title(f'{icd}: {label}', fontweight='bold', fontsize=10)
+            ax.set_axis_off()
+        
+        for idx in range(len(icd_with_lisa), len(axes)):
+            axes[idx].set_visible(False)
+        
+        legend_elements = [Patch(facecolor=color, edgecolor='black', label=label) 
+                           for label, color in colors_dict.items() if label != 'No data']
+        fig.legend(handles=legend_elements, loc='lower center', ncol=5, fontsize=9, 
+                   frameon=True, bbox_to_anchor=(0.5, 0.01))
+        
+        plt.suptitle('LISA Clusters by F84 Subcode - Chile Continental (2019-2024)', 
+                     fontsize=14, fontweight='bold', y=1.01)
+        plt.tight_layout()
+        save_figure(fig, 'lisa_clusters_by_subcode_f84.png')
+        plt.show()
+    else:
+        fig, ax = plt.subplots(figsize=(8, 6))
+        ax.text(0.5, 0.5, 'No LISA data available', ha='center', va='center', fontsize=14)
+        ax.set_axis_off()
+        plt.show()
+else:
+    fig, ax = plt.subplots(figsize=(8, 6))
+    ax.text(0.5, 0.5, 'Spatial data not available', ha='center', va='center', fontsize=14)
+    ax.set_axis_off()
+    plt.show()
+```
+
 ```{python}
 #| label: tbl-lisa-hotspots-national
-#| tbl-cap: "Significant LISA Clusters - Comunas Detail (Chile Continental)"
+#| tbl-cap: "Significant LISA Clusters - Comunas Detail (Total F84)"
 #| tbl-cap-location: bottom
 
 if has_spatial_data and 'cluster_f84' in gdf_f84.columns:
@@ -1596,336 +1936,266 @@ else:
     display(pd.DataFrame({'Message': ['No significant clusters found']}).style.hide(axis="index"))
 ```
 
-### Spatial Analysis Summary
+### Spatial Analysis Summary by Subcode
 
 ```{python}
-#| label: tbl-spatial-summary-national
-#| tbl-cap: "Spatial Analysis Summary - ASD (F84) - Chile Continental"
-#| tbl-cap-location: bottom
-
-if has_spatial_data:
-    spatial_summary = pd.DataFrame({
-        'Metric': [
-            'Comunas analyzed (Continental)',
-            'Comunas with F84 data',
-            'Mean ASR F84',
-            "Moran's I (F84)",
-            'F84 Hot Spots',
-            'F84 Cold Spots'
-        ],
-        'Value': [
-            len(gdf_f84),
-            (gdf_f84['asr_f84'] > 0).sum(),
-            f"{gdf_f84['asr_f84'].mean():.2f}",
-            f"{moran_f84.I:.4f} (p={moran_f84.p_norm:.4f})" if moran_f84 else 'N/A',
-            (gdf_f84['cluster_f84'] == 'High-High (Hot Spot)').sum() if 'cluster_f84' in gdf_f84.columns else 0,
-            (gdf_f84['cluster_f84'] == 'Low-Low (Cold Spot)').sum() if 'cluster_f84' in gdf_f84.columns else 0
-        ]
-    })
-    
-    display(spatial_summary.style.hide(axis="index"))
-else:
-    display(pd.DataFrame({'Message': ['Spatial analysis not available - shapefile not found']}).style.hide(axis="index"))
-```
-
-\newpage
-
-## Diagnosis-Specific Analysis - National Comunas
-
-```{python}
-#| label: disease-specific-setup-national
-#| include: false
-
-def calculate_comuna_asr_by_icd_national(df, pop_df, icd_code, per=100000):
-    who_weights = pd.DataFrame([
-        {'age_group': k, 'who_weight': v} for k, v in WHO_STANDARD_POPULATION.items()
-    ])
-    df_filtered = df[df['icd_code'] == icd_code].copy()
-    if len(df_filtered) == 0:
-        return pd.DataFrame(columns=['comuna', 'hospitalizations', 'asr'])
-    df_filtered['comuna_norm'] = df_filtered['comuna'].apply(normalize_comuna)
-    hosp_agg = df_filtered.groupby(['comuna_norm', 'year', 'age_group', 'sex']).size().reset_index(name='hospitalizations')
-    pop_agg = pop_df.groupby(['comuna_norm', 'year', 'age_group', 'sex'])['population'].sum().reset_index()
-    merged = hosp_agg.merge(pop_agg, on=['comuna_norm', 'year', 'age_group', 'sex'], how='left')
-    merged = merged.dropna(subset=['population'])
-    merged = merged[merged['population'] > 0]
-    if len(merged) == 0:
-        return pd.DataFrame(columns=['comuna', 'hospitalizations', 'asr'])
-    merged['age_specific_rate'] = (merged['hospitalizations'] / merged['population']) * per
-    merged = merged.merge(who_weights, on='age_group', how='left')
-    merged['weighted_rate'] = merged['age_specific_rate'] * merged['who_weight']
-    result = merged.groupby('comuna_norm').agg({
-        'hospitalizations': 'sum',
-        'weighted_rate': 'sum'
-    }).reset_index()
-    result['asr'] = (result['weighted_rate'] / TOTAL_WHO_WEIGHT).round(2)
-    comuna_map = df_filtered.drop_duplicates('comuna_norm')[['comuna', 'comuna_norm']]
-    result = result.merge(comuna_map, on='comuna_norm', how='left')
-    return result[['comuna', 'hospitalizations', 'asr']]
-
-
-# Filtrar datos sin territorios excluidos
-national_data_continental = national_comuna_data[~national_comuna_data['comuna'].apply(is_excluded_comuna)].copy()
-
-icd_codes_national = national_data_continental['icd_code'].unique().tolist()
-icd_codes_national.sort()
-
-disease_asr_by_comuna_national = {}
-for icd in icd_codes_national:
-    asr_df = calculate_comuna_asr_by_icd_national(national_data_continental, pop_nacional, icd)
-    # Filtrar territorios excluidos
-    disease_asr_by_comuna_national[icd] = asr_df[~asr_df['comuna'].apply(is_excluded_comuna)].copy()
-
-disease_gdf_national = {}
-disease_moran_national = {}
-disease_lisa_national = {}
-
-if has_spatial_data and gdf_f84 is not None and pesos is not None:
-    for icd in icd_codes_national:
-        asr_data = disease_asr_by_comuna_national[icd].copy()
-        if len(asr_data) > 0:
-            asr_data['comuna_norm'] = asr_data['comuna'].apply(normalize_comuna_spatial)
-            gdf_disease = gdf_continental.copy()
-            gdf_disease = gdf_disease.merge(
-                asr_data[['comuna_norm', 'asr']], 
-                on='comuna_norm', 
-                how='left'
-            )
-            gdf_disease['asr'] = gdf_disease['asr'].fillna(0)
-            disease_gdf_national[icd] = gdf_disease
-            if gdf_disease['asr'].var() > 0 and gdf_disease['asr'].sum() > 0:
-                try:
-                    disease_moran_national[icd] = Moran(gdf_disease['asr'], pesos)
-                    disease_lisa_national[icd] = Moran_Local(gdf_disease['asr'], pesos)
-                except:
-                    pass
-```
-
-### Diagnosis Distribution Overview
-
-```{python}
-#| label: tbl-disease-overview-national
-#| tbl-cap: "Diagnosis-specific hospitalization summary - Chile Continental"
-#| tbl-cap-location: bottom
-
-overview_data = []
-for icd in icd_codes_national:
-    asr_data = disease_asr_by_comuna_national[icd]
-    if len(asr_data) > 0:
-        overview_data.append({
-            'ICD Code': icd,
-            'Description': ALL_ASD_CODES.get(icd, 'Unknown'),
-            'Total Hosp.': asr_data['hospitalizations'].sum(),
-            'Comunas with Cases': len(asr_data[asr_data['hospitalizations'] > 0]),
-            'Mean ASR': asr_data['asr'].mean().round(2),
-            'Max ASR': asr_data['asr'].max(),
-            'Top Comuna': asr_data.loc[asr_data['asr'].idxmax(), 'comuna'] if len(asr_data) > 0 else 'N/A'
-        })
-
-overview_df = pd.DataFrame(overview_data)
-overview_df = overview_df.sort_values('Total Hosp.', ascending=False)
-
-display(overview_df.style.format({
-    'Total Hosp.': '{:,.0f}',
-    'Mean ASR': '{:.2f}',
-    'Max ASR': '{:.2f}'
-}).hide(axis="index"))
-```
-
-```{python}
-#| label: fig-disease-overview-bars-national
-#| fig-cap: "Diagnosis distribution comparison - Chile Continental"
-#| fig-width: 16
-#| fig-height: 6
-
-fig, axes = plt.subplots(1, 3, figsize=(16, 6))
-
-ax1 = axes[0]
-disease_totals = overview_df.sort_values('Total Hosp.', ascending=True)
-colors = plt.cm.viridis(np.linspace(0.2, 0.8, len(disease_totals)))
-ax1.barh(disease_totals['ICD Code'], disease_totals['Total Hosp.'], color=colors)
-ax1.set_xlabel('Total Hospitalizations')
-ax1.set_title('Total Hospitalizations by Diagnosis', fontweight='bold')
-ax1.grid(True, alpha=0.3, axis='x')
-
-ax2 = axes[1]
-disease_asr = overview_df.sort_values('Mean ASR', ascending=True)
-colors = plt.cm.YlOrRd(disease_asr['Mean ASR'] / disease_asr['Mean ASR'].max())
-ax2.barh(disease_asr['ICD Code'], disease_asr['Mean ASR'], color=colors)
-ax2.set_xlabel('Mean ASR (per 100,000)')
-ax2.set_title('Mean ASR by Diagnosis', fontweight='bold')
-ax2.grid(True, alpha=0.3, axis='x')
-
-ax3 = axes[2]
-disease_comunas = overview_df.sort_values('Comunas with Cases', ascending=True)
-ax3.barh(disease_comunas['ICD Code'], disease_comunas['Comunas with Cases'], color='steelblue')
-ax3.set_xlabel('Number of Comunas')
-ax3.set_title('Geographic Spread (Comunas with Cases)', fontweight='bold')
-ax3.grid(True, alpha=0.3, axis='x')
-
-plt.suptitle('F84 Diagnosis Distribution - Chile Continental', fontsize=14, fontweight='bold', y=1.02)
-plt.tight_layout()
-save_figure(fig, 'disease_overview_national_f84.png')
-plt.show()
-```
-
-\newpage
-
-### Diagnosis Comparison Maps
-
-```{python}
-#| label: fig-all-diseases-choropleth-national
-#| fig-cap: "All F84 Diagnoses - ASR Choropleth Comparison - Chile Continental"
-#| fig-width: 18
-#| fig-height: 20
-
-if has_spatial_data:
-    disease_labels = {
-        'F84': ('Pervasive developmental disorders', 'Blues'),
-        'F84.0': ('Childhood autism', 'Reds'),
-        'F84.1': ('Atypical autism', 'Oranges'),
-        'F84.2': ('Rett syndrome', 'Purples'),
-        'F84.3': ('Childhood disintegrative disorder', 'Greens'),
-        'F84.4': ('Overactive disorder with MR', 'YlOrBr'),
-        'F84.5': ('Asperger syndrome', 'RdPu'),
-        'F84.8': ('Other PDD', 'BuGn'),
-        'F84.9': ('PDD unspecified', 'GnBu')
-    }
-    
-    diseases_to_plot = []
-    for icd in icd_codes_national:
-        if icd in disease_gdf_national and disease_gdf_national[icd]['asr'].sum() > 0:
-            diseases_to_plot.append(icd)
-    
-    n_diseases = len(diseases_to_plot)
-    
-    if n_diseases > 0:
-        ncols = 3
-        nrows = max(1, (n_diseases + ncols - 1) // ncols)
-        
-        fig, axes = plt.subplots(nrows, ncols, figsize=(18, 6*nrows))
-        axes = axes.flatten() if n_diseases > 1 else [axes]
-        
-        for idx, icd in enumerate(diseases_to_plot):
-            ax = axes[idx]
-            gdf = disease_gdf_national[icd]
-            label, cmap = disease_labels.get(icd, (icd, 'viridis'))
-            
-            gdf.plot(column='asr', cmap=cmap, linewidth=0.2, ax=ax, edgecolor='0.7',
-                     legend=True, legend_kwds={'label': 'ASR', 'shrink': 0.4, 'pad': 0.01})
-            ax.set_title(f'{icd}: {label[:30]}', fontweight='bold', fontsize=10)
-            ax.set_axis_off()
-        
-        for idx in range(len(diseases_to_plot), len(axes)):
-            axes[idx].set_visible(False)
-        
-        plt.suptitle('F84 Diagnosis-Specific ASR Distribution - Chile Continental (2019-2024)', 
-                     fontsize=14, fontweight='bold', y=1.01)
-        plt.tight_layout()
-        save_figure(fig, 'all_diseases_choropleth_national_f84.png')
-        plt.show()
-    else:
-        fig, ax = plt.subplots(figsize=(8, 6))
-        ax.text(0.5, 0.5, 'No diagnosis data available for mapping', ha='center', va='center', fontsize=14)
-        ax.set_axis_off()
-        plt.show()
-else:
-    fig, ax = plt.subplots(figsize=(8, 6))
-    ax.text(0.5, 0.5, 'Spatial data not available', ha='center', va='center', fontsize=14)
-    ax.set_axis_off()
-    plt.show()
-```
-
-\newpage
-
-### Spatial Autocorrelation Summary - All F84 Diagnoses
-
-```{python}
-#| label: tbl-all-diseases-moran-national
-#| tbl-cap: "Spatial Autocorrelation (Moran's I) - All F84 Diagnoses - Chile Continental"
-#| tbl-cap-location: bottom
-
-if has_spatial_data:
-    moran_summary = []
-    for icd in icd_codes_national:
-        if icd in disease_moran_national:
-            m = disease_moran_national[icd]
-            moran_summary.append({
-                'ICD Code': icd,
-                'Description': ALL_ASD_CODES.get(icd, 'Unknown')[:40],
-                "Moran's I": round(m.I, 4),
-                'Z-score': round(m.z_norm, 4),
-                'P-value': round(m.p_norm, 4),
-                'Pattern': 'Clustered' if m.I > 0 and m.p_norm < 0.05 else ('Dispersed' if m.I < 0 and m.p_norm < 0.05 else 'Random'),
-                'Significant': 'Yes' if m.p_norm < 0.05 else 'No'
-            })
-    if moran_summary:
-        moran_summary_df = pd.DataFrame(moran_summary)
-        moran_summary_df = moran_summary_df.sort_values("Moran's I", ascending=False)
-        display(moran_summary_df.style.format({
-            "Moran's I": '{:.4f}',
-            'Z-score': '{:.4f}',
-            'P-value': '{:.4f}'
-        }).hide(axis="index"))
-    else:
-        display(pd.DataFrame({'Message': ['No Moran statistics available']}).style.hide(axis="index"))
-else:
-    display(pd.DataFrame({'Message': ['Spatial analysis not available']}).style.hide(axis="index"))
-```
-
-### Diagnosis-Specific Summary Statistics
-
-```{python}
-#| label: tbl-disease-spatial-summary-national
-#| tbl-cap: "Diagnosis-Specific Spatial Analysis Summary - Chile Continental"
+#| label: tbl-spatial-summary-by-subcode
+#| tbl-cap: "Spatial Analysis Summary by F84 Subcode"
 #| tbl-cap-location: bottom
 
 if has_spatial_data:
     summary_data = []
-    for icd in icd_codes_national:
-        if icd in disease_gdf_national:
-            gdf = disease_gdf_national[icd]
-            asr_data = disease_asr_by_comuna_national[icd]
-            row = {
-                'ICD': icd,
-                'Diagnosis': ALL_ASD_CODES.get(icd, 'Unknown')[:30],
-                'Total Hosp.': asr_data['hospitalizations'].sum() if len(asr_data) > 0 else 0,
-                'Comunas': len(asr_data[asr_data['hospitalizations'] > 0]) if len(asr_data) > 0 else 0,
-                'Mean ASR': asr_data['asr'].mean().round(2) if len(asr_data) > 0 else 0,
-                'Max ASR': asr_data['asr'].max() if len(asr_data) > 0 else 0,
-            }
-            if icd in disease_moran_national:
-                m = disease_moran_national[icd]
-                row["Moran's I"] = round(m.I, 4)
-                row['P-value'] = round(m.p_norm, 4)
-                row['Pattern'] = 'Clustered' if m.I > 0 and m.p_norm < 0.05 else ('Dispersed' if m.I < 0 and m.p_norm < 0.05 else 'Random')
-            else:
-                row["Moran's I"] = None
-                row['P-value'] = None
-                row['Pattern'] = 'N/A'
-            if icd in disease_lisa_national:
-                lisa = disease_lisa_national[icd]
-                clusters = clasificar_lisa(lisa, gdf)
-                row['Hot Spots'] = clusters.count('High-High (Hot Spot)')
-                row['Cold Spots'] = clusters.count('Low-Low (Cold Spot)')
-            else:
-                row['Hot Spots'] = 0
-                row['Cold Spots'] = 0
-            summary_data.append(row)
-    if summary_data:
-        summary_df = pd.DataFrame(summary_data)
-        summary_df = summary_df.sort_values('Total Hosp.', ascending=False)
-        display(summary_df.style.format({
-            'Total Hosp.': '{:,.0f}',
-            'Mean ASR': '{:.2f}',
-            'Max ASR': '{:.2f}',
-            "Moran's I": '{:.4f}',
-            'P-value': '{:.4f}'
-        }, na_rep='-').hide(axis="index"))
-    else:
-        display(pd.DataFrame({'Message': ['No summary data available']}).style.hide(axis="index"))
+    
+    summary_data.append({
+        'ICD': 'Total F84',
+        'Comunas with Data': (gdf_f84['asr_f84'] > 0).sum(),
+        'Mean ASR': gdf_f84['asr_f84'].mean().round(2),
+        "Moran's I": round(moran_f84.I, 4) if moran_f84 else None,
+        'P-value': round(moran_f84.p_norm, 4) if moran_f84 else None,
+        'Pattern': 'Clustered' if moran_f84 and moran_f84.I > 0 and moran_f84.p_norm < 0.05 else 'Random',
+        'Hot Spots': (gdf_f84['cluster_f84'] == 'High-High (Hot Spot)').sum() if 'cluster_f84' in gdf_f84.columns else 0,
+        'Cold Spots': (gdf_f84['cluster_f84'] == 'Low-Low (Cold Spot)').sum() if 'cluster_f84' in gdf_f84.columns else 0
+    })
+    
+    for icd in icd_codes_with_data:
+        gdf = gdf_by_icd[icd]
+        m = moran_by_icd.get(icd)
+        summary_data.append({
+            'ICD': icd,
+            'Comunas with Data': (gdf['asr'] > 0).sum(),
+            'Mean ASR': gdf['asr'].mean().round(2),
+            "Moran's I": round(m.I, 4) if m else None,
+            'P-value': round(m.p_norm, 4) if m else None,
+            'Pattern': 'Clustered' if m and m.I > 0 and m.p_norm < 0.05 else 'Random',
+            'Hot Spots': (gdf['cluster'] == 'High-High (Hot Spot)').sum() if 'cluster' in gdf.columns else 0,
+            'Cold Spots': (gdf['cluster'] == 'Low-Low (Cold Spot)').sum() if 'cluster' in gdf.columns else 0
+        })
+    
+    summary_df = pd.DataFrame(summary_data)
+    display(summary_df.style.format({
+        'Mean ASR': '{:.2f}',
+        "Moran's I": '{:.4f}',
+        'P-value': '{:.4f}'
+    }, na_rep='-').hide(axis="index"))
 else:
     display(pd.DataFrame({'Message': ['Spatial analysis not available']}).style.hide(axis="index"))
+```
+
+\newpage
+
+## Regional Comunal Maps
+
+```{python}
+#| label: regional-maps-setup
+#| include: false
+
+if has_spatial_data and REGION_CODE_COL:
+    regions_in_data = gdf_continental[REGION_CODE_COL].dropna().unique()
+    regions_in_data = sorted([int(r) for r in regions_in_data if pd.notna(r)])
+else:
+    regions_in_data = []
+```
+
+```{python}
+#| label: fig-regional-comunas-maps
+#| fig-cap: "ASR by Comuna - Regional Maps"
+#| fig-width: 20
+#| fig-height: 24
+if has_spatial_data and REGION_CODE_COL and len(regions_in_data) > 0:
+    # Excluir región 0 (datos sin asignar o valor por defecto)
+    regions_in_data_valid = [r for r in regions_in_data if r != 0]
+    
+    n_regions = len(regions_in_data_valid)
+    ncols = 4
+    nrows = max(1, (n_regions + ncols - 1) // ncols)
+    
+    fig, axes = plt.subplots(nrows, ncols, figsize=(20, 6*nrows))
+    axes = axes.flatten()
+    
+    for idx, reg_code in enumerate(regions_in_data_valid):
+        ax = axes[idx]
+        gdf_region = gdf_f84[gdf_f84[REGION_CODE_COL] == reg_code].copy()
+        
+        if len(gdf_region) > 0:
+            region_name = REGION_CODES.get(reg_code, f'Region {reg_code}')
+            
+            if gdf_region['asr_f84'].sum() > 0:
+                gdf_region.plot(column='asr_f84', cmap='Blues', linewidth=0.5, ax=ax, 
+                               edgecolor='0.5', legend=True, 
+                               legend_kwds={'label': 'ASR', 'shrink': 0.6, 'pad': 0.02})
+            else:
+                gdf_region.plot(ax=ax, color='lightgrey', edgecolor='0.5', linewidth=0.5)
+            
+            ax.set_title(f'{region_name}', fontweight='bold', fontsize=10)
+            ax.set_axis_off()
+        else:
+            ax.set_visible(False)
+    
+    for idx in range(len(regions_in_data_valid), len(axes)):
+        axes[idx].set_visible(False)
+    
+    plt.suptitle('Age-Standardized Rates (F84) by Comuna - Regional View (2019-2024)', 
+                 fontsize=16, fontweight='bold', y=1.01)
+    plt.tight_layout()
+    save_figure(fig, 'regional_comunas_maps_f84.png')
+    plt.show()
+else:
+    fig, ax = plt.subplots(figsize=(8, 6))
+    ax.text(0.5, 0.5, 'Regional shapefile data not available', ha='center', va='center', fontsize=14)
+    ax.set_axis_off()
+    plt.show()
+```
+
+### Regional Detail Tables
+
+```{python}
+#| label: tbl-regional-comunas-summary
+#| tbl-cap: "Top 5 Comunas by ASR per Region"
+#| tbl-cap-location: bottom
+
+if has_spatial_data and REGION_CODE_COL:
+    regional_top_comunas = []
+    
+    for reg_code in regions_in_data:
+        gdf_region = gdf_f84[gdf_f84[REGION_CODE_COL] == reg_code].copy()
+        gdf_region = gdf_region[gdf_region['asr_f84'] > 0]
+        
+        if len(gdf_region) > 0:
+            region_name = REGION_CODES.get(reg_code, f'Region {reg_code}')
+            top5 = gdf_region.nlargest(5, 'asr_f84')[[COMUNA_COL, 'asr_f84']]
+            
+            for _, row in top5.iterrows():
+                regional_top_comunas.append({
+                    'Region': region_name,
+                    'Comuna': row[COMUNA_COL],
+                    'ASR': row['asr_f84']
+                })
+    
+    if regional_top_comunas:
+        top_comunas_df = pd.DataFrame(regional_top_comunas)
+        display(top_comunas_df.style.format({'ASR': '{:.2f}'}).hide(axis="index"))
+    else:
+        display(pd.DataFrame({'Message': ['No data available']}).style.hide(axis="index"))
+else:
+    display(pd.DataFrame({'Message': ['Regional data not available']}).style.hide(axis="index"))
+```
+
+\newpage
+
+## Summary Statistics
+
+```{python}
+#| label: tbl-overall-summary
+#| tbl-cap: "Overall Analysis Summary"
+#| tbl-cap-location: bottom
+
+total_hosp = hospitalizations['hospitalizations'].sum()
+total_years = len(hospitalizations['year'].unique())
+unique_codes = hospitalizations['icd_code'].nunique()
+
+sex_totals = hospitalizations.groupby('sex')['hospitalizations'].sum()
+male_total = sex_totals.get('Male', 0)
+female_total = sex_totals.get('Female', 0)
+
+most_common = hospitalizations.groupby('icd_code')['hospitalizations'].sum().idxmax()
+most_common_desc = ALL_ASD_CODES.get(most_common, most_common)
+
+summary_stats = pd.DataFrame({
+    'Metric': [
+        'Total Hospitalizations',
+        'Years Analyzed',
+        'Unique ICD-10 Codes (F84.x)',
+        'Male Hospitalizations',
+        'Female Hospitalizations',
+        'Male:Female Ratio',
+        'Most Common Diagnosis',
+        'Average Annual Hospitalizations',
+        'Regions Analyzed',
+        'Comunas Analyzed (Continental)'
+    ],
+    'Value': [
+        f'{total_hosp:,.0f}',
+        total_years,
+        unique_codes,
+        f'{male_total:,.0f}',
+        f'{female_total:,.0f}',
+        f'{male_total/female_total:.2f}' if female_total > 0 else 'N/A',
+        f'{most_common} - {most_common_desc}',
+        f'{total_hosp/total_years:,.0f}',
+        regional_data['region'].nunique(),
+        len(total_by_comuna)
+    ]
+})
+
+summary_stats.style.hide(axis="index")
+```
+
+```{python}
+#| label: fig-summary-dashboard
+#| fig-cap: "Autism Spectrum Disorders (F84) - Summary Dashboard"
+#| fig-width: 16
+#| fig-height: 12
+
+fig, axes = plt.subplots(2, 3, figsize=(16, 12))
+
+ax1 = axes[0, 0]
+yearly_total = hospitalizations.groupby('year')['hospitalizations'].sum()
+ax1.plot(yearly_total.index, yearly_total.values, marker='o', linewidth=3, color='darkgreen')
+ax1.fill_between(yearly_total.index, yearly_total.values, alpha=0.3, color='green')
+ax1.set_xlabel('Year')
+ax1.set_ylabel('Hospitalizations')
+ax1.set_title('Total Hospitalizations Trend', fontweight='bold')
+ax1.grid(True, alpha=0.3)
+
+ax2 = axes[0, 1]
+icd_totals = hospitalizations.groupby('icd_code')['hospitalizations'].sum().sort_values(ascending=False)
+colors = plt.cm.Set2(np.linspace(0, 1, len(icd_totals)))
+ax2.pie(icd_totals.values, labels=icd_totals.index, autopct='%1.1f%%', colors=colors)
+ax2.set_title('Distribution by F84 Subcode', fontweight='bold')
+
+ax3 = axes[0, 2]
+sex_totals = hospitalizations.groupby('sex')['hospitalizations'].sum()
+ax3.bar(sex_totals.index, sex_totals.values, color=['steelblue', 'coral'])
+ax3.set_ylabel('Hospitalizations')
+ax3.set_title('Hospitalizations by Sex', fontweight='bold')
+ax3.grid(True, alpha=0.3, axis='y')
+
+ax4 = axes[1, 0]
+age_dist = hospitalizations.groupby('age_group')['hospitalizations'].sum()
+age_dist = age_dist.reindex([a for a in AGE_ORDER if a in age_dist.index])
+ax4.bar(age_dist.index, age_dist.values, color='teal', alpha=0.7)
+ax4.set_xlabel('Age Group')
+ax4.set_ylabel('Hospitalizations')
+ax4.set_title('Age Distribution', fontweight='bold')
+ax4.tick_params(axis='x', rotation=45)
+ax4.grid(True, alpha=0.3, axis='y')
+
+ax5 = axes[1, 1]
+top_diag = hospitalizations.groupby('icd_code')['hospitalizations'].sum().nlargest(10)
+top_labels = [ALL_ASD_CODES.get(c, c)[:25] for c in top_diag.index]
+ax5.barh(top_labels, top_diag.values, color=plt.cm.viridis(np.linspace(0.2, 0.8, 10)))
+ax5.set_xlabel('Hospitalizations')
+ax5.set_title('Top Diagnoses (F84.x)', fontweight='bold')
+ax5.grid(True, alpha=0.3, axis='x')
+
+ax6 = axes[1, 2]
+width = 0.35
+x = np.arange(len(asr_sex_cols))
+ax6.bar(x - width/2, asr_sex_cols['asr_male'], width, label='Male', color='steelblue')
+ax6.bar(x + width/2, asr_sex_cols['asr_female'], width, label='Female', color='coral')
+ax6.set_xlabel('Year')
+ax6.set_ylabel('ASR (per 100,000)')
+ax6.set_title('ASR Comparison by Sex', fontweight='bold')
+ax6.set_xticks(x)
+ax6.set_xticklabels(asr_sex_cols['year'])
+ax6.legend()
+ax6.grid(True, alpha=0.3, axis='y')
+
+plt.suptitle('Autism Spectrum Disorders (F84) in Chile - Summary Dashboard (2019-2024)', 
+             fontsize=16, fontweight='bold', y=1.02)
+plt.tight_layout()
+save_figure(fig, 'f84_summary_dashboard.png')
+plt.show()
 ```
 
 \newpage
@@ -1943,5 +2213,5 @@ icd_ref = pd.DataFrame([
 
 icd_ref = icd_ref.sort_values('ICD Code')
 
-display(icd_ref.style.hide(axis="index"))
+icd_ref.style.hide(axis="index")
 ```
