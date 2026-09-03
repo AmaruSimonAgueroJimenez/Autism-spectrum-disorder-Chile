@@ -1,0 +1,26 @@
+project:
+  type: default
+  execute-dir: project
+  render:
+    - index.qmd
+    - rem.qmd
+    - grd.qmd
+
+lang: es
+jupyter: python3
+date: today
+format:
+  html:
+    theme: cosmo
+    toc: true
+    toc-depth: 2
+    embed-resources: true
+    css: styles.css
+    code-fold: true
+    code-summary: "Ver Python"
+    fig-cap-location: bottom
+execute:
+  echo: false
+  error: false
+  cache: false
+  daemon: false

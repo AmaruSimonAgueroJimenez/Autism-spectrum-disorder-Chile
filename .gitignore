@@ -47,3 +47,11 @@ po/*~
 
 # RStudio Connect folder
 rsconnect/
+# Local runtime and system files
+.DS_Store
+__pycache__/
+*.pyc
+.venv/
+
+# Quarto execution metadata
+docs/.quarto/

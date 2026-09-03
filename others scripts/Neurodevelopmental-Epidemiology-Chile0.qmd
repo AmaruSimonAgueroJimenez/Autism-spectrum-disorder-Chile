@@ -22,6 +22,9 @@ execute:
   fig-height: 7
 ---
 
+> **Estado: informe histórico pendiente de revisión.** La auditoría identificó diferencias en la interpretación de sexo/edad de A05, totales de A03 y vigencia de códigos. Las cifras históricas de este documento no se han recalculado. [Informe consolidado y auditoría](consolidacion-rem-grd.html).
+
+
 ```{r setup, include=FALSE}
 knitr::opts_chunk$set(
   echo = TRUE,
@@ -142,19 +145,22 @@ df_codigos_tea <- bind_rows(
 
 ```{r carga_datos}
 # Definir la ruta de datos
-data_path <- paste0(gsub("/docs", "", getwd()), "/data/")
+asesorias_data_root <- Sys.getenv(
+  "ASESORIAS_DATA_ROOT", unset = "/Volumes/Datos/Asesorias_Data"
+)
+data_path <- file.path(asesorias_data_root, "REM", "SerieA")
+if (!dir.exists(data_path)) {
+  stop("No se encontró el directorio de CSV canónicos REM: ", data_path)
+}
 
 # Función para leer archivos REM con manejo de errores
 leer_archivo_rem <- function(file_path) {
   tryCatch({
-    # Determinar encoding según el año
-    encoding <- ifelse(grepl("2024", file_path), "Latin-1", "UTF-8")
-    
-    # Leer el archivo
+    # Los CSV canónicos usan UTF-8, separador ';' y un esquema uniforme.
     dt <- fread(
       file_path, 
       sep = ";", 
-      encoding = encoding,
+      encoding = "UTF-8",
       dec = ",",
       stringsAsFactors = FALSE,
       na.strings = c("", "NA", "-", ".")
@@ -179,10 +185,15 @@ leer_archivo_rem <- function(file_path) {
 # Listar archivos REM Serie A disponibles
 archivos_serie_a <- list.files(
   path = data_path,
-  pattern = "SerieA_.*\\.(txt|csv|CSV)$",
+  pattern = "^SerieA_(201[7-9]|202[0-4])\\.csv$",
   full.names = TRUE,
-  recursive = TRUE
+  recursive = FALSE
 )
+anios_disponibles <- as.integer(sub("^SerieA_(\\d{4})\\..*$", "\\1", basename(archivos_serie_a)))
+anios_faltantes <- setdiff(2017:2024, anios_disponibles)
+if (length(anios_faltantes) > 0) {
+  stop("Faltan CSV canónicos REM Serie A para: ", paste(anios_faltantes, collapse = ", "))
+}
 
 # Cargar datos de Serie A
 lista_datos_a <- lapply(archivos_serie_a, leer_archivo_rem)

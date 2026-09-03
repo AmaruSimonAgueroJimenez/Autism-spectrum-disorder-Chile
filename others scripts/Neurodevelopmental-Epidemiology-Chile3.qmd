@@ -24,6 +24,9 @@ execute:
   fig-height: 10
 ---
 
+> **Estado: informe histórico pendiente de revisión.** Este documento conserva el análisis histórico por menciones de códigos. Para trayectorias de pacientes y posición principal/secundaria, usar la nueva extracción; sumar subtipos puede duplicar hospitalizaciones. [Informe consolidado y auditoría](consolidacion-rem-grd.html).
+
+
 # Results - Autism Spectrum Disorders (F84) Analysis
 
 ```{python}
@@ -89,6 +92,10 @@ pd.set_option('display.precision', 2)
 
 base_path = os.path.dirname(os.getcwd())
 data_path = os.path.join(base_path, 'data')
+grd_data_path = os.path.join(
+    os.environ.get("ASESORIAS_DATA_ROOT", "/Volumes/Datos/Asesorias_Data"),
+    "GRD",
+)
 output_path = os.path.join(base_path, 'output_files')
 figures_path = os.path.join(output_path, 'figures')
 
@@ -228,7 +235,7 @@ def load_and_filter_f84_data(years=YEARS, chunksize=100000):
     
     for year in years:
         pattern = f"GRD_PUBLICO_*{year}*.csv"
-        files = glob.glob(os.path.join(data_path, pattern))
+        files = glob.glob(os.path.join(grd_data_path, pattern))
         if not files:
             continue
         
@@ -873,7 +880,7 @@ def load_regional_f84_data(years=YEARS, chunksize=100000):
     
     for year in years:
         pattern = f"GRD_PUBLICO_*{year}*.csv"
-        files = glob.glob(os.path.join(data_path, pattern))
+        files = glob.glob(os.path.join(grd_data_path, pattern))
         if not files:
             continue
         

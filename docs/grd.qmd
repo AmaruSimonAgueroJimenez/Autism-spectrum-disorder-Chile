@@ -1,0 +1,300 @@
+---
+title: "GRD: trayectorias diagnósticas de autismo"
+subtitle: "Primer registro hospitalario, antecedentes y posición principal o secundaria"
+---
+
+::: {.report-nav}
+[Inicio](index.html) [REM](rem.html) [GRD](grd.html)
+:::
+
+```{python}
+#| label: cargar-grd
+from pathlib import Path
+import sys
+import pandas as pd
+import matplotlib.pyplot as plt
+
+ROOT = Path.cwd().parent if Path.cwd().name == "docs" else Path.cwd()
+sys.path.insert(0, str(ROOT / "scripts"))
+from report_helpers import (read_result, show_table, kpis, number, share, plot_style,
+                            POSITION_LABELS, GROUP_LABELS, COLORS)
+
+DEFINITION = "TEA_operacional"
+ERA = "2021-2024"
+summary = read_result("grd_cohort_summary.csv")
+positions = read_result("grd_first_position.csv")
+core = summary.loc[summary.definition == DEFINITION].copy()
+cohort = core.loc[core.era == ERA].iloc[0]
+n_cohort = int(cohort.patients)
+n_prior = int(cohort.prior_hospitalization)
+plot_style()
+
+def selected(frame):
+    return frame.loc[(frame.definition == DEFINITION) & (frame.era == ERA)].copy()
+
+kpis([
+    (number(n_cohort), "Identificadores incluidos · 2021–2024"),
+    (number(n_prior), "Con hospitalizaciones anteriores observables"),
+    (number(cohort.age_median, 1), "Edad mediana al primer ingreso observado con TEA"),
+])
+```
+
+## Pregunta y definición
+
+**¿Qué diagnósticos hospitalarios aparecen antes del primer registro observado de autismo, y cuándo se registra como principal o secundario?**
+
+El análisis prioritario usa la definición operacional F84.0, F84.1, F84.5, F84.8 y F84.9 en cualquiera de las 35 posiciones diagnósticas. Se recuperan todos los egresos de esos identificadores, incluso los que no tienen F84. También se compara con F84.0 específico y con F84 histórico.
+
+La fecha índice es la **primera alta observada** con la definición seleccionada. La edad corresponde al ingreso de ese episodio. No se conoce el día del diagnóstico clínico, y el autismo puede haber sido diagnosticado antes, en atención ambulatoria o fuera del período disponible.
+
+`DIAGNOSTICO1` se utiliza operacionalmente como principal y `DIAGNOSTICO2–35` como secundarios. Un diagnóstico anterior puede ser una comorbilidad, un síntoma, un motivo de ingreso independiente o un diagnóstico alternativo. **La secuencia de códigos no demuestra que se tratara de diferenciales clínicos descartados.**
+
+## Continuidad del identificador
+
+Los bloques 2019–2020 y 2021–2024 **no se enlazan entre sí**: no tienen identificadores compartidos. El cambio de nombre del campo en 2024 sí conserva coincidencias con 2021–2023. La estabilidad del enlace y la semántica de posición diagnóstica requieren confirmación documental del productor.
+
+```{python}
+#| label: tabla-grd-enlace
+linkage = read_result("grd_linkage_between_years.csv")
+show_table(linkage[["year_a", "year_b", "shared_identifiers", "comparable_ids", "agreeing_birth_and_sex", "pct_agreement"]].rename(columns={
+    "year_a": "Año inicial", "year_b": "Año final", "shared_identifiers": "ID compartidos",
+    "comparable_ids": "ID comparables", "agreeing_birth_and_sex": "Nacimiento y sexo concordantes", "pct_agreement": "% concordancia",
+}), "Auditoría entre pares de años", {"% concordancia": 2})
+```
+
+La concordancia se calcula entre identificadores sin contradicciones internas por año y con nacimiento y sexo comparables. No demuestra identidad por sí sola. No se construyen enlaces mediante datos demográficos. Las cohortes excluyen identificadores con inconsistencias, fechas índice inválidas o episodios ambiguos.
+
+## Primer registro: principal o secundario
+
+Las categorías siguientes son excluyentes. «Principal y secundario» indica códigos de la definición en ambas posiciones del mismo episodio. «Posiciones mixtas el mismo día» conserva los empates sin imponer un orden arbitrario.
+
+```{python}
+#| label: tabla-grd-primera-posicion
+pos = positions.loc[positions.definition == DEFINITION].copy()
+pos["% cohorte"] = 100 * pos.patients / pos.groupby("era").patients.transform("sum")
+pos["Posición"] = pos.index_role.map(POSITION_LABELS)
+show_table(pos[["era", "Posición", "patients", "% cohorte"]].rename(columns={
+    "era": "Período", "patients": "Identificadores",
+}), "Posición del primer registro hospitalario de TEA", {"% cohorte": 2})
+```
+
+```{python}
+#| label: fig-grd-posicion
+#| fig-cap: "Posición del primer registro hospitalario observado, cohorte operacional 2021–2024."
+#| fig-width: 9
+#| fig-height: 3.8
+current = pos.loc[pos.era == ERA].sort_values("patients")
+fig, ax = plt.subplots(figsize=(9, 3.8), layout="constrained")
+ax.barh(current["Posición"], current["% cohorte"], color=COLORS[1])
+for i, value in enumerate(current["% cohorte"]):
+    label = "<0,1%" if 0 < value < .1 else number(value, 1) + "%"
+    ax.text(value + 1, i, label, va="center")
+ax.set(xlabel="Porcentaje de la cohorte", xlim=(0, 106), title="Primer registro de TEA")
+plt.show()
+```
+
+## Diagnósticos anteriores
+
+Un antecedente estricto debe **egresar antes del ingreso al episodio índice**. Los diagnósticos contemporáneos o superpuestos se separan. «Sin hospitalizaciones previas» significa sin antecedentes hospitalarios observados en el período; no implica ausencia de síntomas ni de diagnósticos ambulatorios.
+
+```{python}
+#| label: tabla-grd-antecedentes
+core["% con egreso previo"] = 100 * core.prior_hospitalization / core.patients
+core["% con grupo de interés"] = 100 * core.prior_candidate_group / core.patients
+show_table(core[["era", "patients", "prior_hospitalization", "% con egreso previo", "prior_candidate_group", "% con grupo de interés",
+                 "days_first_prior_to_index_median"]].rename(columns={
+    "era": "Período", "patients": "Cohorte", "prior_hospitalization": "Con egreso previo",
+    "prior_candidate_group": "Con grupo previo de interés", "days_first_prior_to_index_median": "Mediana de días del primer egreso previo al ingreso índice",
+}), "Antecedentes observados y tiempo entre contactos", {"% con egreso previo": 1, "% con grupo de interés": 1,
+    "Mediana de días del primer egreso previo al ingreso índice": 1})
+```
+
+El tiempo entre contactos no se denomina retraso diagnóstico. Se calcula únicamente entre quienes tienen un egreso anterior.
+
+### Primer diagnóstico principal hospitalario observado
+
+Incluye el primer egreso de cada identificador dentro del período. Puede ser el propio episodio índice cuando no hay antecedentes. Se conservan los códigos distintos en empates de fecha.
+
+```{python}
+#| label: tabla-grd-primer-diagnostico
+first = selected(read_result("grd_first_hospital_principal.csv")).sort_values("patients", ascending=False)
+first["% cohorte"] = 100 * first.patients / n_cohort
+show_table(first[["code", "patients", "% cohorte"]].head(15).rename(columns={
+    "code": "Código principal", "patients": "Identificadores",
+}), "Primer principal observado · 15 códigos más frecuentes · 2021–2024", {"% cohorte": 1})
+```
+
+### Último diagnóstico principal antes del índice
+
+El denominador son los identificadores con algún egreso previo estricto. No todos tienen necesariamente un diagnóstico principal informado. Los códigos se presentan normalizados sin punto.
+
+```{python}
+#| label: tabla-grd-ultimo-previo
+last = selected(read_result("grd_last_prior_principal.csv")).sort_values("patients", ascending=False)
+last["% con egreso previo"] = 100 * last.patients / n_prior if n_prior else float("nan")
+show_table(last[["code", "patients", "% con egreso previo"]].head(15).rename(columns={
+    "code": "Último principal previo", "patients": "Identificadores",
+}), "Último principal estrictamente anterior · 2021–2024", {"% con egreso previo": 1})
+```
+
+### Grupos previos de interés
+
+Son agrupaciones exploratorias, no diagnósticos diferenciales confirmados. Un identificador cuenta una vez por grupo y ventana, pero puede contribuir a varios grupos. Por eso los grupos no se suman para obtener personas.
+
+```{python}
+#| label: tabla-grd-grupos-previos
+groups = selected(read_result("grd_previous_groups.csv"))
+all_groups = groups.loc[(groups.window == "all") & (groups.position == "any")].sort_values("patients", ascending=False).copy()
+all_groups["Grupo"] = all_groups.group.map(GROUP_LABELS)
+all_groups["% cohorte"] = 100 * all_groups.patients / n_cohort
+all_groups["% con egreso previo"] = 100 * all_groups.patients / n_prior if n_prior else float("nan")
+show_table(all_groups[["Grupo", "patients", "% cohorte", "% con egreso previo"]].rename(columns={
+    "patients": "Identificadores",
+}), "Grupos diagnósticos previos, cualquier posición · 2021–2024", {"% cohorte": 1, "% con egreso previo": 1})
+```
+
+### Ventanas de 365 y 730 días
+
+Las ventanas restringen **las fechas de los antecedentes**, no seleccionan una cohorte con observación completa de esa duración. Se mantiene el denominador de la cohorte total y se distingue a continuación la oportunidad de observación.
+
+```{python}
+#| label: tabla-grd-ventanas
+window_groups = groups.loc[groups.position == "any"].pivot(index="group", columns="window", values="patients")
+window_groups = window_groups.reindex(columns=["365d", "730d", "all"])
+window_groups.index = window_groups.index.map(GROUP_LABELS)
+window_groups = window_groups.rename_axis("Grupo").reset_index().rename(columns={
+    "365d": "ID en 365 días previos", "730d": "ID en 730 días previos", "all": "ID en todo el período previo",
+})
+show_table(window_groups, "Comparación de ventanas, cualquier posición diagnóstica")
+```
+
+### Secuencias registradas
+
+La secuencia enlaza el primer principal observado, el último principal previo y la posición del autismo en el índice. Se muestran solo identificadores con antecedentes y sin empates en las dos etapas previas. La tabla no representa toda la cohorte ni atribuye un cambio de diagnóstico clínico.
+
+```{python}
+#| label: tabla-grd-secuencias
+sequences = selected(read_result("grd_sequences.csv")).sort_values("patients", ascending=False)
+sequences["Posición índice"] = sequences.index_role.map(POSITION_LABELS)
+show_table(sequences[["first_principal", "last_prior_principal", "Posición índice", "patients"]].head(15).rename(columns={
+    "first_principal": "Primer principal", "last_prior_principal": "Último principal previo", "patients": "Identificadores",
+}), "Secuencias más frecuentes entre casos sin empates previos")
+```
+
+## Principal del episodio cuando el autismo es secundario
+
+Estos códigos corresponden a la hospitalización índice. **Son contemporáneos**, no antecedentes al autismo. Describen el diagnóstico que ocupa la posición principal mientras TEA aparece solo en posiciones secundarias.
+
+```{python}
+#| label: tabla-grd-principal-indice
+index_codes = selected(read_result("grd_index_principal.csv"))
+index_codes = index_codes.loc[index_codes.index_role == "solo_secundario"].sort_values("patients", ascending=False)
+show_table(index_codes[["code", "patients"]].head(15).rename(columns={
+    "code": "Código principal del índice", "patients": "Identificadores",
+}), "Principal de la hospitalización índice con TEA solo secundario")
+```
+
+## Paso posterior de secundario a principal
+
+Un episodio posterior debe ingresar después del alta índice. La proporción a 365 días utiliza solo los índices con al menos 365 días calendario hasta el cierre del período. La disponibilidad calendario no acredita seguimiento clínico continuo ni ausencia de eventos fuera de la base.
+
+```{python}
+#| label: tabla-grd-transiciones
+transitions = read_result("grd_principal_transitions.csv")
+transitions = transitions.loc[(transitions.definition == DEFINITION) & (transitions.index_role == "solo_secundario")].copy()
+transitions["% principal en 365 días"] = 100 * transitions.later_principal_365d / transitions.eligible_followup_365d.replace(0, float("nan"))
+show_table(transitions[["era", "patients", "later_principal", "eligible_followup_365d", "later_principal_365d", "% principal en 365 días",
+                        "days_to_principal_median"]].rename(columns={
+    "era": "Período", "patients": "Índice solo secundario", "later_principal": "Principal posterior observado",
+    "eligible_followup_365d": "Con 365 días disponibles", "later_principal_365d": "Principal en 365 días",
+    "days_to_principal_median": "Días medianos entre quienes transitan",
+}), "Transición a principal en otra hospitalización", {"% principal en 365 días": 2, "Días medianos entre quienes transitan": 1})
+```
+
+## Distribución por año, edad y sexo
+
+Son primeros registros observados en una cohorte hospitalaria, no diagnósticos incidentes en la población. La mayor cantidad de registros en un año puede reflejar contacto asistencial o codificación. Los identificadores con inconsistencias demográficas fueron excluidos de la cohorte.
+
+```{python}
+#| label: fig-grd-estratos
+#| fig-cap: "Cohorte operacional 2021–2024: año del primer registro y distribución de edad por sexo."
+#| fig-width: 11
+#| fig-height: 4.3
+strata = selected(read_result("grd_cohort_strata.csv"))
+by_year = strata.groupby("index_year").patients.sum()
+by_age_sex = strata.groupby(["age_band", "sex"]).patients.sum().unstack("sex", fill_value=0).reindex(["0-4", "5-9", "10-14", "15-19", "20+"])
+fig, axes = plt.subplots(1, 2, figsize=(11, 4.3), layout="constrained")
+axes[0].bar(by_year.index.astype(str), by_year.values, color=COLORS[0])
+axes[0].set(title="Año del primer registro", xlabel="Año", ylabel="Identificadores")
+by_age_sex.rename(columns={"HOMBRE": "Hombres", "MUJER": "Mujeres"}).plot.bar(ax=axes[1], color=COLORS[:2], rot=0)
+axes[1].set(title="Edad y sexo al registro", xlabel="Edad (años)", ylabel="Identificadores")
+axes[1].legend(title="Sexo registrado")
+plt.show()
+```
+
+```{python}
+#| label: tabla-grd-sexo-antecedentes
+sex_summary = strata.groupby("sex")[["patients", "prior_hospitalization", "prior_candidate_group"]].sum().reset_index()
+sex_summary["% con egreso previo"] = 100 * sex_summary.prior_hospitalization / sex_summary.patients
+sex_summary["% con grupo previo"] = 100 * sex_summary.prior_candidate_group / sex_summary.patients
+show_table(sex_summary[["sex", "patients", "% con egreso previo", "% con grupo previo"]].rename(columns={
+    "sex": "Sexo registrado", "patients": "Identificadores",
+}), "Antecedentes por sexo, sin ajuste por edad o contacto asistencial", {"% con egreso previo": 1, "% con grupo previo": 1})
+```
+
+## Sensibilidad de la definición
+
+Cada definición vuelve a calcular su primera fecha; las cohortes se solapan y **no se suman**. F84 histórico incluye Rett y otras categorías que deben distinguirse al interpretar los resultados. La selección operacional no es una equivalencia clínica automática con DSM-5. [Clasificación CIE-10, NHS](https://classbrowser.nhs.uk/ICD-10-5TH-Edition/vol1/block-f80-f89.htm).
+
+| Definición | Códigos |
+|---|---|
+| Autismo específico | F84.0 |
+| TEA operacional | F84.0, F84.1, F84.5, F84.8, F84.9 |
+| F84 histórico | F84 y sus subcategorías válidas, incluyendo F84.2–F84.4 |
+
+```{python}
+#| label: tabla-grd-sensibilidad
+show_table(summary[["era", "definition", "patients", "prior_hospitalization", "prior_candidate_group", "age_median"]].rename(columns={
+    "era": "Período", "definition": "Definición", "patients": "Incluidos", "prior_hospitalization": "Con egreso previo",
+    "prior_candidate_group": "Con grupo previo", "age_median": "Edad mediana al registro",
+}), "Sensibilidad de la definición de caso", {"Edad mediana al registro": 1})
+```
+
+## Oportunidad de observación y calidad
+
+Un primer registro de 2021 puede corresponder a autismo conocido previamente. La siguiente tabla separa calendario disponible de evidencia de un contacto hospitalario a esa distancia. Ninguna condición demuestra observación clínica continua. Los descriptivos anteriores todavía no son análisis restringidos a 365/730 días completos.
+
+```{python}
+#| label: tabla-grd-observacion
+show_table(core[["era", "patients", "lookback_365d", "lookback_730d", "observed_prior_365d", "observed_prior_730d"]].rename(columns={
+    "era": "Período", "patients": "Incluidos", "lookback_365d": "365 días calendario", "lookback_730d": "730 días calendario",
+    "observed_prior_365d": "Contacto al menos 365 días antes", "observed_prior_730d": "Contacto al menos 730 días antes",
+}), "Oportunidad de observar antecedentes")
+
+quality = read_result("grd_trajectory_quality.csv")
+show_table(quality[["era", "raw_F84_identifiers", "F84_records_missing_id", "exact_duplicate_rows_removed",
+                    "ids_inconsistent_or_missing_birth_sex", "ids_ambiguous_encounter_key", "history_records_invalid_dates"]].rename(columns={
+    "era": "Período", "raw_F84_identifiers": "ID F84 iniciales", "F84_records_missing_id": "Registros F84 sin ID",
+    "exact_duplicate_rows_removed": "Duplicados exactos retirados", "ids_inconsistent_or_missing_birth_sex": "ID demográficos inconsistentes/incompletos",
+    "ids_ambiguous_encounter_key": "ID con episodio ambiguo", "history_records_invalid_dates": "Registros con fechas inválidas",
+}), "Calidad del universo F84 antes de las exclusiones; causas que pueden solaparse")
+
+show_table(summary[["era", "definition", "case_ids_before_qc", "patients", "case_ids_invalid_index_dates",
+                    "index_same_day_ties", "concurrent_prior_records"]].rename(columns={
+    "era": "Período", "definition": "Definición", "case_ids_before_qc": "ID antes de controles", "patients": "ID incluidos",
+    "case_ids_invalid_index_dates": "ID con fechas F84 inválidas", "index_same_day_ties": "ID con empate índice",
+    "concurrent_prior_records": "Registros superpuestos separados",
+}), "Inclusión y temporalidad por definición")
+```
+
+Los registros sin identificador no pueden entrar a una trayectoria. Un identificador con más hospitalizaciones tiene más oportunidades de acumular diagnósticos: antes de interpretar diferencias entre grupos se deben considerar edad, sexo, período y contactos previos. No se han estimado modelos causales, supervivencia ni riesgos poblacionales.
+
+## Reproducibilidad y siguiente extensión
+
+Este QMD ejecuta los descriptivos y figuras en Python a partir de las salidas agregadas de `scripts/grd_trajectories.py`. La auditoría de enlace proviene de `scripts/audit_grd_linkage.py`. El diccionario de las 20 tablas derivadas está en `output_files/consolidacion/README.md` y las instrucciones de ejecución en el README del repositorio.
+
+La prioridad siguiente es confirmar el enlace con el productor, restringir la cohorte por oportunidad de observación y comparar posición principal/secundaria con ajuste por edad, sexo, año, contactos y hospital. Determinar qué antecedentes fueron diferenciales descartados requiere una fuente clínica validada.
+
+::: {.report-nav}
+[Volver al inicio](index.html) [Ver análisis REM](rem.html)
+:::

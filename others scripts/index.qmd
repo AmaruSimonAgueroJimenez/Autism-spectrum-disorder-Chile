@@ -1,0 +1,44 @@
+---
+title: "Neurodevelopmental Epidemiology Chile"
+author:
+  - name: "Amaru Simón Agüero Jiménez"
+    email: "a.agueroj@udd.cl"
+    orcid: "0000-0001-7336-1833"
+date: "today"
+lang: en
+format:
+  html:
+    smooth-scroll: true
+    toc: true
+    toc-depth: 6
+    toc-location: right
+    number-sections: true
+    number-depth: 6
+    code-fold: true
+#    bibliography: ref.bib
+#    csl: apa-numeric-superscript.csl
+    fig-cap-location: bottom
+#    css: styles.css
+execute:
+  warning: false #que los chunks no arrojen mensajes de emergencia
+  message: false #que los chunks no arrojen mensajes
+  fig-width: 14 #ancho de las figuras en el documento
+  fig-height: 10 #alto de las figuras
+---
+
+# Análisis consolidados
+
+- [REM y GRD: auditoría y primeros resultados](consolidacion-rem-grd.html).
+- [Propuesta de extensión: trayectorias GRD y actividad REM](propuesta-rem-grd.md).
+
+Los resultados nuevos son exploratorios. Los informes históricos siguientes requieren revisar la interpretación de columnas REM, la unidad de conteo GRD y la definición de autismo antes de reutilizarlos.
+
+# Informes históricos
+
+- [Epidemiology REM](https://amarusimonaguerojimenez.github.io/Autism-spectrum-disorder-Chile/Neurodevelopmental-Epidemiology-Chile0.html).
+
+- [Epidemiology Hosp](https://amarusimonaguerojimenez.github.io/Autism-spectrum-disorder-Chile/Neurodevelopmental-Epidemiology-Chile1.html).
+
+- [Epidemiology Hosp Geo RM](https://amarusimonaguerojimenez.github.io/Autism-spectrum-disorder-Chile/Neurodevelopmental-Epidemiology-Chile2.html).
+
+- [Epidemiology Hosp Geo ALL](https://amarusimonaguerojimenez.github.io/Autism-spectrum-disorder-Chile/Neurodevelopmental-Epidemiology-Chile4.html).

@@ -1,37 +1,68 @@
 ---
-title: "Neurodevelopmental Epidemiology Chile"
-author:
-  - name: "Amaru Simón Agüero Jiménez"
-    email: "a.agueroj@udd.cl"
-    orcid: "0000-0001-7336-1833"
-date: "today"
-lang: en
-format:
-  html:
-    smooth-scroll: true
-    toc: true
-    toc-depth: 6
-    toc-location: right
-    number-sections: true
-    number-depth: 6
-    code-fold: true
-#    bibliography: ref.bib
-#    csl: apa-numeric-superscript.csl
-    fig-cap-location: bottom
-#    css: styles.css
-execute:
-  warning: false #que los chunks no arrojen mensajes de emergencia
-  message: false #que los chunks no arrojen mensajes
-  fig-width: 14 #ancho de las figuras en el documento
-  fig-height: 10 #alto de las figuras
+title: "Autismo en Chile"
+subtitle: "Análisis de REM y trayectorias hospitalarias GRD"
 ---
 
-# About repository
+::: {.report-nav}
+[Inicio](index.html) [REM](rem.html) [GRD](grd.html)
+:::
 
-- [Epidemiology REM](https://amarusimonaguerojimenez.github.io/Autism-spectrum-disorder-Chile/Neurodevelopmental-Epidemiology-Chile0.html).
+```{python}
+#| label: cargar-resumen
+from pathlib import Path
+import sys
 
-- [Epidemiology Hosp](https://amarusimonaguerojimenez.github.io/Autism-spectrum-disorder-Chile/Neurodevelopmental-Epidemiology-Chile1.html).
+ROOT = Path.cwd().parent if Path.cwd().name == "docs" else Path.cwd()
+sys.path.insert(0, str(ROOT / "scripts"))
+from report_helpers import read_result, kpis, number, share, show_table
 
-- [Epidemiology Hosp Geo RM](https://amarusimonaguerojimenez.github.io/Autism-spectrum-disorder-Chile/Neurodevelopmental-Epidemiology-Chile2.html).
+grd_sources = read_result("grd_source_inventory.csv")
+rem_quality = read_result("rem_quality.csv")
+grd_summary = read_result("grd_cohort_summary.csv")
+cohort = grd_summary.query("era == '2021-2024' and definition == 'TEA_operacional'").iloc[0]
+kpis([
+    (number(grd_sources.records.sum()), "Registros GRD · 2019–2024"),
+    (number(rem_quality.records.sum()), "Filas REM · 2017–2024"),
+    (number(cohort.patients), "Identificadores en la cohorte TEA · 2021–2024"),
+])
+```
 
-- [Epidemiology Hosp Geo ALL](https://amarusimonaguerojimenez.github.io/Autism-spectrum-disorder-Chile/Neurodevelopmental-Epidemiology-Chile4.html).
+## Dos fuentes, dos preguntas
+
+**[REM: actividad asistencial, tamizaje y acceso](rem.html).** Describe ingresos y egresos de salud mental, edad y sexo, registros mensuales, cobertura de campos y actividad de rehabilitación. Los formularios contienen conteos agregados; no permiten seguir personas entre prestaciones.
+
+**[GRD: diagnósticos anteriores al primer registro de autismo](grd.html).** Reconstruye antecedentes hospitalarios, distingue diagnóstico principal y secundario y describe cuándo aparece posteriormente como principal. El período 2021–2024 es el análisis prioritario; 2019–2020 se mantiene separado.
+
+## Primeros resultados
+
+```{python}
+#| label: hallazgos-principales
+positions = read_result("grd_first_position.csv")
+secondary = positions.query(
+    "era == '2021-2024' and definition == 'TEA_operacional' and index_role == 'solo_secundario'"
+).patients.sum()
+kpis([
+    (number(share(secondary, cohort.patients), 1) + "%", "Primer registro GRD solo como secundario"),
+    (number(share(cohort.prior_hospitalization, cohort.patients), 1) + "%", "Con hospitalizaciones anteriores observables"),
+    ("2 períodos", "Sin enlace de identificadores entre 2020 y 2021"),
+])
+```
+
+Estas cifras corresponden a una cohorte hospitalaria depurada y a una definición operacional de TEA. El **primer registro hospitalario observado no equivale al primer diagnóstico clínico**. Los códigos anteriores tampoco demuestran que se hayan descartado como diagnósticos diferenciales: pueden ser comorbilidades, síntomas o motivos de ingreso independientes.
+
+REM y GRD tienen unidades y coberturas diferentes. Sus conteos no se suman y no se enlazan individualmente con los archivos disponibles.
+
+## Cómo están organizados los análisis
+
+Los tres documentos actuales ejecutan **Python** y leen las tablas agregadas de `output_files/consolidacion/`. Las tablas y figuras se recalculan al renderizar; no contienen cifras pegadas manualmente. La extracción de los archivos originales se ejecuta por separado, mediante los scripts documentados en el [README del repositorio](../README.md).
+
+Los informes previos, sus HTML y sus recursos se conservaron en **`others scripts/`**, fuera de `docs`. Esa carpeta contiene también la propuesta metodológica y un inventario de la migración. Los resultados antiguos permanecen disponibles para trazabilidad.
+
+## Prioridades de interpretación
+
+| Fuente | Ya disponible | Siguiente extensión metodológica |
+|---|---|---|
+| REM | Catálogo anual, series mensuales, edad/sexo A05, cobertura de campos, A03 y A28 separados | Validar denominadores de tamizaje y construir un panel estable de establecimientos |
+| GRD | Cohortes por período, posición diagnóstica, antecedentes, ventanas temporales, sensibilidad de definición y transición a principal | Confirmar enlace con el productor y estimar resultados restringidos por oportunidad de observación antes de modelos ajustados |
+
+Los datos originales permanecen en la raíz externa configurada mediante `ASESORIAS_DATA_ROOT`. La extracción utilizada no incorpora REM 2025–2026: esos archivos requieren revisar integridad, cobertura y comparabilidad antes de ampliar las series.

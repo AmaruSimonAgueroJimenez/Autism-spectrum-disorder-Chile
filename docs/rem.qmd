@@ -1,0 +1,198 @@
+---
+title: "REM: autismo y actividad asistencial"
+subtitle: "Serie A · 2017–2024 · ingresos, tamizaje y rehabilitación"
+---
+
+::: {.report-nav}
+[Inicio](index.html) [REM](rem.html) [GRD](grd.html)
+:::
+
+```{python}
+#| label: cargar-rem
+from pathlib import Path
+import sys
+import pandas as pd
+import matplotlib.pyplot as plt
+
+ROOT = Path.cwd().parent if Path.cwd().name == "docs" else Path.cwd()
+sys.path.insert(0, str(ROOT / "scripts"))
+from report_helpers import read_result, show_table, kpis, number, plot_style, AGE_GROUPS, COLORS
+
+annual = read_result("rem_annual_by_code.csv")
+monthly = read_result("rem_monthly_region_raw_columns.csv")
+ages = read_result("rem_a05_age_sex.csv")
+catalogue = read_result("rem_code_catalogue.csv")
+quality = read_result("rem_quality.csv")
+plot_style()
+
+kpis([
+    (number(quality.records.sum()), "Filas de la Serie A revisadas"),
+    (number(quality.selected_records.sum()), "Filas seleccionadas tras deduplicación"),
+    (number(len(catalogue)), "Combinaciones de año y código documentadas"),
+])
+```
+
+## Qué mide REM
+
+REM contiene **registros agregados de actividad asistencial**. Un ingreso a salud mental no representa necesariamente un diagnóstico nuevo; un egreso del programa no describe el desenlace de una cohorte de ingresos. No se estiman incidencia, prevalencia, retención ni tiempos individuales hasta el diagnóstico con estos conteos.
+
+La extracción lee únicamente los archivos canónicos externos de la Serie A y aplica los diccionarios de cada año. Los códigos genéricos de TGD de 2017–2020 se mantienen separados de los códigos específicos disponibles desde 2021.
+
+## Reglas de lectura corregidas
+
+| Formulario | Total y sexo | Precaución |
+|---|---|---|
+| A05, salud mental | `Col01`: total; `Col02`: hombres; `Col03`: mujeres | Las edades empiezan en `Col04`, en pares por sexo, hasta `Col37` |
+| A03, secciones de tamizaje seleccionadas | `Col01`: hombres; `Col02`: mujeres | El total de una fila requiere ambas columnas; una celda vacía no se convierte en cero |
+| A28, códigos seleccionados | `Col01`: ambos sexos | Se mantienen separadas las secciones de ingresos; no se denominan consultas ni se suman como personas únicas |
+
+Las reglas se comprobaron contra la posición de las columnas en los diccionarios. `total_known` suma solo las filas que tienen un total completo según esa regla. Puede ser una suma parcial cuando faltan campos; no sustituye automáticamente al total nacional.
+
+## A05: ingresos con código de autismo
+
+Se analiza `05990022` por separado. Todas las cifras son **sumas de valores observados**. La proporción de mujeres se calcula entre los valores de sexo informados, sin imputar campos faltantes.
+
+```{python}
+#| label: tabla-ingresos-autismo
+autism = annual.loc[annual.code == "05990022"].sort_values("year").copy()
+autism["Filas sin total"] = autism.rows - autism.rows_total_known
+autism["% mujeres entre sexo informado"] = 100 * autism.Col03 / (autism.Col02 + autism.Col03)
+show_table(autism[["year", "Col01", "Col02", "Col03", "% mujeres entre sexo informado",
+                    "reporting_establishments", "months", "Filas sin total"]].rename(columns={
+    "year": "Año", "Col01": "Ingresos observados", "Col02": "Hombres", "Col03": "Mujeres",
+    "reporting_establishments": "Establecimientos con registro", "months": "Meses presentes",
+}), "Ingresos A05 con código de autismo", {"% mujeres entre sexo informado": 1})
+```
+
+### Tendencia anual y mensual
+
+El número de establecimientos corresponde a aquellos con una fila seleccionada; no implica cobertura completa de la red ni actividad positiva en todos ellos. En la serie mensual los meses ausentes se conservan como faltantes.
+
+```{python}
+#| label: fig-rem-tendencias
+#| fig-cap: "Ingresos A05 con código 05990022: valores observados por año y mes."
+#| fig-width: 11
+#| fig-height: 4.2
+autism_monthly = monthly.loc[monthly.CodigoPrestacion == "05990022"].copy()
+trend = autism_monthly.groupby(["year", "Mes"])["Col01"].sum(min_count=1).reset_index()
+trend["fecha"] = pd.to_datetime(dict(year=trend.year, month=trend.Mes, day=1))
+trend = trend.set_index("fecha").Col01.sort_index()
+trend = trend.reindex(pd.date_range(trend.index.min(), trend.index.max(), freq="MS"))
+fig, axes = plt.subplots(1, 2, figsize=(11, 4.2), layout="constrained")
+axes[0].plot(autism.year, autism.Col01, "o-", color=COLORS[0])
+axes[0].set(title="Ingresos anuales", xlabel="Año", ylabel="Registros observados", xticks=autism.year)
+axes[1].plot(trend.index, trend.values, color=COLORS[1], linewidth=1.8)
+axes[1].set(title="Ingresos mensuales", xlabel="Mes", ylabel="Registros observados")
+plt.show()
+```
+
+### Edad y sexo
+
+Se utilizan los 17 grupos etarios del formulario A05, con hombres y mujeres en columnas distintas. Los totales generales y los subgrupos adicionales no se incluyen como edades. Las sumas corresponden a celdas informadas: las celdas faltantes no demuestran ausencia de actividad.
+
+```{python}
+#| label: fig-rem-edad-sexo
+#| fig-cap: "Ingresos con código de autismo por edad y sexo, acumulado 2021–2024; celdas informadas."
+#| fig-width: 10
+#| fig-height: 5.5
+autism_ages = ages.loc[ages.code == "05990022"]
+age_sex = autism_ages.groupby(["age_group", "sex"])['count'].sum(min_count=1).unstack("sex").reindex(AGE_GROUPS)
+fig, ax = plt.subplots(figsize=(10, 5.5), layout="constrained")
+age_sex.plot.barh(ax=ax, color=[COLORS[0], COLORS[1]], width=.8)
+ax.invert_yaxis()
+ax.set(xlabel="Ingresos observados", ylabel="Edad (años)", title="Edad y sexo en A05")
+ax.legend(title="Sexo registrado")
+plt.show()
+```
+
+### Distribución regional
+
+Son conteos del lugar de registro. Las diferencias pueden reflejar tamaño poblacional, oferta, cobertura o prácticas de registro; no se interpretan como riesgo territorial de autismo.
+
+```{python}
+#| label: tabla-rem-region
+last_year = int(autism.year.max())
+regional = autism_monthly.loc[autism_monthly.year == last_year].groupby("IdRegion", dropna=False).agg(
+    ingresos=("Col01", lambda s: s.sum(min_count=1)),
+    meses=("Mes", "nunique"), filas=("rows", "sum"), filas_total=("rows_total_known", "sum"),
+).reset_index()
+regional["% filas con total"] = 100 * regional.filas_total / regional.filas
+show_table(regional.sort_values("ingresos", ascending=False)[["IdRegion", "ingresos", "meses", "% filas con total"]].rename(columns={
+    "IdRegion": "Código de región", "ingresos": "Ingresos observados", "meses": "Meses presentes",
+}), f"A05, autismo específico por región · {last_year}", {"% filas con total": 1})
+```
+
+### Subcategorías e ingresos frente a egresos
+
+Los egresos por alta clínica no se vinculan individualmente a los ingresos. Su cociente no es una tasa de retención o resolución. Rett y el trastorno desintegrativo se muestran como categorías separadas del catálogo histórico.
+
+```{python}
+#| label: tabla-rem-subcategorias
+labels = {"22": "Autismo", "23": "Asperger", "24": "Rett", "25": "Trastorno desintegrativo", "26": "TGD no específico",
+          "27": "Autismo", "28": "Asperger", "29": "Rett", "30": "Trastorno desintegrativo", "31": "TGD no específico"}
+a05 = annual.loc[(annual.sheet == "A05") & (annual.year == last_year)].copy()
+a05["Categoría"] = a05.code.str[-2:].map(labels)
+a05["Actividad"] = a05.code.str[-2:].astype(int).map(lambda n: "Ingreso" if n <= 26 else "Egreso")
+show_table(a05[["code", "Categoría", "Actividad", "Col01", "rows", "rows_total_known"]].rename(columns={
+    "code": "Código", "Col01": "Suma observada", "rows": "Filas", "rows_total_known": "Filas con total",
+}), f"Subcategorías A05 · {last_year}")
+historical = annual.loc[annual.code.isin(["06902600", "05225000"])]
+show_table(historical[["year", "code", "Col01", "rows", "rows_total_known"]].rename(columns={
+    "year": "Año", "code": "Código TGD genérico", "Col01": "Suma observada", "rows": "Filas", "rows_total_known": "Filas con total",
+}), "Serie genérica anterior: conservar separada de los códigos específicos")
+```
+
+## A03: tamizaje y sospecha
+
+Hay un cambio de instrumento y de encabezados etarios: las secciones revisadas distinguen la serie MCHAT 2019–2022 y MCHAT-R/F 2023–2024. En 2024 aparece además una sección para 31–59 meses. Deben distinguirse controles, aplicación del instrumento, resultados de cada etapa y derivación.
+
+`03500406` describe realización del tamizaje en niños con alteración de lenguaje/social; **no equivale a tamizaje positivo**. Por eso no se publica su cociente respecto de todos los controles como positividad. Los denominadores se deben validar en el manual de la misma versión, etapa y edad.
+
+```{python}
+#| label: tabla-rem-tamizaje
+a03 = annual.loc[(annual.sheet == "A03") & (annual.year == last_year)].copy()
+a03["% filas con ambos sexos"] = 100 * a03.rows_total_known / a03.rows
+show_table(a03[["code", "label", "Col01", "Col02", "total_known", "% filas con ambos sexos"]].rename(columns={
+    "code": "Código", "label": "Etiqueta del diccionario", "Col01": "Hombres informados", "Col02": "Mujeres informadas",
+    "total_known": "Suma de filas completas",
+}), f"A03 · {last_year}: valores observados y completitud", {"% filas con ambos sexos": 1})
+```
+
+La suma de hombres informados más mujeres informadas puede abarcar filas diferentes. La columna «suma de filas completas» exige ambos campos en cada fila. Ninguna de estas cantidades representa automáticamente un total completo si existen faltantes.
+
+## A28: ingresos a rehabilitación
+
+Los códigos se mantienen separados por sección. No se suman entre sí como personas distintas y no se etiquetan como consultas.
+
+```{python}
+#| label: tabla-rem-rehabilitacion
+a28 = annual.loc[annual.sheet == "A28"].copy()
+show_table(a28[["year", "code", "section", "Col01", "rows", "rows_total_known"]].rename(columns={
+    "year": "Año", "code": "Código", "section": "Sección", "Col01": "Suma observada",
+    "rows": "Filas", "rows_total_known": "Filas con total",
+}), "A28: actividad registrada por sección")
+```
+
+## Calidad y comparabilidad
+
+```{python}
+#| label: tabla-rem-calidad
+show_table(quality[["year", "selected_records", "exact_duplicates_removed", "a05_rows_sex_comparable",
+                    "a05_rows_sex_mismatch", "a05_rows_age_comparable", "a05_rows_age_mismatch"]].rename(columns={
+    "year": "Año", "selected_records": "Filas seleccionadas", "exact_duplicates_removed": "Duplicados retirados",
+    "a05_rows_sex_comparable": "Comparables por sexo", "a05_rows_sex_mismatch": "Discrepancias por sexo",
+    "a05_rows_age_comparable": "Comparables por edad", "a05_rows_age_mismatch": "Discrepancias por edad",
+}), "Controles de filas seleccionadas; las discrepancias no alteran la fuente")
+```
+
+Los controles por sexo o edad solo comparan filas con todas las celdas necesarias observadas. Un total regional o nacional con doce meses presentes no acredita información completa de todos los establecimientos. No se imputan ceros a filas o celdas ausentes.
+
+La siguiente extensión requiere construir un panel de establecimientos estable, comprobar denominadores de tamizaje y revisar 2025–2026 antes de ampliar el período. Los manuales y formularios tienen versiones anuales y actualizaciones. [REM, Servicio de Salud Tarapacá](https://sstarapaca.redsalud.gob.cl/rem/).
+
+## Reproducibilidad
+
+Este QMD realiza agrupaciones, tablas y figuras en Python. La extracción previa y la validación de diccionarios corresponden a `scripts/audit_rem.py`; las salidas están documentadas en `output_files/consolidacion/README.md`. Cada código conserva su archivo, hoja y fila de diccionario en `rem_code_catalogue.csv`. Los archivos originales permanecen intactos en el disco externo.
+
+::: {.report-nav}
+[Volver al inicio](index.html) [Ver trayectorias GRD](grd.html)
+:::

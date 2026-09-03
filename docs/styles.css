@@ -1,0 +1,18 @@
+:root { --report-ink: #21334a; --report-accent: #167482; }
+body { color: var(--report-ink); }
+main { max-width: 1060px; }
+h1, h2, h3 { color: var(--report-ink); }
+h2 { padding-top: .7rem; }
+.report-nav { display: flex; gap: 1rem; padding: .8rem 0 1.1rem; border-bottom: 1px solid #dce3e8; margin-bottom: 1.5rem; }
+.report-nav a { font-weight: 600; text-decoration: none; }
+.metrics { display: grid; grid-template-columns: repeat(auto-fit, minmax(180px, 1fr)); gap: 1rem; margin: 1.4rem 0 2rem; }
+.metric { background: #edf5f5; border-left: 4px solid var(--report-accent); padding: 1rem 1.2rem; border-radius: 5px; }
+.metric strong { display: block; font-size: 1.85rem; color: #125864; }
+.metric span { display: block; margin-top: .3rem; font-size: .93rem; }
+.analysis-table { overflow-x: auto; margin: 1.2rem 0 1.7rem; }
+.analysis-table table { min-width: 100%; font-size: .88rem; font-variant-numeric: tabular-nums; }
+.analysis-table caption { caption-side: top; color: #465a6d; font-weight: 600; }
+.analysis-table th { white-space: normal; min-width: 75px; }
+.analysis-table td { vertical-align: top; }
+.source-note { color: #5b6d7b; font-size: .92rem; }
+@media (max-width: 650px) { .metrics { grid-template-columns: 1fr; } }
