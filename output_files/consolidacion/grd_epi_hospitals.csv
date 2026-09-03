@@ -1,0 +1,2022 @@
+year,definition,role,COD_HOSPITAL,records,identifiers,hospital
+2019,autismo_F840,principal,101100,3,3,Hospital Dr. Juan Noé Crevanni (Arica)
+2019,autismo_F840,principal,102100,4,3,Hospital Dr. Ernesto Torres Galdames (Iquique)
+2019,autismo_F840,principal,103100,19,18,Hospital Dr. Leonardo Guzmán (Antofagasta)
+2019,autismo_F840,principal,103101,4,3,Hospital Dr. Carlos Cisternas (Calama)
+2019,autismo_F840,principal,105100,1,1,Hospital San Juan de Dios (La Serena)
+2019,autismo_F840,principal,105101,3,2,Hospital San Pablo (Coquimbo)
+2019,autismo_F840,principal,105102,1,1,Hospital Dr. Antonio Tirado Lanas (Ovalle)
+2019,autismo_F840,principal,106103,1,1,Hospital Claudio Vicuña (San Antonio)
+2019,autismo_F840,principal,107100,2,2,Hospital Dr. Gustavo Fricke (Viña del Mar)
+2019,autismo_F840,principal,107102,3,3,Hospital de Quilpué
+2019,autismo_F840,principal,108100,2,2,Hospital de San Camilo (San Felipe)
+2019,autismo_F840,principal,109101,1,1,"Hospital Clínico de Niños Dr. Roberto del Río (Santiago, Independencia)"
+2019,autismo_F840,principal,110100,1,1,"Hospital San Juan de Dios (Santiago, Santiago)"
+2019,autismo_F840,principal,110120,16,13,"Hospital Dr. Félix Bulnes Cerda (Santiago, Quinta Normal)"
+2019,autismo_F840,principal,110130,1,1,Hospital Adalberto Steeger (Talagante)
+2019,autismo_F840,principal,110150,2,2,Hospital San José (Melipilla)
+2019,autismo_F840,principal,111100,21,6,"Hospital Clínico San Borja-Arriarán (Santiago, Santiago)"
+2019,autismo_F840,principal,111101,1,1,Hospital Clínico Metropolitano El Carmen Doctor Luis Valentín Ferrada
+2019,autismo_F840,principal,112102,2,2,"Hospital de Niños Dr. Luis Calvo Mackenna (Santiago, Providencia)"
+2019,autismo_F840,principal,113130,5,4,"Hospital Dr. Exequiel González Cortés (Santiago, San Miguel)"
+2019,autismo_F840,principal,114101,3,3,"Complejo Hospitalario Dr. Sótero del Río (Santiago, Puente Alto)"
+2019,autismo_F840,principal,114103,3,2,Hospital Padre Alberto Hurtado (San Ramón)
+2019,autismo_F840,principal,115107,2,2,Hospital San Juan de Dios (San Fernando)
+2019,autismo_F840,principal,116105,2,2,Hospital Dr. César Garavagno Burotto (Talca)
+2019,autismo_F840,principal,117101,14,12,Hospital Clínico Herminda Martín (Chillán)
+2019,autismo_F840,principal,117102,1,1,Hospital de San Carlos
+2019,autismo_F840,principal,118100,4,4,Hospital Clínico Regional Dr. Guillermo Grant Benavente (Concepción)
+2019,autismo_F840,principal,119100,1,1,Hospital Las Higueras (Talcahuano)
+2019,autismo_F840,principal,120101,2,2,Complejo Asistencial Dr. Víctor Ríos Ruiz (Los Ángeles)
+2019,autismo_F840,principal,121109,4,4,Hospital Dr. Hernán Henríquez Aravena (Temuco)
+2019,autismo_F840,principal,122100,2,2,Hospital Clínico Regional (Valdivia)
+2019,autismo_F840,principal,123100,2,2,Hospital Base San José de Osorno
+2019,autismo_F840,principal,124105,5,5,Hospital de Puerto Montt
+2019,autismo_F840,principal,125100,1,1,Hospital Regional (Coihaique)
+2019,autismo_F840,principal,126100,10,5,Hospital Clínico de Magallanes Dr. Lautaro Navarro Avaria
+2019,autismo_F840,principal,133150,1,1,Hospital de Castro
+2019,autismo_F840,solo_secundario,101100,22,18,Hospital Dr. Juan Noé Crevanni (Arica)
+2019,autismo_F840,solo_secundario,102100,23,23,Hospital Dr. Ernesto Torres Galdames (Iquique)
+2019,autismo_F840,solo_secundario,103100,58,52,Hospital Dr. Leonardo Guzmán (Antofagasta)
+2019,autismo_F840,solo_secundario,103101,11,9,Hospital Dr. Carlos Cisternas (Calama)
+2019,autismo_F840,solo_secundario,104100,4,4,Hospital San José del Carmen (Copiapó)
+2019,autismo_F840,solo_secundario,104103,10,10,Hospital Provincial del Huasco Monseñor Fernando Ariztía Ruiz (Vallenar)
+2019,autismo_F840,solo_secundario,105100,23,23,Hospital San Juan de Dios (La Serena)
+2019,autismo_F840,solo_secundario,105101,30,27,Hospital San Pablo (Coquimbo)
+2019,autismo_F840,solo_secundario,105102,9,9,Hospital Dr. Antonio Tirado Lanas (Ovalle)
+2019,autismo_F840,solo_secundario,106100,54,47,Hospital Carlos Van Buren (Valparaíso)
+2019,autismo_F840,solo_secundario,106102,1,1,Hospital Dr. Eduardo Pereira Ramírez (Valparaíso)
+2019,autismo_F840,solo_secundario,106103,14,13,Hospital Claudio Vicuña (San Antonio)
+2019,autismo_F840,solo_secundario,107100,38,37,Hospital Dr. Gustavo Fricke (Viña del Mar)
+2019,autismo_F840,solo_secundario,107101,9,7,Hospital San Martín (Quillota)
+2019,autismo_F840,solo_secundario,107102,5,5,Hospital de Quilpué
+2019,autismo_F840,solo_secundario,108100,10,10,Hospital de San Camilo (San Felipe)
+2019,autismo_F840,solo_secundario,108101,5,4,Hospital San Juan de Dios (Los Andes)
+2019,autismo_F840,solo_secundario,109100,7,6,"Complejo Hospitalario San José (Santiago, Independencia)"
+2019,autismo_F840,solo_secundario,109101,57,51,"Hospital Clínico de Niños Dr. Roberto del Río (Santiago, Independencia)"
+2019,autismo_F840,solo_secundario,110100,40,32,"Hospital San Juan de Dios (Santiago, Santiago)"
+2019,autismo_F840,solo_secundario,110120,25,23,"Hospital Dr. Félix Bulnes Cerda (Santiago, Quinta Normal)"
+2019,autismo_F840,solo_secundario,110130,1,1,Hospital Adalberto Steeger (Talagante)
+2019,autismo_F840,solo_secundario,111100,69,50,"Hospital Clínico San Borja-Arriarán (Santiago, Santiago)"
+2019,autismo_F840,solo_secundario,111101,15,15,Hospital Clínico Metropolitano El Carmen Doctor Luis Valentín Ferrada
+2019,autismo_F840,solo_secundario,112100,4,3,"Hospital Del Salvador (Santiago, Providencia)"
+2019,autismo_F840,solo_secundario,112101,3,3,"Hospital Dr. Luis Tisné B. (Santiago, Peñalolén)"
+2019,autismo_F840,solo_secundario,112102,45,40,"Hospital de Niños Dr. Luis Calvo Mackenna (Santiago, Providencia)"
+2019,autismo_F840,solo_secundario,112104,1,1,Instituto de Neurocirugía Dr. Alfonso Asenjo
+2019,autismo_F840,solo_secundario,113100,7,7,"Hospital Barros Luco Trudeau (Santiago, San Miguel)"
+2019,autismo_F840,solo_secundario,113130,45,41,"Hospital Dr. Exequiel González Cortés (Santiago, San Miguel)"
+2019,autismo_F840,solo_secundario,113150,2,2,Hospital San Luis (Buin)
+2019,autismo_F840,solo_secundario,113180,3,3,"Hospital El Pino (Santiago, San Bernardo)"
+2019,autismo_F840,solo_secundario,114101,65,56,"Complejo Hospitalario Dr. Sótero del Río (Santiago, Puente Alto)"
+2019,autismo_F840,solo_secundario,114103,14,14,Hospital Padre Alberto Hurtado (San Ramón)
+2019,autismo_F840,solo_secundario,114105,18,17,Hospital Clínico Metropolitano La Florida Dra. Eloisa Díaz Inzunza
+2019,autismo_F840,solo_secundario,115100,22,21,Hospital Regional de Rancagua
+2019,autismo_F840,solo_secundario,115107,5,5,Hospital San Juan de Dios (San Fernando)
+2019,autismo_F840,solo_secundario,115110,7,6,Hospital de Santa Cruz
+2019,autismo_F840,solo_secundario,116100,5,5,Hospital San Juan de Dios (Curicó)
+2019,autismo_F840,solo_secundario,116105,11,10,Hospital Dr. César Garavagno Burotto (Talca)
+2019,autismo_F840,solo_secundario,116108,12,12,Hospital Presidente Carlos Ibáñez del Campo (Linares)
+2019,autismo_F840,solo_secundario,117101,66,62,Hospital Clínico Herminda Martín (Chillán)
+2019,autismo_F840,solo_secundario,117102,8,8,Hospital de San Carlos
+2019,autismo_F840,solo_secundario,118100,88,77,Hospital Clínico Regional Dr. Guillermo Grant Benavente (Concepción)
+2019,autismo_F840,solo_secundario,118105,7,7,Hospital San José (Coronel)
+2019,autismo_F840,solo_secundario,119100,41,38,Hospital Las Higueras (Talcahuano)
+2019,autismo_F840,solo_secundario,120101,25,25,Complejo Asistencial Dr. Víctor Ríos Ruiz (Los Ángeles)
+2019,autismo_F840,solo_secundario,121109,50,46,Hospital Dr. Hernán Henríquez Aravena (Temuco)
+2019,autismo_F840,solo_secundario,121110,2,2,Hospital Dr. Abraham Godoy (Lautaro)
+2019,autismo_F840,solo_secundario,121114,2,2,Hospital Intercultural de Nueva Imperial
+2019,autismo_F840,solo_secundario,121117,1,1,Hospital de Pitrufquén
+2019,autismo_F840,solo_secundario,121121,3,3,Hospital de Villarrica
+2019,autismo_F840,solo_secundario,122100,43,21,Hospital Clínico Regional (Valdivia)
+2019,autismo_F840,solo_secundario,123100,24,22,Hospital Base San José de Osorno
+2019,autismo_F840,solo_secundario,124105,32,32,Hospital de Puerto Montt
+2019,autismo_F840,solo_secundario,125100,5,5,Hospital Regional (Coihaique)
+2019,autismo_F840,solo_secundario,126100,27,20,Hospital Clínico de Magallanes Dr. Lautaro Navarro Avaria
+2019,autismo_F840,solo_secundario,128109,5,5,Hospital Provincial Dr. Rafael Avaría (Curanilahue)
+2019,autismo_F840,solo_secundario,129100,4,3,Hospital Dr. Mauricio Heyermann (Angol)
+2019,autismo_F840,solo_secundario,129106,2,2,Hospital San José (Victoria)
+2019,autismo_F840,solo_secundario,133150,6,6,Hospital de Castro
+2020,autismo_F840,principal,101100,3,3,Hospital Dr. Juan Noé Crevanni (Arica)
+2020,autismo_F840,principal,102100,4,3,Hospital Dr. Ernesto Torres Galdames (Iquique)
+2020,autismo_F840,principal,103100,7,7,Hospital Dr. Leonardo Guzmán (Antofagasta)
+2020,autismo_F840,principal,103101,1,1,Hospital Dr. Carlos Cisternas (Calama)
+2020,autismo_F840,principal,104100,1,1,Hospital San José del Carmen (Copiapó)
+2020,autismo_F840,principal,104103,1,1,Hospital Provincial del Huasco Monseñor Fernando Ariztía Ruiz (Vallenar)
+2020,autismo_F840,principal,105100,1,1,Hospital San Juan de Dios (La Serena)
+2020,autismo_F840,principal,105101,1,1,Hospital San Pablo (Coquimbo)
+2020,autismo_F840,principal,106103,1,1,Hospital Claudio Vicuña (San Antonio)
+2020,autismo_F840,principal,107101,1,1,Hospital San Martín (Quillota)
+2020,autismo_F840,principal,107102,2,2,Hospital de Quilpué
+2020,autismo_F840,principal,109101,4,4,"Hospital Clínico de Niños Dr. Roberto del Río (Santiago, Independencia)"
+2020,autismo_F840,principal,110100,1,1,"Hospital San Juan de Dios (Santiago, Santiago)"
+2020,autismo_F840,principal,110120,13,8,"Hospital Dr. Félix Bulnes Cerda (Santiago, Quinta Normal)"
+2020,autismo_F840,principal,111100,15,5,"Hospital Clínico San Borja-Arriarán (Santiago, Santiago)"
+2020,autismo_F840,principal,112102,2,2,"Hospital de Niños Dr. Luis Calvo Mackenna (Santiago, Providencia)"
+2020,autismo_F840,principal,113130,2,2,"Hospital Dr. Exequiel González Cortés (Santiago, San Miguel)"
+2020,autismo_F840,principal,114101,8,7,"Complejo Hospitalario Dr. Sótero del Río (Santiago, Puente Alto)"
+2020,autismo_F840,principal,114103,2,2,Hospital Padre Alberto Hurtado (San Ramón)
+2020,autismo_F840,principal,114105,3,2,Hospital Clínico Metropolitano La Florida Dra. Eloisa Díaz Inzunza
+2020,autismo_F840,principal,115100,6,6,Hospital Regional de Rancagua
+2020,autismo_F840,principal,115110,1,1,Hospital de Santa Cruz
+2020,autismo_F840,principal,116105,1,1,Hospital Dr. César Garavagno Burotto (Talca)
+2020,autismo_F840,principal,117101,7,6,Hospital Clínico Herminda Martín (Chillán)
+2020,autismo_F840,principal,118100,8,6,Hospital Clínico Regional Dr. Guillermo Grant Benavente (Concepción)
+2020,autismo_F840,principal,121109,2,2,Hospital Dr. Hernán Henríquez Aravena (Temuco)
+2020,autismo_F840,principal,121110,1,1,Hospital Dr. Abraham Godoy (Lautaro)
+2020,autismo_F840,principal,121121,1,1,Hospital de Villarrica
+2020,autismo_F840,principal,122100,2,2,Hospital Clínico Regional (Valdivia)
+2020,autismo_F840,principal,124105,4,4,Hospital de Puerto Montt
+2020,autismo_F840,principal,125100,1,1,Hospital Regional (Coihaique)
+2020,autismo_F840,principal,126100,4,3,Hospital Clínico de Magallanes Dr. Lautaro Navarro Avaria
+2020,autismo_F840,principal,129100,1,1,Hospital Dr. Mauricio Heyermann (Angol)
+2020,autismo_F840,principal,129106,1,1,Hospital San José (Victoria)
+2020,autismo_F840,principal,133150,1,1,Hospital de Castro
+2020,autismo_F840,solo_secundario,101100,20,18,Hospital Dr. Juan Noé Crevanni (Arica)
+2020,autismo_F840,solo_secundario,102100,13,12,Hospital Dr. Ernesto Torres Galdames (Iquique)
+2020,autismo_F840,solo_secundario,103100,31,28,Hospital Dr. Leonardo Guzmán (Antofagasta)
+2020,autismo_F840,solo_secundario,103101,11,10,Hospital Dr. Carlos Cisternas (Calama)
+2020,autismo_F840,solo_secundario,104100,5,5,Hospital San José del Carmen (Copiapó)
+2020,autismo_F840,solo_secundario,104103,3,3,Hospital Provincial del Huasco Monseñor Fernando Ariztía Ruiz (Vallenar)
+2020,autismo_F840,solo_secundario,105100,21,17,Hospital San Juan de Dios (La Serena)
+2020,autismo_F840,solo_secundario,105101,21,20,Hospital San Pablo (Coquimbo)
+2020,autismo_F840,solo_secundario,105102,8,8,Hospital Dr. Antonio Tirado Lanas (Ovalle)
+2020,autismo_F840,solo_secundario,106100,27,23,Hospital Carlos Van Buren (Valparaíso)
+2020,autismo_F840,solo_secundario,106102,1,1,Hospital Dr. Eduardo Pereira Ramírez (Valparaíso)
+2020,autismo_F840,solo_secundario,106103,6,6,Hospital Claudio Vicuña (San Antonio)
+2020,autismo_F840,solo_secundario,107100,56,42,Hospital Dr. Gustavo Fricke (Viña del Mar)
+2020,autismo_F840,solo_secundario,107101,6,6,Hospital San Martín (Quillota)
+2020,autismo_F840,solo_secundario,107102,11,9,Hospital de Quilpué
+2020,autismo_F840,solo_secundario,108100,6,6,Hospital de San Camilo (San Felipe)
+2020,autismo_F840,solo_secundario,108101,2,2,Hospital San Juan de Dios (Los Andes)
+2020,autismo_F840,solo_secundario,109100,5,3,"Complejo Hospitalario San José (Santiago, Independencia)"
+2020,autismo_F840,solo_secundario,109101,46,36,"Hospital Clínico de Niños Dr. Roberto del Río (Santiago, Independencia)"
+2020,autismo_F840,solo_secundario,110100,9,9,"Hospital San Juan de Dios (Santiago, Santiago)"
+2020,autismo_F840,solo_secundario,110120,22,22,"Hospital Dr. Félix Bulnes Cerda (Santiago, Quinta Normal)"
+2020,autismo_F840,solo_secundario,110150,3,3,Hospital San José (Melipilla)
+2020,autismo_F840,solo_secundario,111100,33,23,"Hospital Clínico San Borja-Arriarán (Santiago, Santiago)"
+2020,autismo_F840,solo_secundario,111101,11,10,Hospital Clínico Metropolitano El Carmen Doctor Luis Valentín Ferrada
+2020,autismo_F840,solo_secundario,112100,2,2,"Hospital Del Salvador (Santiago, Providencia)"
+2020,autismo_F840,solo_secundario,112102,33,26,"Hospital de Niños Dr. Luis Calvo Mackenna (Santiago, Providencia)"
+2020,autismo_F840,solo_secundario,112104,8,8,Instituto de Neurocirugía Dr. Alfonso Asenjo
+2020,autismo_F840,solo_secundario,113100,4,4,"Hospital Barros Luco Trudeau (Santiago, San Miguel)"
+2020,autismo_F840,solo_secundario,113130,62,58,"Hospital Dr. Exequiel González Cortés (Santiago, San Miguel)"
+2020,autismo_F840,solo_secundario,113150,3,3,Hospital San Luis (Buin)
+2020,autismo_F840,solo_secundario,113180,6,6,"Hospital El Pino (Santiago, San Bernardo)"
+2020,autismo_F840,solo_secundario,114101,41,37,"Complejo Hospitalario Dr. Sótero del Río (Santiago, Puente Alto)"
+2020,autismo_F840,solo_secundario,114103,4,4,Hospital Padre Alberto Hurtado (San Ramón)
+2020,autismo_F840,solo_secundario,114105,17,16,Hospital Clínico Metropolitano La Florida Dra. Eloisa Díaz Inzunza
+2020,autismo_F840,solo_secundario,115100,29,28,Hospital Regional de Rancagua
+2020,autismo_F840,solo_secundario,115107,1,1,Hospital San Juan de Dios (San Fernando)
+2020,autismo_F840,solo_secundario,116100,2,2,Hospital San Juan de Dios (Curicó)
+2020,autismo_F840,solo_secundario,116105,17,14,Hospital Dr. César Garavagno Burotto (Talca)
+2020,autismo_F840,solo_secundario,116108,10,10,Hospital Presidente Carlos Ibáñez del Campo (Linares)
+2020,autismo_F840,solo_secundario,116110,3,3,Hospital San José (Parral)
+2020,autismo_F840,solo_secundario,117101,38,35,Hospital Clínico Herminda Martín (Chillán)
+2020,autismo_F840,solo_secundario,117102,8,7,Hospital de San Carlos
+2020,autismo_F840,solo_secundario,118100,64,51,Hospital Clínico Regional Dr. Guillermo Grant Benavente (Concepción)
+2020,autismo_F840,solo_secundario,118105,4,4,Hospital San José (Coronel)
+2020,autismo_F840,solo_secundario,119100,32,27,Hospital Las Higueras (Talcahuano)
+2020,autismo_F840,solo_secundario,120101,23,21,Complejo Asistencial Dr. Víctor Ríos Ruiz (Los Ángeles)
+2020,autismo_F840,solo_secundario,121109,57,45,Hospital Dr. Hernán Henríquez Aravena (Temuco)
+2020,autismo_F840,solo_secundario,121117,3,3,Hospital de Pitrufquén
+2020,autismo_F840,solo_secundario,121121,1,1,Hospital de Villarrica
+2020,autismo_F840,solo_secundario,122100,27,19,Hospital Clínico Regional (Valdivia)
+2020,autismo_F840,solo_secundario,123100,23,21,Hospital Base San José de Osorno
+2020,autismo_F840,solo_secundario,124105,19,13,Hospital de Puerto Montt
+2020,autismo_F840,solo_secundario,125100,5,4,Hospital Regional (Coihaique)
+2020,autismo_F840,solo_secundario,126100,29,27,Hospital Clínico de Magallanes Dr. Lautaro Navarro Avaria
+2020,autismo_F840,solo_secundario,128109,3,3,Hospital Provincial Dr. Rafael Avaría (Curanilahue)
+2020,autismo_F840,solo_secundario,129100,5,5,Hospital Dr. Mauricio Heyermann (Angol)
+2020,autismo_F840,solo_secundario,129106,5,4,Hospital San José (Victoria)
+2020,autismo_F840,solo_secundario,133150,5,4,Hospital de Castro
+2021,autismo_F840,principal,101100,6,6,Hospital Dr. Juan Noé Crevanni (Arica)
+2021,autismo_F840,principal,102100,3,2,Hospital Dr. Ernesto Torres Galdames (Iquique)
+2021,autismo_F840,principal,103100,25,23,Hospital Dr. Leonardo Guzmán (Antofagasta)
+2021,autismo_F840,principal,104100,1,1,Hospital San José del Carmen (Copiapó)
+2021,autismo_F840,principal,104103,1,1,Hospital Provincial del Huasco Monseñor Fernando Ariztía Ruiz (Vallenar)
+2021,autismo_F840,principal,105101,2,2,Hospital San Pablo (Coquimbo)
+2021,autismo_F840,principal,106100,2,2,Hospital Carlos Van Buren (Valparaíso)
+2021,autismo_F840,principal,107100,1,1,Hospital Dr. Gustavo Fricke (Viña del Mar)
+2021,autismo_F840,principal,107102,1,1,Hospital de Quilpué
+2021,autismo_F840,principal,109101,1,1,"Hospital Clínico de Niños Dr. Roberto del Río (Santiago, Independencia)"
+2021,autismo_F840,principal,110120,2,2,"Hospital Dr. Félix Bulnes Cerda (Santiago, Quinta Normal)"
+2021,autismo_F840,principal,111100,7,2,"Hospital Clínico San Borja-Arriarán (Santiago, Santiago)"
+2021,autismo_F840,principal,111101,1,1,Hospital Clínico Metropolitano El Carmen Doctor Luis Valentín Ferrada
+2021,autismo_F840,principal,112102,3,2,"Hospital de Niños Dr. Luis Calvo Mackenna (Santiago, Providencia)"
+2021,autismo_F840,principal,113130,1,1,"Hospital Dr. Exequiel González Cortés (Santiago, San Miguel)"
+2021,autismo_F840,principal,113180,2,2,"Hospital El Pino (Santiago, San Bernardo)"
+2021,autismo_F840,principal,114101,7,7,"Complejo Hospitalario Dr. Sótero del Río (Santiago, Puente Alto)"
+2021,autismo_F840,principal,114103,1,1,Hospital Padre Alberto Hurtado (San Ramón)
+2021,autismo_F840,principal,114105,1,1,Hospital Clínico Metropolitano La Florida Dra. Eloisa Díaz Inzunza
+2021,autismo_F840,principal,115100,4,4,Hospital Regional de Rancagua
+2021,autismo_F840,principal,116105,2,2,Hospital Dr. César Garavagno Burotto (Talca)
+2021,autismo_F840,principal,117101,14,9,Hospital Clínico Herminda Martín (Chillán)
+2021,autismo_F840,principal,117102,1,1,Hospital de San Carlos
+2021,autismo_F840,principal,118100,5,5,Hospital Clínico Regional Dr. Guillermo Grant Benavente (Concepción)
+2021,autismo_F840,principal,119100,5,5,Hospital Las Higueras (Talcahuano)
+2021,autismo_F840,principal,120101,6,5,Complejo Asistencial Dr. Víctor Ríos Ruiz (Los Ángeles)
+2021,autismo_F840,principal,121109,9,8,Hospital Dr. Hernán Henríquez Aravena (Temuco)
+2021,autismo_F840,principal,121110,1,1,Hospital Dr. Abraham Godoy (Lautaro)
+2021,autismo_F840,principal,122100,3,3,Hospital Clínico Regional (Valdivia)
+2021,autismo_F840,principal,123100,6,4,Hospital Base San José de Osorno
+2021,autismo_F840,principal,124105,3,3,Hospital de Puerto Montt
+2021,autismo_F840,principal,125100,3,1,Hospital Regional (Coihaique)
+2021,autismo_F840,principal,126100,8,5,Hospital Clínico de Magallanes Dr. Lautaro Navarro Avaria
+2021,autismo_F840,principal,129106,1,1,Hospital San José (Victoria)
+2021,autismo_F840,solo_secundario,101100,49,46,Hospital Dr. Juan Noé Crevanni (Arica)
+2021,autismo_F840,solo_secundario,102100,16,16,Hospital Dr. Ernesto Torres Galdames (Iquique)
+2021,autismo_F840,solo_secundario,103100,61,55,Hospital Dr. Leonardo Guzmán (Antofagasta)
+2021,autismo_F840,solo_secundario,103101,15,14,Hospital Dr. Carlos Cisternas (Calama)
+2021,autismo_F840,solo_secundario,104100,9,9,Hospital San José del Carmen (Copiapó)
+2021,autismo_F840,solo_secundario,104103,9,9,Hospital Provincial del Huasco Monseñor Fernando Ariztía Ruiz (Vallenar)
+2021,autismo_F840,solo_secundario,105100,43,32,Hospital San Juan de Dios (La Serena)
+2021,autismo_F840,solo_secundario,105101,47,36,Hospital San Pablo (Coquimbo)
+2021,autismo_F840,solo_secundario,105102,8,7,Hospital Dr. Antonio Tirado Lanas (Ovalle)
+2021,autismo_F840,solo_secundario,106100,36,33,Hospital Carlos Van Buren (Valparaíso)
+2021,autismo_F840,solo_secundario,106103,4,4,Hospital Claudio Vicuña (San Antonio)
+2021,autismo_F840,solo_secundario,107100,49,44,Hospital Dr. Gustavo Fricke (Viña del Mar)
+2021,autismo_F840,solo_secundario,107101,14,14,Hospital San Martín (Quillota)
+2021,autismo_F840,solo_secundario,107102,6,6,Hospital de Quilpué
+2021,autismo_F840,solo_secundario,108100,14,14,Hospital de San Camilo (San Felipe)
+2021,autismo_F840,solo_secundario,108101,2,2,Hospital San Juan de Dios (Los Andes)
+2021,autismo_F840,solo_secundario,109100,9,9,"Complejo Hospitalario San José (Santiago, Independencia)"
+2021,autismo_F840,solo_secundario,109101,67,51,"Hospital Clínico de Niños Dr. Roberto del Río (Santiago, Independencia)"
+2021,autismo_F840,solo_secundario,110100,22,20,"Hospital San Juan de Dios (Santiago, Santiago)"
+2021,autismo_F840,solo_secundario,110120,43,38,"Hospital Dr. Félix Bulnes Cerda (Santiago, Quinta Normal)"
+2021,autismo_F840,solo_secundario,110130,5,5,Hospital Adalberto Steeger (Talagante)
+2021,autismo_F840,solo_secundario,110150,7,7,Hospital San José (Melipilla)
+2021,autismo_F840,solo_secundario,111100,25,24,"Hospital Clínico San Borja-Arriarán (Santiago, Santiago)"
+2021,autismo_F840,solo_secundario,111101,14,12,Hospital Clínico Metropolitano El Carmen Doctor Luis Valentín Ferrada
+2021,autismo_F840,solo_secundario,112100,6,6,"Hospital Del Salvador (Santiago, Providencia)"
+2021,autismo_F840,solo_secundario,112101,1,1,"Hospital Dr. Luis Tisné B. (Santiago, Peñalolén)"
+2021,autismo_F840,solo_secundario,112102,65,52,"Hospital de Niños Dr. Luis Calvo Mackenna (Santiago, Providencia)"
+2021,autismo_F840,solo_secundario,112104,24,20,Instituto de Neurocirugía Dr. Alfonso Asenjo
+2021,autismo_F840,solo_secundario,113100,15,14,"Hospital Barros Luco Trudeau (Santiago, San Miguel)"
+2021,autismo_F840,solo_secundario,113130,136,122,"Hospital Dr. Exequiel González Cortés (Santiago, San Miguel)"
+2021,autismo_F840,solo_secundario,113180,8,8,"Hospital El Pino (Santiago, San Bernardo)"
+2021,autismo_F840,solo_secundario,114101,146,111,"Complejo Hospitalario Dr. Sótero del Río (Santiago, Puente Alto)"
+2021,autismo_F840,solo_secundario,114103,19,18,Hospital Padre Alberto Hurtado (San Ramón)
+2021,autismo_F840,solo_secundario,114105,40,34,Hospital Clínico Metropolitano La Florida Dra. Eloisa Díaz Inzunza
+2021,autismo_F840,solo_secundario,115100,53,50,Hospital Regional de Rancagua
+2021,autismo_F840,solo_secundario,115107,6,5,Hospital San Juan de Dios (San Fernando)
+2021,autismo_F840,solo_secundario,115110,4,4,Hospital de Santa Cruz
+2021,autismo_F840,solo_secundario,116100,7,7,Hospital San Juan de Dios (Curicó)
+2021,autismo_F840,solo_secundario,116105,27,25,Hospital Dr. César Garavagno Burotto (Talca)
+2021,autismo_F840,solo_secundario,116108,36,32,Hospital Presidente Carlos Ibáñez del Campo (Linares)
+2021,autismo_F840,solo_secundario,116110,1,1,Hospital San José (Parral)
+2021,autismo_F840,solo_secundario,117101,94,88,Hospital Clínico Herminda Martín (Chillán)
+2021,autismo_F840,solo_secundario,117102,12,11,Hospital de San Carlos
+2021,autismo_F840,solo_secundario,118100,101,77,Hospital Clínico Regional Dr. Guillermo Grant Benavente (Concepción)
+2021,autismo_F840,solo_secundario,118105,10,10,Hospital San José (Coronel)
+2021,autismo_F840,solo_secundario,119100,60,54,Hospital Las Higueras (Talcahuano)
+2021,autismo_F840,solo_secundario,120101,30,25,Complejo Asistencial Dr. Víctor Ríos Ruiz (Los Ángeles)
+2021,autismo_F840,solo_secundario,121109,58,51,Hospital Dr. Hernán Henríquez Aravena (Temuco)
+2021,autismo_F840,solo_secundario,121110,3,3,Hospital Dr. Abraham Godoy (Lautaro)
+2021,autismo_F840,solo_secundario,121114,6,6,Hospital Intercultural de Nueva Imperial
+2021,autismo_F840,solo_secundario,121117,2,2,Hospital de Pitrufquén
+2021,autismo_F840,solo_secundario,121121,5,5,Hospital de Villarrica
+2021,autismo_F840,solo_secundario,122100,21,19,Hospital Clínico Regional (Valdivia)
+2021,autismo_F840,solo_secundario,123100,38,36,Hospital Base San José de Osorno
+2021,autismo_F840,solo_secundario,124105,30,27,Hospital de Puerto Montt
+2021,autismo_F840,solo_secundario,125100,6,5,Hospital Regional (Coihaique)
+2021,autismo_F840,solo_secundario,126100,25,22,Hospital Clínico de Magallanes Dr. Lautaro Navarro Avaria
+2021,autismo_F840,solo_secundario,128109,13,13,Hospital Provincial Dr. Rafael Avaría (Curanilahue)
+2021,autismo_F840,solo_secundario,129100,11,11,Hospital Dr. Mauricio Heyermann (Angol)
+2021,autismo_F840,solo_secundario,129106,4,2,Hospital San José (Victoria)
+2021,autismo_F840,solo_secundario,133150,12,10,Hospital de Castro
+2022,autismo_F840,principal,101100,14,10,Hospital Dr. Juan Noé Crevanni (Arica)
+2022,autismo_F840,principal,102100,8,8,Hospital Dr. Ernesto Torres Galdames (Iquique)
+2022,autismo_F840,principal,103100,23,21,Hospital Dr. Leonardo Guzmán (Antofagasta)
+2022,autismo_F840,principal,103101,1,1,Hospital Dr. Carlos Cisternas (Calama)
+2022,autismo_F840,principal,104100,1,1,Hospital San José del Carmen (Copiapó)
+2022,autismo_F840,principal,104103,1,1,Hospital Provincial del Huasco Monseñor Fernando Ariztía Ruiz (Vallenar)
+2022,autismo_F840,principal,105100,2,2,Hospital San Juan de Dios (La Serena)
+2022,autismo_F840,principal,105101,4,4,Hospital San Pablo (Coquimbo)
+2022,autismo_F840,principal,105102,4,4,Hospital Dr. Antonio Tirado Lanas (Ovalle)
+2022,autismo_F840,principal,106103,2,2,Hospital Claudio Vicuña (San Antonio)
+2022,autismo_F840,principal,107100,1,1,Hospital Dr. Gustavo Fricke (Viña del Mar)
+2022,autismo_F840,principal,107101,1,1,Hospital San Martín (Quillota)
+2022,autismo_F840,principal,107102,1,1,Hospital de Quilpué
+2022,autismo_F840,principal,109101,2,1,"Hospital Clínico de Niños Dr. Roberto del Río (Santiago, Independencia)"
+2022,autismo_F840,principal,110120,3,3,"Hospital Dr. Félix Bulnes Cerda (Santiago, Quinta Normal)"
+2022,autismo_F840,principal,111100,10,5,"Hospital Clínico San Borja-Arriarán (Santiago, Santiago)"
+2022,autismo_F840,principal,111101,5,5,Hospital Clínico Metropolitano El Carmen Doctor Luis Valentín Ferrada
+2022,autismo_F840,principal,112102,2,2,"Hospital de Niños Dr. Luis Calvo Mackenna (Santiago, Providencia)"
+2022,autismo_F840,principal,113130,1,1,"Hospital Dr. Exequiel González Cortés (Santiago, San Miguel)"
+2022,autismo_F840,principal,114101,17,16,"Complejo Hospitalario Dr. Sótero del Río (Santiago, Puente Alto)"
+2022,autismo_F840,principal,114105,1,1,Hospital Clínico Metropolitano La Florida Dra. Eloisa Díaz Inzunza
+2022,autismo_F840,principal,115100,2,2,Hospital Regional de Rancagua
+2022,autismo_F840,principal,116105,3,3,Hospital Dr. César Garavagno Burotto (Talca)
+2022,autismo_F840,principal,117101,20,17,Hospital Clínico Herminda Martín (Chillán)
+2022,autismo_F840,principal,117102,1,1,Hospital de San Carlos
+2022,autismo_F840,principal,118100,5,5,Hospital Clínico Regional Dr. Guillermo Grant Benavente (Concepción)
+2022,autismo_F840,principal,118105,2,2,Hospital San José (Coronel)
+2022,autismo_F840,principal,119100,7,7,Hospital Las Higueras (Talcahuano)
+2022,autismo_F840,principal,120101,12,8,Complejo Asistencial Dr. Víctor Ríos Ruiz (Los Ángeles)
+2022,autismo_F840,principal,121109,3,3,Hospital Dr. Hernán Henríquez Aravena (Temuco)
+2022,autismo_F840,principal,121110,2,2,Hospital Dr. Abraham Godoy (Lautaro)
+2022,autismo_F840,principal,122100,6,4,Hospital Clínico Regional (Valdivia)
+2022,autismo_F840,principal,123100,7,4,Hospital Base San José de Osorno
+2022,autismo_F840,principal,124105,8,7,Hospital de Puerto Montt
+2022,autismo_F840,principal,125100,1,1,Hospital Regional (Coihaique)
+2022,autismo_F840,principal,126100,14,9,Hospital Clínico de Magallanes Dr. Lautaro Navarro Avaria
+2022,autismo_F840,principal,129100,2,2,Hospital Dr. Mauricio Heyermann (Angol)
+2022,autismo_F840,principal,133150,3,3,Hospital de Castro
+2022,autismo_F840,solo_secundario,101100,70,54,Hospital Dr. Juan Noé Crevanni (Arica)
+2022,autismo_F840,solo_secundario,102100,40,39,Hospital Dr. Ernesto Torres Galdames (Iquique)
+2022,autismo_F840,solo_secundario,103100,98,89,Hospital Dr. Leonardo Guzmán (Antofagasta)
+2022,autismo_F840,solo_secundario,103101,39,35,Hospital Dr. Carlos Cisternas (Calama)
+2022,autismo_F840,solo_secundario,104100,19,17,Hospital San José del Carmen (Copiapó)
+2022,autismo_F840,solo_secundario,104103,20,19,Hospital Provincial del Huasco Monseñor Fernando Ariztía Ruiz (Vallenar)
+2022,autismo_F840,solo_secundario,105100,78,64,Hospital San Juan de Dios (La Serena)
+2022,autismo_F840,solo_secundario,105101,59,57,Hospital San Pablo (Coquimbo)
+2022,autismo_F840,solo_secundario,105102,38,35,Hospital Dr. Antonio Tirado Lanas (Ovalle)
+2022,autismo_F840,solo_secundario,106100,73,64,Hospital Carlos Van Buren (Valparaíso)
+2022,autismo_F840,solo_secundario,106102,3,2,Hospital Dr. Eduardo Pereira Ramírez (Valparaíso)
+2022,autismo_F840,solo_secundario,106103,7,7,Hospital Claudio Vicuña (San Antonio)
+2022,autismo_F840,solo_secundario,107100,101,95,Hospital Dr. Gustavo Fricke (Viña del Mar)
+2022,autismo_F840,solo_secundario,107101,25,24,Hospital San Martín (Quillota)
+2022,autismo_F840,solo_secundario,107102,9,8,Hospital de Quilpué
+2022,autismo_F840,solo_secundario,108100,15,15,Hospital de San Camilo (San Felipe)
+2022,autismo_F840,solo_secundario,108101,4,4,Hospital San Juan de Dios (Los Andes)
+2022,autismo_F840,solo_secundario,109100,9,7,"Complejo Hospitalario San José (Santiago, Independencia)"
+2022,autismo_F840,solo_secundario,109101,53,52,"Hospital Clínico de Niños Dr. Roberto del Río (Santiago, Independencia)"
+2022,autismo_F840,solo_secundario,110100,31,26,"Hospital San Juan de Dios (Santiago, Santiago)"
+2022,autismo_F840,solo_secundario,110120,58,56,"Hospital Dr. Félix Bulnes Cerda (Santiago, Quinta Normal)"
+2022,autismo_F840,solo_secundario,110130,5,5,Hospital Adalberto Steeger (Talagante)
+2022,autismo_F840,solo_secundario,110150,7,6,Hospital San José (Melipilla)
+2022,autismo_F840,solo_secundario,111100,68,63,"Hospital Clínico San Borja-Arriarán (Santiago, Santiago)"
+2022,autismo_F840,solo_secundario,111101,25,25,Hospital Clínico Metropolitano El Carmen Doctor Luis Valentín Ferrada
+2022,autismo_F840,solo_secundario,111195,1,1,Hospital de Urgencia Asistencia Pública Dr. Alejandro del Río
+2022,autismo_F840,solo_secundario,112100,7,7,"Hospital Del Salvador (Santiago, Providencia)"
+2022,autismo_F840,solo_secundario,112101,2,2,"Hospital Dr. Luis Tisné B. (Santiago, Peñalolén)"
+2022,autismo_F840,solo_secundario,112102,133,106,"Hospital de Niños Dr. Luis Calvo Mackenna (Santiago, Providencia)"
+2022,autismo_F840,solo_secundario,112104,27,18,Instituto de Neurocirugía Dr. Alfonso Asenjo
+2022,autismo_F840,solo_secundario,113100,10,10,"Hospital Barros Luco Trudeau (Santiago, San Miguel)"
+2022,autismo_F840,solo_secundario,113130,197,175,"Hospital Dr. Exequiel González Cortés (Santiago, San Miguel)"
+2022,autismo_F840,solo_secundario,113150,4,4,Hospital San Luis (Buin)
+2022,autismo_F840,solo_secundario,113180,15,15,"Hospital El Pino (Santiago, San Bernardo)"
+2022,autismo_F840,solo_secundario,114101,224,177,"Complejo Hospitalario Dr. Sótero del Río (Santiago, Puente Alto)"
+2022,autismo_F840,solo_secundario,114103,40,37,Hospital Padre Alberto Hurtado (San Ramón)
+2022,autismo_F840,solo_secundario,114105,50,44,Hospital Clínico Metropolitano La Florida Dra. Eloisa Díaz Inzunza
+2022,autismo_F840,solo_secundario,115100,73,64,Hospital Regional de Rancagua
+2022,autismo_F840,solo_secundario,115107,13,12,Hospital San Juan de Dios (San Fernando)
+2022,autismo_F840,solo_secundario,115110,14,14,Hospital de Santa Cruz
+2022,autismo_F840,solo_secundario,116100,13,13,Hospital San Juan de Dios (Curicó)
+2022,autismo_F840,solo_secundario,116105,78,65,Hospital Dr. César Garavagno Burotto (Talca)
+2022,autismo_F840,solo_secundario,116108,65,58,Hospital Presidente Carlos Ibáñez del Campo (Linares)
+2022,autismo_F840,solo_secundario,116110,4,4,Hospital San José (Parral)
+2022,autismo_F840,solo_secundario,117101,164,146,Hospital Clínico Herminda Martín (Chillán)
+2022,autismo_F840,solo_secundario,117102,14,13,Hospital de San Carlos
+2022,autismo_F840,solo_secundario,118100,149,129,Hospital Clínico Regional Dr. Guillermo Grant Benavente (Concepción)
+2022,autismo_F840,solo_secundario,118105,18,18,Hospital San José (Coronel)
+2022,autismo_F840,solo_secundario,119100,123,108,Hospital Las Higueras (Talcahuano)
+2022,autismo_F840,solo_secundario,120101,74,66,Complejo Asistencial Dr. Víctor Ríos Ruiz (Los Ángeles)
+2022,autismo_F840,solo_secundario,121109,104,93,Hospital Dr. Hernán Henríquez Aravena (Temuco)
+2022,autismo_F840,solo_secundario,121110,7,7,Hospital Dr. Abraham Godoy (Lautaro)
+2022,autismo_F840,solo_secundario,121114,9,8,Hospital Intercultural de Nueva Imperial
+2022,autismo_F840,solo_secundario,121117,2,2,Hospital de Pitrufquén
+2022,autismo_F840,solo_secundario,121121,10,9,Hospital de Villarrica
+2022,autismo_F840,solo_secundario,122100,32,30,Hospital Clínico Regional (Valdivia)
+2022,autismo_F840,solo_secundario,123100,51,47,Hospital Base San José de Osorno
+2022,autismo_F840,solo_secundario,124105,62,57,Hospital de Puerto Montt
+2022,autismo_F840,solo_secundario,125100,17,14,Hospital Regional (Coihaique)
+2022,autismo_F840,solo_secundario,126100,38,32,Hospital Clínico de Magallanes Dr. Lautaro Navarro Avaria
+2022,autismo_F840,solo_secundario,128109,12,10,Hospital Provincial Dr. Rafael Avaría (Curanilahue)
+2022,autismo_F840,solo_secundario,129100,31,29,Hospital Dr. Mauricio Heyermann (Angol)
+2022,autismo_F840,solo_secundario,129106,8,8,Hospital San José (Victoria)
+2022,autismo_F840,solo_secundario,133150,10,10,Hospital de Castro
+2023,autismo_F840,principal,101100,9,9,Hospital Dr. Juan Noé Crevanni (Arica)
+2023,autismo_F840,principal,102100,11,11,Hospital Dr. Ernesto Torres Galdames (Iquique)
+2023,autismo_F840,principal,103100,23,19,Hospital Dr. Leonardo Guzmán (Antofagasta)
+2023,autismo_F840,principal,103101,5,5,Hospital Dr. Carlos Cisternas (Calama)
+2023,autismo_F840,principal,104100,2,2,Hospital San José del Carmen (Copiapó)
+2023,autismo_F840,principal,104103,1,1,Hospital Provincial del Huasco Monseñor Fernando Ariztía Ruiz (Vallenar)
+2023,autismo_F840,principal,105101,1,1,Hospital San Pablo (Coquimbo)
+2023,autismo_F840,principal,105102,1,1,Hospital Dr. Antonio Tirado Lanas (Ovalle)
+2023,autismo_F840,principal,106103,1,1,Hospital Claudio Vicuña (San Antonio)
+2023,autismo_F840,principal,107101,1,1,Hospital San Martín (Quillota)
+2023,autismo_F840,principal,107102,1,1,Hospital de Quilpué
+2023,autismo_F840,principal,109101,2,2,"Hospital Clínico de Niños Dr. Roberto del Río (Santiago, Independencia)"
+2023,autismo_F840,principal,110120,2,2,"Hospital Dr. Félix Bulnes Cerda (Santiago, Quinta Normal)"
+2023,autismo_F840,principal,110150,1,1,Hospital San José (Melipilla)
+2023,autismo_F840,principal,111100,47,10,"Hospital Clínico San Borja-Arriarán (Santiago, Santiago)"
+2023,autismo_F840,principal,111101,2,2,Hospital Clínico Metropolitano El Carmen Doctor Luis Valentín Ferrada
+2023,autismo_F840,principal,112102,8,8,"Hospital de Niños Dr. Luis Calvo Mackenna (Santiago, Providencia)"
+2023,autismo_F840,principal,113130,1,1,"Hospital Dr. Exequiel González Cortés (Santiago, San Miguel)"
+2023,autismo_F840,principal,114101,23,20,"Complejo Hospitalario Dr. Sótero del Río (Santiago, Puente Alto)"
+2023,autismo_F840,principal,114103,1,1,Hospital Padre Alberto Hurtado (San Ramón)
+2023,autismo_F840,principal,114105,4,4,Hospital Clínico Metropolitano La Florida Dra. Eloisa Díaz Inzunza
+2023,autismo_F840,principal,115100,3,3,Hospital Regional de Rancagua
+2023,autismo_F840,principal,115110,3,1,Hospital de Santa Cruz
+2023,autismo_F840,principal,116105,2,2,Hospital Dr. César Garavagno Burotto (Talca)
+2023,autismo_F840,principal,116108,1,1,Hospital Presidente Carlos Ibáñez del Campo (Linares)
+2023,autismo_F840,principal,116110,1,1,Hospital San José (Parral)
+2023,autismo_F840,principal,117101,12,12,Hospital Clínico Herminda Martín (Chillán)
+2023,autismo_F840,principal,117102,7,6,Hospital de San Carlos
+2023,autismo_F840,principal,118100,14,12,Hospital Clínico Regional Dr. Guillermo Grant Benavente (Concepción)
+2023,autismo_F840,principal,118106,2,2,Hospital de Lota
+2023,autismo_F840,principal,119100,5,5,Hospital Las Higueras (Talcahuano)
+2023,autismo_F840,principal,120101,9,5,Complejo Asistencial Dr. Víctor Ríos Ruiz (Los Ángeles)
+2023,autismo_F840,principal,121109,7,7,Hospital Dr. Hernán Henríquez Aravena (Temuco)
+2023,autismo_F840,principal,121110,3,3,Hospital Dr. Abraham Godoy (Lautaro)
+2023,autismo_F840,principal,121114,1,1,Hospital Intercultural de Nueva Imperial
+2023,autismo_F840,principal,121117,2,2,Hospital de Pitrufquén
+2023,autismo_F840,principal,121121,1,1,Hospital de Villarrica
+2023,autismo_F840,principal,122100,3,2,Hospital Clínico Regional (Valdivia)
+2023,autismo_F840,principal,123100,8,7,Hospital Base San José de Osorno
+2023,autismo_F840,principal,124105,8,7,Hospital de Puerto Montt
+2023,autismo_F840,principal,125100,4,4,Hospital Regional (Coihaique)
+2023,autismo_F840,principal,126100,4,4,Hospital Clínico de Magallanes Dr. Lautaro Navarro Avaria
+2023,autismo_F840,principal,129100,6,6,Hospital Dr. Mauricio Heyermann (Angol)
+2023,autismo_F840,solo_secundario,101100,130,109,Hospital Dr. Juan Noé Crevanni (Arica)
+2023,autismo_F840,solo_secundario,102100,77,71,Hospital Dr. Ernesto Torres Galdames (Iquique)
+2023,autismo_F840,solo_secundario,103100,194,149,Hospital Dr. Leonardo Guzmán (Antofagasta)
+2023,autismo_F840,solo_secundario,103101,109,95,Hospital Dr. Carlos Cisternas (Calama)
+2023,autismo_F840,solo_secundario,104100,38,36,Hospital San José del Carmen (Copiapó)
+2023,autismo_F840,solo_secundario,104103,28,26,Hospital Provincial del Huasco Monseñor Fernando Ariztía Ruiz (Vallenar)
+2023,autismo_F840,solo_secundario,105100,131,115,Hospital San Juan de Dios (La Serena)
+2023,autismo_F840,solo_secundario,105101,139,127,Hospital San Pablo (Coquimbo)
+2023,autismo_F840,solo_secundario,105102,63,62,Hospital Dr. Antonio Tirado Lanas (Ovalle)
+2023,autismo_F840,solo_secundario,106100,143,123,Hospital Carlos Van Buren (Valparaíso)
+2023,autismo_F840,solo_secundario,106102,2,2,Hospital Dr. Eduardo Pereira Ramírez (Valparaíso)
+2023,autismo_F840,solo_secundario,106103,13,13,Hospital Claudio Vicuña (San Antonio)
+2023,autismo_F840,solo_secundario,107100,214,180,Hospital Dr. Gustavo Fricke (Viña del Mar)
+2023,autismo_F840,solo_secundario,107101,42,41,Hospital San Martín (Quillota)
+2023,autismo_F840,solo_secundario,107102,4,4,Hospital de Quilpué
+2023,autismo_F840,solo_secundario,108100,38,34,Hospital de San Camilo (San Felipe)
+2023,autismo_F840,solo_secundario,108101,20,20,Hospital San Juan de Dios (Los Andes)
+2023,autismo_F840,solo_secundario,109100,11,11,"Complejo Hospitalario San José (Santiago, Independencia)"
+2023,autismo_F840,solo_secundario,109101,49,46,"Hospital Clínico de Niños Dr. Roberto del Río (Santiago, Independencia)"
+2023,autismo_F840,solo_secundario,110100,62,49,"Hospital San Juan de Dios (Santiago, Santiago)"
+2023,autismo_F840,solo_secundario,110110,5,5,Instituto Traumatológico Dr. Teodoro Gebauer
+2023,autismo_F840,solo_secundario,110120,112,104,"Hospital Dr. Félix Bulnes Cerda (Santiago, Quinta Normal)"
+2023,autismo_F840,solo_secundario,110130,16,16,Hospital Adalberto Steeger (Talagante)
+2023,autismo_F840,solo_secundario,110150,22,22,Hospital San José (Melipilla)
+2023,autismo_F840,solo_secundario,111100,153,107,"Hospital Clínico San Borja-Arriarán (Santiago, Santiago)"
+2023,autismo_F840,solo_secundario,111101,80,77,Hospital Clínico Metropolitano El Carmen Doctor Luis Valentín Ferrada
+2023,autismo_F840,solo_secundario,111195,4,4,Hospital de Urgencia Asistencia Pública Dr. Alejandro del Río
+2023,autismo_F840,solo_secundario,112100,12,9,"Hospital Del Salvador (Santiago, Providencia)"
+2023,autismo_F840,solo_secundario,112101,11,11,"Hospital Dr. Luis Tisné B. (Santiago, Peñalolén)"
+2023,autismo_F840,solo_secundario,112102,167,127,"Hospital de Niños Dr. Luis Calvo Mackenna (Santiago, Providencia)"
+2023,autismo_F840,solo_secundario,112103,2,1,Instituto Nacional de Enfermedades Respiratorias y Cirugía Torácica
+2023,autismo_F840,solo_secundario,112104,25,19,Instituto de Neurocirugía Dr. Alfonso Asenjo
+2023,autismo_F840,solo_secundario,113100,13,13,"Hospital Barros Luco Trudeau (Santiago, San Miguel)"
+2023,autismo_F840,solo_secundario,113130,238,218,"Hospital Dr. Exequiel González Cortés (Santiago, San Miguel)"
+2023,autismo_F840,solo_secundario,113150,11,10,Hospital San Luis (Buin)
+2023,autismo_F840,solo_secundario,113180,24,23,"Hospital El Pino (Santiago, San Bernardo)"
+2023,autismo_F840,solo_secundario,114101,411,326,"Complejo Hospitalario Dr. Sótero del Río (Santiago, Puente Alto)"
+2023,autismo_F840,solo_secundario,114103,61,55,Hospital Padre Alberto Hurtado (San Ramón)
+2023,autismo_F840,solo_secundario,114105,102,94,Hospital Clínico Metropolitano La Florida Dra. Eloisa Díaz Inzunza
+2023,autismo_F840,solo_secundario,115100,92,79,Hospital Regional de Rancagua
+2023,autismo_F840,solo_secundario,115107,27,25,Hospital San Juan de Dios (San Fernando)
+2023,autismo_F840,solo_secundario,115110,11,10,Hospital de Santa Cruz
+2023,autismo_F840,solo_secundario,116100,44,42,Hospital San Juan de Dios (Curicó)
+2023,autismo_F840,solo_secundario,116105,132,97,Hospital Dr. César Garavagno Burotto (Talca)
+2023,autismo_F840,solo_secundario,116108,102,92,Hospital Presidente Carlos Ibáñez del Campo (Linares)
+2023,autismo_F840,solo_secundario,116110,14,13,Hospital San José (Parral)
+2023,autismo_F840,solo_secundario,117101,225,202,Hospital Clínico Herminda Martín (Chillán)
+2023,autismo_F840,solo_secundario,117102,53,52,Hospital de San Carlos
+2023,autismo_F840,solo_secundario,118100,266,231,Hospital Clínico Regional Dr. Guillermo Grant Benavente (Concepción)
+2023,autismo_F840,solo_secundario,118105,45,40,Hospital San José (Coronel)
+2023,autismo_F840,solo_secundario,118106,23,22,Hospital de Lota
+2023,autismo_F840,solo_secundario,119100,166,145,Hospital Las Higueras (Talcahuano)
+2023,autismo_F840,solo_secundario,119101,9,9,Hospital de Tomé
+2023,autismo_F840,solo_secundario,120101,155,138,Complejo Asistencial Dr. Víctor Ríos Ruiz (Los Ángeles)
+2023,autismo_F840,solo_secundario,121109,203,172,Hospital Dr. Hernán Henríquez Aravena (Temuco)
+2023,autismo_F840,solo_secundario,121110,5,5,Hospital Dr. Abraham Godoy (Lautaro)
+2023,autismo_F840,solo_secundario,121114,12,11,Hospital Intercultural de Nueva Imperial
+2023,autismo_F840,solo_secundario,121117,6,6,Hospital de Pitrufquén
+2023,autismo_F840,solo_secundario,121121,10,10,Hospital de Villarrica
+2023,autismo_F840,solo_secundario,122100,79,64,Hospital Clínico Regional (Valdivia)
+2023,autismo_F840,solo_secundario,123100,79,71,Hospital Base San José de Osorno
+2023,autismo_F840,solo_secundario,124105,107,97,Hospital de Puerto Montt
+2023,autismo_F840,solo_secundario,125100,28,24,Hospital Regional (Coihaique)
+2023,autismo_F840,solo_secundario,126100,77,65,Hospital Clínico de Magallanes Dr. Lautaro Navarro Avaria
+2023,autismo_F840,solo_secundario,128109,33,28,Hospital Provincial Dr. Rafael Avaría (Curanilahue)
+2023,autismo_F840,solo_secundario,129100,37,34,Hospital Dr. Mauricio Heyermann (Angol)
+2023,autismo_F840,solo_secundario,129106,23,19,Hospital San José (Victoria)
+2023,autismo_F840,solo_secundario,133150,33,26,Hospital de Castro
+2024,autismo_F840,principal,101100,10,9,Hospital Dr. Juan Noé Crevanni (Arica)
+2024,autismo_F840,principal,102100,11,9,Hospital Dr. Ernesto Torres Galdames (Iquique)
+2024,autismo_F840,principal,103100,19,18,Hospital Dr. Leonardo Guzmán (Antofagasta)
+2024,autismo_F840,principal,103101,5,4,Hospital Dr. Carlos Cisternas (Calama)
+2024,autismo_F840,principal,105101,4,4,Hospital San Pablo (Coquimbo)
+2024,autismo_F840,principal,105102,1,1,Hospital Dr. Antonio Tirado Lanas (Ovalle)
+2024,autismo_F840,principal,106100,1,1,Hospital Carlos Van Buren (Valparaíso)
+2024,autismo_F840,principal,107100,2,2,Hospital Dr. Gustavo Fricke (Viña del Mar)
+2024,autismo_F840,principal,107101,2,2,Hospital San Martín (Quillota)
+2024,autismo_F840,principal,108100,1,1,Hospital de San Camilo (San Felipe)
+2024,autismo_F840,principal,108101,1,1,Hospital San Juan de Dios (Los Andes)
+2024,autismo_F840,principal,109101,2,2,"Hospital Clínico de Niños Dr. Roberto del Río (Santiago, Independencia)"
+2024,autismo_F840,principal,110100,1,1,"Hospital San Juan de Dios (Santiago, Santiago)"
+2024,autismo_F840,principal,110120,2,2,"Hospital Dr. Félix Bulnes Cerda (Santiago, Quinta Normal)"
+2024,autismo_F840,principal,111100,48,18,"Hospital Clínico San Borja-Arriarán (Santiago, Santiago)"
+2024,autismo_F840,principal,111101,1,1,Hospital Clínico Metropolitano El Carmen Doctor Luis Valentín Ferrada
+2024,autismo_F840,principal,112100,2,2,"Hospital Del Salvador (Santiago, Providencia)"
+2024,autismo_F840,principal,112101,1,1,"Hospital Dr. Luis Tisné B. (Santiago, Peñalolén)"
+2024,autismo_F840,principal,112102,5,5,"Hospital de Niños Dr. Luis Calvo Mackenna (Santiago, Providencia)"
+2024,autismo_F840,principal,113100,1,1,"Hospital Barros Luco Trudeau (Santiago, San Miguel)"
+2024,autismo_F840,principal,113130,8,5,"Hospital Dr. Exequiel González Cortés (Santiago, San Miguel)"
+2024,autismo_F840,principal,113180,5,5,"Hospital El Pino (Santiago, San Bernardo)"
+2024,autismo_F840,principal,114101,15,13,"Complejo Hospitalario Dr. Sótero del Río (Santiago, Puente Alto)"
+2024,autismo_F840,principal,114103,2,2,Hospital Padre Alberto Hurtado (San Ramón)
+2024,autismo_F840,principal,114105,3,3,Hospital Clínico Metropolitano La Florida Dra. Eloisa Díaz Inzunza
+2024,autismo_F840,principal,115100,1,1,Hospital Regional de Rancagua
+2024,autismo_F840,principal,116100,1,1,Hospital San Juan de Dios (Curicó)
+2024,autismo_F840,principal,116105,5,5,Hospital Dr. César Garavagno Burotto (Talca)
+2024,autismo_F840,principal,116111,1,1,Hospital San Juan de Dios (Cauquenes)
+2024,autismo_F840,principal,117101,21,18,Hospital Clínico Herminda Martín (Chillán)
+2024,autismo_F840,principal,117102,3,3,Hospital de San Carlos
+2024,autismo_F840,principal,118100,11,9,Hospital Clínico Regional Dr. Guillermo Grant Benavente (Concepción)
+2024,autismo_F840,principal,118105,2,2,Hospital San José (Coronel)
+2024,autismo_F840,principal,118106,1,1,Hospital de Lota
+2024,autismo_F840,principal,119100,8,7,Hospital Las Higueras (Talcahuano)
+2024,autismo_F840,principal,119101,1,1,Hospital de Tomé
+2024,autismo_F840,principal,119102,4,3,Hospital Penco - Lirquén
+2024,autismo_F840,principal,120101,3,3,Complejo Asistencial Dr. Víctor Ríos Ruiz (Los Ángeles)
+2024,autismo_F840,principal,121109,11,10,Hospital Dr. Hernán Henríquez Aravena (Temuco)
+2024,autismo_F840,principal,121114,2,2,Hospital Intercultural de Nueva Imperial
+2024,autismo_F840,principal,121121,2,2,Hospital de Villarrica
+2024,autismo_F840,principal,122100,4,4,Hospital Clínico Regional (Valdivia)
+2024,autismo_F840,principal,123100,4,4,Hospital Base San José de Osorno
+2024,autismo_F840,principal,124105,11,10,Hospital de Puerto Montt
+2024,autismo_F840,principal,125100,5,4,Hospital Regional (Coihaique)
+2024,autismo_F840,principal,126100,11,10,Hospital Clínico de Magallanes Dr. Lautaro Navarro Avaria
+2024,autismo_F840,principal,129100,2,2,Hospital Dr. Mauricio Heyermann (Angol)
+2024,autismo_F840,principal,129106,10,9,Hospital San José (Victoria)
+2024,autismo_F840,principal,133150,2,2,Hospital de Castro
+2024,autismo_F840,principal,200717,1,1,
+2024,autismo_F840,solo_secundario,101100,145,119,Hospital Dr. Juan Noé Crevanni (Arica)
+2024,autismo_F840,solo_secundario,102100,132,121,Hospital Dr. Ernesto Torres Galdames (Iquique)
+2024,autismo_F840,solo_secundario,103100,241,224,Hospital Dr. Leonardo Guzmán (Antofagasta)
+2024,autismo_F840,solo_secundario,103101,127,114,Hospital Dr. Carlos Cisternas (Calama)
+2024,autismo_F840,solo_secundario,104100,54,48,Hospital San José del Carmen (Copiapó)
+2024,autismo_F840,solo_secundario,104103,32,27,Hospital Provincial del Huasco Monseñor Fernando Ariztía Ruiz (Vallenar)
+2024,autismo_F840,solo_secundario,105100,204,183,Hospital San Juan de Dios (La Serena)
+2024,autismo_F840,solo_secundario,105101,195,175,Hospital San Pablo (Coquimbo)
+2024,autismo_F840,solo_secundario,105102,100,90,Hospital Dr. Antonio Tirado Lanas (Ovalle)
+2024,autismo_F840,solo_secundario,106100,250,197,Hospital Carlos Van Buren (Valparaíso)
+2024,autismo_F840,solo_secundario,106102,8,7,Hospital Dr. Eduardo Pereira Ramírez (Valparaíso)
+2024,autismo_F840,solo_secundario,106103,35,34,Hospital Claudio Vicuña (San Antonio)
+2024,autismo_F840,solo_secundario,107100,325,273,Hospital Dr. Gustavo Fricke (Viña del Mar)
+2024,autismo_F840,solo_secundario,107101,91,78,Hospital San Martín (Quillota)
+2024,autismo_F840,solo_secundario,107102,3,3,Hospital de Quilpué
+2024,autismo_F840,solo_secundario,108100,36,35,Hospital de San Camilo (San Felipe)
+2024,autismo_F840,solo_secundario,108101,19,19,Hospital San Juan de Dios (Los Andes)
+2024,autismo_F840,solo_secundario,109100,27,26,"Complejo Hospitalario San José (Santiago, Independencia)"
+2024,autismo_F840,solo_secundario,109101,88,83,"Hospital Clínico de Niños Dr. Roberto del Río (Santiago, Independencia)"
+2024,autismo_F840,solo_secundario,110100,59,48,"Hospital San Juan de Dios (Santiago, Santiago)"
+2024,autismo_F840,solo_secundario,110110,3,3,Instituto Traumatológico Dr. Teodoro Gebauer
+2024,autismo_F840,solo_secundario,110120,144,136,"Hospital Dr. Félix Bulnes Cerda (Santiago, Quinta Normal)"
+2024,autismo_F840,solo_secundario,110130,21,21,Hospital Adalberto Steeger (Talagante)
+2024,autismo_F840,solo_secundario,110150,28,25,Hospital San José (Melipilla)
+2024,autismo_F840,solo_secundario,111100,286,198,"Hospital Clínico San Borja-Arriarán (Santiago, Santiago)"
+2024,autismo_F840,solo_secundario,111101,131,123,Hospital Clínico Metropolitano El Carmen Doctor Luis Valentín Ferrada
+2024,autismo_F840,solo_secundario,111195,5,5,Hospital de Urgencia Asistencia Pública Dr. Alejandro del Río
+2024,autismo_F840,solo_secundario,112100,23,23,"Hospital Del Salvador (Santiago, Providencia)"
+2024,autismo_F840,solo_secundario,112101,9,9,"Hospital Dr. Luis Tisné B. (Santiago, Peñalolén)"
+2024,autismo_F840,solo_secundario,112102,246,186,"Hospital de Niños Dr. Luis Calvo Mackenna (Santiago, Providencia)"
+2024,autismo_F840,solo_secundario,112103,3,3,Instituto Nacional de Enfermedades Respiratorias y Cirugía Torácica
+2024,autismo_F840,solo_secundario,112104,46,32,Instituto de Neurocirugía Dr. Alfonso Asenjo
+2024,autismo_F840,solo_secundario,113100,14,14,"Hospital Barros Luco Trudeau (Santiago, San Miguel)"
+2024,autismo_F840,solo_secundario,113130,371,340,"Hospital Dr. Exequiel González Cortés (Santiago, San Miguel)"
+2024,autismo_F840,solo_secundario,113150,2,2,Hospital San Luis (Buin)
+2024,autismo_F840,solo_secundario,113180,41,37,"Hospital El Pino (Santiago, San Bernardo)"
+2024,autismo_F840,solo_secundario,114101,471,396,"Complejo Hospitalario Dr. Sótero del Río (Santiago, Puente Alto)"
+2024,autismo_F840,solo_secundario,114103,93,83,Hospital Padre Alberto Hurtado (San Ramón)
+2024,autismo_F840,solo_secundario,114105,127,109,Hospital Clínico Metropolitano La Florida Dra. Eloisa Díaz Inzunza
+2024,autismo_F840,solo_secundario,115100,110,97,Hospital Regional de Rancagua
+2024,autismo_F840,solo_secundario,115107,39,37,Hospital San Juan de Dios (San Fernando)
+2024,autismo_F840,solo_secundario,115110,24,23,Hospital de Santa Cruz
+2024,autismo_F840,solo_secundario,116100,113,97,Hospital San Juan de Dios (Curicó)
+2024,autismo_F840,solo_secundario,116105,155,145,Hospital Dr. César Garavagno Burotto (Talca)
+2024,autismo_F840,solo_secundario,116107,15,14,Hospital de Constitución
+2024,autismo_F840,solo_secundario,116108,123,116,Hospital Presidente Carlos Ibáñez del Campo (Linares)
+2024,autismo_F840,solo_secundario,116110,12,11,Hospital San José (Parral)
+2024,autismo_F840,solo_secundario,116111,15,14,Hospital San Juan de Dios (Cauquenes)
+2024,autismo_F840,solo_secundario,117101,210,186,Hospital Clínico Herminda Martín (Chillán)
+2024,autismo_F840,solo_secundario,117102,76,66,Hospital de San Carlos
+2024,autismo_F840,solo_secundario,118100,308,240,Hospital Clínico Regional Dr. Guillermo Grant Benavente (Concepción)
+2024,autismo_F840,solo_secundario,118105,79,70,Hospital San José (Coronel)
+2024,autismo_F840,solo_secundario,118106,12,10,Hospital de Lota
+2024,autismo_F840,solo_secundario,119100,243,215,Hospital Las Higueras (Talcahuano)
+2024,autismo_F840,solo_secundario,119101,22,17,Hospital de Tomé
+2024,autismo_F840,solo_secundario,119102,80,66,Hospital Penco - Lirquén
+2024,autismo_F840,solo_secundario,120101,174,154,Complejo Asistencial Dr. Víctor Ríos Ruiz (Los Ángeles)
+2024,autismo_F840,solo_secundario,121109,266,226,Hospital Dr. Hernán Henríquez Aravena (Temuco)
+2024,autismo_F840,solo_secundario,121110,23,20,Hospital Dr. Abraham Godoy (Lautaro)
+2024,autismo_F840,solo_secundario,121114,15,15,Hospital Intercultural de Nueva Imperial
+2024,autismo_F840,solo_secundario,121117,12,8,Hospital de Pitrufquén
+2024,autismo_F840,solo_secundario,121121,34,30,Hospital de Villarrica
+2024,autismo_F840,solo_secundario,122100,75,54,Hospital Clínico Regional (Valdivia)
+2024,autismo_F840,solo_secundario,123100,145,124,Hospital Base San José de Osorno
+2024,autismo_F840,solo_secundario,124105,61,57,Hospital de Puerto Montt
+2024,autismo_F840,solo_secundario,125100,16,15,Hospital Regional (Coihaique)
+2024,autismo_F840,solo_secundario,126100,72,62,Hospital Clínico de Magallanes Dr. Lautaro Navarro Avaria
+2024,autismo_F840,solo_secundario,128109,26,23,Hospital Provincial Dr. Rafael Avaría (Curanilahue)
+2024,autismo_F840,solo_secundario,129100,58,55,Hospital Dr. Mauricio Heyermann (Angol)
+2024,autismo_F840,solo_secundario,129106,22,21,Hospital San José (Victoria)
+2024,autismo_F840,solo_secundario,133150,47,43,Hospital de Castro
+2024,autismo_F840,solo_secundario,200717,33,30,
+2019,TEA_operacional,principal,101100,5,5,Hospital Dr. Juan Noé Crevanni (Arica)
+2019,TEA_operacional,principal,102100,6,6,Hospital Dr. Ernesto Torres Galdames (Iquique)
+2019,TEA_operacional,principal,103100,19,18,Hospital Dr. Leonardo Guzmán (Antofagasta)
+2019,TEA_operacional,principal,103101,4,3,Hospital Dr. Carlos Cisternas (Calama)
+2019,TEA_operacional,principal,104103,1,1,Hospital Provincial del Huasco Monseñor Fernando Ariztía Ruiz (Vallenar)
+2019,TEA_operacional,principal,105100,2,2,Hospital San Juan de Dios (La Serena)
+2019,TEA_operacional,principal,105101,3,2,Hospital San Pablo (Coquimbo)
+2019,TEA_operacional,principal,105102,1,1,Hospital Dr. Antonio Tirado Lanas (Ovalle)
+2019,TEA_operacional,principal,106103,1,1,Hospital Claudio Vicuña (San Antonio)
+2019,TEA_operacional,principal,107100,2,2,Hospital Dr. Gustavo Fricke (Viña del Mar)
+2019,TEA_operacional,principal,107102,4,4,Hospital de Quilpué
+2019,TEA_operacional,principal,108100,3,3,Hospital de San Camilo (San Felipe)
+2019,TEA_operacional,principal,109101,2,2,"Hospital Clínico de Niños Dr. Roberto del Río (Santiago, Independencia)"
+2019,TEA_operacional,principal,110100,1,1,"Hospital San Juan de Dios (Santiago, Santiago)"
+2019,TEA_operacional,principal,110120,18,15,"Hospital Dr. Félix Bulnes Cerda (Santiago, Quinta Normal)"
+2019,TEA_operacional,principal,110130,1,1,Hospital Adalberto Steeger (Talagante)
+2019,TEA_operacional,principal,110150,3,2,Hospital San José (Melipilla)
+2019,TEA_operacional,principal,111100,30,11,"Hospital Clínico San Borja-Arriarán (Santiago, Santiago)"
+2019,TEA_operacional,principal,111101,1,1,Hospital Clínico Metropolitano El Carmen Doctor Luis Valentín Ferrada
+2019,TEA_operacional,principal,112102,3,2,"Hospital de Niños Dr. Luis Calvo Mackenna (Santiago, Providencia)"
+2019,TEA_operacional,principal,113100,1,1,"Hospital Barros Luco Trudeau (Santiago, San Miguel)"
+2019,TEA_operacional,principal,113130,6,5,"Hospital Dr. Exequiel González Cortés (Santiago, San Miguel)"
+2019,TEA_operacional,principal,113180,6,3,"Hospital El Pino (Santiago, San Bernardo)"
+2019,TEA_operacional,principal,114101,13,12,"Complejo Hospitalario Dr. Sótero del Río (Santiago, Puente Alto)"
+2019,TEA_operacional,principal,114103,4,3,Hospital Padre Alberto Hurtado (San Ramón)
+2019,TEA_operacional,principal,114105,1,1,Hospital Clínico Metropolitano La Florida Dra. Eloisa Díaz Inzunza
+2019,TEA_operacional,principal,115107,2,2,Hospital San Juan de Dios (San Fernando)
+2019,TEA_operacional,principal,116100,1,1,Hospital San Juan de Dios (Curicó)
+2019,TEA_operacional,principal,116105,2,2,Hospital Dr. César Garavagno Burotto (Talca)
+2019,TEA_operacional,principal,117101,21,15,Hospital Clínico Herminda Martín (Chillán)
+2019,TEA_operacional,principal,117102,1,1,Hospital de San Carlos
+2019,TEA_operacional,principal,118100,7,7,Hospital Clínico Regional Dr. Guillermo Grant Benavente (Concepción)
+2019,TEA_operacional,principal,119100,4,4,Hospital Las Higueras (Talcahuano)
+2019,TEA_operacional,principal,120101,3,3,Complejo Asistencial Dr. Víctor Ríos Ruiz (Los Ángeles)
+2019,TEA_operacional,principal,121109,4,4,Hospital Dr. Hernán Henríquez Aravena (Temuco)
+2019,TEA_operacional,principal,122100,4,3,Hospital Clínico Regional (Valdivia)
+2019,TEA_operacional,principal,123100,5,4,Hospital Base San José de Osorno
+2019,TEA_operacional,principal,124105,7,7,Hospital de Puerto Montt
+2019,TEA_operacional,principal,125100,2,2,Hospital Regional (Coihaique)
+2019,TEA_operacional,principal,126100,11,6,Hospital Clínico de Magallanes Dr. Lautaro Navarro Avaria
+2019,TEA_operacional,principal,128109,1,1,Hospital Provincial Dr. Rafael Avaría (Curanilahue)
+2019,TEA_operacional,principal,129106,4,1,Hospital San José (Victoria)
+2019,TEA_operacional,principal,133150,1,1,Hospital de Castro
+2019,TEA_operacional,principal_y_secundario,102100,1,1,Hospital Dr. Ernesto Torres Galdames (Iquique)
+2019,TEA_operacional,principal_y_secundario,107100,1,1,Hospital Dr. Gustavo Fricke (Viña del Mar)
+2019,TEA_operacional,principal_y_secundario,111100,2,1,"Hospital Clínico San Borja-Arriarán (Santiago, Santiago)"
+2019,TEA_operacional,principal_y_secundario,116105,1,1,Hospital Dr. César Garavagno Burotto (Talca)
+2019,TEA_operacional,principal_y_secundario,129100,1,1,Hospital Dr. Mauricio Heyermann (Angol)
+2019,TEA_operacional,solo_secundario,101100,33,28,Hospital Dr. Juan Noé Crevanni (Arica)
+2019,TEA_operacional,solo_secundario,102100,55,52,Hospital Dr. Ernesto Torres Galdames (Iquique)
+2019,TEA_operacional,solo_secundario,103100,70,63,Hospital Dr. Leonardo Guzmán (Antofagasta)
+2019,TEA_operacional,solo_secundario,103101,16,14,Hospital Dr. Carlos Cisternas (Calama)
+2019,TEA_operacional,solo_secundario,104100,11,9,Hospital San José del Carmen (Copiapó)
+2019,TEA_operacional,solo_secundario,104103,13,13,Hospital Provincial del Huasco Monseñor Fernando Ariztía Ruiz (Vallenar)
+2019,TEA_operacional,solo_secundario,105100,28,28,Hospital San Juan de Dios (La Serena)
+2019,TEA_operacional,solo_secundario,105101,45,41,Hospital San Pablo (Coquimbo)
+2019,TEA_operacional,solo_secundario,105102,16,16,Hospital Dr. Antonio Tirado Lanas (Ovalle)
+2019,TEA_operacional,solo_secundario,106100,79,64,Hospital Carlos Van Buren (Valparaíso)
+2019,TEA_operacional,solo_secundario,106102,4,4,Hospital Dr. Eduardo Pereira Ramírez (Valparaíso)
+2019,TEA_operacional,solo_secundario,106103,20,19,Hospital Claudio Vicuña (San Antonio)
+2019,TEA_operacional,solo_secundario,107100,64,61,Hospital Dr. Gustavo Fricke (Viña del Mar)
+2019,TEA_operacional,solo_secundario,107101,13,11,Hospital San Martín (Quillota)
+2019,TEA_operacional,solo_secundario,107102,10,10,Hospital de Quilpué
+2019,TEA_operacional,solo_secundario,108100,14,14,Hospital de San Camilo (San Felipe)
+2019,TEA_operacional,solo_secundario,108101,7,6,Hospital San Juan de Dios (Los Andes)
+2019,TEA_operacional,solo_secundario,109100,12,11,"Complejo Hospitalario San José (Santiago, Independencia)"
+2019,TEA_operacional,solo_secundario,109101,87,72,"Hospital Clínico de Niños Dr. Roberto del Río (Santiago, Independencia)"
+2019,TEA_operacional,solo_secundario,110100,44,35,"Hospital San Juan de Dios (Santiago, Santiago)"
+2019,TEA_operacional,solo_secundario,110120,39,34,"Hospital Dr. Félix Bulnes Cerda (Santiago, Quinta Normal)"
+2019,TEA_operacional,solo_secundario,110130,1,1,Hospital Adalberto Steeger (Talagante)
+2019,TEA_operacional,solo_secundario,111100,145,117,"Hospital Clínico San Borja-Arriarán (Santiago, Santiago)"
+2019,TEA_operacional,solo_secundario,111101,38,38,Hospital Clínico Metropolitano El Carmen Doctor Luis Valentín Ferrada
+2019,TEA_operacional,solo_secundario,111195,1,1,Hospital de Urgencia Asistencia Pública Dr. Alejandro del Río
+2019,TEA_operacional,solo_secundario,112100,8,6,"Hospital Del Salvador (Santiago, Providencia)"
+2019,TEA_operacional,solo_secundario,112101,3,3,"Hospital Dr. Luis Tisné B. (Santiago, Peñalolén)"
+2019,TEA_operacional,solo_secundario,112102,83,72,"Hospital de Niños Dr. Luis Calvo Mackenna (Santiago, Providencia)"
+2019,TEA_operacional,solo_secundario,112103,1,1,Instituto Nacional de Enfermedades Respiratorias y Cirugía Torácica
+2019,TEA_operacional,solo_secundario,112104,2,2,Instituto de Neurocirugía Dr. Alfonso Asenjo
+2019,TEA_operacional,solo_secundario,113100,12,12,"Hospital Barros Luco Trudeau (Santiago, San Miguel)"
+2019,TEA_operacional,solo_secundario,113130,53,49,"Hospital Dr. Exequiel González Cortés (Santiago, San Miguel)"
+2019,TEA_operacional,solo_secundario,113150,3,3,Hospital San Luis (Buin)
+2019,TEA_operacional,solo_secundario,113180,7,7,"Hospital El Pino (Santiago, San Bernardo)"
+2019,TEA_operacional,solo_secundario,114101,93,84,"Complejo Hospitalario Dr. Sótero del Río (Santiago, Puente Alto)"
+2019,TEA_operacional,solo_secundario,114103,23,22,Hospital Padre Alberto Hurtado (San Ramón)
+2019,TEA_operacional,solo_secundario,114105,21,19,Hospital Clínico Metropolitano La Florida Dra. Eloisa Díaz Inzunza
+2019,TEA_operacional,solo_secundario,115100,30,28,Hospital Regional de Rancagua
+2019,TEA_operacional,solo_secundario,115107,35,32,Hospital San Juan de Dios (San Fernando)
+2019,TEA_operacional,solo_secundario,115110,8,7,Hospital de Santa Cruz
+2019,TEA_operacional,solo_secundario,116100,14,14,Hospital San Juan de Dios (Curicó)
+2019,TEA_operacional,solo_secundario,116105,48,44,Hospital Dr. César Garavagno Burotto (Talca)
+2019,TEA_operacional,solo_secundario,116108,16,16,Hospital Presidente Carlos Ibáñez del Campo (Linares)
+2019,TEA_operacional,solo_secundario,116110,2,2,Hospital San José (Parral)
+2019,TEA_operacional,solo_secundario,117101,77,73,Hospital Clínico Herminda Martín (Chillán)
+2019,TEA_operacional,solo_secundario,117102,13,13,Hospital de San Carlos
+2019,TEA_operacional,solo_secundario,118100,125,107,Hospital Clínico Regional Dr. Guillermo Grant Benavente (Concepción)
+2019,TEA_operacional,solo_secundario,118105,11,11,Hospital San José (Coronel)
+2019,TEA_operacional,solo_secundario,119100,65,57,Hospital Las Higueras (Talcahuano)
+2019,TEA_operacional,solo_secundario,120101,144,110,Complejo Asistencial Dr. Víctor Ríos Ruiz (Los Ángeles)
+2019,TEA_operacional,solo_secundario,121109,68,63,Hospital Dr. Hernán Henríquez Aravena (Temuco)
+2019,TEA_operacional,solo_secundario,121110,5,5,Hospital Dr. Abraham Godoy (Lautaro)
+2019,TEA_operacional,solo_secundario,121114,2,2,Hospital Intercultural de Nueva Imperial
+2019,TEA_operacional,solo_secundario,121117,2,2,Hospital de Pitrufquén
+2019,TEA_operacional,solo_secundario,121121,5,5,Hospital de Villarrica
+2019,TEA_operacional,solo_secundario,122100,77,50,Hospital Clínico Regional (Valdivia)
+2019,TEA_operacional,solo_secundario,123100,37,31,Hospital Base San José de Osorno
+2019,TEA_operacional,solo_secundario,124105,47,46,Hospital de Puerto Montt
+2019,TEA_operacional,solo_secundario,125100,10,10,Hospital Regional (Coihaique)
+2019,TEA_operacional,solo_secundario,126100,48,32,Hospital Clínico de Magallanes Dr. Lautaro Navarro Avaria
+2019,TEA_operacional,solo_secundario,128109,11,11,Hospital Provincial Dr. Rafael Avaría (Curanilahue)
+2019,TEA_operacional,solo_secundario,129100,6,5,Hospital Dr. Mauricio Heyermann (Angol)
+2019,TEA_operacional,solo_secundario,129106,7,6,Hospital San José (Victoria)
+2019,TEA_operacional,solo_secundario,133150,10,10,Hospital de Castro
+2020,TEA_operacional,principal,101100,3,3,Hospital Dr. Juan Noé Crevanni (Arica)
+2020,TEA_operacional,principal,102100,6,3,Hospital Dr. Ernesto Torres Galdames (Iquique)
+2020,TEA_operacional,principal,103100,10,10,Hospital Dr. Leonardo Guzmán (Antofagasta)
+2020,TEA_operacional,principal,103101,1,1,Hospital Dr. Carlos Cisternas (Calama)
+2020,TEA_operacional,principal,104100,1,1,Hospital San José del Carmen (Copiapó)
+2020,TEA_operacional,principal,104103,1,1,Hospital Provincial del Huasco Monseñor Fernando Ariztía Ruiz (Vallenar)
+2020,TEA_operacional,principal,105100,2,2,Hospital San Juan de Dios (La Serena)
+2020,TEA_operacional,principal,105101,2,2,Hospital San Pablo (Coquimbo)
+2020,TEA_operacional,principal,106103,1,1,Hospital Claudio Vicuña (San Antonio)
+2020,TEA_operacional,principal,107100,1,1,Hospital Dr. Gustavo Fricke (Viña del Mar)
+2020,TEA_operacional,principal,107101,1,1,Hospital San Martín (Quillota)
+2020,TEA_operacional,principal,107102,3,3,Hospital de Quilpué
+2020,TEA_operacional,principal,108100,1,1,Hospital de San Camilo (San Felipe)
+2020,TEA_operacional,principal,109101,3,3,"Hospital Clínico de Niños Dr. Roberto del Río (Santiago, Independencia)"
+2020,TEA_operacional,principal,110100,1,1,"Hospital San Juan de Dios (Santiago, Santiago)"
+2020,TEA_operacional,principal,110120,13,8,"Hospital Dr. Félix Bulnes Cerda (Santiago, Quinta Normal)"
+2020,TEA_operacional,principal,111100,19,7,"Hospital Clínico San Borja-Arriarán (Santiago, Santiago)"
+2020,TEA_operacional,principal,112102,1,1,"Hospital de Niños Dr. Luis Calvo Mackenna (Santiago, Providencia)"
+2020,TEA_operacional,principal,113100,1,1,"Hospital Barros Luco Trudeau (Santiago, San Miguel)"
+2020,TEA_operacional,principal,113130,2,2,"Hospital Dr. Exequiel González Cortés (Santiago, San Miguel)"
+2020,TEA_operacional,principal,113180,1,1,"Hospital El Pino (Santiago, San Bernardo)"
+2020,TEA_operacional,principal,114101,9,8,"Complejo Hospitalario Dr. Sótero del Río (Santiago, Puente Alto)"
+2020,TEA_operacional,principal,114103,1,1,Hospital Padre Alberto Hurtado (San Ramón)
+2020,TEA_operacional,principal,114105,5,3,Hospital Clínico Metropolitano La Florida Dra. Eloisa Díaz Inzunza
+2020,TEA_operacional,principal,115100,6,6,Hospital Regional de Rancagua
+2020,TEA_operacional,principal,115110,2,2,Hospital de Santa Cruz
+2020,TEA_operacional,principal,116105,1,1,Hospital Dr. César Garavagno Burotto (Talca)
+2020,TEA_operacional,principal,117101,8,6,Hospital Clínico Herminda Martín (Chillán)
+2020,TEA_operacional,principal,118100,11,9,Hospital Clínico Regional Dr. Guillermo Grant Benavente (Concepción)
+2020,TEA_operacional,principal,118105,2,1,Hospital San José (Coronel)
+2020,TEA_operacional,principal,119100,2,2,Hospital Las Higueras (Talcahuano)
+2020,TEA_operacional,principal,120101,1,1,Complejo Asistencial Dr. Víctor Ríos Ruiz (Los Ángeles)
+2020,TEA_operacional,principal,121109,2,2,Hospital Dr. Hernán Henríquez Aravena (Temuco)
+2020,TEA_operacional,principal,121110,1,1,Hospital Dr. Abraham Godoy (Lautaro)
+2020,TEA_operacional,principal,121121,1,1,Hospital de Villarrica
+2020,TEA_operacional,principal,122100,6,6,Hospital Clínico Regional (Valdivia)
+2020,TEA_operacional,principal,123100,3,3,Hospital Base San José de Osorno
+2020,TEA_operacional,principal,124105,6,6,Hospital de Puerto Montt
+2020,TEA_operacional,principal,125100,3,3,Hospital Regional (Coihaique)
+2020,TEA_operacional,principal,126100,4,3,Hospital Clínico de Magallanes Dr. Lautaro Navarro Avaria
+2020,TEA_operacional,principal,129100,1,1,Hospital Dr. Mauricio Heyermann (Angol)
+2020,TEA_operacional,principal,129106,2,2,Hospital San José (Victoria)
+2020,TEA_operacional,principal,133150,1,1,Hospital de Castro
+2020,TEA_operacional,principal_y_secundario,103100,1,1,Hospital Dr. Leonardo Guzmán (Antofagasta)
+2020,TEA_operacional,principal_y_secundario,109101,2,2,"Hospital Clínico de Niños Dr. Roberto del Río (Santiago, Independencia)"
+2020,TEA_operacional,principal_y_secundario,112102,1,1,"Hospital de Niños Dr. Luis Calvo Mackenna (Santiago, Providencia)"
+2020,TEA_operacional,principal_y_secundario,114103,1,1,Hospital Padre Alberto Hurtado (San Ramón)
+2020,TEA_operacional,solo_secundario,101100,29,26,Hospital Dr. Juan Noé Crevanni (Arica)
+2020,TEA_operacional,solo_secundario,102100,27,24,Hospital Dr. Ernesto Torres Galdames (Iquique)
+2020,TEA_operacional,solo_secundario,103100,64,56,Hospital Dr. Leonardo Guzmán (Antofagasta)
+2020,TEA_operacional,solo_secundario,103101,16,15,Hospital Dr. Carlos Cisternas (Calama)
+2020,TEA_operacional,solo_secundario,104100,6,6,Hospital San José del Carmen (Copiapó)
+2020,TEA_operacional,solo_secundario,104103,5,5,Hospital Provincial del Huasco Monseñor Fernando Ariztía Ruiz (Vallenar)
+2020,TEA_operacional,solo_secundario,105100,22,18,Hospital San Juan de Dios (La Serena)
+2020,TEA_operacional,solo_secundario,105101,24,23,Hospital San Pablo (Coquimbo)
+2020,TEA_operacional,solo_secundario,105102,11,10,Hospital Dr. Antonio Tirado Lanas (Ovalle)
+2020,TEA_operacional,solo_secundario,106100,38,34,Hospital Carlos Van Buren (Valparaíso)
+2020,TEA_operacional,solo_secundario,106102,1,1,Hospital Dr. Eduardo Pereira Ramírez (Valparaíso)
+2020,TEA_operacional,solo_secundario,106103,9,9,Hospital Claudio Vicuña (San Antonio)
+2020,TEA_operacional,solo_secundario,107100,73,54,Hospital Dr. Gustavo Fricke (Viña del Mar)
+2020,TEA_operacional,solo_secundario,107101,7,7,Hospital San Martín (Quillota)
+2020,TEA_operacional,solo_secundario,107102,15,13,Hospital de Quilpué
+2020,TEA_operacional,solo_secundario,108100,7,7,Hospital de San Camilo (San Felipe)
+2020,TEA_operacional,solo_secundario,108101,4,4,Hospital San Juan de Dios (Los Andes)
+2020,TEA_operacional,solo_secundario,109100,8,6,"Complejo Hospitalario San José (Santiago, Independencia)"
+2020,TEA_operacional,solo_secundario,109101,66,50,"Hospital Clínico de Niños Dr. Roberto del Río (Santiago, Independencia)"
+2020,TEA_operacional,solo_secundario,110100,14,14,"Hospital San Juan de Dios (Santiago, Santiago)"
+2020,TEA_operacional,solo_secundario,110120,25,25,"Hospital Dr. Félix Bulnes Cerda (Santiago, Quinta Normal)"
+2020,TEA_operacional,solo_secundario,110130,1,1,Hospital Adalberto Steeger (Talagante)
+2020,TEA_operacional,solo_secundario,110150,5,5,Hospital San José (Melipilla)
+2020,TEA_operacional,solo_secundario,111100,71,52,"Hospital Clínico San Borja-Arriarán (Santiago, Santiago)"
+2020,TEA_operacional,solo_secundario,111101,18,16,Hospital Clínico Metropolitano El Carmen Doctor Luis Valentín Ferrada
+2020,TEA_operacional,solo_secundario,111195,1,1,Hospital de Urgencia Asistencia Pública Dr. Alejandro del Río
+2020,TEA_operacional,solo_secundario,112100,4,4,"Hospital Del Salvador (Santiago, Providencia)"
+2020,TEA_operacional,solo_secundario,112101,5,5,"Hospital Dr. Luis Tisné B. (Santiago, Peñalolén)"
+2020,TEA_operacional,solo_secundario,112102,43,33,"Hospital de Niños Dr. Luis Calvo Mackenna (Santiago, Providencia)"
+2020,TEA_operacional,solo_secundario,112103,1,1,Instituto Nacional de Enfermedades Respiratorias y Cirugía Torácica
+2020,TEA_operacional,solo_secundario,112104,10,10,Instituto de Neurocirugía Dr. Alfonso Asenjo
+2020,TEA_operacional,solo_secundario,113100,11,11,"Hospital Barros Luco Trudeau (Santiago, San Miguel)"
+2020,TEA_operacional,solo_secundario,113130,68,64,"Hospital Dr. Exequiel González Cortés (Santiago, San Miguel)"
+2020,TEA_operacional,solo_secundario,113150,3,3,Hospital San Luis (Buin)
+2020,TEA_operacional,solo_secundario,113180,7,7,"Hospital El Pino (Santiago, San Bernardo)"
+2020,TEA_operacional,solo_secundario,114101,60,53,"Complejo Hospitalario Dr. Sótero del Río (Santiago, Puente Alto)"
+2020,TEA_operacional,solo_secundario,114103,7,6,Hospital Padre Alberto Hurtado (San Ramón)
+2020,TEA_operacional,solo_secundario,114105,28,25,Hospital Clínico Metropolitano La Florida Dra. Eloisa Díaz Inzunza
+2020,TEA_operacional,solo_secundario,115100,37,34,Hospital Regional de Rancagua
+2020,TEA_operacional,solo_secundario,115107,8,8,Hospital San Juan de Dios (San Fernando)
+2020,TEA_operacional,solo_secundario,115110,3,3,Hospital de Santa Cruz
+2020,TEA_operacional,solo_secundario,116100,5,5,Hospital San Juan de Dios (Curicó)
+2020,TEA_operacional,solo_secundario,116105,39,35,Hospital Dr. César Garavagno Burotto (Talca)
+2020,TEA_operacional,solo_secundario,116108,15,15,Hospital Presidente Carlos Ibáñez del Campo (Linares)
+2020,TEA_operacional,solo_secundario,116110,4,4,Hospital San José (Parral)
+2020,TEA_operacional,solo_secundario,117101,47,43,Hospital Clínico Herminda Martín (Chillán)
+2020,TEA_operacional,solo_secundario,117102,9,8,Hospital de San Carlos
+2020,TEA_operacional,solo_secundario,118100,83,66,Hospital Clínico Regional Dr. Guillermo Grant Benavente (Concepción)
+2020,TEA_operacional,solo_secundario,118105,6,6,Hospital San José (Coronel)
+2020,TEA_operacional,solo_secundario,119100,43,36,Hospital Las Higueras (Talcahuano)
+2020,TEA_operacional,solo_secundario,120101,82,73,Complejo Asistencial Dr. Víctor Ríos Ruiz (Los Ángeles)
+2020,TEA_operacional,solo_secundario,121109,62,50,Hospital Dr. Hernán Henríquez Aravena (Temuco)
+2020,TEA_operacional,solo_secundario,121114,2,2,Hospital Intercultural de Nueva Imperial
+2020,TEA_operacional,solo_secundario,121117,5,5,Hospital de Pitrufquén
+2020,TEA_operacional,solo_secundario,121121,1,1,Hospital de Villarrica
+2020,TEA_operacional,solo_secundario,122100,52,33,Hospital Clínico Regional (Valdivia)
+2020,TEA_operacional,solo_secundario,123100,27,25,Hospital Base San José de Osorno
+2020,TEA_operacional,solo_secundario,124105,27,20,Hospital de Puerto Montt
+2020,TEA_operacional,solo_secundario,125100,6,5,Hospital Regional (Coihaique)
+2020,TEA_operacional,solo_secundario,126100,35,31,Hospital Clínico de Magallanes Dr. Lautaro Navarro Avaria
+2020,TEA_operacional,solo_secundario,128109,4,4,Hospital Provincial Dr. Rafael Avaría (Curanilahue)
+2020,TEA_operacional,solo_secundario,129100,7,7,Hospital Dr. Mauricio Heyermann (Angol)
+2020,TEA_operacional,solo_secundario,129106,11,9,Hospital San José (Victoria)
+2020,TEA_operacional,solo_secundario,133150,7,6,Hospital de Castro
+2021,TEA_operacional,principal,101100,10,9,Hospital Dr. Juan Noé Crevanni (Arica)
+2021,TEA_operacional,principal,102100,10,6,Hospital Dr. Ernesto Torres Galdames (Iquique)
+2021,TEA_operacional,principal,103100,35,29,Hospital Dr. Leonardo Guzmán (Antofagasta)
+2021,TEA_operacional,principal,104100,1,1,Hospital San José del Carmen (Copiapó)
+2021,TEA_operacional,principal,104103,2,2,Hospital Provincial del Huasco Monseñor Fernando Ariztía Ruiz (Vallenar)
+2021,TEA_operacional,principal,105101,2,2,Hospital San Pablo (Coquimbo)
+2021,TEA_operacional,principal,106100,2,2,Hospital Carlos Van Buren (Valparaíso)
+2021,TEA_operacional,principal,107100,2,1,Hospital Dr. Gustavo Fricke (Viña del Mar)
+2021,TEA_operacional,principal,107102,2,1,Hospital de Quilpué
+2021,TEA_operacional,principal,109101,2,2,"Hospital Clínico de Niños Dr. Roberto del Río (Santiago, Independencia)"
+2021,TEA_operacional,principal,110120,3,2,"Hospital Dr. Félix Bulnes Cerda (Santiago, Quinta Normal)"
+2021,TEA_operacional,principal,111100,9,4,"Hospital Clínico San Borja-Arriarán (Santiago, Santiago)"
+2021,TEA_operacional,principal,111101,1,1,Hospital Clínico Metropolitano El Carmen Doctor Luis Valentín Ferrada
+2021,TEA_operacional,principal,112102,4,3,"Hospital de Niños Dr. Luis Calvo Mackenna (Santiago, Providencia)"
+2021,TEA_operacional,principal,113130,1,1,"Hospital Dr. Exequiel González Cortés (Santiago, San Miguel)"
+2021,TEA_operacional,principal,113180,4,4,"Hospital El Pino (Santiago, San Bernardo)"
+2021,TEA_operacional,principal,114101,9,8,"Complejo Hospitalario Dr. Sótero del Río (Santiago, Puente Alto)"
+2021,TEA_operacional,principal,114103,1,1,Hospital Padre Alberto Hurtado (San Ramón)
+2021,TEA_operacional,principal,114105,2,2,Hospital Clínico Metropolitano La Florida Dra. Eloisa Díaz Inzunza
+2021,TEA_operacional,principal,115100,4,4,Hospital Regional de Rancagua
+2021,TEA_operacional,principal,116105,3,3,Hospital Dr. César Garavagno Burotto (Talca)
+2021,TEA_operacional,principal,117101,14,9,Hospital Clínico Herminda Martín (Chillán)
+2021,TEA_operacional,principal,117102,1,1,Hospital de San Carlos
+2021,TEA_operacional,principal,118100,4,4,Hospital Clínico Regional Dr. Guillermo Grant Benavente (Concepción)
+2021,TEA_operacional,principal,119100,6,6,Hospital Las Higueras (Talcahuano)
+2021,TEA_operacional,principal,120101,7,6,Complejo Asistencial Dr. Víctor Ríos Ruiz (Los Ángeles)
+2021,TEA_operacional,principal,121109,9,8,Hospital Dr. Hernán Henríquez Aravena (Temuco)
+2021,TEA_operacional,principal,121110,2,2,Hospital Dr. Abraham Godoy (Lautaro)
+2021,TEA_operacional,principal,122100,4,3,Hospital Clínico Regional (Valdivia)
+2021,TEA_operacional,principal,123100,6,4,Hospital Base San José de Osorno
+2021,TEA_operacional,principal,124105,4,4,Hospital de Puerto Montt
+2021,TEA_operacional,principal,125100,5,1,Hospital Regional (Coihaique)
+2021,TEA_operacional,principal,126100,11,7,Hospital Clínico de Magallanes Dr. Lautaro Navarro Avaria
+2021,TEA_operacional,principal,129106,1,1,Hospital San José (Victoria)
+2021,TEA_operacional,principal_y_secundario,113100,1,1,"Hospital Barros Luco Trudeau (Santiago, San Miguel)"
+2021,TEA_operacional,principal_y_secundario,114101,1,1,"Complejo Hospitalario Dr. Sótero del Río (Santiago, Puente Alto)"
+2021,TEA_operacional,principal_y_secundario,118100,1,1,Hospital Clínico Regional Dr. Guillermo Grant Benavente (Concepción)
+2021,TEA_operacional,solo_secundario,101100,57,53,Hospital Dr. Juan Noé Crevanni (Arica)
+2021,TEA_operacional,solo_secundario,102100,32,30,Hospital Dr. Ernesto Torres Galdames (Iquique)
+2021,TEA_operacional,solo_secundario,103100,89,76,Hospital Dr. Leonardo Guzmán (Antofagasta)
+2021,TEA_operacional,solo_secundario,103101,17,16,Hospital Dr. Carlos Cisternas (Calama)
+2021,TEA_operacional,solo_secundario,104100,12,12,Hospital San José del Carmen (Copiapó)
+2021,TEA_operacional,solo_secundario,104103,10,10,Hospital Provincial del Huasco Monseñor Fernando Ariztía Ruiz (Vallenar)
+2021,TEA_operacional,solo_secundario,105100,54,38,Hospital San Juan de Dios (La Serena)
+2021,TEA_operacional,solo_secundario,105101,53,41,Hospital San Pablo (Coquimbo)
+2021,TEA_operacional,solo_secundario,105102,8,7,Hospital Dr. Antonio Tirado Lanas (Ovalle)
+2021,TEA_operacional,solo_secundario,106100,42,38,Hospital Carlos Van Buren (Valparaíso)
+2021,TEA_operacional,solo_secundario,106103,6,6,Hospital Claudio Vicuña (San Antonio)
+2021,TEA_operacional,solo_secundario,107100,66,60,Hospital Dr. Gustavo Fricke (Viña del Mar)
+2021,TEA_operacional,solo_secundario,107101,16,16,Hospital San Martín (Quillota)
+2021,TEA_operacional,solo_secundario,107102,16,16,Hospital de Quilpué
+2021,TEA_operacional,solo_secundario,108100,16,16,Hospital de San Camilo (San Felipe)
+2021,TEA_operacional,solo_secundario,108101,5,5,Hospital San Juan de Dios (Los Andes)
+2021,TEA_operacional,solo_secundario,109100,10,10,"Complejo Hospitalario San José (Santiago, Independencia)"
+2021,TEA_operacional,solo_secundario,109101,118,86,"Hospital Clínico de Niños Dr. Roberto del Río (Santiago, Independencia)"
+2021,TEA_operacional,solo_secundario,110100,27,24,"Hospital San Juan de Dios (Santiago, Santiago)"
+2021,TEA_operacional,solo_secundario,110120,46,40,"Hospital Dr. Félix Bulnes Cerda (Santiago, Quinta Normal)"
+2021,TEA_operacional,solo_secundario,110130,6,6,Hospital Adalberto Steeger (Talagante)
+2021,TEA_operacional,solo_secundario,110150,7,7,Hospital San José (Melipilla)
+2021,TEA_operacional,solo_secundario,111100,38,36,"Hospital Clínico San Borja-Arriarán (Santiago, Santiago)"
+2021,TEA_operacional,solo_secundario,111101,24,20,Hospital Clínico Metropolitano El Carmen Doctor Luis Valentín Ferrada
+2021,TEA_operacional,solo_secundario,111195,1,1,Hospital de Urgencia Asistencia Pública Dr. Alejandro del Río
+2021,TEA_operacional,solo_secundario,112100,13,12,"Hospital Del Salvador (Santiago, Providencia)"
+2021,TEA_operacional,solo_secundario,112101,2,2,"Hospital Dr. Luis Tisné B. (Santiago, Peñalolén)"
+2021,TEA_operacional,solo_secundario,112102,68,54,"Hospital de Niños Dr. Luis Calvo Mackenna (Santiago, Providencia)"
+2021,TEA_operacional,solo_secundario,112104,30,23,Instituto de Neurocirugía Dr. Alfonso Asenjo
+2021,TEA_operacional,solo_secundario,113100,23,22,"Hospital Barros Luco Trudeau (Santiago, San Miguel)"
+2021,TEA_operacional,solo_secundario,113130,152,136,"Hospital Dr. Exequiel González Cortés (Santiago, San Miguel)"
+2021,TEA_operacional,solo_secundario,113180,18,18,"Hospital El Pino (Santiago, San Bernardo)"
+2021,TEA_operacional,solo_secundario,114101,164,126,"Complejo Hospitalario Dr. Sótero del Río (Santiago, Puente Alto)"
+2021,TEA_operacional,solo_secundario,114103,23,22,Hospital Padre Alberto Hurtado (San Ramón)
+2021,TEA_operacional,solo_secundario,114105,42,35,Hospital Clínico Metropolitano La Florida Dra. Eloisa Díaz Inzunza
+2021,TEA_operacional,solo_secundario,115100,57,53,Hospital Regional de Rancagua
+2021,TEA_operacional,solo_secundario,115107,15,14,Hospital San Juan de Dios (San Fernando)
+2021,TEA_operacional,solo_secundario,115110,6,6,Hospital de Santa Cruz
+2021,TEA_operacional,solo_secundario,116100,9,9,Hospital San Juan de Dios (Curicó)
+2021,TEA_operacional,solo_secundario,116105,33,30,Hospital Dr. César Garavagno Burotto (Talca)
+2021,TEA_operacional,solo_secundario,116108,37,33,Hospital Presidente Carlos Ibáñez del Campo (Linares)
+2021,TEA_operacional,solo_secundario,116110,1,1,Hospital San José (Parral)
+2021,TEA_operacional,solo_secundario,117101,109,99,Hospital Clínico Herminda Martín (Chillán)
+2021,TEA_operacional,solo_secundario,117102,16,15,Hospital de San Carlos
+2021,TEA_operacional,solo_secundario,118100,126,93,Hospital Clínico Regional Dr. Guillermo Grant Benavente (Concepción)
+2021,TEA_operacional,solo_secundario,118105,12,12,Hospital San José (Coronel)
+2021,TEA_operacional,solo_secundario,119100,68,62,Hospital Las Higueras (Talcahuano)
+2021,TEA_operacional,solo_secundario,120101,57,46,Complejo Asistencial Dr. Víctor Ríos Ruiz (Los Ángeles)
+2021,TEA_operacional,solo_secundario,121109,71,62,Hospital Dr. Hernán Henríquez Aravena (Temuco)
+2021,TEA_operacional,solo_secundario,121110,4,4,Hospital Dr. Abraham Godoy (Lautaro)
+2021,TEA_operacional,solo_secundario,121114,8,8,Hospital Intercultural de Nueva Imperial
+2021,TEA_operacional,solo_secundario,121117,2,2,Hospital de Pitrufquén
+2021,TEA_operacional,solo_secundario,121121,9,9,Hospital de Villarrica
+2021,TEA_operacional,solo_secundario,122100,34,28,Hospital Clínico Regional (Valdivia)
+2021,TEA_operacional,solo_secundario,123100,44,42,Hospital Base San José de Osorno
+2021,TEA_operacional,solo_secundario,124105,45,41,Hospital de Puerto Montt
+2021,TEA_operacional,solo_secundario,125100,12,10,Hospital Regional (Coihaique)
+2021,TEA_operacional,solo_secundario,126100,37,33,Hospital Clínico de Magallanes Dr. Lautaro Navarro Avaria
+2021,TEA_operacional,solo_secundario,128109,14,14,Hospital Provincial Dr. Rafael Avaría (Curanilahue)
+2021,TEA_operacional,solo_secundario,129100,12,12,Hospital Dr. Mauricio Heyermann (Angol)
+2021,TEA_operacional,solo_secundario,129106,5,3,Hospital San José (Victoria)
+2021,TEA_operacional,solo_secundario,133150,15,13,Hospital de Castro
+2022,TEA_operacional,principal,101100,16,11,Hospital Dr. Juan Noé Crevanni (Arica)
+2022,TEA_operacional,principal,102100,22,18,Hospital Dr. Ernesto Torres Galdames (Iquique)
+2022,TEA_operacional,principal,103100,34,30,Hospital Dr. Leonardo Guzmán (Antofagasta)
+2022,TEA_operacional,principal,103101,1,1,Hospital Dr. Carlos Cisternas (Calama)
+2022,TEA_operacional,principal,104100,1,1,Hospital San José del Carmen (Copiapó)
+2022,TEA_operacional,principal,104103,1,1,Hospital Provincial del Huasco Monseñor Fernando Ariztía Ruiz (Vallenar)
+2022,TEA_operacional,principal,105100,2,2,Hospital San Juan de Dios (La Serena)
+2022,TEA_operacional,principal,105101,4,4,Hospital San Pablo (Coquimbo)
+2022,TEA_operacional,principal,105102,4,4,Hospital Dr. Antonio Tirado Lanas (Ovalle)
+2022,TEA_operacional,principal,106103,2,2,Hospital Claudio Vicuña (San Antonio)
+2022,TEA_operacional,principal,107100,1,1,Hospital Dr. Gustavo Fricke (Viña del Mar)
+2022,TEA_operacional,principal,107101,2,2,Hospital San Martín (Quillota)
+2022,TEA_operacional,principal,107102,1,1,Hospital de Quilpué
+2022,TEA_operacional,principal,109101,6,3,"Hospital Clínico de Niños Dr. Roberto del Río (Santiago, Independencia)"
+2022,TEA_operacional,principal,110120,3,3,"Hospital Dr. Félix Bulnes Cerda (Santiago, Quinta Normal)"
+2022,TEA_operacional,principal,111100,20,6,"Hospital Clínico San Borja-Arriarán (Santiago, Santiago)"
+2022,TEA_operacional,principal,111101,5,5,Hospital Clínico Metropolitano El Carmen Doctor Luis Valentín Ferrada
+2022,TEA_operacional,principal,112100,1,1,"Hospital Del Salvador (Santiago, Providencia)"
+2022,TEA_operacional,principal,112102,3,3,"Hospital de Niños Dr. Luis Calvo Mackenna (Santiago, Providencia)"
+2022,TEA_operacional,principal,113100,4,1,"Hospital Barros Luco Trudeau (Santiago, San Miguel)"
+2022,TEA_operacional,principal,113130,3,3,"Hospital Dr. Exequiel González Cortés (Santiago, San Miguel)"
+2022,TEA_operacional,principal,113180,3,3,"Hospital El Pino (Santiago, San Bernardo)"
+2022,TEA_operacional,principal,114101,20,19,"Complejo Hospitalario Dr. Sótero del Río (Santiago, Puente Alto)"
+2022,TEA_operacional,principal,114105,2,2,Hospital Clínico Metropolitano La Florida Dra. Eloisa Díaz Inzunza
+2022,TEA_operacional,principal,115100,2,2,Hospital Regional de Rancagua
+2022,TEA_operacional,principal,116105,2,2,Hospital Dr. César Garavagno Burotto (Talca)
+2022,TEA_operacional,principal,117101,24,20,Hospital Clínico Herminda Martín (Chillán)
+2022,TEA_operacional,principal,117102,1,1,Hospital de San Carlos
+2022,TEA_operacional,principal,118100,6,6,Hospital Clínico Regional Dr. Guillermo Grant Benavente (Concepción)
+2022,TEA_operacional,principal,118105,2,2,Hospital San José (Coronel)
+2022,TEA_operacional,principal,119100,8,7,Hospital Las Higueras (Talcahuano)
+2022,TEA_operacional,principal,120101,15,10,Complejo Asistencial Dr. Víctor Ríos Ruiz (Los Ángeles)
+2022,TEA_operacional,principal,121109,3,3,Hospital Dr. Hernán Henríquez Aravena (Temuco)
+2022,TEA_operacional,principal,121110,5,5,Hospital Dr. Abraham Godoy (Lautaro)
+2022,TEA_operacional,principal,121117,1,1,Hospital de Pitrufquén
+2022,TEA_operacional,principal,122100,6,4,Hospital Clínico Regional (Valdivia)
+2022,TEA_operacional,principal,123100,10,4,Hospital Base San José de Osorno
+2022,TEA_operacional,principal,124105,11,10,Hospital de Puerto Montt
+2022,TEA_operacional,principal,125100,4,4,Hospital Regional (Coihaique)
+2022,TEA_operacional,principal,126100,17,11,Hospital Clínico de Magallanes Dr. Lautaro Navarro Avaria
+2022,TEA_operacional,principal,129100,3,3,Hospital Dr. Mauricio Heyermann (Angol)
+2022,TEA_operacional,principal,129106,1,1,Hospital San José (Victoria)
+2022,TEA_operacional,principal,133150,4,4,Hospital de Castro
+2022,TEA_operacional,principal_y_secundario,102100,1,1,Hospital Dr. Ernesto Torres Galdames (Iquique)
+2022,TEA_operacional,principal_y_secundario,103100,1,1,Hospital Dr. Leonardo Guzmán (Antofagasta)
+2022,TEA_operacional,principal_y_secundario,112102,1,1,"Hospital de Niños Dr. Luis Calvo Mackenna (Santiago, Providencia)"
+2022,TEA_operacional,principal_y_secundario,114101,1,1,"Complejo Hospitalario Dr. Sótero del Río (Santiago, Puente Alto)"
+2022,TEA_operacional,principal_y_secundario,116105,1,1,Hospital Dr. César Garavagno Burotto (Talca)
+2022,TEA_operacional,principal_y_secundario,117101,1,1,Hospital Clínico Herminda Martín (Chillán)
+2022,TEA_operacional,principal_y_secundario,117102,1,1,Hospital de San Carlos
+2022,TEA_operacional,principal_y_secundario,123100,1,1,Hospital Base San José de Osorno
+2022,TEA_operacional,solo_secundario,101100,79,62,Hospital Dr. Juan Noé Crevanni (Arica)
+2022,TEA_operacional,solo_secundario,102100,70,66,Hospital Dr. Ernesto Torres Galdames (Iquique)
+2022,TEA_operacional,solo_secundario,103100,129,115,Hospital Dr. Leonardo Guzmán (Antofagasta)
+2022,TEA_operacional,solo_secundario,103101,40,36,Hospital Dr. Carlos Cisternas (Calama)
+2022,TEA_operacional,solo_secundario,104100,25,21,Hospital San José del Carmen (Copiapó)
+2022,TEA_operacional,solo_secundario,104103,21,20,Hospital Provincial del Huasco Monseñor Fernando Ariztía Ruiz (Vallenar)
+2022,TEA_operacional,solo_secundario,105100,90,75,Hospital San Juan de Dios (La Serena)
+2022,TEA_operacional,solo_secundario,105101,67,65,Hospital San Pablo (Coquimbo)
+2022,TEA_operacional,solo_secundario,105102,42,39,Hospital Dr. Antonio Tirado Lanas (Ovalle)
+2022,TEA_operacional,solo_secundario,106100,89,80,Hospital Carlos Van Buren (Valparaíso)
+2022,TEA_operacional,solo_secundario,106102,4,3,Hospital Dr. Eduardo Pereira Ramírez (Valparaíso)
+2022,TEA_operacional,solo_secundario,106103,10,8,Hospital Claudio Vicuña (San Antonio)
+2022,TEA_operacional,solo_secundario,107100,136,128,Hospital Dr. Gustavo Fricke (Viña del Mar)
+2022,TEA_operacional,solo_secundario,107101,25,24,Hospital San Martín (Quillota)
+2022,TEA_operacional,solo_secundario,107102,28,26,Hospital de Quilpué
+2022,TEA_operacional,solo_secundario,108100,20,20,Hospital de San Camilo (San Felipe)
+2022,TEA_operacional,solo_secundario,108101,6,6,Hospital San Juan de Dios (Los Andes)
+2022,TEA_operacional,solo_secundario,109100,13,10,"Complejo Hospitalario San José (Santiago, Independencia)"
+2022,TEA_operacional,solo_secundario,109101,190,153,"Hospital Clínico de Niños Dr. Roberto del Río (Santiago, Independencia)"
+2022,TEA_operacional,solo_secundario,110100,37,32,"Hospital San Juan de Dios (Santiago, Santiago)"
+2022,TEA_operacional,solo_secundario,110120,62,59,"Hospital Dr. Félix Bulnes Cerda (Santiago, Quinta Normal)"
+2022,TEA_operacional,solo_secundario,110130,6,6,Hospital Adalberto Steeger (Talagante)
+2022,TEA_operacional,solo_secundario,110150,9,8,Hospital San José (Melipilla)
+2022,TEA_operacional,solo_secundario,111100,88,80,"Hospital Clínico San Borja-Arriarán (Santiago, Santiago)"
+2022,TEA_operacional,solo_secundario,111101,42,42,Hospital Clínico Metropolitano El Carmen Doctor Luis Valentín Ferrada
+2022,TEA_operacional,solo_secundario,111195,3,3,Hospital de Urgencia Asistencia Pública Dr. Alejandro del Río
+2022,TEA_operacional,solo_secundario,112100,12,12,"Hospital Del Salvador (Santiago, Providencia)"
+2022,TEA_operacional,solo_secundario,112101,4,4,"Hospital Dr. Luis Tisné B. (Santiago, Peñalolén)"
+2022,TEA_operacional,solo_secundario,112102,139,110,"Hospital de Niños Dr. Luis Calvo Mackenna (Santiago, Providencia)"
+2022,TEA_operacional,solo_secundario,112104,31,22,Instituto de Neurocirugía Dr. Alfonso Asenjo
+2022,TEA_operacional,solo_secundario,113100,19,18,"Hospital Barros Luco Trudeau (Santiago, San Miguel)"
+2022,TEA_operacional,solo_secundario,113130,256,218,"Hospital Dr. Exequiel González Cortés (Santiago, San Miguel)"
+2022,TEA_operacional,solo_secundario,113150,7,6,Hospital San Luis (Buin)
+2022,TEA_operacional,solo_secundario,113180,40,36,"Hospital El Pino (Santiago, San Bernardo)"
+2022,TEA_operacional,solo_secundario,114101,252,199,"Complejo Hospitalario Dr. Sótero del Río (Santiago, Puente Alto)"
+2022,TEA_operacional,solo_secundario,114103,44,41,Hospital Padre Alberto Hurtado (San Ramón)
+2022,TEA_operacional,solo_secundario,114105,58,51,Hospital Clínico Metropolitano La Florida Dra. Eloisa Díaz Inzunza
+2022,TEA_operacional,solo_secundario,115100,89,78,Hospital Regional de Rancagua
+2022,TEA_operacional,solo_secundario,115107,15,14,Hospital San Juan de Dios (San Fernando)
+2022,TEA_operacional,solo_secundario,115110,17,16,Hospital de Santa Cruz
+2022,TEA_operacional,solo_secundario,116100,17,17,Hospital San Juan de Dios (Curicó)
+2022,TEA_operacional,solo_secundario,116105,85,69,Hospital Dr. César Garavagno Burotto (Talca)
+2022,TEA_operacional,solo_secundario,116108,66,59,Hospital Presidente Carlos Ibáñez del Campo (Linares)
+2022,TEA_operacional,solo_secundario,116110,5,5,Hospital San José (Parral)
+2022,TEA_operacional,solo_secundario,117101,174,155,Hospital Clínico Herminda Martín (Chillán)
+2022,TEA_operacional,solo_secundario,117102,15,14,Hospital de San Carlos
+2022,TEA_operacional,solo_secundario,118100,175,154,Hospital Clínico Regional Dr. Guillermo Grant Benavente (Concepción)
+2022,TEA_operacional,solo_secundario,118105,18,18,Hospital San José (Coronel)
+2022,TEA_operacional,solo_secundario,119100,130,112,Hospital Las Higueras (Talcahuano)
+2022,TEA_operacional,solo_secundario,120101,81,72,Complejo Asistencial Dr. Víctor Ríos Ruiz (Los Ángeles)
+2022,TEA_operacional,solo_secundario,121109,111,100,Hospital Dr. Hernán Henríquez Aravena (Temuco)
+2022,TEA_operacional,solo_secundario,121110,14,13,Hospital Dr. Abraham Godoy (Lautaro)
+2022,TEA_operacional,solo_secundario,121114,11,10,Hospital Intercultural de Nueva Imperial
+2022,TEA_operacional,solo_secundario,121117,3,3,Hospital de Pitrufquén
+2022,TEA_operacional,solo_secundario,121121,14,13,Hospital de Villarrica
+2022,TEA_operacional,solo_secundario,122100,55,48,Hospital Clínico Regional (Valdivia)
+2022,TEA_operacional,solo_secundario,123100,55,49,Hospital Base San José de Osorno
+2022,TEA_operacional,solo_secundario,124105,73,68,Hospital de Puerto Montt
+2022,TEA_operacional,solo_secundario,125100,26,22,Hospital Regional (Coihaique)
+2022,TEA_operacional,solo_secundario,126100,43,37,Hospital Clínico de Magallanes Dr. Lautaro Navarro Avaria
+2022,TEA_operacional,solo_secundario,128109,16,12,Hospital Provincial Dr. Rafael Avaría (Curanilahue)
+2022,TEA_operacional,solo_secundario,129100,36,33,Hospital Dr. Mauricio Heyermann (Angol)
+2022,TEA_operacional,solo_secundario,129106,9,9,Hospital San José (Victoria)
+2022,TEA_operacional,solo_secundario,133150,11,11,Hospital de Castro
+2023,TEA_operacional,principal,101100,13,13,Hospital Dr. Juan Noé Crevanni (Arica)
+2023,TEA_operacional,principal,102100,27,20,Hospital Dr. Ernesto Torres Galdames (Iquique)
+2023,TEA_operacional,principal,103100,30,21,Hospital Dr. Leonardo Guzmán (Antofagasta)
+2023,TEA_operacional,principal,103101,5,5,Hospital Dr. Carlos Cisternas (Calama)
+2023,TEA_operacional,principal,104100,2,2,Hospital San José del Carmen (Copiapó)
+2023,TEA_operacional,principal,104103,2,2,Hospital Provincial del Huasco Monseñor Fernando Ariztía Ruiz (Vallenar)
+2023,TEA_operacional,principal,105101,1,1,Hospital San Pablo (Coquimbo)
+2023,TEA_operacional,principal,105102,1,1,Hospital Dr. Antonio Tirado Lanas (Ovalle)
+2023,TEA_operacional,principal,106103,1,1,Hospital Claudio Vicuña (San Antonio)
+2023,TEA_operacional,principal,107100,3,3,Hospital Dr. Gustavo Fricke (Viña del Mar)
+2023,TEA_operacional,principal,107101,2,2,Hospital San Martín (Quillota)
+2023,TEA_operacional,principal,107102,1,1,Hospital de Quilpué
+2023,TEA_operacional,principal,109101,6,6,"Hospital Clínico de Niños Dr. Roberto del Río (Santiago, Independencia)"
+2023,TEA_operacional,principal,110120,4,4,"Hospital Dr. Félix Bulnes Cerda (Santiago, Quinta Normal)"
+2023,TEA_operacional,principal,111100,71,10,"Hospital Clínico San Borja-Arriarán (Santiago, Santiago)"
+2023,TEA_operacional,principal,111101,2,2,Hospital Clínico Metropolitano El Carmen Doctor Luis Valentín Ferrada
+2023,TEA_operacional,principal,112100,1,1,"Hospital Del Salvador (Santiago, Providencia)"
+2023,TEA_operacional,principal,112102,7,7,"Hospital de Niños Dr. Luis Calvo Mackenna (Santiago, Providencia)"
+2023,TEA_operacional,principal,113100,2,2,"Hospital Barros Luco Trudeau (Santiago, San Miguel)"
+2023,TEA_operacional,principal,113130,3,3,"Hospital Dr. Exequiel González Cortés (Santiago, San Miguel)"
+2023,TEA_operacional,principal,113180,1,1,"Hospital El Pino (Santiago, San Bernardo)"
+2023,TEA_operacional,principal,114101,27,23,"Complejo Hospitalario Dr. Sótero del Río (Santiago, Puente Alto)"
+2023,TEA_operacional,principal,114103,2,2,Hospital Padre Alberto Hurtado (San Ramón)
+2023,TEA_operacional,principal,114105,4,4,Hospital Clínico Metropolitano La Florida Dra. Eloisa Díaz Inzunza
+2023,TEA_operacional,principal,115100,4,4,Hospital Regional de Rancagua
+2023,TEA_operacional,principal,115110,3,1,Hospital de Santa Cruz
+2023,TEA_operacional,principal,116105,2,2,Hospital Dr. César Garavagno Burotto (Talca)
+2023,TEA_operacional,principal,116108,1,1,Hospital Presidente Carlos Ibáñez del Campo (Linares)
+2023,TEA_operacional,principal,116110,1,1,Hospital San José (Parral)
+2023,TEA_operacional,principal,117101,13,13,Hospital Clínico Herminda Martín (Chillán)
+2023,TEA_operacional,principal,117102,7,6,Hospital de San Carlos
+2023,TEA_operacional,principal,118100,15,13,Hospital Clínico Regional Dr. Guillermo Grant Benavente (Concepción)
+2023,TEA_operacional,principal,118106,2,2,Hospital de Lota
+2023,TEA_operacional,principal,119100,7,7,Hospital Las Higueras (Talcahuano)
+2023,TEA_operacional,principal,119101,1,1,Hospital de Tomé
+2023,TEA_operacional,principal,120101,13,8,Complejo Asistencial Dr. Víctor Ríos Ruiz (Los Ángeles)
+2023,TEA_operacional,principal,121109,8,8,Hospital Dr. Hernán Henríquez Aravena (Temuco)
+2023,TEA_operacional,principal,121110,6,6,Hospital Dr. Abraham Godoy (Lautaro)
+2023,TEA_operacional,principal,121114,4,3,Hospital Intercultural de Nueva Imperial
+2023,TEA_operacional,principal,121117,3,3,Hospital de Pitrufquén
+2023,TEA_operacional,principal,121121,2,1,Hospital de Villarrica
+2023,TEA_operacional,principal,122100,3,2,Hospital Clínico Regional (Valdivia)
+2023,TEA_operacional,principal,123100,11,8,Hospital Base San José de Osorno
+2023,TEA_operacional,principal,124105,11,9,Hospital de Puerto Montt
+2023,TEA_operacional,principal,125100,4,4,Hospital Regional (Coihaique)
+2023,TEA_operacional,principal,126100,4,4,Hospital Clínico de Magallanes Dr. Lautaro Navarro Avaria
+2023,TEA_operacional,principal,129100,7,7,Hospital Dr. Mauricio Heyermann (Angol)
+2023,TEA_operacional,principal,129106,1,1,Hospital San José (Victoria)
+2023,TEA_operacional,principal_y_secundario,110150,1,1,Hospital San José (Melipilla)
+2023,TEA_operacional,principal_y_secundario,112102,1,1,"Hospital de Niños Dr. Luis Calvo Mackenna (Santiago, Providencia)"
+2023,TEA_operacional,principal_y_secundario,114101,1,1,"Complejo Hospitalario Dr. Sótero del Río (Santiago, Puente Alto)"
+2023,TEA_operacional,principal_y_secundario,117101,1,1,Hospital Clínico Herminda Martín (Chillán)
+2023,TEA_operacional,principal_y_secundario,120101,1,1,Complejo Asistencial Dr. Víctor Ríos Ruiz (Los Ángeles)
+2023,TEA_operacional,principal_y_secundario,121114,2,1,Hospital Intercultural de Nueva Imperial
+2023,TEA_operacional,solo_secundario,101100,138,114,Hospital Dr. Juan Noé Crevanni (Arica)
+2023,TEA_operacional,solo_secundario,102100,100,91,Hospital Dr. Ernesto Torres Galdames (Iquique)
+2023,TEA_operacional,solo_secundario,103100,255,195,Hospital Dr. Leonardo Guzmán (Antofagasta)
+2023,TEA_operacional,solo_secundario,103101,112,98,Hospital Dr. Carlos Cisternas (Calama)
+2023,TEA_operacional,solo_secundario,104100,41,39,Hospital San José del Carmen (Copiapó)
+2023,TEA_operacional,solo_secundario,104103,29,27,Hospital Provincial del Huasco Monseñor Fernando Ariztía Ruiz (Vallenar)
+2023,TEA_operacional,solo_secundario,105100,136,119,Hospital San Juan de Dios (La Serena)
+2023,TEA_operacional,solo_secundario,105101,144,132,Hospital San Pablo (Coquimbo)
+2023,TEA_operacional,solo_secundario,105102,65,63,Hospital Dr. Antonio Tirado Lanas (Ovalle)
+2023,TEA_operacional,solo_secundario,106100,160,137,Hospital Carlos Van Buren (Valparaíso)
+2023,TEA_operacional,solo_secundario,106102,3,3,Hospital Dr. Eduardo Pereira Ramírez (Valparaíso)
+2023,TEA_operacional,solo_secundario,106103,16,15,Hospital Claudio Vicuña (San Antonio)
+2023,TEA_operacional,solo_secundario,107100,263,218,Hospital Dr. Gustavo Fricke (Viña del Mar)
+2023,TEA_operacional,solo_secundario,107101,45,43,Hospital San Martín (Quillota)
+2023,TEA_operacional,solo_secundario,107102,58,56,Hospital de Quilpué
+2023,TEA_operacional,solo_secundario,108100,39,35,Hospital de San Camilo (San Felipe)
+2023,TEA_operacional,solo_secundario,108101,20,20,Hospital San Juan de Dios (Los Andes)
+2023,TEA_operacional,solo_secundario,109100,21,20,"Complejo Hospitalario San José (Santiago, Independencia)"
+2023,TEA_operacional,solo_secundario,109101,252,191,"Hospital Clínico de Niños Dr. Roberto del Río (Santiago, Independencia)"
+2023,TEA_operacional,solo_secundario,110100,81,65,"Hospital San Juan de Dios (Santiago, Santiago)"
+2023,TEA_operacional,solo_secundario,110110,5,5,Instituto Traumatológico Dr. Teodoro Gebauer
+2023,TEA_operacional,solo_secundario,110120,115,107,"Hospital Dr. Félix Bulnes Cerda (Santiago, Quinta Normal)"
+2023,TEA_operacional,solo_secundario,110130,17,17,Hospital Adalberto Steeger (Talagante)
+2023,TEA_operacional,solo_secundario,110150,24,24,Hospital San José (Melipilla)
+2023,TEA_operacional,solo_secundario,111100,182,111,"Hospital Clínico San Borja-Arriarán (Santiago, Santiago)"
+2023,TEA_operacional,solo_secundario,111101,92,87,Hospital Clínico Metropolitano El Carmen Doctor Luis Valentín Ferrada
+2023,TEA_operacional,solo_secundario,111195,8,8,Hospital de Urgencia Asistencia Pública Dr. Alejandro del Río
+2023,TEA_operacional,solo_secundario,112100,22,17,"Hospital Del Salvador (Santiago, Providencia)"
+2023,TEA_operacional,solo_secundario,112101,16,16,"Hospital Dr. Luis Tisné B. (Santiago, Peñalolén)"
+2023,TEA_operacional,solo_secundario,112102,171,130,"Hospital de Niños Dr. Luis Calvo Mackenna (Santiago, Providencia)"
+2023,TEA_operacional,solo_secundario,112103,5,4,Instituto Nacional de Enfermedades Respiratorias y Cirugía Torácica
+2023,TEA_operacional,solo_secundario,112104,27,20,Instituto de Neurocirugía Dr. Alfonso Asenjo
+2023,TEA_operacional,solo_secundario,113100,26,26,"Hospital Barros Luco Trudeau (Santiago, San Miguel)"
+2023,TEA_operacional,solo_secundario,113130,329,292,"Hospital Dr. Exequiel González Cortés (Santiago, San Miguel)"
+2023,TEA_operacional,solo_secundario,113150,17,15,Hospital San Luis (Buin)
+2023,TEA_operacional,solo_secundario,113180,38,37,"Hospital El Pino (Santiago, San Bernardo)"
+2023,TEA_operacional,solo_secundario,114101,447,348,"Complejo Hospitalario Dr. Sótero del Río (Santiago, Puente Alto)"
+2023,TEA_operacional,solo_secundario,114103,63,57,Hospital Padre Alberto Hurtado (San Ramón)
+2023,TEA_operacional,solo_secundario,114105,115,106,Hospital Clínico Metropolitano La Florida Dra. Eloisa Díaz Inzunza
+2023,TEA_operacional,solo_secundario,115100,156,127,Hospital Regional de Rancagua
+2023,TEA_operacional,solo_secundario,115107,28,26,Hospital San Juan de Dios (San Fernando)
+2023,TEA_operacional,solo_secundario,115110,14,13,Hospital de Santa Cruz
+2023,TEA_operacional,solo_secundario,116100,46,44,Hospital San Juan de Dios (Curicó)
+2023,TEA_operacional,solo_secundario,116105,136,100,Hospital Dr. César Garavagno Burotto (Talca)
+2023,TEA_operacional,solo_secundario,116108,104,94,Hospital Presidente Carlos Ibáñez del Campo (Linares)
+2023,TEA_operacional,solo_secundario,116110,21,18,Hospital San José (Parral)
+2023,TEA_operacional,solo_secundario,117101,231,207,Hospital Clínico Herminda Martín (Chillán)
+2023,TEA_operacional,solo_secundario,117102,55,54,Hospital de San Carlos
+2023,TEA_operacional,solo_secundario,118100,298,256,Hospital Clínico Regional Dr. Guillermo Grant Benavente (Concepción)
+2023,TEA_operacional,solo_secundario,118105,47,40,Hospital San José (Coronel)
+2023,TEA_operacional,solo_secundario,118106,29,28,Hospital de Lota
+2023,TEA_operacional,solo_secundario,119100,179,156,Hospital Las Higueras (Talcahuano)
+2023,TEA_operacional,solo_secundario,119101,15,14,Hospital de Tomé
+2023,TEA_operacional,solo_secundario,120101,167,149,Complejo Asistencial Dr. Víctor Ríos Ruiz (Los Ángeles)
+2023,TEA_operacional,solo_secundario,121109,223,185,Hospital Dr. Hernán Henríquez Aravena (Temuco)
+2023,TEA_operacional,solo_secundario,121110,11,11,Hospital Dr. Abraham Godoy (Lautaro)
+2023,TEA_operacional,solo_secundario,121114,11,10,Hospital Intercultural de Nueva Imperial
+2023,TEA_operacional,solo_secundario,121117,10,8,Hospital de Pitrufquén
+2023,TEA_operacional,solo_secundario,121121,13,12,Hospital de Villarrica
+2023,TEA_operacional,solo_secundario,122100,85,68,Hospital Clínico Regional (Valdivia)
+2023,TEA_operacional,solo_secundario,123100,86,77,Hospital Base San José de Osorno
+2023,TEA_operacional,solo_secundario,124105,122,110,Hospital de Puerto Montt
+2023,TEA_operacional,solo_secundario,125100,41,35,Hospital Regional (Coihaique)
+2023,TEA_operacional,solo_secundario,126100,77,65,Hospital Clínico de Magallanes Dr. Lautaro Navarro Avaria
+2023,TEA_operacional,solo_secundario,128109,37,32,Hospital Provincial Dr. Rafael Avaría (Curanilahue)
+2023,TEA_operacional,solo_secundario,129100,40,37,Hospital Dr. Mauricio Heyermann (Angol)
+2023,TEA_operacional,solo_secundario,129106,25,20,Hospital San José (Victoria)
+2023,TEA_operacional,solo_secundario,133150,44,35,Hospital de Castro
+2024,TEA_operacional,principal,101100,12,11,Hospital Dr. Juan Noé Crevanni (Arica)
+2024,TEA_operacional,principal,102100,33,20,Hospital Dr. Ernesto Torres Galdames (Iquique)
+2024,TEA_operacional,principal,103100,21,20,Hospital Dr. Leonardo Guzmán (Antofagasta)
+2024,TEA_operacional,principal,103101,5,4,Hospital Dr. Carlos Cisternas (Calama)
+2024,TEA_operacional,principal,104103,1,1,Hospital Provincial del Huasco Monseñor Fernando Ariztía Ruiz (Vallenar)
+2024,TEA_operacional,principal,105101,5,5,Hospital San Pablo (Coquimbo)
+2024,TEA_operacional,principal,105102,1,1,Hospital Dr. Antonio Tirado Lanas (Ovalle)
+2024,TEA_operacional,principal,106100,1,1,Hospital Carlos Van Buren (Valparaíso)
+2024,TEA_operacional,principal,107100,2,2,Hospital Dr. Gustavo Fricke (Viña del Mar)
+2024,TEA_operacional,principal,107101,2,2,Hospital San Martín (Quillota)
+2024,TEA_operacional,principal,107102,1,1,Hospital de Quilpué
+2024,TEA_operacional,principal,108100,1,1,Hospital de San Camilo (San Felipe)
+2024,TEA_operacional,principal,108101,1,1,Hospital San Juan de Dios (Los Andes)
+2024,TEA_operacional,principal,109101,9,8,"Hospital Clínico de Niños Dr. Roberto del Río (Santiago, Independencia)"
+2024,TEA_operacional,principal,110100,1,1,"Hospital San Juan de Dios (Santiago, Santiago)"
+2024,TEA_operacional,principal,110120,2,2,"Hospital Dr. Félix Bulnes Cerda (Santiago, Quinta Normal)"
+2024,TEA_operacional,principal,111100,48,18,"Hospital Clínico San Borja-Arriarán (Santiago, Santiago)"
+2024,TEA_operacional,principal,111101,3,3,Hospital Clínico Metropolitano El Carmen Doctor Luis Valentín Ferrada
+2024,TEA_operacional,principal,112100,4,3,"Hospital Del Salvador (Santiago, Providencia)"
+2024,TEA_operacional,principal,112101,1,1,"Hospital Dr. Luis Tisné B. (Santiago, Peñalolén)"
+2024,TEA_operacional,principal,112102,6,6,"Hospital de Niños Dr. Luis Calvo Mackenna (Santiago, Providencia)"
+2024,TEA_operacional,principal,113100,2,2,"Hospital Barros Luco Trudeau (Santiago, San Miguel)"
+2024,TEA_operacional,principal,113130,10,7,"Hospital Dr. Exequiel González Cortés (Santiago, San Miguel)"
+2024,TEA_operacional,principal,113180,5,5,"Hospital El Pino (Santiago, San Bernardo)"
+2024,TEA_operacional,principal,114101,19,16,"Complejo Hospitalario Dr. Sótero del Río (Santiago, Puente Alto)"
+2024,TEA_operacional,principal,114103,1,1,Hospital Padre Alberto Hurtado (San Ramón)
+2024,TEA_operacional,principal,114105,4,4,Hospital Clínico Metropolitano La Florida Dra. Eloisa Díaz Inzunza
+2024,TEA_operacional,principal,115100,5,5,Hospital Regional de Rancagua
+2024,TEA_operacional,principal,116100,3,3,Hospital San Juan de Dios (Curicó)
+2024,TEA_operacional,principal,116105,6,6,Hospital Dr. César Garavagno Burotto (Talca)
+2024,TEA_operacional,principal,116107,1,1,Hospital de Constitución
+2024,TEA_operacional,principal,116111,1,1,Hospital San Juan de Dios (Cauquenes)
+2024,TEA_operacional,principal,117101,22,20,Hospital Clínico Herminda Martín (Chillán)
+2024,TEA_operacional,principal,117102,3,3,Hospital de San Carlos
+2024,TEA_operacional,principal,118100,12,10,Hospital Clínico Regional Dr. Guillermo Grant Benavente (Concepción)
+2024,TEA_operacional,principal,118105,2,2,Hospital San José (Coronel)
+2024,TEA_operacional,principal,118106,1,1,Hospital de Lota
+2024,TEA_operacional,principal,119100,9,8,Hospital Las Higueras (Talcahuano)
+2024,TEA_operacional,principal,119101,1,1,Hospital de Tomé
+2024,TEA_operacional,principal,119102,4,3,Hospital Penco - Lirquén
+2024,TEA_operacional,principal,120101,7,7,Complejo Asistencial Dr. Víctor Ríos Ruiz (Los Ángeles)
+2024,TEA_operacional,principal,121109,12,10,Hospital Dr. Hernán Henríquez Aravena (Temuco)
+2024,TEA_operacional,principal,121110,4,4,Hospital Dr. Abraham Godoy (Lautaro)
+2024,TEA_operacional,principal,121114,2,2,Hospital Intercultural de Nueva Imperial
+2024,TEA_operacional,principal,121117,4,2,Hospital de Pitrufquén
+2024,TEA_operacional,principal,121121,4,4,Hospital de Villarrica
+2024,TEA_operacional,principal,122100,5,5,Hospital Clínico Regional (Valdivia)
+2024,TEA_operacional,principal,123100,6,6,Hospital Base San José de Osorno
+2024,TEA_operacional,principal,124105,17,16,Hospital de Puerto Montt
+2024,TEA_operacional,principal,125100,14,8,Hospital Regional (Coihaique)
+2024,TEA_operacional,principal,126100,11,10,Hospital Clínico de Magallanes Dr. Lautaro Navarro Avaria
+2024,TEA_operacional,principal,129100,3,3,Hospital Dr. Mauricio Heyermann (Angol)
+2024,TEA_operacional,principal,129106,10,9,Hospital San José (Victoria)
+2024,TEA_operacional,principal,133150,2,2,Hospital de Castro
+2024,TEA_operacional,principal,200717,1,1,
+2024,TEA_operacional,principal_y_secundario,103100,2,2,Hospital Dr. Leonardo Guzmán (Antofagasta)
+2024,TEA_operacional,principal_y_secundario,104103,1,1,Hospital Provincial del Huasco Monseñor Fernando Ariztía Ruiz (Vallenar)
+2024,TEA_operacional,principal_y_secundario,112102,2,2,"Hospital de Niños Dr. Luis Calvo Mackenna (Santiago, Providencia)"
+2024,TEA_operacional,principal_y_secundario,114101,2,2,"Complejo Hospitalario Dr. Sótero del Río (Santiago, Puente Alto)"
+2024,TEA_operacional,principal_y_secundario,114103,1,1,Hospital Padre Alberto Hurtado (San Ramón)
+2024,TEA_operacional,principal_y_secundario,116108,1,1,Hospital Presidente Carlos Ibáñez del Campo (Linares)
+2024,TEA_operacional,principal_y_secundario,117101,2,2,Hospital Clínico Herminda Martín (Chillán)
+2024,TEA_operacional,principal_y_secundario,120101,1,1,Complejo Asistencial Dr. Víctor Ríos Ruiz (Los Ángeles)
+2024,TEA_operacional,principal_y_secundario,124105,3,3,Hospital de Puerto Montt
+2024,TEA_operacional,solo_secundario,101100,156,128,Hospital Dr. Juan Noé Crevanni (Arica)
+2024,TEA_operacional,solo_secundario,102100,178,158,Hospital Dr. Ernesto Torres Galdames (Iquique)
+2024,TEA_operacional,solo_secundario,103100,310,275,Hospital Dr. Leonardo Guzmán (Antofagasta)
+2024,TEA_operacional,solo_secundario,103101,128,115,Hospital Dr. Carlos Cisternas (Calama)
+2024,TEA_operacional,solo_secundario,104100,57,49,Hospital San José del Carmen (Copiapó)
+2024,TEA_operacional,solo_secundario,104103,31,26,Hospital Provincial del Huasco Monseñor Fernando Ariztía Ruiz (Vallenar)
+2024,TEA_operacional,solo_secundario,105100,206,185,Hospital San Juan de Dios (La Serena)
+2024,TEA_operacional,solo_secundario,105101,207,186,Hospital San Pablo (Coquimbo)
+2024,TEA_operacional,solo_secundario,105102,100,90,Hospital Dr. Antonio Tirado Lanas (Ovalle)
+2024,TEA_operacional,solo_secundario,106100,274,216,Hospital Carlos Van Buren (Valparaíso)
+2024,TEA_operacional,solo_secundario,106102,13,10,Hospital Dr. Eduardo Pereira Ramírez (Valparaíso)
+2024,TEA_operacional,solo_secundario,106103,37,36,Hospital Claudio Vicuña (San Antonio)
+2024,TEA_operacional,solo_secundario,107100,367,305,Hospital Dr. Gustavo Fricke (Viña del Mar)
+2024,TEA_operacional,solo_secundario,107101,93,80,Hospital San Martín (Quillota)
+2024,TEA_operacional,solo_secundario,107102,63,53,Hospital de Quilpué
+2024,TEA_operacional,solo_secundario,108100,39,38,Hospital de San Camilo (San Felipe)
+2024,TEA_operacional,solo_secundario,108101,22,21,Hospital San Juan de Dios (Los Andes)
+2024,TEA_operacional,solo_secundario,109100,38,37,"Complejo Hospitalario San José (Santiago, Independencia)"
+2024,TEA_operacional,solo_secundario,109101,321,269,"Hospital Clínico de Niños Dr. Roberto del Río (Santiago, Independencia)"
+2024,TEA_operacional,solo_secundario,110100,91,78,"Hospital San Juan de Dios (Santiago, Santiago)"
+2024,TEA_operacional,solo_secundario,110110,3,3,Instituto Traumatológico Dr. Teodoro Gebauer
+2024,TEA_operacional,solo_secundario,110120,147,139,"Hospital Dr. Félix Bulnes Cerda (Santiago, Quinta Normal)"
+2024,TEA_operacional,solo_secundario,110130,21,21,Hospital Adalberto Steeger (Talagante)
+2024,TEA_operacional,solo_secundario,110150,30,26,Hospital San José (Melipilla)
+2024,TEA_operacional,solo_secundario,111100,289,200,"Hospital Clínico San Borja-Arriarán (Santiago, Santiago)"
+2024,TEA_operacional,solo_secundario,111101,141,133,Hospital Clínico Metropolitano El Carmen Doctor Luis Valentín Ferrada
+2024,TEA_operacional,solo_secundario,111195,8,8,Hospital de Urgencia Asistencia Pública Dr. Alejandro del Río
+2024,TEA_operacional,solo_secundario,112100,39,37,"Hospital Del Salvador (Santiago, Providencia)"
+2024,TEA_operacional,solo_secundario,112101,13,13,"Hospital Dr. Luis Tisné B. (Santiago, Peñalolén)"
+2024,TEA_operacional,solo_secundario,112102,250,190,"Hospital de Niños Dr. Luis Calvo Mackenna (Santiago, Providencia)"
+2024,TEA_operacional,solo_secundario,112103,5,5,Instituto Nacional de Enfermedades Respiratorias y Cirugía Torácica
+2024,TEA_operacional,solo_secundario,112104,47,33,Instituto de Neurocirugía Dr. Alfonso Asenjo
+2024,TEA_operacional,solo_secundario,113100,39,36,"Hospital Barros Luco Trudeau (Santiago, San Miguel)"
+2024,TEA_operacional,solo_secundario,113130,508,448,"Hospital Dr. Exequiel González Cortés (Santiago, San Miguel)"
+2024,TEA_operacional,solo_secundario,113150,12,12,Hospital San Luis (Buin)
+2024,TEA_operacional,solo_secundario,113180,57,50,"Hospital El Pino (Santiago, San Bernardo)"
+2024,TEA_operacional,solo_secundario,114101,492,414,"Complejo Hospitalario Dr. Sótero del Río (Santiago, Puente Alto)"
+2024,TEA_operacional,solo_secundario,114103,104,94,Hospital Padre Alberto Hurtado (San Ramón)
+2024,TEA_operacional,solo_secundario,114105,154,133,Hospital Clínico Metropolitano La Florida Dra. Eloisa Díaz Inzunza
+2024,TEA_operacional,solo_secundario,115100,188,157,Hospital Regional de Rancagua
+2024,TEA_operacional,solo_secundario,115107,48,43,Hospital San Juan de Dios (San Fernando)
+2024,TEA_operacional,solo_secundario,115110,32,31,Hospital de Santa Cruz
+2024,TEA_operacional,solo_secundario,116100,119,102,Hospital San Juan de Dios (Curicó)
+2024,TEA_operacional,solo_secundario,116105,165,154,Hospital Dr. César Garavagno Burotto (Talca)
+2024,TEA_operacional,solo_secundario,116107,18,15,Hospital de Constitución
+2024,TEA_operacional,solo_secundario,116108,123,116,Hospital Presidente Carlos Ibáñez del Campo (Linares)
+2024,TEA_operacional,solo_secundario,116110,19,16,Hospital San José (Parral)
+2024,TEA_operacional,solo_secundario,116111,16,15,Hospital San Juan de Dios (Cauquenes)
+2024,TEA_operacional,solo_secundario,117101,257,222,Hospital Clínico Herminda Martín (Chillán)
+2024,TEA_operacional,solo_secundario,117102,86,73,Hospital de San Carlos
+2024,TEA_operacional,solo_secundario,118100,332,263,Hospital Clínico Regional Dr. Guillermo Grant Benavente (Concepción)
+2024,TEA_operacional,solo_secundario,118105,81,72,Hospital San José (Coronel)
+2024,TEA_operacional,solo_secundario,118106,57,49,Hospital de Lota
+2024,TEA_operacional,solo_secundario,119100,248,219,Hospital Las Higueras (Talcahuano)
+2024,TEA_operacional,solo_secundario,119101,25,18,Hospital de Tomé
+2024,TEA_operacional,solo_secundario,119102,82,68,Hospital Penco - Lirquén
+2024,TEA_operacional,solo_secundario,120101,201,176,Complejo Asistencial Dr. Víctor Ríos Ruiz (Los Ángeles)
+2024,TEA_operacional,solo_secundario,121109,278,238,Hospital Dr. Hernán Henríquez Aravena (Temuco)
+2024,TEA_operacional,solo_secundario,121110,33,28,Hospital Dr. Abraham Godoy (Lautaro)
+2024,TEA_operacional,solo_secundario,121114,22,22,Hospital Intercultural de Nueva Imperial
+2024,TEA_operacional,solo_secundario,121117,17,12,Hospital de Pitrufquén
+2024,TEA_operacional,solo_secundario,121121,46,36,Hospital de Villarrica
+2024,TEA_operacional,solo_secundario,122100,97,73,Hospital Clínico Regional (Valdivia)
+2024,TEA_operacional,solo_secundario,123100,146,125,Hospital Base San José de Osorno
+2024,TEA_operacional,solo_secundario,124105,162,147,Hospital de Puerto Montt
+2024,TEA_operacional,solo_secundario,125100,55,45,Hospital Regional (Coihaique)
+2024,TEA_operacional,solo_secundario,126100,74,62,Hospital Clínico de Magallanes Dr. Lautaro Navarro Avaria
+2024,TEA_operacional,solo_secundario,128109,26,23,Hospital Provincial Dr. Rafael Avaría (Curanilahue)
+2024,TEA_operacional,solo_secundario,129100,62,59,Hospital Dr. Mauricio Heyermann (Angol)
+2024,TEA_operacional,solo_secundario,129106,25,24,Hospital San José (Victoria)
+2024,TEA_operacional,solo_secundario,133150,57,51,Hospital de Castro
+2024,TEA_operacional,solo_secundario,200717,41,38,
+2019,F84_historico,principal,101100,5,5,Hospital Dr. Juan Noé Crevanni (Arica)
+2019,F84_historico,principal,102100,6,6,Hospital Dr. Ernesto Torres Galdames (Iquique)
+2019,F84_historico,principal,103100,19,18,Hospital Dr. Leonardo Guzmán (Antofagasta)
+2019,F84_historico,principal,103101,4,3,Hospital Dr. Carlos Cisternas (Calama)
+2019,F84_historico,principal,104100,1,1,Hospital San José del Carmen (Copiapó)
+2019,F84_historico,principal,104103,1,1,Hospital Provincial del Huasco Monseñor Fernando Ariztía Ruiz (Vallenar)
+2019,F84_historico,principal,105100,2,2,Hospital San Juan de Dios (La Serena)
+2019,F84_historico,principal,105101,3,2,Hospital San Pablo (Coquimbo)
+2019,F84_historico,principal,105102,1,1,Hospital Dr. Antonio Tirado Lanas (Ovalle)
+2019,F84_historico,principal,106103,1,1,Hospital Claudio Vicuña (San Antonio)
+2019,F84_historico,principal,107100,2,2,Hospital Dr. Gustavo Fricke (Viña del Mar)
+2019,F84_historico,principal,107102,4,4,Hospital de Quilpué
+2019,F84_historico,principal,108100,3,3,Hospital de San Camilo (San Felipe)
+2019,F84_historico,principal,109101,2,2,"Hospital Clínico de Niños Dr. Roberto del Río (Santiago, Independencia)"
+2019,F84_historico,principal,110100,1,1,"Hospital San Juan de Dios (Santiago, Santiago)"
+2019,F84_historico,principal,110120,18,15,"Hospital Dr. Félix Bulnes Cerda (Santiago, Quinta Normal)"
+2019,F84_historico,principal,110130,1,1,Hospital Adalberto Steeger (Talagante)
+2019,F84_historico,principal,110150,3,2,Hospital San José (Melipilla)
+2019,F84_historico,principal,111100,35,16,"Hospital Clínico San Borja-Arriarán (Santiago, Santiago)"
+2019,F84_historico,principal,111101,1,1,Hospital Clínico Metropolitano El Carmen Doctor Luis Valentín Ferrada
+2019,F84_historico,principal,111195,1,1,Hospital de Urgencia Asistencia Pública Dr. Alejandro del Río
+2019,F84_historico,principal,112102,3,2,"Hospital de Niños Dr. Luis Calvo Mackenna (Santiago, Providencia)"
+2019,F84_historico,principal,113100,1,1,"Hospital Barros Luco Trudeau (Santiago, San Miguel)"
+2019,F84_historico,principal,113130,6,5,"Hospital Dr. Exequiel González Cortés (Santiago, San Miguel)"
+2019,F84_historico,principal,113180,6,3,"Hospital El Pino (Santiago, San Bernardo)"
+2019,F84_historico,principal,114101,13,12,"Complejo Hospitalario Dr. Sótero del Río (Santiago, Puente Alto)"
+2019,F84_historico,principal,114103,4,3,Hospital Padre Alberto Hurtado (San Ramón)
+2019,F84_historico,principal,114105,1,1,Hospital Clínico Metropolitano La Florida Dra. Eloisa Díaz Inzunza
+2019,F84_historico,principal,115100,1,1,Hospital Regional de Rancagua
+2019,F84_historico,principal,115107,2,2,Hospital San Juan de Dios (San Fernando)
+2019,F84_historico,principal,116100,1,1,Hospital San Juan de Dios (Curicó)
+2019,F84_historico,principal,116105,2,2,Hospital Dr. César Garavagno Burotto (Talca)
+2019,F84_historico,principal,117101,24,17,Hospital Clínico Herminda Martín (Chillán)
+2019,F84_historico,principal,117102,1,1,Hospital de San Carlos
+2019,F84_historico,principal,118100,7,7,Hospital Clínico Regional Dr. Guillermo Grant Benavente (Concepción)
+2019,F84_historico,principal,119100,4,4,Hospital Las Higueras (Talcahuano)
+2019,F84_historico,principal,120101,3,3,Complejo Asistencial Dr. Víctor Ríos Ruiz (Los Ángeles)
+2019,F84_historico,principal,121109,5,5,Hospital Dr. Hernán Henríquez Aravena (Temuco)
+2019,F84_historico,principal,122100,5,4,Hospital Clínico Regional (Valdivia)
+2019,F84_historico,principal,123100,5,4,Hospital Base San José de Osorno
+2019,F84_historico,principal,124105,7,7,Hospital de Puerto Montt
+2019,F84_historico,principal,125100,2,2,Hospital Regional (Coihaique)
+2019,F84_historico,principal,126100,11,6,Hospital Clínico de Magallanes Dr. Lautaro Navarro Avaria
+2019,F84_historico,principal,128109,1,1,Hospital Provincial Dr. Rafael Avaría (Curanilahue)
+2019,F84_historico,principal,129106,4,1,Hospital San José (Victoria)
+2019,F84_historico,principal,133150,1,1,Hospital de Castro
+2019,F84_historico,principal_y_secundario,102100,1,1,Hospital Dr. Ernesto Torres Galdames (Iquique)
+2019,F84_historico,principal_y_secundario,107100,1,1,Hospital Dr. Gustavo Fricke (Viña del Mar)
+2019,F84_historico,principal_y_secundario,111100,3,2,"Hospital Clínico San Borja-Arriarán (Santiago, Santiago)"
+2019,F84_historico,principal_y_secundario,116105,1,1,Hospital Dr. César Garavagno Burotto (Talca)
+2019,F84_historico,principal_y_secundario,129100,1,1,Hospital Dr. Mauricio Heyermann (Angol)
+2019,F84_historico,solo_secundario,101100,33,28,Hospital Dr. Juan Noé Crevanni (Arica)
+2019,F84_historico,solo_secundario,102100,56,53,Hospital Dr. Ernesto Torres Galdames (Iquique)
+2019,F84_historico,solo_secundario,103100,73,65,Hospital Dr. Leonardo Guzmán (Antofagasta)
+2019,F84_historico,solo_secundario,103101,16,14,Hospital Dr. Carlos Cisternas (Calama)
+2019,F84_historico,solo_secundario,104100,11,9,Hospital San José del Carmen (Copiapó)
+2019,F84_historico,solo_secundario,104103,13,13,Hospital Provincial del Huasco Monseñor Fernando Ariztía Ruiz (Vallenar)
+2019,F84_historico,solo_secundario,105100,28,28,Hospital San Juan de Dios (La Serena)
+2019,F84_historico,solo_secundario,105101,48,43,Hospital San Pablo (Coquimbo)
+2019,F84_historico,solo_secundario,105102,16,16,Hospital Dr. Antonio Tirado Lanas (Ovalle)
+2019,F84_historico,solo_secundario,106100,80,65,Hospital Carlos Van Buren (Valparaíso)
+2019,F84_historico,solo_secundario,106102,4,4,Hospital Dr. Eduardo Pereira Ramírez (Valparaíso)
+2019,F84_historico,solo_secundario,106103,20,19,Hospital Claudio Vicuña (San Antonio)
+2019,F84_historico,solo_secundario,107100,68,65,Hospital Dr. Gustavo Fricke (Viña del Mar)
+2019,F84_historico,solo_secundario,107101,13,11,Hospital San Martín (Quillota)
+2019,F84_historico,solo_secundario,107102,10,10,Hospital de Quilpué
+2019,F84_historico,solo_secundario,108100,14,14,Hospital de San Camilo (San Felipe)
+2019,F84_historico,solo_secundario,108101,7,6,Hospital San Juan de Dios (Los Andes)
+2019,F84_historico,solo_secundario,109100,12,11,"Complejo Hospitalario San José (Santiago, Independencia)"
+2019,F84_historico,solo_secundario,109101,88,72,"Hospital Clínico de Niños Dr. Roberto del Río (Santiago, Independencia)"
+2019,F84_historico,solo_secundario,110100,44,35,"Hospital San Juan de Dios (Santiago, Santiago)"
+2019,F84_historico,solo_secundario,110120,39,34,"Hospital Dr. Félix Bulnes Cerda (Santiago, Quinta Normal)"
+2019,F84_historico,solo_secundario,110130,1,1,Hospital Adalberto Steeger (Talagante)
+2019,F84_historico,solo_secundario,111100,152,122,"Hospital Clínico San Borja-Arriarán (Santiago, Santiago)"
+2019,F84_historico,solo_secundario,111101,38,38,Hospital Clínico Metropolitano El Carmen Doctor Luis Valentín Ferrada
+2019,F84_historico,solo_secundario,111195,1,1,Hospital de Urgencia Asistencia Pública Dr. Alejandro del Río
+2019,F84_historico,solo_secundario,112100,8,6,"Hospital Del Salvador (Santiago, Providencia)"
+2019,F84_historico,solo_secundario,112101,3,3,"Hospital Dr. Luis Tisné B. (Santiago, Peñalolén)"
+2019,F84_historico,solo_secundario,112102,86,74,"Hospital de Niños Dr. Luis Calvo Mackenna (Santiago, Providencia)"
+2019,F84_historico,solo_secundario,112103,1,1,Instituto Nacional de Enfermedades Respiratorias y Cirugía Torácica
+2019,F84_historico,solo_secundario,112104,2,2,Instituto de Neurocirugía Dr. Alfonso Asenjo
+2019,F84_historico,solo_secundario,113100,14,14,"Hospital Barros Luco Trudeau (Santiago, San Miguel)"
+2019,F84_historico,solo_secundario,113130,56,52,"Hospital Dr. Exequiel González Cortés (Santiago, San Miguel)"
+2019,F84_historico,solo_secundario,113150,4,4,Hospital San Luis (Buin)
+2019,F84_historico,solo_secundario,113180,7,7,"Hospital El Pino (Santiago, San Bernardo)"
+2019,F84_historico,solo_secundario,114101,95,86,"Complejo Hospitalario Dr. Sótero del Río (Santiago, Puente Alto)"
+2019,F84_historico,solo_secundario,114103,23,22,Hospital Padre Alberto Hurtado (San Ramón)
+2019,F84_historico,solo_secundario,114105,21,19,Hospital Clínico Metropolitano La Florida Dra. Eloisa Díaz Inzunza
+2019,F84_historico,solo_secundario,115100,35,32,Hospital Regional de Rancagua
+2019,F84_historico,solo_secundario,115107,35,32,Hospital San Juan de Dios (San Fernando)
+2019,F84_historico,solo_secundario,115110,9,8,Hospital de Santa Cruz
+2019,F84_historico,solo_secundario,116100,14,14,Hospital San Juan de Dios (Curicó)
+2019,F84_historico,solo_secundario,116105,50,46,Hospital Dr. César Garavagno Burotto (Talca)
+2019,F84_historico,solo_secundario,116108,16,16,Hospital Presidente Carlos Ibáñez del Campo (Linares)
+2019,F84_historico,solo_secundario,116110,3,3,Hospital San José (Parral)
+2019,F84_historico,solo_secundario,117101,79,74,Hospital Clínico Herminda Martín (Chillán)
+2019,F84_historico,solo_secundario,117102,13,13,Hospital de San Carlos
+2019,F84_historico,solo_secundario,118100,125,107,Hospital Clínico Regional Dr. Guillermo Grant Benavente (Concepción)
+2019,F84_historico,solo_secundario,118105,11,11,Hospital San José (Coronel)
+2019,F84_historico,solo_secundario,119100,66,58,Hospital Las Higueras (Talcahuano)
+2019,F84_historico,solo_secundario,120101,144,110,Complejo Asistencial Dr. Víctor Ríos Ruiz (Los Ángeles)
+2019,F84_historico,solo_secundario,121109,68,63,Hospital Dr. Hernán Henríquez Aravena (Temuco)
+2019,F84_historico,solo_secundario,121110,5,5,Hospital Dr. Abraham Godoy (Lautaro)
+2019,F84_historico,solo_secundario,121114,2,2,Hospital Intercultural de Nueva Imperial
+2019,F84_historico,solo_secundario,121117,2,2,Hospital de Pitrufquén
+2019,F84_historico,solo_secundario,121121,5,5,Hospital de Villarrica
+2019,F84_historico,solo_secundario,122100,79,52,Hospital Clínico Regional (Valdivia)
+2019,F84_historico,solo_secundario,123100,37,31,Hospital Base San José de Osorno
+2019,F84_historico,solo_secundario,124105,47,46,Hospital de Puerto Montt
+2019,F84_historico,solo_secundario,125100,10,10,Hospital Regional (Coihaique)
+2019,F84_historico,solo_secundario,126100,49,33,Hospital Clínico de Magallanes Dr. Lautaro Navarro Avaria
+2019,F84_historico,solo_secundario,128109,11,11,Hospital Provincial Dr. Rafael Avaría (Curanilahue)
+2019,F84_historico,solo_secundario,129100,6,5,Hospital Dr. Mauricio Heyermann (Angol)
+2019,F84_historico,solo_secundario,129106,8,7,Hospital San José (Victoria)
+2019,F84_historico,solo_secundario,133150,10,10,Hospital de Castro
+2020,F84_historico,principal,101100,3,3,Hospital Dr. Juan Noé Crevanni (Arica)
+2020,F84_historico,principal,102100,6,3,Hospital Dr. Ernesto Torres Galdames (Iquique)
+2020,F84_historico,principal,103100,10,10,Hospital Dr. Leonardo Guzmán (Antofagasta)
+2020,F84_historico,principal,103101,1,1,Hospital Dr. Carlos Cisternas (Calama)
+2020,F84_historico,principal,104100,1,1,Hospital San José del Carmen (Copiapó)
+2020,F84_historico,principal,104103,1,1,Hospital Provincial del Huasco Monseñor Fernando Ariztía Ruiz (Vallenar)
+2020,F84_historico,principal,105100,2,2,Hospital San Juan de Dios (La Serena)
+2020,F84_historico,principal,105101,2,2,Hospital San Pablo (Coquimbo)
+2020,F84_historico,principal,106103,1,1,Hospital Claudio Vicuña (San Antonio)
+2020,F84_historico,principal,107100,1,1,Hospital Dr. Gustavo Fricke (Viña del Mar)
+2020,F84_historico,principal,107101,1,1,Hospital San Martín (Quillota)
+2020,F84_historico,principal,107102,3,3,Hospital de Quilpué
+2020,F84_historico,principal,108100,1,1,Hospital de San Camilo (San Felipe)
+2020,F84_historico,principal,109101,3,3,"Hospital Clínico de Niños Dr. Roberto del Río (Santiago, Independencia)"
+2020,F84_historico,principal,110100,1,1,"Hospital San Juan de Dios (Santiago, Santiago)"
+2020,F84_historico,principal,110120,13,8,"Hospital Dr. Félix Bulnes Cerda (Santiago, Quinta Normal)"
+2020,F84_historico,principal,111100,21,9,"Hospital Clínico San Borja-Arriarán (Santiago, Santiago)"
+2020,F84_historico,principal,112102,1,1,"Hospital de Niños Dr. Luis Calvo Mackenna (Santiago, Providencia)"
+2020,F84_historico,principal,113100,1,1,"Hospital Barros Luco Trudeau (Santiago, San Miguel)"
+2020,F84_historico,principal,113130,2,2,"Hospital Dr. Exequiel González Cortés (Santiago, San Miguel)"
+2020,F84_historico,principal,113180,1,1,"Hospital El Pino (Santiago, San Bernardo)"
+2020,F84_historico,principal,114101,9,8,"Complejo Hospitalario Dr. Sótero del Río (Santiago, Puente Alto)"
+2020,F84_historico,principal,114103,2,2,Hospital Padre Alberto Hurtado (San Ramón)
+2020,F84_historico,principal,114105,5,3,Hospital Clínico Metropolitano La Florida Dra. Eloisa Díaz Inzunza
+2020,F84_historico,principal,115100,7,7,Hospital Regional de Rancagua
+2020,F84_historico,principal,115110,2,2,Hospital de Santa Cruz
+2020,F84_historico,principal,116105,1,1,Hospital Dr. César Garavagno Burotto (Talca)
+2020,F84_historico,principal,117101,8,6,Hospital Clínico Herminda Martín (Chillán)
+2020,F84_historico,principal,118100,10,8,Hospital Clínico Regional Dr. Guillermo Grant Benavente (Concepción)
+2020,F84_historico,principal,118105,2,1,Hospital San José (Coronel)
+2020,F84_historico,principal,119100,2,2,Hospital Las Higueras (Talcahuano)
+2020,F84_historico,principal,120101,1,1,Complejo Asistencial Dr. Víctor Ríos Ruiz (Los Ángeles)
+2020,F84_historico,principal,121109,2,2,Hospital Dr. Hernán Henríquez Aravena (Temuco)
+2020,F84_historico,principal,121110,1,1,Hospital Dr. Abraham Godoy (Lautaro)
+2020,F84_historico,principal,121121,1,1,Hospital de Villarrica
+2020,F84_historico,principal,122100,6,6,Hospital Clínico Regional (Valdivia)
+2020,F84_historico,principal,123100,3,3,Hospital Base San José de Osorno
+2020,F84_historico,principal,124105,6,6,Hospital de Puerto Montt
+2020,F84_historico,principal,125100,3,3,Hospital Regional (Coihaique)
+2020,F84_historico,principal,126100,4,3,Hospital Clínico de Magallanes Dr. Lautaro Navarro Avaria
+2020,F84_historico,principal,129100,1,1,Hospital Dr. Mauricio Heyermann (Angol)
+2020,F84_historico,principal,129106,2,2,Hospital San José (Victoria)
+2020,F84_historico,principal,133150,1,1,Hospital de Castro
+2020,F84_historico,principal_y_secundario,103100,1,1,Hospital Dr. Leonardo Guzmán (Antofagasta)
+2020,F84_historico,principal_y_secundario,107100,1,1,Hospital Dr. Gustavo Fricke (Viña del Mar)
+2020,F84_historico,principal_y_secundario,109101,2,2,"Hospital Clínico de Niños Dr. Roberto del Río (Santiago, Independencia)"
+2020,F84_historico,principal_y_secundario,111100,1,1,"Hospital Clínico San Borja-Arriarán (Santiago, Santiago)"
+2020,F84_historico,principal_y_secundario,112102,1,1,"Hospital de Niños Dr. Luis Calvo Mackenna (Santiago, Providencia)"
+2020,F84_historico,principal_y_secundario,114103,1,1,Hospital Padre Alberto Hurtado (San Ramón)
+2020,F84_historico,principal_y_secundario,118100,1,1,Hospital Clínico Regional Dr. Guillermo Grant Benavente (Concepción)
+2020,F84_historico,solo_secundario,101100,30,27,Hospital Dr. Juan Noé Crevanni (Arica)
+2020,F84_historico,solo_secundario,102100,27,24,Hospital Dr. Ernesto Torres Galdames (Iquique)
+2020,F84_historico,solo_secundario,103100,64,56,Hospital Dr. Leonardo Guzmán (Antofagasta)
+2020,F84_historico,solo_secundario,103101,16,15,Hospital Dr. Carlos Cisternas (Calama)
+2020,F84_historico,solo_secundario,104100,6,6,Hospital San José del Carmen (Copiapó)
+2020,F84_historico,solo_secundario,104103,5,5,Hospital Provincial del Huasco Monseñor Fernando Ariztía Ruiz (Vallenar)
+2020,F84_historico,solo_secundario,105100,22,18,Hospital San Juan de Dios (La Serena)
+2020,F84_historico,solo_secundario,105101,25,24,Hospital San Pablo (Coquimbo)
+2020,F84_historico,solo_secundario,105102,11,10,Hospital Dr. Antonio Tirado Lanas (Ovalle)
+2020,F84_historico,solo_secundario,106100,38,34,Hospital Carlos Van Buren (Valparaíso)
+2020,F84_historico,solo_secundario,106102,1,1,Hospital Dr. Eduardo Pereira Ramírez (Valparaíso)
+2020,F84_historico,solo_secundario,106103,10,10,Hospital Claudio Vicuña (San Antonio)
+2020,F84_historico,solo_secundario,107100,74,55,Hospital Dr. Gustavo Fricke (Viña del Mar)
+2020,F84_historico,solo_secundario,107101,8,8,Hospital San Martín (Quillota)
+2020,F84_historico,solo_secundario,107102,15,13,Hospital de Quilpué
+2020,F84_historico,solo_secundario,108100,9,9,Hospital de San Camilo (San Felipe)
+2020,F84_historico,solo_secundario,108101,4,4,Hospital San Juan de Dios (Los Andes)
+2020,F84_historico,solo_secundario,109100,8,6,"Complejo Hospitalario San José (Santiago, Independencia)"
+2020,F84_historico,solo_secundario,109101,66,50,"Hospital Clínico de Niños Dr. Roberto del Río (Santiago, Independencia)"
+2020,F84_historico,solo_secundario,110100,14,14,"Hospital San Juan de Dios (Santiago, Santiago)"
+2020,F84_historico,solo_secundario,110120,25,25,"Hospital Dr. Félix Bulnes Cerda (Santiago, Quinta Normal)"
+2020,F84_historico,solo_secundario,110130,1,1,Hospital Adalberto Steeger (Talagante)
+2020,F84_historico,solo_secundario,110150,5,5,Hospital San José (Melipilla)
+2020,F84_historico,solo_secundario,111100,76,55,"Hospital Clínico San Borja-Arriarán (Santiago, Santiago)"
+2020,F84_historico,solo_secundario,111101,18,16,Hospital Clínico Metropolitano El Carmen Doctor Luis Valentín Ferrada
+2020,F84_historico,solo_secundario,111195,1,1,Hospital de Urgencia Asistencia Pública Dr. Alejandro del Río
+2020,F84_historico,solo_secundario,112100,5,5,"Hospital Del Salvador (Santiago, Providencia)"
+2020,F84_historico,solo_secundario,112101,5,5,"Hospital Dr. Luis Tisné B. (Santiago, Peñalolén)"
+2020,F84_historico,solo_secundario,112102,43,33,"Hospital de Niños Dr. Luis Calvo Mackenna (Santiago, Providencia)"
+2020,F84_historico,solo_secundario,112103,1,1,Instituto Nacional de Enfermedades Respiratorias y Cirugía Torácica
+2020,F84_historico,solo_secundario,112104,10,10,Instituto de Neurocirugía Dr. Alfonso Asenjo
+2020,F84_historico,solo_secundario,113100,11,11,"Hospital Barros Luco Trudeau (Santiago, San Miguel)"
+2020,F84_historico,solo_secundario,113130,69,65,"Hospital Dr. Exequiel González Cortés (Santiago, San Miguel)"
+2020,F84_historico,solo_secundario,113150,3,3,Hospital San Luis (Buin)
+2020,F84_historico,solo_secundario,113180,7,7,"Hospital El Pino (Santiago, San Bernardo)"
+2020,F84_historico,solo_secundario,114101,60,53,"Complejo Hospitalario Dr. Sótero del Río (Santiago, Puente Alto)"
+2020,F84_historico,solo_secundario,114103,9,7,Hospital Padre Alberto Hurtado (San Ramón)
+2020,F84_historico,solo_secundario,114105,29,26,Hospital Clínico Metropolitano La Florida Dra. Eloisa Díaz Inzunza
+2020,F84_historico,solo_secundario,115100,39,35,Hospital Regional de Rancagua
+2020,F84_historico,solo_secundario,115107,8,8,Hospital San Juan de Dios (San Fernando)
+2020,F84_historico,solo_secundario,115110,3,3,Hospital de Santa Cruz
+2020,F84_historico,solo_secundario,116100,5,5,Hospital San Juan de Dios (Curicó)
+2020,F84_historico,solo_secundario,116105,40,36,Hospital Dr. César Garavagno Burotto (Talca)
+2020,F84_historico,solo_secundario,116108,15,15,Hospital Presidente Carlos Ibáñez del Campo (Linares)
+2020,F84_historico,solo_secundario,116110,4,4,Hospital San José (Parral)
+2020,F84_historico,solo_secundario,117101,48,44,Hospital Clínico Herminda Martín (Chillán)
+2020,F84_historico,solo_secundario,117102,9,8,Hospital de San Carlos
+2020,F84_historico,solo_secundario,118100,83,66,Hospital Clínico Regional Dr. Guillermo Grant Benavente (Concepción)
+2020,F84_historico,solo_secundario,118105,7,7,Hospital San José (Coronel)
+2020,F84_historico,solo_secundario,119100,44,37,Hospital Las Higueras (Talcahuano)
+2020,F84_historico,solo_secundario,120101,82,73,Complejo Asistencial Dr. Víctor Ríos Ruiz (Los Ángeles)
+2020,F84_historico,solo_secundario,121109,63,51,Hospital Dr. Hernán Henríquez Aravena (Temuco)
+2020,F84_historico,solo_secundario,121114,2,2,Hospital Intercultural de Nueva Imperial
+2020,F84_historico,solo_secundario,121117,5,5,Hospital de Pitrufquén
+2020,F84_historico,solo_secundario,121121,1,1,Hospital de Villarrica
+2020,F84_historico,solo_secundario,122100,54,35,Hospital Clínico Regional (Valdivia)
+2020,F84_historico,solo_secundario,123100,27,25,Hospital Base San José de Osorno
+2020,F84_historico,solo_secundario,124105,28,21,Hospital de Puerto Montt
+2020,F84_historico,solo_secundario,125100,7,6,Hospital Regional (Coihaique)
+2020,F84_historico,solo_secundario,126100,35,31,Hospital Clínico de Magallanes Dr. Lautaro Navarro Avaria
+2020,F84_historico,solo_secundario,128109,4,4,Hospital Provincial Dr. Rafael Avaría (Curanilahue)
+2020,F84_historico,solo_secundario,129100,8,8,Hospital Dr. Mauricio Heyermann (Angol)
+2020,F84_historico,solo_secundario,129106,11,9,Hospital San José (Victoria)
+2020,F84_historico,solo_secundario,133150,7,6,Hospital de Castro
+2021,F84_historico,principal,101100,10,9,Hospital Dr. Juan Noé Crevanni (Arica)
+2021,F84_historico,principal,102100,10,6,Hospital Dr. Ernesto Torres Galdames (Iquique)
+2021,F84_historico,principal,103100,35,29,Hospital Dr. Leonardo Guzmán (Antofagasta)
+2021,F84_historico,principal,104100,1,1,Hospital San José del Carmen (Copiapó)
+2021,F84_historico,principal,104103,2,2,Hospital Provincial del Huasco Monseñor Fernando Ariztía Ruiz (Vallenar)
+2021,F84_historico,principal,105101,2,2,Hospital San Pablo (Coquimbo)
+2021,F84_historico,principal,106100,2,2,Hospital Carlos Van Buren (Valparaíso)
+2021,F84_historico,principal,107100,2,1,Hospital Dr. Gustavo Fricke (Viña del Mar)
+2021,F84_historico,principal,107102,2,1,Hospital de Quilpué
+2021,F84_historico,principal,109101,3,3,"Hospital Clínico de Niños Dr. Roberto del Río (Santiago, Independencia)"
+2021,F84_historico,principal,110120,3,2,"Hospital Dr. Félix Bulnes Cerda (Santiago, Quinta Normal)"
+2021,F84_historico,principal,111100,10,5,"Hospital Clínico San Borja-Arriarán (Santiago, Santiago)"
+2021,F84_historico,principal,111101,1,1,Hospital Clínico Metropolitano El Carmen Doctor Luis Valentín Ferrada
+2021,F84_historico,principal,112102,4,3,"Hospital de Niños Dr. Luis Calvo Mackenna (Santiago, Providencia)"
+2021,F84_historico,principal,113130,1,1,"Hospital Dr. Exequiel González Cortés (Santiago, San Miguel)"
+2021,F84_historico,principal,113180,4,4,"Hospital El Pino (Santiago, San Bernardo)"
+2021,F84_historico,principal,114101,9,8,"Complejo Hospitalario Dr. Sótero del Río (Santiago, Puente Alto)"
+2021,F84_historico,principal,114103,1,1,Hospital Padre Alberto Hurtado (San Ramón)
+2021,F84_historico,principal,114105,2,2,Hospital Clínico Metropolitano La Florida Dra. Eloisa Díaz Inzunza
+2021,F84_historico,principal,115100,4,4,Hospital Regional de Rancagua
+2021,F84_historico,principal,116105,3,3,Hospital Dr. César Garavagno Burotto (Talca)
+2021,F84_historico,principal,117101,14,9,Hospital Clínico Herminda Martín (Chillán)
+2021,F84_historico,principal,117102,1,1,Hospital de San Carlos
+2021,F84_historico,principal,118100,4,4,Hospital Clínico Regional Dr. Guillermo Grant Benavente (Concepción)
+2021,F84_historico,principal,119100,6,6,Hospital Las Higueras (Talcahuano)
+2021,F84_historico,principal,120101,7,6,Complejo Asistencial Dr. Víctor Ríos Ruiz (Los Ángeles)
+2021,F84_historico,principal,121109,9,8,Hospital Dr. Hernán Henríquez Aravena (Temuco)
+2021,F84_historico,principal,121110,2,2,Hospital Dr. Abraham Godoy (Lautaro)
+2021,F84_historico,principal,122100,4,3,Hospital Clínico Regional (Valdivia)
+2021,F84_historico,principal,123100,6,4,Hospital Base San José de Osorno
+2021,F84_historico,principal,124105,4,4,Hospital de Puerto Montt
+2021,F84_historico,principal,125100,5,1,Hospital Regional (Coihaique)
+2021,F84_historico,principal,126100,11,7,Hospital Clínico de Magallanes Dr. Lautaro Navarro Avaria
+2021,F84_historico,principal,129100,1,1,Hospital Dr. Mauricio Heyermann (Angol)
+2021,F84_historico,principal,129106,1,1,Hospital San José (Victoria)
+2021,F84_historico,principal_y_secundario,113100,1,1,"Hospital Barros Luco Trudeau (Santiago, San Miguel)"
+2021,F84_historico,principal_y_secundario,114101,1,1,"Complejo Hospitalario Dr. Sótero del Río (Santiago, Puente Alto)"
+2021,F84_historico,principal_y_secundario,118100,1,1,Hospital Clínico Regional Dr. Guillermo Grant Benavente (Concepción)
+2021,F84_historico,solo_secundario,101100,57,53,Hospital Dr. Juan Noé Crevanni (Arica)
+2021,F84_historico,solo_secundario,102100,32,30,Hospital Dr. Ernesto Torres Galdames (Iquique)
+2021,F84_historico,solo_secundario,103100,92,78,Hospital Dr. Leonardo Guzmán (Antofagasta)
+2021,F84_historico,solo_secundario,103101,18,17,Hospital Dr. Carlos Cisternas (Calama)
+2021,F84_historico,solo_secundario,104100,12,12,Hospital San José del Carmen (Copiapó)
+2021,F84_historico,solo_secundario,104103,10,10,Hospital Provincial del Huasco Monseñor Fernando Ariztía Ruiz (Vallenar)
+2021,F84_historico,solo_secundario,105100,54,38,Hospital San Juan de Dios (La Serena)
+2021,F84_historico,solo_secundario,105101,54,42,Hospital San Pablo (Coquimbo)
+2021,F84_historico,solo_secundario,105102,9,8,Hospital Dr. Antonio Tirado Lanas (Ovalle)
+2021,F84_historico,solo_secundario,106100,43,39,Hospital Carlos Van Buren (Valparaíso)
+2021,F84_historico,solo_secundario,106103,6,6,Hospital Claudio Vicuña (San Antonio)
+2021,F84_historico,solo_secundario,107100,67,61,Hospital Dr. Gustavo Fricke (Viña del Mar)
+2021,F84_historico,solo_secundario,107101,16,16,Hospital San Martín (Quillota)
+2021,F84_historico,solo_secundario,107102,16,16,Hospital de Quilpué
+2021,F84_historico,solo_secundario,108100,16,16,Hospital de San Camilo (San Felipe)
+2021,F84_historico,solo_secundario,108101,5,5,Hospital San Juan de Dios (Los Andes)
+2021,F84_historico,solo_secundario,109100,10,10,"Complejo Hospitalario San José (Santiago, Independencia)"
+2021,F84_historico,solo_secundario,109101,126,93,"Hospital Clínico de Niños Dr. Roberto del Río (Santiago, Independencia)"
+2021,F84_historico,solo_secundario,110100,27,24,"Hospital San Juan de Dios (Santiago, Santiago)"
+2021,F84_historico,solo_secundario,110120,48,42,"Hospital Dr. Félix Bulnes Cerda (Santiago, Quinta Normal)"
+2021,F84_historico,solo_secundario,110130,6,6,Hospital Adalberto Steeger (Talagante)
+2021,F84_historico,solo_secundario,110150,7,7,Hospital San José (Melipilla)
+2021,F84_historico,solo_secundario,111100,40,38,"Hospital Clínico San Borja-Arriarán (Santiago, Santiago)"
+2021,F84_historico,solo_secundario,111101,24,20,Hospital Clínico Metropolitano El Carmen Doctor Luis Valentín Ferrada
+2021,F84_historico,solo_secundario,111195,1,1,Hospital de Urgencia Asistencia Pública Dr. Alejandro del Río
+2021,F84_historico,solo_secundario,112100,13,12,"Hospital Del Salvador (Santiago, Providencia)"
+2021,F84_historico,solo_secundario,112101,2,2,"Hospital Dr. Luis Tisné B. (Santiago, Peñalolén)"
+2021,F84_historico,solo_secundario,112102,69,55,"Hospital de Niños Dr. Luis Calvo Mackenna (Santiago, Providencia)"
+2021,F84_historico,solo_secundario,112104,31,24,Instituto de Neurocirugía Dr. Alfonso Asenjo
+2021,F84_historico,solo_secundario,113100,23,22,"Hospital Barros Luco Trudeau (Santiago, San Miguel)"
+2021,F84_historico,solo_secundario,113130,155,138,"Hospital Dr. Exequiel González Cortés (Santiago, San Miguel)"
+2021,F84_historico,solo_secundario,113180,18,18,"Hospital El Pino (Santiago, San Bernardo)"
+2021,F84_historico,solo_secundario,114101,165,126,"Complejo Hospitalario Dr. Sótero del Río (Santiago, Puente Alto)"
+2021,F84_historico,solo_secundario,114103,23,22,Hospital Padre Alberto Hurtado (San Ramón)
+2021,F84_historico,solo_secundario,114105,43,36,Hospital Clínico Metropolitano La Florida Dra. Eloisa Díaz Inzunza
+2021,F84_historico,solo_secundario,115100,59,55,Hospital Regional de Rancagua
+2021,F84_historico,solo_secundario,115107,15,14,Hospital San Juan de Dios (San Fernando)
+2021,F84_historico,solo_secundario,115110,6,6,Hospital de Santa Cruz
+2021,F84_historico,solo_secundario,116100,10,10,Hospital San Juan de Dios (Curicó)
+2021,F84_historico,solo_secundario,116105,35,32,Hospital Dr. César Garavagno Burotto (Talca)
+2021,F84_historico,solo_secundario,116108,37,33,Hospital Presidente Carlos Ibáñez del Campo (Linares)
+2021,F84_historico,solo_secundario,116110,1,1,Hospital San José (Parral)
+2021,F84_historico,solo_secundario,117101,110,100,Hospital Clínico Herminda Martín (Chillán)
+2021,F84_historico,solo_secundario,117102,16,15,Hospital de San Carlos
+2021,F84_historico,solo_secundario,118100,127,94,Hospital Clínico Regional Dr. Guillermo Grant Benavente (Concepción)
+2021,F84_historico,solo_secundario,118105,12,12,Hospital San José (Coronel)
+2021,F84_historico,solo_secundario,119100,69,63,Hospital Las Higueras (Talcahuano)
+2021,F84_historico,solo_secundario,120101,58,47,Complejo Asistencial Dr. Víctor Ríos Ruiz (Los Ángeles)
+2021,F84_historico,solo_secundario,121109,71,62,Hospital Dr. Hernán Henríquez Aravena (Temuco)
+2021,F84_historico,solo_secundario,121110,4,4,Hospital Dr. Abraham Godoy (Lautaro)
+2021,F84_historico,solo_secundario,121114,8,8,Hospital Intercultural de Nueva Imperial
+2021,F84_historico,solo_secundario,121117,2,2,Hospital de Pitrufquén
+2021,F84_historico,solo_secundario,121121,9,9,Hospital de Villarrica
+2021,F84_historico,solo_secundario,122100,37,31,Hospital Clínico Regional (Valdivia)
+2021,F84_historico,solo_secundario,123100,45,43,Hospital Base San José de Osorno
+2021,F84_historico,solo_secundario,124105,45,41,Hospital de Puerto Montt
+2021,F84_historico,solo_secundario,125100,12,10,Hospital Regional (Coihaique)
+2021,F84_historico,solo_secundario,126100,37,33,Hospital Clínico de Magallanes Dr. Lautaro Navarro Avaria
+2021,F84_historico,solo_secundario,128109,14,14,Hospital Provincial Dr. Rafael Avaría (Curanilahue)
+2021,F84_historico,solo_secundario,129100,13,13,Hospital Dr. Mauricio Heyermann (Angol)
+2021,F84_historico,solo_secundario,129106,5,3,Hospital San José (Victoria)
+2021,F84_historico,solo_secundario,133150,15,13,Hospital de Castro
+2022,F84_historico,principal,101100,16,11,Hospital Dr. Juan Noé Crevanni (Arica)
+2022,F84_historico,principal,102100,24,19,Hospital Dr. Ernesto Torres Galdames (Iquique)
+2022,F84_historico,principal,103100,34,30,Hospital Dr. Leonardo Guzmán (Antofagasta)
+2022,F84_historico,principal,103101,1,1,Hospital Dr. Carlos Cisternas (Calama)
+2022,F84_historico,principal,104100,1,1,Hospital San José del Carmen (Copiapó)
+2022,F84_historico,principal,104103,1,1,Hospital Provincial del Huasco Monseñor Fernando Ariztía Ruiz (Vallenar)
+2022,F84_historico,principal,105100,2,2,Hospital San Juan de Dios (La Serena)
+2022,F84_historico,principal,105101,5,5,Hospital San Pablo (Coquimbo)
+2022,F84_historico,principal,105102,5,5,Hospital Dr. Antonio Tirado Lanas (Ovalle)
+2022,F84_historico,principal,106100,1,1,Hospital Carlos Van Buren (Valparaíso)
+2022,F84_historico,principal,106103,2,2,Hospital Claudio Vicuña (San Antonio)
+2022,F84_historico,principal,107100,1,1,Hospital Dr. Gustavo Fricke (Viña del Mar)
+2022,F84_historico,principal,107101,2,2,Hospital San Martín (Quillota)
+2022,F84_historico,principal,107102,1,1,Hospital de Quilpué
+2022,F84_historico,principal,109101,7,4,"Hospital Clínico de Niños Dr. Roberto del Río (Santiago, Independencia)"
+2022,F84_historico,principal,110120,3,3,"Hospital Dr. Félix Bulnes Cerda (Santiago, Quinta Normal)"
+2022,F84_historico,principal,111100,21,7,"Hospital Clínico San Borja-Arriarán (Santiago, Santiago)"
+2022,F84_historico,principal,111101,5,5,Hospital Clínico Metropolitano El Carmen Doctor Luis Valentín Ferrada
+2022,F84_historico,principal,112100,1,1,"Hospital Del Salvador (Santiago, Providencia)"
+2022,F84_historico,principal,112102,3,3,"Hospital de Niños Dr. Luis Calvo Mackenna (Santiago, Providencia)"
+2022,F84_historico,principal,113100,4,1,"Hospital Barros Luco Trudeau (Santiago, San Miguel)"
+2022,F84_historico,principal,113130,3,3,"Hospital Dr. Exequiel González Cortés (Santiago, San Miguel)"
+2022,F84_historico,principal,113180,3,3,"Hospital El Pino (Santiago, San Bernardo)"
+2022,F84_historico,principal,114101,20,19,"Complejo Hospitalario Dr. Sótero del Río (Santiago, Puente Alto)"
+2022,F84_historico,principal,114105,2,2,Hospital Clínico Metropolitano La Florida Dra. Eloisa Díaz Inzunza
+2022,F84_historico,principal,115100,2,2,Hospital Regional de Rancagua
+2022,F84_historico,principal,116100,1,1,Hospital San Juan de Dios (Curicó)
+2022,F84_historico,principal,116105,2,2,Hospital Dr. César Garavagno Burotto (Talca)
+2022,F84_historico,principal,116108,1,1,Hospital Presidente Carlos Ibáñez del Campo (Linares)
+2022,F84_historico,principal,117101,24,20,Hospital Clínico Herminda Martín (Chillán)
+2022,F84_historico,principal,117102,1,1,Hospital de San Carlos
+2022,F84_historico,principal,118100,6,6,Hospital Clínico Regional Dr. Guillermo Grant Benavente (Concepción)
+2022,F84_historico,principal,118105,2,2,Hospital San José (Coronel)
+2022,F84_historico,principal,119100,8,7,Hospital Las Higueras (Talcahuano)
+2022,F84_historico,principal,120101,16,11,Complejo Asistencial Dr. Víctor Ríos Ruiz (Los Ángeles)
+2022,F84_historico,principal,121109,3,3,Hospital Dr. Hernán Henríquez Aravena (Temuco)
+2022,F84_historico,principal,121110,5,5,Hospital Dr. Abraham Godoy (Lautaro)
+2022,F84_historico,principal,121117,1,1,Hospital de Pitrufquén
+2022,F84_historico,principal,122100,6,4,Hospital Clínico Regional (Valdivia)
+2022,F84_historico,principal,123100,10,4,Hospital Base San José de Osorno
+2022,F84_historico,principal,124105,11,10,Hospital de Puerto Montt
+2022,F84_historico,principal,125100,4,4,Hospital Regional (Coihaique)
+2022,F84_historico,principal,126100,17,11,Hospital Clínico de Magallanes Dr. Lautaro Navarro Avaria
+2022,F84_historico,principal,129100,3,3,Hospital Dr. Mauricio Heyermann (Angol)
+2022,F84_historico,principal,129106,1,1,Hospital San José (Victoria)
+2022,F84_historico,principal,133150,4,4,Hospital de Castro
+2022,F84_historico,principal_y_secundario,102100,1,1,Hospital Dr. Ernesto Torres Galdames (Iquique)
+2022,F84_historico,principal_y_secundario,103100,1,1,Hospital Dr. Leonardo Guzmán (Antofagasta)
+2022,F84_historico,principal_y_secundario,112102,1,1,"Hospital de Niños Dr. Luis Calvo Mackenna (Santiago, Providencia)"
+2022,F84_historico,principal_y_secundario,114101,1,1,"Complejo Hospitalario Dr. Sótero del Río (Santiago, Puente Alto)"
+2022,F84_historico,principal_y_secundario,116105,1,1,Hospital Dr. César Garavagno Burotto (Talca)
+2022,F84_historico,principal_y_secundario,117101,1,1,Hospital Clínico Herminda Martín (Chillán)
+2022,F84_historico,principal_y_secundario,117102,1,1,Hospital de San Carlos
+2022,F84_historico,principal_y_secundario,123100,1,1,Hospital Base San José de Osorno
+2022,F84_historico,solo_secundario,101100,79,62,Hospital Dr. Juan Noé Crevanni (Arica)
+2022,F84_historico,solo_secundario,102100,70,66,Hospital Dr. Ernesto Torres Galdames (Iquique)
+2022,F84_historico,solo_secundario,103100,130,116,Hospital Dr. Leonardo Guzmán (Antofagasta)
+2022,F84_historico,solo_secundario,103101,41,37,Hospital Dr. Carlos Cisternas (Calama)
+2022,F84_historico,solo_secundario,104100,26,22,Hospital San José del Carmen (Copiapó)
+2022,F84_historico,solo_secundario,104103,21,20,Hospital Provincial del Huasco Monseñor Fernando Ariztía Ruiz (Vallenar)
+2022,F84_historico,solo_secundario,105100,90,75,Hospital San Juan de Dios (La Serena)
+2022,F84_historico,solo_secundario,105101,67,65,Hospital San Pablo (Coquimbo)
+2022,F84_historico,solo_secundario,105102,43,40,Hospital Dr. Antonio Tirado Lanas (Ovalle)
+2022,F84_historico,solo_secundario,106100,91,82,Hospital Carlos Van Buren (Valparaíso)
+2022,F84_historico,solo_secundario,106102,4,3,Hospital Dr. Eduardo Pereira Ramírez (Valparaíso)
+2022,F84_historico,solo_secundario,106103,13,10,Hospital Claudio Vicuña (San Antonio)
+2022,F84_historico,solo_secundario,107100,137,129,Hospital Dr. Gustavo Fricke (Viña del Mar)
+2022,F84_historico,solo_secundario,107101,25,24,Hospital San Martín (Quillota)
+2022,F84_historico,solo_secundario,107102,28,26,Hospital de Quilpué
+2022,F84_historico,solo_secundario,108100,20,20,Hospital de San Camilo (San Felipe)
+2022,F84_historico,solo_secundario,108101,7,7,Hospital San Juan de Dios (Los Andes)
+2022,F84_historico,solo_secundario,109100,13,10,"Complejo Hospitalario San José (Santiago, Independencia)"
+2022,F84_historico,solo_secundario,109101,194,156,"Hospital Clínico de Niños Dr. Roberto del Río (Santiago, Independencia)"
+2022,F84_historico,solo_secundario,110100,37,32,"Hospital San Juan de Dios (Santiago, Santiago)"
+2022,F84_historico,solo_secundario,110120,65,60,"Hospital Dr. Félix Bulnes Cerda (Santiago, Quinta Normal)"
+2022,F84_historico,solo_secundario,110130,6,6,Hospital Adalberto Steeger (Talagante)
+2022,F84_historico,solo_secundario,110150,9,8,Hospital San José (Melipilla)
+2022,F84_historico,solo_secundario,111100,93,83,"Hospital Clínico San Borja-Arriarán (Santiago, Santiago)"
+2022,F84_historico,solo_secundario,111101,43,43,Hospital Clínico Metropolitano El Carmen Doctor Luis Valentín Ferrada
+2022,F84_historico,solo_secundario,111195,3,3,Hospital de Urgencia Asistencia Pública Dr. Alejandro del Río
+2022,F84_historico,solo_secundario,112100,14,13,"Hospital Del Salvador (Santiago, Providencia)"
+2022,F84_historico,solo_secundario,112101,4,4,"Hospital Dr. Luis Tisné B. (Santiago, Peñalolén)"
+2022,F84_historico,solo_secundario,112102,140,111,"Hospital de Niños Dr. Luis Calvo Mackenna (Santiago, Providencia)"
+2022,F84_historico,solo_secundario,112104,31,22,Instituto de Neurocirugía Dr. Alfonso Asenjo
+2022,F84_historico,solo_secundario,113100,19,18,"Hospital Barros Luco Trudeau (Santiago, San Miguel)"
+2022,F84_historico,solo_secundario,113130,260,222,"Hospital Dr. Exequiel González Cortés (Santiago, San Miguel)"
+2022,F84_historico,solo_secundario,113150,8,7,Hospital San Luis (Buin)
+2022,F84_historico,solo_secundario,113180,40,36,"Hospital El Pino (Santiago, San Bernardo)"
+2022,F84_historico,solo_secundario,114101,254,201,"Complejo Hospitalario Dr. Sótero del Río (Santiago, Puente Alto)"
+2022,F84_historico,solo_secundario,114103,46,43,Hospital Padre Alberto Hurtado (San Ramón)
+2022,F84_historico,solo_secundario,114105,58,51,Hospital Clínico Metropolitano La Florida Dra. Eloisa Díaz Inzunza
+2022,F84_historico,solo_secundario,115100,89,78,Hospital Regional de Rancagua
+2022,F84_historico,solo_secundario,115107,15,14,Hospital San Juan de Dios (San Fernando)
+2022,F84_historico,solo_secundario,115110,17,16,Hospital de Santa Cruz
+2022,F84_historico,solo_secundario,116100,19,19,Hospital San Juan de Dios (Curicó)
+2022,F84_historico,solo_secundario,116105,87,71,Hospital Dr. César Garavagno Burotto (Talca)
+2022,F84_historico,solo_secundario,116108,66,59,Hospital Presidente Carlos Ibáñez del Campo (Linares)
+2022,F84_historico,solo_secundario,116110,5,5,Hospital San José (Parral)
+2022,F84_historico,solo_secundario,117101,174,155,Hospital Clínico Herminda Martín (Chillán)
+2022,F84_historico,solo_secundario,117102,15,14,Hospital de San Carlos
+2022,F84_historico,solo_secundario,118100,175,154,Hospital Clínico Regional Dr. Guillermo Grant Benavente (Concepción)
+2022,F84_historico,solo_secundario,118105,18,18,Hospital San José (Coronel)
+2022,F84_historico,solo_secundario,119100,130,112,Hospital Las Higueras (Talcahuano)
+2022,F84_historico,solo_secundario,120101,83,74,Complejo Asistencial Dr. Víctor Ríos Ruiz (Los Ángeles)
+2022,F84_historico,solo_secundario,121109,113,102,Hospital Dr. Hernán Henríquez Aravena (Temuco)
+2022,F84_historico,solo_secundario,121110,14,13,Hospital Dr. Abraham Godoy (Lautaro)
+2022,F84_historico,solo_secundario,121114,11,10,Hospital Intercultural de Nueva Imperial
+2022,F84_historico,solo_secundario,121117,4,4,Hospital de Pitrufquén
+2022,F84_historico,solo_secundario,121121,14,13,Hospital de Villarrica
+2022,F84_historico,solo_secundario,122100,58,51,Hospital Clínico Regional (Valdivia)
+2022,F84_historico,solo_secundario,123100,55,49,Hospital Base San José de Osorno
+2022,F84_historico,solo_secundario,124105,73,68,Hospital de Puerto Montt
+2022,F84_historico,solo_secundario,125100,26,22,Hospital Regional (Coihaique)
+2022,F84_historico,solo_secundario,126100,43,37,Hospital Clínico de Magallanes Dr. Lautaro Navarro Avaria
+2022,F84_historico,solo_secundario,128109,18,13,Hospital Provincial Dr. Rafael Avaría (Curanilahue)
+2022,F84_historico,solo_secundario,129100,37,34,Hospital Dr. Mauricio Heyermann (Angol)
+2022,F84_historico,solo_secundario,129106,9,9,Hospital San José (Victoria)
+2022,F84_historico,solo_secundario,133150,11,11,Hospital de Castro
+2023,F84_historico,principal,101100,13,13,Hospital Dr. Juan Noé Crevanni (Arica)
+2023,F84_historico,principal,102100,28,21,Hospital Dr. Ernesto Torres Galdames (Iquique)
+2023,F84_historico,principal,103100,30,21,Hospital Dr. Leonardo Guzmán (Antofagasta)
+2023,F84_historico,principal,103101,5,5,Hospital Dr. Carlos Cisternas (Calama)
+2023,F84_historico,principal,104100,2,2,Hospital San José del Carmen (Copiapó)
+2023,F84_historico,principal,104103,2,2,Hospital Provincial del Huasco Monseñor Fernando Ariztía Ruiz (Vallenar)
+2023,F84_historico,principal,105101,1,1,Hospital San Pablo (Coquimbo)
+2023,F84_historico,principal,105102,1,1,Hospital Dr. Antonio Tirado Lanas (Ovalle)
+2023,F84_historico,principal,106103,1,1,Hospital Claudio Vicuña (San Antonio)
+2023,F84_historico,principal,107100,3,3,Hospital Dr. Gustavo Fricke (Viña del Mar)
+2023,F84_historico,principal,107101,2,2,Hospital San Martín (Quillota)
+2023,F84_historico,principal,107102,1,1,Hospital de Quilpué
+2023,F84_historico,principal,109101,6,6,"Hospital Clínico de Niños Dr. Roberto del Río (Santiago, Independencia)"
+2023,F84_historico,principal,110120,5,5,"Hospital Dr. Félix Bulnes Cerda (Santiago, Quinta Normal)"
+2023,F84_historico,principal,111100,73,11,"Hospital Clínico San Borja-Arriarán (Santiago, Santiago)"
+2023,F84_historico,principal,111101,2,2,Hospital Clínico Metropolitano El Carmen Doctor Luis Valentín Ferrada
+2023,F84_historico,principal,112100,1,1,"Hospital Del Salvador (Santiago, Providencia)"
+2023,F84_historico,principal,112102,7,7,"Hospital de Niños Dr. Luis Calvo Mackenna (Santiago, Providencia)"
+2023,F84_historico,principal,113100,2,2,"Hospital Barros Luco Trudeau (Santiago, San Miguel)"
+2023,F84_historico,principal,113130,3,3,"Hospital Dr. Exequiel González Cortés (Santiago, San Miguel)"
+2023,F84_historico,principal,113180,1,1,"Hospital El Pino (Santiago, San Bernardo)"
+2023,F84_historico,principal,114101,27,23,"Complejo Hospitalario Dr. Sótero del Río (Santiago, Puente Alto)"
+2023,F84_historico,principal,114103,2,2,Hospital Padre Alberto Hurtado (San Ramón)
+2023,F84_historico,principal,114105,4,4,Hospital Clínico Metropolitano La Florida Dra. Eloisa Díaz Inzunza
+2023,F84_historico,principal,115100,4,4,Hospital Regional de Rancagua
+2023,F84_historico,principal,115110,3,1,Hospital de Santa Cruz
+2023,F84_historico,principal,116105,2,2,Hospital Dr. César Garavagno Burotto (Talca)
+2023,F84_historico,principal,116108,1,1,Hospital Presidente Carlos Ibáñez del Campo (Linares)
+2023,F84_historico,principal,116110,1,1,Hospital San José (Parral)
+2023,F84_historico,principal,117101,13,13,Hospital Clínico Herminda Martín (Chillán)
+2023,F84_historico,principal,117102,7,6,Hospital de San Carlos
+2023,F84_historico,principal,118100,15,13,Hospital Clínico Regional Dr. Guillermo Grant Benavente (Concepción)
+2023,F84_historico,principal,118106,2,2,Hospital de Lota
+2023,F84_historico,principal,119100,7,7,Hospital Las Higueras (Talcahuano)
+2023,F84_historico,principal,119101,1,1,Hospital de Tomé
+2023,F84_historico,principal,120101,14,9,Complejo Asistencial Dr. Víctor Ríos Ruiz (Los Ángeles)
+2023,F84_historico,principal,121109,8,8,Hospital Dr. Hernán Henríquez Aravena (Temuco)
+2023,F84_historico,principal,121110,7,7,Hospital Dr. Abraham Godoy (Lautaro)
+2023,F84_historico,principal,121114,4,3,Hospital Intercultural de Nueva Imperial
+2023,F84_historico,principal,121117,3,3,Hospital de Pitrufquén
+2023,F84_historico,principal,121121,2,1,Hospital de Villarrica
+2023,F84_historico,principal,122100,3,2,Hospital Clínico Regional (Valdivia)
+2023,F84_historico,principal,123100,11,8,Hospital Base San José de Osorno
+2023,F84_historico,principal,124105,11,9,Hospital de Puerto Montt
+2023,F84_historico,principal,125100,4,4,Hospital Regional (Coihaique)
+2023,F84_historico,principal,126100,4,4,Hospital Clínico de Magallanes Dr. Lautaro Navarro Avaria
+2023,F84_historico,principal,129100,7,7,Hospital Dr. Mauricio Heyermann (Angol)
+2023,F84_historico,principal,129106,1,1,Hospital San José (Victoria)
+2023,F84_historico,principal_y_secundario,110150,1,1,Hospital San José (Melipilla)
+2023,F84_historico,principal_y_secundario,112102,1,1,"Hospital de Niños Dr. Luis Calvo Mackenna (Santiago, Providencia)"
+2023,F84_historico,principal_y_secundario,114101,2,2,"Complejo Hospitalario Dr. Sótero del Río (Santiago, Puente Alto)"
+2023,F84_historico,principal_y_secundario,117101,1,1,Hospital Clínico Herminda Martín (Chillán)
+2023,F84_historico,principal_y_secundario,120101,1,1,Complejo Asistencial Dr. Víctor Ríos Ruiz (Los Ángeles)
+2023,F84_historico,principal_y_secundario,121109,1,1,Hospital Dr. Hernán Henríquez Aravena (Temuco)
+2023,F84_historico,principal_y_secundario,121114,2,1,Hospital Intercultural de Nueva Imperial
+2023,F84_historico,solo_secundario,101100,138,114,Hospital Dr. Juan Noé Crevanni (Arica)
+2023,F84_historico,solo_secundario,102100,101,92,Hospital Dr. Ernesto Torres Galdames (Iquique)
+2023,F84_historico,solo_secundario,103100,258,197,Hospital Dr. Leonardo Guzmán (Antofagasta)
+2023,F84_historico,solo_secundario,103101,113,99,Hospital Dr. Carlos Cisternas (Calama)
+2023,F84_historico,solo_secundario,104100,41,39,Hospital San José del Carmen (Copiapó)
+2023,F84_historico,solo_secundario,104103,29,27,Hospital Provincial del Huasco Monseñor Fernando Ariztía Ruiz (Vallenar)
+2023,F84_historico,solo_secundario,105100,136,119,Hospital San Juan de Dios (La Serena)
+2023,F84_historico,solo_secundario,105101,146,134,Hospital San Pablo (Coquimbo)
+2023,F84_historico,solo_secundario,105102,68,66,Hospital Dr. Antonio Tirado Lanas (Ovalle)
+2023,F84_historico,solo_secundario,106100,162,139,Hospital Carlos Van Buren (Valparaíso)
+2023,F84_historico,solo_secundario,106102,3,3,Hospital Dr. Eduardo Pereira Ramírez (Valparaíso)
+2023,F84_historico,solo_secundario,106103,18,17,Hospital Claudio Vicuña (San Antonio)
+2023,F84_historico,solo_secundario,107100,267,221,Hospital Dr. Gustavo Fricke (Viña del Mar)
+2023,F84_historico,solo_secundario,107101,45,43,Hospital San Martín (Quillota)
+2023,F84_historico,solo_secundario,107102,59,57,Hospital de Quilpué
+2023,F84_historico,solo_secundario,108100,40,36,Hospital de San Camilo (San Felipe)
+2023,F84_historico,solo_secundario,108101,20,20,Hospital San Juan de Dios (Los Andes)
+2023,F84_historico,solo_secundario,109100,21,20,"Complejo Hospitalario San José (Santiago, Independencia)"
+2023,F84_historico,solo_secundario,109101,252,191,"Hospital Clínico de Niños Dr. Roberto del Río (Santiago, Independencia)"
+2023,F84_historico,solo_secundario,110100,81,65,"Hospital San Juan de Dios (Santiago, Santiago)"
+2023,F84_historico,solo_secundario,110110,5,5,Instituto Traumatológico Dr. Teodoro Gebauer
+2023,F84_historico,solo_secundario,110120,119,109,"Hospital Dr. Félix Bulnes Cerda (Santiago, Quinta Normal)"
+2023,F84_historico,solo_secundario,110130,18,18,Hospital Adalberto Steeger (Talagante)
+2023,F84_historico,solo_secundario,110150,24,24,Hospital San José (Melipilla)
+2023,F84_historico,solo_secundario,111100,188,117,"Hospital Clínico San Borja-Arriarán (Santiago, Santiago)"
+2023,F84_historico,solo_secundario,111101,96,89,Hospital Clínico Metropolitano El Carmen Doctor Luis Valentín Ferrada
+2023,F84_historico,solo_secundario,111195,8,8,Hospital de Urgencia Asistencia Pública Dr. Alejandro del Río
+2023,F84_historico,solo_secundario,112100,22,17,"Hospital Del Salvador (Santiago, Providencia)"
+2023,F84_historico,solo_secundario,112101,16,16,"Hospital Dr. Luis Tisné B. (Santiago, Peñalolén)"
+2023,F84_historico,solo_secundario,112102,173,132,"Hospital de Niños Dr. Luis Calvo Mackenna (Santiago, Providencia)"
+2023,F84_historico,solo_secundario,112103,5,4,Instituto Nacional de Enfermedades Respiratorias y Cirugía Torácica
+2023,F84_historico,solo_secundario,112104,27,20,Instituto de Neurocirugía Dr. Alfonso Asenjo
+2023,F84_historico,solo_secundario,113100,26,26,"Hospital Barros Luco Trudeau (Santiago, San Miguel)"
+2023,F84_historico,solo_secundario,113130,334,294,"Hospital Dr. Exequiel González Cortés (Santiago, San Miguel)"
+2023,F84_historico,solo_secundario,113150,17,15,Hospital San Luis (Buin)
+2023,F84_historico,solo_secundario,113180,38,37,"Hospital El Pino (Santiago, San Bernardo)"
+2023,F84_historico,solo_secundario,114101,447,348,"Complejo Hospitalario Dr. Sótero del Río (Santiago, Puente Alto)"
+2023,F84_historico,solo_secundario,114103,66,60,Hospital Padre Alberto Hurtado (San Ramón)
+2023,F84_historico,solo_secundario,114105,115,106,Hospital Clínico Metropolitano La Florida Dra. Eloisa Díaz Inzunza
+2023,F84_historico,solo_secundario,115100,158,129,Hospital Regional de Rancagua
+2023,F84_historico,solo_secundario,115107,29,27,Hospital San Juan de Dios (San Fernando)
+2023,F84_historico,solo_secundario,115110,14,13,Hospital de Santa Cruz
+2023,F84_historico,solo_secundario,116100,47,45,Hospital San Juan de Dios (Curicó)
+2023,F84_historico,solo_secundario,116105,138,102,Hospital Dr. César Garavagno Burotto (Talca)
+2023,F84_historico,solo_secundario,116108,106,96,Hospital Presidente Carlos Ibáñez del Campo (Linares)
+2023,F84_historico,solo_secundario,116110,21,18,Hospital San José (Parral)
+2023,F84_historico,solo_secundario,117101,231,207,Hospital Clínico Herminda Martín (Chillán)
+2023,F84_historico,solo_secundario,117102,55,54,Hospital de San Carlos
+2023,F84_historico,solo_secundario,118100,298,256,Hospital Clínico Regional Dr. Guillermo Grant Benavente (Concepción)
+2023,F84_historico,solo_secundario,118105,47,40,Hospital San José (Coronel)
+2023,F84_historico,solo_secundario,118106,29,28,Hospital de Lota
+2023,F84_historico,solo_secundario,119100,180,157,Hospital Las Higueras (Talcahuano)
+2023,F84_historico,solo_secundario,119101,15,14,Hospital de Tomé
+2023,F84_historico,solo_secundario,120101,169,150,Complejo Asistencial Dr. Víctor Ríos Ruiz (Los Ángeles)
+2023,F84_historico,solo_secundario,121109,223,185,Hospital Dr. Hernán Henríquez Aravena (Temuco)
+2023,F84_historico,solo_secundario,121110,11,11,Hospital Dr. Abraham Godoy (Lautaro)
+2023,F84_historico,solo_secundario,121114,11,10,Hospital Intercultural de Nueva Imperial
+2023,F84_historico,solo_secundario,121117,10,8,Hospital de Pitrufquén
+2023,F84_historico,solo_secundario,121121,15,14,Hospital de Villarrica
+2023,F84_historico,solo_secundario,122100,85,68,Hospital Clínico Regional (Valdivia)
+2023,F84_historico,solo_secundario,123100,86,77,Hospital Base San José de Osorno
+2023,F84_historico,solo_secundario,124105,122,110,Hospital de Puerto Montt
+2023,F84_historico,solo_secundario,125100,41,35,Hospital Regional (Coihaique)
+2023,F84_historico,solo_secundario,126100,77,65,Hospital Clínico de Magallanes Dr. Lautaro Navarro Avaria
+2023,F84_historico,solo_secundario,128109,37,32,Hospital Provincial Dr. Rafael Avaría (Curanilahue)
+2023,F84_historico,solo_secundario,129100,41,38,Hospital Dr. Mauricio Heyermann (Angol)
+2023,F84_historico,solo_secundario,129106,25,20,Hospital San José (Victoria)
+2023,F84_historico,solo_secundario,133150,44,35,Hospital de Castro
+2024,F84_historico,principal,101100,12,11,Hospital Dr. Juan Noé Crevanni (Arica)
+2024,F84_historico,principal,102100,33,20,Hospital Dr. Ernesto Torres Galdames (Iquique)
+2024,F84_historico,principal,103100,21,20,Hospital Dr. Leonardo Guzmán (Antofagasta)
+2024,F84_historico,principal,103101,5,4,Hospital Dr. Carlos Cisternas (Calama)
+2024,F84_historico,principal,104103,1,1,Hospital Provincial del Huasco Monseñor Fernando Ariztía Ruiz (Vallenar)
+2024,F84_historico,principal,105101,5,5,Hospital San Pablo (Coquimbo)
+2024,F84_historico,principal,105102,1,1,Hospital Dr. Antonio Tirado Lanas (Ovalle)
+2024,F84_historico,principal,106100,1,1,Hospital Carlos Van Buren (Valparaíso)
+2024,F84_historico,principal,107100,2,2,Hospital Dr. Gustavo Fricke (Viña del Mar)
+2024,F84_historico,principal,107101,2,2,Hospital San Martín (Quillota)
+2024,F84_historico,principal,107102,1,1,Hospital de Quilpué
+2024,F84_historico,principal,108100,1,1,Hospital de San Camilo (San Felipe)
+2024,F84_historico,principal,108101,3,2,Hospital San Juan de Dios (Los Andes)
+2024,F84_historico,principal,109101,9,8,"Hospital Clínico de Niños Dr. Roberto del Río (Santiago, Independencia)"
+2024,F84_historico,principal,110100,1,1,"Hospital San Juan de Dios (Santiago, Santiago)"
+2024,F84_historico,principal,110120,2,2,"Hospital Dr. Félix Bulnes Cerda (Santiago, Quinta Normal)"
+2024,F84_historico,principal,111100,54,23,"Hospital Clínico San Borja-Arriarán (Santiago, Santiago)"
+2024,F84_historico,principal,111101,3,3,Hospital Clínico Metropolitano El Carmen Doctor Luis Valentín Ferrada
+2024,F84_historico,principal,112100,4,3,"Hospital Del Salvador (Santiago, Providencia)"
+2024,F84_historico,principal,112101,1,1,"Hospital Dr. Luis Tisné B. (Santiago, Peñalolén)"
+2024,F84_historico,principal,112102,7,7,"Hospital de Niños Dr. Luis Calvo Mackenna (Santiago, Providencia)"
+2024,F84_historico,principal,113100,2,2,"Hospital Barros Luco Trudeau (Santiago, San Miguel)"
+2024,F84_historico,principal,113130,10,7,"Hospital Dr. Exequiel González Cortés (Santiago, San Miguel)"
+2024,F84_historico,principal,113180,5,5,"Hospital El Pino (Santiago, San Bernardo)"
+2024,F84_historico,principal,114101,19,16,"Complejo Hospitalario Dr. Sótero del Río (Santiago, Puente Alto)"
+2024,F84_historico,principal,114103,1,1,Hospital Padre Alberto Hurtado (San Ramón)
+2024,F84_historico,principal,114105,4,4,Hospital Clínico Metropolitano La Florida Dra. Eloisa Díaz Inzunza
+2024,F84_historico,principal,115100,5,5,Hospital Regional de Rancagua
+2024,F84_historico,principal,116100,3,3,Hospital San Juan de Dios (Curicó)
+2024,F84_historico,principal,116105,7,7,Hospital Dr. César Garavagno Burotto (Talca)
+2024,F84_historico,principal,116107,3,2,Hospital de Constitución
+2024,F84_historico,principal,116111,1,1,Hospital San Juan de Dios (Cauquenes)
+2024,F84_historico,principal,117101,22,20,Hospital Clínico Herminda Martín (Chillán)
+2024,F84_historico,principal,117102,3,3,Hospital de San Carlos
+2024,F84_historico,principal,118100,12,10,Hospital Clínico Regional Dr. Guillermo Grant Benavente (Concepción)
+2024,F84_historico,principal,118105,2,2,Hospital San José (Coronel)
+2024,F84_historico,principal,118106,1,1,Hospital de Lota
+2024,F84_historico,principal,119100,10,9,Hospital Las Higueras (Talcahuano)
+2024,F84_historico,principal,119101,1,1,Hospital de Tomé
+2024,F84_historico,principal,119102,4,3,Hospital Penco - Lirquén
+2024,F84_historico,principal,120101,7,7,Complejo Asistencial Dr. Víctor Ríos Ruiz (Los Ángeles)
+2024,F84_historico,principal,121109,12,10,Hospital Dr. Hernán Henríquez Aravena (Temuco)
+2024,F84_historico,principal,121110,4,4,Hospital Dr. Abraham Godoy (Lautaro)
+2024,F84_historico,principal,121114,2,2,Hospital Intercultural de Nueva Imperial
+2024,F84_historico,principal,121117,4,2,Hospital de Pitrufquén
+2024,F84_historico,principal,121121,4,4,Hospital de Villarrica
+2024,F84_historico,principal,122100,5,5,Hospital Clínico Regional (Valdivia)
+2024,F84_historico,principal,123100,6,6,Hospital Base San José de Osorno
+2024,F84_historico,principal,124105,17,16,Hospital de Puerto Montt
+2024,F84_historico,principal,125100,14,8,Hospital Regional (Coihaique)
+2024,F84_historico,principal,126100,11,10,Hospital Clínico de Magallanes Dr. Lautaro Navarro Avaria
+2024,F84_historico,principal,129100,3,3,Hospital Dr. Mauricio Heyermann (Angol)
+2024,F84_historico,principal,129106,10,9,Hospital San José (Victoria)
+2024,F84_historico,principal,133150,2,2,Hospital de Castro
+2024,F84_historico,principal,200717,1,1,
+2024,F84_historico,principal_y_secundario,103100,2,2,Hospital Dr. Leonardo Guzmán (Antofagasta)
+2024,F84_historico,principal_y_secundario,104103,1,1,Hospital Provincial del Huasco Monseñor Fernando Ariztía Ruiz (Vallenar)
+2024,F84_historico,principal_y_secundario,112102,2,2,"Hospital de Niños Dr. Luis Calvo Mackenna (Santiago, Providencia)"
+2024,F84_historico,principal_y_secundario,114101,2,2,"Complejo Hospitalario Dr. Sótero del Río (Santiago, Puente Alto)"
+2024,F84_historico,principal_y_secundario,114103,1,1,Hospital Padre Alberto Hurtado (San Ramón)
+2024,F84_historico,principal_y_secundario,116108,1,1,Hospital Presidente Carlos Ibáñez del Campo (Linares)
+2024,F84_historico,principal_y_secundario,117101,2,2,Hospital Clínico Herminda Martín (Chillán)
+2024,F84_historico,principal_y_secundario,120101,1,1,Complejo Asistencial Dr. Víctor Ríos Ruiz (Los Ángeles)
+2024,F84_historico,principal_y_secundario,124105,3,3,Hospital de Puerto Montt
+2024,F84_historico,solo_secundario,101100,157,129,Hospital Dr. Juan Noé Crevanni (Arica)
+2024,F84_historico,solo_secundario,102100,181,160,Hospital Dr. Ernesto Torres Galdames (Iquique)
+2024,F84_historico,solo_secundario,103100,312,276,Hospital Dr. Leonardo Guzmán (Antofagasta)
+2024,F84_historico,solo_secundario,103101,131,116,Hospital Dr. Carlos Cisternas (Calama)
+2024,F84_historico,solo_secundario,104100,58,50,Hospital San José del Carmen (Copiapó)
+2024,F84_historico,solo_secundario,104103,31,26,Hospital Provincial del Huasco Monseñor Fernando Ariztía Ruiz (Vallenar)
+2024,F84_historico,solo_secundario,105100,208,186,Hospital San Juan de Dios (La Serena)
+2024,F84_historico,solo_secundario,105101,208,187,Hospital San Pablo (Coquimbo)
+2024,F84_historico,solo_secundario,105102,100,90,Hospital Dr. Antonio Tirado Lanas (Ovalle)
+2024,F84_historico,solo_secundario,106100,274,216,Hospital Carlos Van Buren (Valparaíso)
+2024,F84_historico,solo_secundario,106102,13,10,Hospital Dr. Eduardo Pereira Ramírez (Valparaíso)
+2024,F84_historico,solo_secundario,106103,39,37,Hospital Claudio Vicuña (San Antonio)
+2024,F84_historico,solo_secundario,107100,369,307,Hospital Dr. Gustavo Fricke (Viña del Mar)
+2024,F84_historico,solo_secundario,107101,94,81,Hospital San Martín (Quillota)
+2024,F84_historico,solo_secundario,107102,63,53,Hospital de Quilpué
+2024,F84_historico,solo_secundario,108100,41,40,Hospital de San Camilo (San Felipe)
+2024,F84_historico,solo_secundario,108101,22,21,Hospital San Juan de Dios (Los Andes)
+2024,F84_historico,solo_secundario,109100,38,37,"Complejo Hospitalario San José (Santiago, Independencia)"
+2024,F84_historico,solo_secundario,109101,325,271,"Hospital Clínico de Niños Dr. Roberto del Río (Santiago, Independencia)"
+2024,F84_historico,solo_secundario,110100,92,79,"Hospital San Juan de Dios (Santiago, Santiago)"
+2024,F84_historico,solo_secundario,110110,3,3,Instituto Traumatológico Dr. Teodoro Gebauer
+2024,F84_historico,solo_secundario,110120,152,142,"Hospital Dr. Félix Bulnes Cerda (Santiago, Quinta Normal)"
+2024,F84_historico,solo_secundario,110130,21,21,Hospital Adalberto Steeger (Talagante)
+2024,F84_historico,solo_secundario,110150,30,26,Hospital San José (Melipilla)
+2024,F84_historico,solo_secundario,111100,293,202,"Hospital Clínico San Borja-Arriarán (Santiago, Santiago)"
+2024,F84_historico,solo_secundario,111101,147,135,Hospital Clínico Metropolitano El Carmen Doctor Luis Valentín Ferrada
+2024,F84_historico,solo_secundario,111195,8,8,Hospital de Urgencia Asistencia Pública Dr. Alejandro del Río
+2024,F84_historico,solo_secundario,112100,39,37,"Hospital Del Salvador (Santiago, Providencia)"
+2024,F84_historico,solo_secundario,112101,14,14,"Hospital Dr. Luis Tisné B. (Santiago, Peñalolén)"
+2024,F84_historico,solo_secundario,112102,251,191,"Hospital de Niños Dr. Luis Calvo Mackenna (Santiago, Providencia)"
+2024,F84_historico,solo_secundario,112103,5,5,Instituto Nacional de Enfermedades Respiratorias y Cirugía Torácica
+2024,F84_historico,solo_secundario,112104,47,33,Instituto de Neurocirugía Dr. Alfonso Asenjo
+2024,F84_historico,solo_secundario,113100,39,36,"Hospital Barros Luco Trudeau (Santiago, San Miguel)"
+2024,F84_historico,solo_secundario,113130,515,450,"Hospital Dr. Exequiel González Cortés (Santiago, San Miguel)"
+2024,F84_historico,solo_secundario,113150,13,13,Hospital San Luis (Buin)
+2024,F84_historico,solo_secundario,113180,57,50,"Hospital El Pino (Santiago, San Bernardo)"
+2024,F84_historico,solo_secundario,114101,494,416,"Complejo Hospitalario Dr. Sótero del Río (Santiago, Puente Alto)"
+2024,F84_historico,solo_secundario,114103,105,95,Hospital Padre Alberto Hurtado (San Ramón)
+2024,F84_historico,solo_secundario,114105,156,134,Hospital Clínico Metropolitano La Florida Dra. Eloisa Díaz Inzunza
+2024,F84_historico,solo_secundario,115100,189,158,Hospital Regional de Rancagua
+2024,F84_historico,solo_secundario,115107,48,43,Hospital San Juan de Dios (San Fernando)
+2024,F84_historico,solo_secundario,115110,32,31,Hospital de Santa Cruz
+2024,F84_historico,solo_secundario,116100,124,104,Hospital San Juan de Dios (Curicó)
+2024,F84_historico,solo_secundario,116105,167,156,Hospital Dr. César Garavagno Burotto (Talca)
+2024,F84_historico,solo_secundario,116107,24,17,Hospital de Constitución
+2024,F84_historico,solo_secundario,116108,124,117,Hospital Presidente Carlos Ibáñez del Campo (Linares)
+2024,F84_historico,solo_secundario,116110,19,16,Hospital San José (Parral)
+2024,F84_historico,solo_secundario,116111,16,15,Hospital San Juan de Dios (Cauquenes)
+2024,F84_historico,solo_secundario,117101,257,222,Hospital Clínico Herminda Martín (Chillán)
+2024,F84_historico,solo_secundario,117102,87,74,Hospital de San Carlos
+2024,F84_historico,solo_secundario,118100,334,264,Hospital Clínico Regional Dr. Guillermo Grant Benavente (Concepción)
+2024,F84_historico,solo_secundario,118105,81,72,Hospital San José (Coronel)
+2024,F84_historico,solo_secundario,118106,57,49,Hospital de Lota
+2024,F84_historico,solo_secundario,119100,248,219,Hospital Las Higueras (Talcahuano)
+2024,F84_historico,solo_secundario,119101,26,19,Hospital de Tomé
+2024,F84_historico,solo_secundario,119102,82,68,Hospital Penco - Lirquén
+2024,F84_historico,solo_secundario,120101,203,178,Complejo Asistencial Dr. Víctor Ríos Ruiz (Los Ángeles)
+2024,F84_historico,solo_secundario,121109,282,240,Hospital Dr. Hernán Henríquez Aravena (Temuco)
+2024,F84_historico,solo_secundario,121110,33,28,Hospital Dr. Abraham Godoy (Lautaro)
+2024,F84_historico,solo_secundario,121114,22,22,Hospital Intercultural de Nueva Imperial
+2024,F84_historico,solo_secundario,121117,17,12,Hospital de Pitrufquén
+2024,F84_historico,solo_secundario,121121,49,38,Hospital de Villarrica
+2024,F84_historico,solo_secundario,122100,100,76,Hospital Clínico Regional (Valdivia)
+2024,F84_historico,solo_secundario,123100,146,125,Hospital Base San José de Osorno
+2024,F84_historico,solo_secundario,124105,164,149,Hospital de Puerto Montt
+2024,F84_historico,solo_secundario,125100,55,45,Hospital Regional (Coihaique)
+2024,F84_historico,solo_secundario,126100,74,62,Hospital Clínico de Magallanes Dr. Lautaro Navarro Avaria
+2024,F84_historico,solo_secundario,128109,26,23,Hospital Provincial Dr. Rafael Avaría (Curanilahue)
+2024,F84_historico,solo_secundario,129100,62,59,Hospital Dr. Mauricio Heyermann (Angol)
+2024,F84_historico,solo_secundario,129106,25,24,Hospital San José (Victoria)
+2024,F84_historico,solo_secundario,133150,57,51,Hospital de Castro
+2024,F84_historico,solo_secundario,200717,42,39,

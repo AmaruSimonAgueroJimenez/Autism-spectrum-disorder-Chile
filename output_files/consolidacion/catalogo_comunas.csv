@@ -1,0 +1,347 @@
+cut_comuna,comuna,comuna_norm,cut_region,region,region_short,continental
+1101,Iquique,IQUIQUE,1,Tarapacá,Tarapacá,True
+1107,Alto Hospicio,ALTO HOSPICIO,1,Tarapacá,Tarapacá,True
+1401,Pozo Almonte,POZO ALMONTE,1,Tarapacá,Tarapacá,True
+1402,Camiña,CAMINA,1,Tarapacá,Tarapacá,True
+1403,Colchane,COLCHANE,1,Tarapacá,Tarapacá,True
+1404,Huara,HUARA,1,Tarapacá,Tarapacá,True
+1405,Pica,PICA,1,Tarapacá,Tarapacá,True
+2101,Antofagasta,ANTOFAGASTA,2,Antofagasta,Antofagasta,True
+2102,Mejillones,MEJILLONES,2,Antofagasta,Antofagasta,True
+2103,Sierra Gorda,SIERRA GORDA,2,Antofagasta,Antofagasta,True
+2104,Taltal,TALTAL,2,Antofagasta,Antofagasta,True
+2201,Calama,CALAMA,2,Antofagasta,Antofagasta,True
+2202,Ollagüe,OLLAGUE,2,Antofagasta,Antofagasta,True
+2203,San Pedro de Atacama,SAN PEDRO DE ATACAMA,2,Antofagasta,Antofagasta,True
+2301,Tocopilla,TOCOPILLA,2,Antofagasta,Antofagasta,True
+2302,María Elena,MARIA ELENA,2,Antofagasta,Antofagasta,True
+3101,Copiapó,COPIAPO,3,Atacama,Atacama,True
+3102,Caldera,CALDERA,3,Atacama,Atacama,True
+3103,Tierra Amarilla,TIERRA AMARILLA,3,Atacama,Atacama,True
+3201,Chañaral,CHANARAL,3,Atacama,Atacama,True
+3202,Diego de Almagro,DIEGO DE ALMAGRO,3,Atacama,Atacama,True
+3301,Vallenar,VALLENAR,3,Atacama,Atacama,True
+3302,Alto del Carmen,ALTO DEL CARMEN,3,Atacama,Atacama,True
+3303,Freirina,FREIRINA,3,Atacama,Atacama,True
+3304,Huasco,HUASCO,3,Atacama,Atacama,True
+4101,La Serena,LA SERENA,4,Coquimbo,Coquimbo,True
+4102,Coquimbo,COQUIMBO,4,Coquimbo,Coquimbo,True
+4103,Andacollo,ANDACOLLO,4,Coquimbo,Coquimbo,True
+4104,La Higuera,LA HIGUERA,4,Coquimbo,Coquimbo,True
+4105,Paiguano,PAIGUANO,4,Coquimbo,Coquimbo,True
+4106,Vicuña,VICUNA,4,Coquimbo,Coquimbo,True
+4201,Illapel,ILLAPEL,4,Coquimbo,Coquimbo,True
+4202,Canela,CANELA,4,Coquimbo,Coquimbo,True
+4203,Los Vilos,LOS VILOS,4,Coquimbo,Coquimbo,True
+4204,Salamanca,SALAMANCA,4,Coquimbo,Coquimbo,True
+4301,Ovalle,OVALLE,4,Coquimbo,Coquimbo,True
+4302,Combarbalá,COMBARBALA,4,Coquimbo,Coquimbo,True
+4303,Monte Patria,MONTE PATRIA,4,Coquimbo,Coquimbo,True
+4304,Punitaqui,PUNITAQUI,4,Coquimbo,Coquimbo,True
+4305,Río Hurtado,RIO HURTADO,4,Coquimbo,Coquimbo,True
+5101,Valparaíso,VALPARAISO,5,Valparaíso,Valparaíso,True
+5102,Casablanca,CASABLANCA,5,Valparaíso,Valparaíso,True
+5103,Concón,CONCON,5,Valparaíso,Valparaíso,True
+5104,Juan Fernández,JUAN FERNANDEZ,5,Valparaíso,Valparaíso,False
+5105,Puchuncaví,PUCHUNCAVI,5,Valparaíso,Valparaíso,True
+5107,Quintero,QUINTERO,5,Valparaíso,Valparaíso,True
+5109,Viña del Mar,VINA DEL MAR,5,Valparaíso,Valparaíso,True
+5201,Isla de Pascua,ISLA DE PASCUA,5,Valparaíso,Valparaíso,False
+5301,Los Andes,LOS ANDES,5,Valparaíso,Valparaíso,True
+5302,Calle Larga,CALLE LARGA,5,Valparaíso,Valparaíso,True
+5303,Rinconada,RINCONADA,5,Valparaíso,Valparaíso,True
+5304,San Esteban,SAN ESTEBAN,5,Valparaíso,Valparaíso,True
+5401,La Ligua,LA LIGUA,5,Valparaíso,Valparaíso,True
+5402,Cabildo,CABILDO,5,Valparaíso,Valparaíso,True
+5403,Papudo,PAPUDO,5,Valparaíso,Valparaíso,True
+5404,Petorca,PETORCA,5,Valparaíso,Valparaíso,True
+5405,Zapallar,ZAPALLAR,5,Valparaíso,Valparaíso,True
+5501,Quillota,QUILLOTA,5,Valparaíso,Valparaíso,True
+5502,Calera,CALERA,5,Valparaíso,Valparaíso,True
+5503,Hijuelas,HIJUELAS,5,Valparaíso,Valparaíso,True
+5504,La Cruz,LA CRUZ,5,Valparaíso,Valparaíso,True
+5506,Nogales,NOGALES,5,Valparaíso,Valparaíso,True
+5601,San Antonio,SAN ANTONIO,5,Valparaíso,Valparaíso,True
+5602,Algarrobo,ALGARROBO,5,Valparaíso,Valparaíso,True
+5603,Cartagena,CARTAGENA,5,Valparaíso,Valparaíso,True
+5604,El Quisco,EL QUISCO,5,Valparaíso,Valparaíso,True
+5605,El Tabo,EL TABO,5,Valparaíso,Valparaíso,True
+5606,Santo Domingo,SANTO DOMINGO,5,Valparaíso,Valparaíso,True
+5701,San Felipe,SAN FELIPE,5,Valparaíso,Valparaíso,True
+5702,Catemu,CATEMU,5,Valparaíso,Valparaíso,True
+5703,Llaillay,LLAILLAY,5,Valparaíso,Valparaíso,True
+5704,Panquehue,PANQUEHUE,5,Valparaíso,Valparaíso,True
+5705,Putaendo,PUTAENDO,5,Valparaíso,Valparaíso,True
+5706,Santa María,SANTA MARIA,5,Valparaíso,Valparaíso,True
+5801,Quilpué,QUILPUE,5,Valparaíso,Valparaíso,True
+5802,Limache,LIMACHE,5,Valparaíso,Valparaíso,True
+5803,Olmué,OLMUE,5,Valparaíso,Valparaíso,True
+5804,Villa Alemana,VILLA ALEMANA,5,Valparaíso,Valparaíso,True
+6101,Rancagua,RANCAGUA,6,Libertador General Bernardo O'Higgins,O'Higgins,True
+6102,Codegua,CODEGUA,6,Libertador General Bernardo O'Higgins,O'Higgins,True
+6103,Coinco,COINCO,6,Libertador General Bernardo O'Higgins,O'Higgins,True
+6104,Coltauco,COLTAUCO,6,Libertador General Bernardo O'Higgins,O'Higgins,True
+6105,Doñihue,DONIHUE,6,Libertador General Bernardo O'Higgins,O'Higgins,True
+6106,Graneros,GRANEROS,6,Libertador General Bernardo O'Higgins,O'Higgins,True
+6107,Las Cabras,LAS CABRAS,6,Libertador General Bernardo O'Higgins,O'Higgins,True
+6108,Machalí,MACHALI,6,Libertador General Bernardo O'Higgins,O'Higgins,True
+6109,Malloa,MALLOA,6,Libertador General Bernardo O'Higgins,O'Higgins,True
+6110,Mostazal,MOSTAZAL,6,Libertador General Bernardo O'Higgins,O'Higgins,True
+6111,Olivar,OLIVAR,6,Libertador General Bernardo O'Higgins,O'Higgins,True
+6112,Peumo,PEUMO,6,Libertador General Bernardo O'Higgins,O'Higgins,True
+6113,Pichidegua,PICHIDEGUA,6,Libertador General Bernardo O'Higgins,O'Higgins,True
+6114,Quinta de Tilcoco,QUINTA DE TILCOCO,6,Libertador General Bernardo O'Higgins,O'Higgins,True
+6115,Rengo,RENGO,6,Libertador General Bernardo O'Higgins,O'Higgins,True
+6116,Requínoa,REQUINOA,6,Libertador General Bernardo O'Higgins,O'Higgins,True
+6117,San Vicente,SAN VICENTE,6,Libertador General Bernardo O'Higgins,O'Higgins,True
+6201,Pichilemu,PICHILEMU,6,Libertador General Bernardo O'Higgins,O'Higgins,True
+6202,La Estrella,LA ESTRELLA,6,Libertador General Bernardo O'Higgins,O'Higgins,True
+6203,Litueche,LITUECHE,6,Libertador General Bernardo O'Higgins,O'Higgins,True
+6204,Marchihue,MARCHIHUE,6,Libertador General Bernardo O'Higgins,O'Higgins,True
+6205,Navidad,NAVIDAD,6,Libertador General Bernardo O'Higgins,O'Higgins,True
+6206,Paredones,PAREDONES,6,Libertador General Bernardo O'Higgins,O'Higgins,True
+6301,San Fernando,SAN FERNANDO,6,Libertador General Bernardo O'Higgins,O'Higgins,True
+6302,Chépica,CHEPICA,6,Libertador General Bernardo O'Higgins,O'Higgins,True
+6303,Chimbarongo,CHIMBARONGO,6,Libertador General Bernardo O'Higgins,O'Higgins,True
+6304,Lolol,LOLOL,6,Libertador General Bernardo O'Higgins,O'Higgins,True
+6305,Nancagua,NANCAGUA,6,Libertador General Bernardo O'Higgins,O'Higgins,True
+6306,Palmilla,PALMILLA,6,Libertador General Bernardo O'Higgins,O'Higgins,True
+6307,Peralillo,PERALILLO,6,Libertador General Bernardo O'Higgins,O'Higgins,True
+6308,Placilla,PLACILLA,6,Libertador General Bernardo O'Higgins,O'Higgins,True
+6309,Pumanque,PUMANQUE,6,Libertador General Bernardo O'Higgins,O'Higgins,True
+6310,Santa Cruz,SANTA CRUZ,6,Libertador General Bernardo O'Higgins,O'Higgins,True
+7101,Talca,TALCA,7,Maule,Maule,True
+7102,Constitución,CONSTITUCION,7,Maule,Maule,True
+7103,Curepto,CUREPTO,7,Maule,Maule,True
+7104,Empedrado,EMPEDRADO,7,Maule,Maule,True
+7105,Maule,MAULE,7,Maule,Maule,True
+7106,Pelarco,PELARCO,7,Maule,Maule,True
+7107,Pencahue,PENCAHUE,7,Maule,Maule,True
+7108,Río Claro,RIO CLARO,7,Maule,Maule,True
+7109,San Clemente,SAN CLEMENTE,7,Maule,Maule,True
+7110,San Rafael,SAN RAFAEL,7,Maule,Maule,True
+7201,Cauquenes,CAUQUENES,7,Maule,Maule,True
+7202,Chanco,CHANCO,7,Maule,Maule,True
+7203,Pelluhue,PELLUHUE,7,Maule,Maule,True
+7301,Curicó,CURICO,7,Maule,Maule,True
+7302,Hualañé,HUALANE,7,Maule,Maule,True
+7303,Licantén,LICANTEN,7,Maule,Maule,True
+7304,Molina,MOLINA,7,Maule,Maule,True
+7305,Rauco,RAUCO,7,Maule,Maule,True
+7306,Romeral,ROMERAL,7,Maule,Maule,True
+7307,Sagrada Familia,SAGRADA FAMILIA,7,Maule,Maule,True
+7308,Teno,TENO,7,Maule,Maule,True
+7309,Vichuquén,VICHUQUEN,7,Maule,Maule,True
+7401,Linares,LINARES,7,Maule,Maule,True
+7402,Colbún,COLBUN,7,Maule,Maule,True
+7403,Longaví,LONGAVI,7,Maule,Maule,True
+7404,Parral,PARRAL,7,Maule,Maule,True
+7405,Retiro,RETIRO,7,Maule,Maule,True
+7406,San Javier,SAN JAVIER,7,Maule,Maule,True
+7407,Villa Alegre,VILLA ALEGRE,7,Maule,Maule,True
+7408,Yerbas Buenas,YERBAS BUENAS,7,Maule,Maule,True
+8101,Concepción,CONCEPCION,8,Biobío,Biobío,True
+8102,Coronel,CORONEL,8,Biobío,Biobío,True
+8103,Chiguayante,CHIGUAYANTE,8,Biobío,Biobío,True
+8104,Florida,FLORIDA,8,Biobío,Biobío,True
+8105,Hualqui,HUALQUI,8,Biobío,Biobío,True
+8106,Lota,LOTA,8,Biobío,Biobío,True
+8107,Penco,PENCO,8,Biobío,Biobío,True
+8108,San Pedro de la Paz,SAN PEDRO DE LA PAZ,8,Biobío,Biobío,True
+8109,Santa Juana,SANTA JUANA,8,Biobío,Biobío,True
+8110,Talcahuano,TALCAHUANO,8,Biobío,Biobío,True
+8111,Tomé,TOME,8,Biobío,Biobío,True
+8112,Hualpén,HUALPEN,8,Biobío,Biobío,True
+8201,Lebu,LEBU,8,Biobío,Biobío,True
+8202,Arauco,ARAUCO,8,Biobío,Biobío,True
+8203,Cañete,CANETE,8,Biobío,Biobío,True
+8204,Contulmo,CONTULMO,8,Biobío,Biobío,True
+8205,Curanilahue,CURANILAHUE,8,Biobío,Biobío,True
+8206,Los Álamos,LOS ALAMOS,8,Biobío,Biobío,True
+8207,Tirúa,TIRUA,8,Biobío,Biobío,True
+8301,Los Angeles,LOS ANGELES,8,Biobío,Biobío,True
+8302,Antuco,ANTUCO,8,Biobío,Biobío,True
+8303,Cabrero,CABRERO,8,Biobío,Biobío,True
+8304,Laja,LAJA,8,Biobío,Biobío,True
+8305,Mulchén,MULCHEN,8,Biobío,Biobío,True
+8306,Nacimiento,NACIMIENTO,8,Biobío,Biobío,True
+8307,Negrete,NEGRETE,8,Biobío,Biobío,True
+8308,Quilaco,QUILACO,8,Biobío,Biobío,True
+8309,Quilleco,QUILLECO,8,Biobío,Biobío,True
+8310,San Rosendo,SAN ROSENDO,8,Biobío,Biobío,True
+8311,Santa Bárbara,SANTA BARBARA,8,Biobío,Biobío,True
+8312,Tucapel,TUCAPEL,8,Biobío,Biobío,True
+8313,Yumbel,YUMBEL,8,Biobío,Biobío,True
+8314,Alto Biobío,ALTO BIOBIO,8,Biobío,Biobío,True
+9101,Temuco,TEMUCO,9,La Araucanía,La Araucanía,True
+9102,Carahue,CARAHUE,9,La Araucanía,La Araucanía,True
+9103,Cunco,CUNCO,9,La Araucanía,La Araucanía,True
+9104,Curarrehue,CURARREHUE,9,La Araucanía,La Araucanía,True
+9105,Freire,FREIRE,9,La Araucanía,La Araucanía,True
+9106,Galvarino,GALVARINO,9,La Araucanía,La Araucanía,True
+9107,Gorbea,GORBEA,9,La Araucanía,La Araucanía,True
+9108,Lautaro,LAUTARO,9,La Araucanía,La Araucanía,True
+9109,Loncoche,LONCOCHE,9,La Araucanía,La Araucanía,True
+9110,Melipeuco,MELIPEUCO,9,La Araucanía,La Araucanía,True
+9111,Nueva Imperial,NUEVA IMPERIAL,9,La Araucanía,La Araucanía,True
+9112,Padre Las Casas,PADRE LAS CASAS,9,La Araucanía,La Araucanía,True
+9113,Perquenco,PERQUENCO,9,La Araucanía,La Araucanía,True
+9114,Pitrufquen,PITRUFQUEN,9,La Araucanía,La Araucanía,True
+9115,Pucón,PUCON,9,La Araucanía,La Araucanía,True
+9116,Saavedra,SAAVEDRA,9,La Araucanía,La Araucanía,True
+9117,Teodoro Schmidt,TEODORO SCHMIDT,9,La Araucanía,La Araucanía,True
+9118,Toltén,TOLTEN,9,La Araucanía,La Araucanía,True
+9119,Vilcún,VILCUN,9,La Araucanía,La Araucanía,True
+9120,Villarrica,VILLARRICA,9,La Araucanía,La Araucanía,True
+9121,Cholchol,CHOLCHOL,9,La Araucanía,La Araucanía,True
+9201,Angol,ANGOL,9,La Araucanía,La Araucanía,True
+9202,Collipulli,COLLIPULLI,9,La Araucanía,La Araucanía,True
+9203,Curacautín,CURACAUTIN,9,La Araucanía,La Araucanía,True
+9204,Ercilla,ERCILLA,9,La Araucanía,La Araucanía,True
+9205,Lonquimay,LONQUIMAY,9,La Araucanía,La Araucanía,True
+9206,Los Sauces,LOS SAUCES,9,La Araucanía,La Araucanía,True
+9207,Lumaco,LUMACO,9,La Araucanía,La Araucanía,True
+9208,Purén,PUREN,9,La Araucanía,La Araucanía,True
+9209,Renaico,RENAICO,9,La Araucanía,La Araucanía,True
+9210,Traiguén,TRAIGUEN,9,La Araucanía,La Araucanía,True
+9211,Victoria,VICTORIA,9,La Araucanía,La Araucanía,True
+10101,Puerto Montt,PUERTO MONTT,10,Los Lagos,Los Lagos,True
+10102,Calbuco,CALBUCO,10,Los Lagos,Los Lagos,True
+10103,Cochamó,COCHAMO,10,Los Lagos,Los Lagos,True
+10104,Fresia,FRESIA,10,Los Lagos,Los Lagos,True
+10105,Frutillar,FRUTILLAR,10,Los Lagos,Los Lagos,True
+10106,Los Muermos,LOS MUERMOS,10,Los Lagos,Los Lagos,True
+10107,Llanquihue,LLANQUIHUE,10,Los Lagos,Los Lagos,True
+10108,Maullín,MAULLIN,10,Los Lagos,Los Lagos,True
+10109,Puerto Varas,PUERTO VARAS,10,Los Lagos,Los Lagos,True
+10201,Castro,CASTRO,10,Los Lagos,Los Lagos,True
+10202,Ancud,ANCUD,10,Los Lagos,Los Lagos,True
+10203,Chonchi,CHONCHI,10,Los Lagos,Los Lagos,True
+10204,Curaco de Vélez,CURACO DE VELEZ,10,Los Lagos,Los Lagos,True
+10205,Dalcahue,DALCAHUE,10,Los Lagos,Los Lagos,True
+10206,Puqueldón,PUQUELDON,10,Los Lagos,Los Lagos,True
+10207,Queilén,QUEILEN,10,Los Lagos,Los Lagos,True
+10208,Quellón,QUELLON,10,Los Lagos,Los Lagos,True
+10209,Quemchi,QUEMCHI,10,Los Lagos,Los Lagos,True
+10210,Quinchao,QUINCHAO,10,Los Lagos,Los Lagos,True
+10301,Osorno,OSORNO,10,Los Lagos,Los Lagos,True
+10302,Puerto Octay,PUERTO OCTAY,10,Los Lagos,Los Lagos,True
+10303,Purranque,PURRANQUE,10,Los Lagos,Los Lagos,True
+10304,Puyehue,PUYEHUE,10,Los Lagos,Los Lagos,True
+10305,Río Negro,RIO NEGRO,10,Los Lagos,Los Lagos,True
+10306,San Juan de la Costa,SAN JUAN DE LA COSTA,10,Los Lagos,Los Lagos,True
+10307,San Pablo,SAN PABLO,10,Los Lagos,Los Lagos,True
+10401,Chaitén,CHAITEN,10,Los Lagos,Los Lagos,True
+10402,Futaleufú,FUTALEUFU,10,Los Lagos,Los Lagos,True
+10403,Hualaihué,HUALAIHUE,10,Los Lagos,Los Lagos,True
+10404,Palena,PALENA,10,Los Lagos,Los Lagos,True
+11101,Coyhaique,COYHAIQUE,11,Aysén del General Carlos Ibáñez del Campo,Aysén,True
+11102,Lago Verde,LAGO VERDE,11,Aysén del General Carlos Ibáñez del Campo,Aysén,True
+11201,Aysén,AYSEN,11,Aysén del General Carlos Ibáñez del Campo,Aysén,True
+11202,Cisnes,CISNES,11,Aysén del General Carlos Ibáñez del Campo,Aysén,True
+11203,Guaitecas,GUAITECAS,11,Aysén del General Carlos Ibáñez del Campo,Aysén,True
+11301,Cochrane,COCHRANE,11,Aysén del General Carlos Ibáñez del Campo,Aysén,True
+11302,O'Higgins,O HIGGINS,11,Aysén del General Carlos Ibáñez del Campo,Aysén,True
+11303,Tortel,TORTEL,11,Aysén del General Carlos Ibáñez del Campo,Aysén,True
+11401,Chile Chico,CHILE CHICO,11,Aysén del General Carlos Ibáñez del Campo,Aysén,True
+11402,Río Ibáñez,RIO IBANEZ,11,Aysén del General Carlos Ibáñez del Campo,Aysén,True
+12101,Punta Arenas,PUNTA ARENAS,12,Magallanes y de la Antártica Chilena,Magallanes,True
+12102,Laguna Blanca,LAGUNA BLANCA,12,Magallanes y de la Antártica Chilena,Magallanes,True
+12103,Río Verde,RIO VERDE,12,Magallanes y de la Antártica Chilena,Magallanes,True
+12104,San Gregorio,SAN GREGORIO,12,Magallanes y de la Antártica Chilena,Magallanes,True
+12201,Cabo de Hornos,CABO DE HORNOS,12,Magallanes y de la Antártica Chilena,Magallanes,False
+12202,Antártica,ANTARTICA,12,Magallanes y de la Antártica Chilena,Magallanes,False
+12301,Porvenir,PORVENIR,12,Magallanes y de la Antártica Chilena,Magallanes,True
+12302,Primavera,PRIMAVERA,12,Magallanes y de la Antártica Chilena,Magallanes,True
+12303,Timaukel,TIMAUKEL,12,Magallanes y de la Antártica Chilena,Magallanes,True
+12401,Natales,NATALES,12,Magallanes y de la Antártica Chilena,Magallanes,True
+12402,Torres del Paine,TORRES DEL PAINE,12,Magallanes y de la Antártica Chilena,Magallanes,True
+13101,Santiago,SANTIAGO,13,Metropolitana de Santiago,Metropolitana,True
+13102,Cerrillos,CERRILLOS,13,Metropolitana de Santiago,Metropolitana,True
+13103,Cerro Navia,CERRO NAVIA,13,Metropolitana de Santiago,Metropolitana,True
+13104,Conchalí,CONCHALI,13,Metropolitana de Santiago,Metropolitana,True
+13105,El Bosque,EL BOSQUE,13,Metropolitana de Santiago,Metropolitana,True
+13106,Estación Central,ESTACION CENTRAL,13,Metropolitana de Santiago,Metropolitana,True
+13107,Huechuraba,HUECHURABA,13,Metropolitana de Santiago,Metropolitana,True
+13108,Independencia,INDEPENDENCIA,13,Metropolitana de Santiago,Metropolitana,True
+13109,La Cisterna,LA CISTERNA,13,Metropolitana de Santiago,Metropolitana,True
+13110,La Florida,LA FLORIDA,13,Metropolitana de Santiago,Metropolitana,True
+13111,La Granja,LA GRANJA,13,Metropolitana de Santiago,Metropolitana,True
+13112,La Pintana,LA PINTANA,13,Metropolitana de Santiago,Metropolitana,True
+13113,La Reina,LA REINA,13,Metropolitana de Santiago,Metropolitana,True
+13114,Las Condes,LAS CONDES,13,Metropolitana de Santiago,Metropolitana,True
+13115,Lo Barnechea,LO BARNECHEA,13,Metropolitana de Santiago,Metropolitana,True
+13116,Lo Espejo,LO ESPEJO,13,Metropolitana de Santiago,Metropolitana,True
+13117,Lo Prado,LO PRADO,13,Metropolitana de Santiago,Metropolitana,True
+13118,Macul,MACUL,13,Metropolitana de Santiago,Metropolitana,True
+13119,Maipú,MAIPU,13,Metropolitana de Santiago,Metropolitana,True
+13120,Ñuñoa,NUNOA,13,Metropolitana de Santiago,Metropolitana,True
+13121,Pedro Aguirre Cerda,PEDRO AGUIRRE CERDA,13,Metropolitana de Santiago,Metropolitana,True
+13122,Peñalolén,PENALOLEN,13,Metropolitana de Santiago,Metropolitana,True
+13123,Providencia,PROVIDENCIA,13,Metropolitana de Santiago,Metropolitana,True
+13124,Pudahuel,PUDAHUEL,13,Metropolitana de Santiago,Metropolitana,True
+13125,Quilicura,QUILICURA,13,Metropolitana de Santiago,Metropolitana,True
+13126,Quinta Normal,QUINTA NORMAL,13,Metropolitana de Santiago,Metropolitana,True
+13127,Recoleta,RECOLETA,13,Metropolitana de Santiago,Metropolitana,True
+13128,Renca,RENCA,13,Metropolitana de Santiago,Metropolitana,True
+13129,San Joaquín,SAN JOAQUIN,13,Metropolitana de Santiago,Metropolitana,True
+13130,San Miguel,SAN MIGUEL,13,Metropolitana de Santiago,Metropolitana,True
+13131,San Ramón,SAN RAMON,13,Metropolitana de Santiago,Metropolitana,True
+13132,Vitacura,VITACURA,13,Metropolitana de Santiago,Metropolitana,True
+13201,Puente Alto,PUENTE ALTO,13,Metropolitana de Santiago,Metropolitana,True
+13202,Pirque,PIRQUE,13,Metropolitana de Santiago,Metropolitana,True
+13203,San José de Maipo,SAN JOSE DE MAIPO,13,Metropolitana de Santiago,Metropolitana,True
+13301,Colina,COLINA,13,Metropolitana de Santiago,Metropolitana,True
+13302,Lampa,LAMPA,13,Metropolitana de Santiago,Metropolitana,True
+13303,Tiltil,TILTIL,13,Metropolitana de Santiago,Metropolitana,True
+13401,San Bernardo,SAN BERNARDO,13,Metropolitana de Santiago,Metropolitana,True
+13402,Buin,BUIN,13,Metropolitana de Santiago,Metropolitana,True
+13403,Calera de Tango,CALERA DE TANGO,13,Metropolitana de Santiago,Metropolitana,True
+13404,Paine,PAINE,13,Metropolitana de Santiago,Metropolitana,True
+13501,Melipilla,MELIPILLA,13,Metropolitana de Santiago,Metropolitana,True
+13502,Alhué,ALHUE,13,Metropolitana de Santiago,Metropolitana,True
+13503,Curacaví,CURACAVI,13,Metropolitana de Santiago,Metropolitana,True
+13504,María Pinto,MARIA PINTO,13,Metropolitana de Santiago,Metropolitana,True
+13505,San Pedro,SAN PEDRO,13,Metropolitana de Santiago,Metropolitana,True
+13601,Talagante,TALAGANTE,13,Metropolitana de Santiago,Metropolitana,True
+13602,El Monte,EL MONTE,13,Metropolitana de Santiago,Metropolitana,True
+13603,Isla de Maipo,ISLA DE MAIPO,13,Metropolitana de Santiago,Metropolitana,True
+13604,Padre Hurtado,PADRE HURTADO,13,Metropolitana de Santiago,Metropolitana,True
+13605,Peñaflor,PENAFLOR,13,Metropolitana de Santiago,Metropolitana,True
+14101,Valdivia,VALDIVIA,14,Los Ríos,Los Ríos,True
+14102,Corral,CORRAL,14,Los Ríos,Los Ríos,True
+14103,Lanco,LANCO,14,Los Ríos,Los Ríos,True
+14104,Los Lagos,LOS LAGOS,14,Los Ríos,Los Ríos,True
+14105,Máfil,MAFIL,14,Los Ríos,Los Ríos,True
+14106,Mariquina,MARIQUINA,14,Los Ríos,Los Ríos,True
+14107,Paillaco,PAILLACO,14,Los Ríos,Los Ríos,True
+14108,Panguipulli,PANGUIPULLI,14,Los Ríos,Los Ríos,True
+14201,La Unión,LA UNION,14,Los Ríos,Los Ríos,True
+14202,Futrono,FUTRONO,14,Los Ríos,Los Ríos,True
+14203,Lago Ranco,LAGO RANCO,14,Los Ríos,Los Ríos,True
+14204,Río Bueno,RIO BUENO,14,Los Ríos,Los Ríos,True
+15101,Arica,ARICA,15,Arica y Parinacota,Arica y Parinacota,True
+15102,Camarones,CAMARONES,15,Arica y Parinacota,Arica y Parinacota,True
+15201,Putre,PUTRE,15,Arica y Parinacota,Arica y Parinacota,True
+15202,General Lagos,GENERAL LAGOS,15,Arica y Parinacota,Arica y Parinacota,True
+16101,Chillán,CHILLAN,16,Ñuble,Ñuble,True
+16102,Bulnes,BULNES,16,Ñuble,Ñuble,True
+16103,Chillán Viejo,CHILLAN VIEJO,16,Ñuble,Ñuble,True
+16104,El Carmen,EL CARMEN,16,Ñuble,Ñuble,True
+16105,Pemuco,PEMUCO,16,Ñuble,Ñuble,True
+16106,Pinto,PINTO,16,Ñuble,Ñuble,True
+16107,Quillón,QUILLON,16,Ñuble,Ñuble,True
+16108,San Ignacio,SAN IGNACIO,16,Ñuble,Ñuble,True
+16109,Yungay,YUNGAY,16,Ñuble,Ñuble,True
+16201,Quirihue,QUIRIHUE,16,Ñuble,Ñuble,True
+16202,Cobquecura,COBQUECURA,16,Ñuble,Ñuble,True
+16203,Coelemu,COELEMU,16,Ñuble,Ñuble,True
+16204,Ninhue,NINHUE,16,Ñuble,Ñuble,True
+16205,Portezuelo,PORTEZUELO,16,Ñuble,Ñuble,True
+16206,Ránquil,RANQUIL,16,Ñuble,Ñuble,True
+16207,Treguaco,TREGUACO,16,Ñuble,Ñuble,True
+16301,San Carlos,SAN CARLOS,16,Ñuble,Ñuble,True
+16302,Coihueco,COIHUECO,16,Ñuble,Ñuble,True
+16303,Ñiquén,NIQUEN,16,Ñuble,Ñuble,True
+16304,San Fabián,SAN FABIAN,16,Ñuble,Ñuble,True
+16305,San Nicolás,SAN NICOLAS,16,Ñuble,Ñuble,True

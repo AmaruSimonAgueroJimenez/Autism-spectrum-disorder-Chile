@@ -7,7 +7,7 @@
 <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=yes">
 
 
-<title>Autismo en Chile</title>
+<title>Metodología</title>
 <style>
 code{white-space: pre-wrap;}
 span.smallcaps{font-variant: small-caps;}
@@ -19,7 +19,27 @@ ul.task-list li input[type="checkbox"] {
 width: 0.8em;
 margin: 0 0.8em 0.2em -1em;  vertical-align: middle;
 }
-</style>
+
+div.csl-bib-body { }
+div.csl-entry {
+clear: both;
+margin-bottom: 0em;
+}
+.hanging-indent div.csl-entry {
+margin-left:2em;
+text-indent:-2em;
+}
+div.csl-left-margin {
+min-width:2em;
+float:left;
+}
+div.csl-right-inline {
+margin-left:2em;
+padding-left:1em;
+}
+div.csl-indent {
+margin-left: 2em;
+}</style>
 
 
 <script src="https://cdnjs.cloudflare.com/ajax/libs/jquery/3.5.1/jquery.min.js" integrity="sha512-bLT0Qm9VnAYZDflyKcBaQ2gg0hSYNQrJ8RilYldYQ1FxQYoCLtUjuuRuZo+fjqhx/qtq/1itJ0C2ejDxltZVFg==" crossorigin="anonymous"></script><script>/*!
@@ -2136,6 +2156,44 @@ vertical-align: -.125em;
 
 <script type="application/javascript">define('jquery', [],function() {return window.jQuery;})</script>
 
+  <script src="https://cdnjs.cloudflare.com/polyfill/v3/polyfill.min.js?features=es6"></script>
+  
+  <script>
+    (function () {
+      var script = document.createElement("script");
+      script.type = "text/javascript";
+      script.src  = "https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-chtml-full.js";
+      document.getElementsByTagName("head")[0].appendChild(script);
+    })();
+  </script>
+
+
+<script type="text/javascript">
+const typesetMath = (el) => {
+  if (window.MathJax) {
+    // MathJax Typeset
+    window.MathJax.typeset([el]);
+  } else if (window.katex) {
+    // KaTeX Render
+    var mathElements = el.getElementsByClassName("math");
+    var macros = [];
+    for (var i = 0; i < mathElements.length; i++) {
+      var texText = mathElements[i].firstChild;
+      if (mathElements[i].tagName == "SPAN") {
+        window.katex.render(texText.data, mathElements[i], {
+          displayMode: mathElements[i].classList.contains('display'),
+          throwOnError: false,
+          macros: macros,
+          fleqn: false
+        });
+      }
+    }
+  }
+}
+window.Quarto = {
+  typesetMath
+};
+</script>
 
 <style type="text/css">:root { --report-ink: #21334a; --report-accent: #167482; }
 body { color: var(--report-ink); }
@@ -2166,10 +2224,37 @@ h2 { padding-top: .7rem; }
     <h2 id="toc-title">Tabla de contenidos</h2>
    
   <ul>
-  <li><a href="#tres-preguntas-dos-fuentes" id="toc-tres-preguntas-dos-fuentes" class="nav-link active" data-scroll-target="#tres-preguntas-dos-fuentes">Tres preguntas, dos fuentes</a></li>
-  <li><a href="#resultados-principales" id="toc-resultados-principales" class="nav-link" data-scroll-target="#resultados-principales">Resultados principales</a></li>
-  <li><a href="#cómo-están-organizados-los-análisis" id="toc-cómo-están-organizados-los-análisis" class="nav-link" data-scroll-target="#cómo-están-organizados-los-análisis">Cómo están organizados los análisis</a></li>
-  <li><a href="#prioridades-de-interpretación" id="toc-prioridades-de-interpretación" class="nav-link" data-scroll-target="#prioridades-de-interpretación">Prioridades de interpretación</a></li>
+  <li><a href="#diseño-y-preguntas" id="toc-diseño-y-preguntas" class="nav-link active" data-scroll-target="#diseño-y-preguntas">Diseño y preguntas</a></li>
+  <li><a href="#contexto-epidemiológico" id="toc-contexto-epidemiológico" class="nav-link" data-scroll-target="#contexto-epidemiológico">Contexto epidemiológico</a></li>
+  <li><a href="#fuentes-de-datos" id="toc-fuentes-de-datos" class="nav-link" data-scroll-target="#fuentes-de-datos">Fuentes de datos</a>
+  <ul class="collapse">
+  <li><a href="#egresos-hospitalarios-agrupados-por-grd" id="toc-egresos-hospitalarios-agrupados-por-grd" class="nav-link" data-scroll-target="#egresos-hospitalarios-agrupados-por-grd">Egresos hospitalarios agrupados por GRD</a></li>
+  <li><a href="#resúmenes-estadísticos-mensuales-rem-serie-a" id="toc-resúmenes-estadísticos-mensuales-rem-serie-a" class="nav-link" data-scroll-target="#resúmenes-estadísticos-mensuales-rem-serie-a">Resúmenes Estadísticos Mensuales (REM), Serie A</a></li>
+  <li><a href="#denominadores-poblacionales-y-cartografía" id="toc-denominadores-poblacionales-y-cartografía" class="nav-link" data-scroll-target="#denominadores-poblacionales-y-cartografía">Denominadores poblacionales y cartografía</a></li>
+  </ul></li>
+  <li><a href="#definiciones-de-caso" id="toc-definiciones-de-caso" class="nav-link" data-scroll-target="#definiciones-de-caso">Definiciones de caso</a>
+  <ul class="collapse">
+  <li><a href="#códigos-cie-10-en-grd" id="toc-códigos-cie-10-en-grd" class="nav-link" data-scroll-target="#códigos-cie-10-en-grd">Códigos CIE-10 en GRD</a></li>
+  <li><a href="#códigos-rem" id="toc-códigos-rem" class="nav-link" data-scroll-target="#códigos-rem">Códigos REM</a></li>
+  </ul></li>
+  <li><a href="#unidades-de-análisis-y-medidas" id="toc-unidades-de-análisis-y-medidas" class="nav-link" data-scroll-target="#unidades-de-análisis-y-medidas">Unidades de análisis y medidas</a></li>
+  <li><a href="#tasas-estandarización-e-intervalos" id="toc-tasas-estandarización-e-intervalos" class="nav-link" data-scroll-target="#tasas-estandarización-e-intervalos">Tasas, estandarización e intervalos</a>
+  <ul class="collapse">
+  <li><a href="#tasas-crudas-y-específicas" id="toc-tasas-crudas-y-específicas" class="nav-link" data-scroll-target="#tasas-crudas-y-específicas">Tasas crudas y específicas</a></li>
+  <li><a href="#estandarización-directa" id="toc-estandarización-directa" class="nav-link" data-scroll-target="#estandarización-directa">Estandarización directa</a></li>
+  <li><a href="#razón-de-tasas-entre-sexos" id="toc-razón-de-tasas-entre-sexos" class="nav-link" data-scroll-target="#razón-de-tasas-entre-sexos">Razón de tasas entre sexos</a></li>
+  <li><a href="#estandarización-indirecta-y-suavizado-empírico-bayesiano" id="toc-estandarización-indirecta-y-suavizado-empírico-bayesiano" class="nav-link" data-scroll-target="#estandarización-indirecta-y-suavizado-empírico-bayesiano">Estandarización indirecta y suavizado empírico bayesiano</a></li>
+  <li><a href="#tendencias" id="toc-tendencias" class="nav-link" data-scroll-target="#tendencias">Tendencias</a></li>
+  </ul></li>
+  <li><a href="#análisis-territorial-y-espacial" id="toc-análisis-territorial-y-espacial" class="nav-link" data-scroll-target="#análisis-territorial-y-espacial">Análisis territorial y espacial</a></li>
+  <li><a href="#características-de-la-hospitalización-y-codiagnósticos" id="toc-características-de-la-hospitalización-y-codiagnósticos" class="nav-link" data-scroll-target="#características-de-la-hospitalización-y-codiagnósticos">Características de la hospitalización y codiagnósticos</a></li>
+  <li><a href="#trayectorias-de-codificación-hospitalaria" id="toc-trayectorias-de-codificación-hospitalaria" class="nav-link" data-scroll-target="#trayectorias-de-codificación-hospitalaria">Trayectorias de codificación hospitalaria</a></li>
+  <li><a href="#reglas-de-lectura-de-rem" id="toc-reglas-de-lectura-de-rem" class="nav-link" data-scroll-target="#reglas-de-lectura-de-rem">Reglas de lectura de REM</a></li>
+  <li><a href="#calidad-de-datos-y-controles" id="toc-calidad-de-datos-y-controles" class="nav-link" data-scroll-target="#calidad-de-datos-y-controles">Calidad de datos y controles</a></li>
+  <li><a href="#sesgos-y-limitaciones" id="toc-sesgos-y-limitaciones" class="nav-link" data-scroll-target="#sesgos-y-limitaciones">Sesgos y limitaciones</a></li>
+  <li><a href="#ética-y-protección-de-datos" id="toc-ética-y-protección-de-datos" class="nav-link" data-scroll-target="#ética-y-protección-de-datos">Ética y protección de datos</a></li>
+  <li><a href="#reproducibilidad-y-software" id="toc-reproducibilidad-y-software" class="nav-link" data-scroll-target="#reproducibilidad-y-software">Reproducibilidad y software</a></li>
+  <li><a href="#referencias" id="toc-referencias" class="nav-link" data-scroll-target="#referencias">Referencias</a></li>
   </ul>
 </nav>
 </div>
@@ -2177,8 +2262,8 @@ h2 { padding-top: .7rem; }
 
 <header id="title-block-header" class="quarto-title-block default">
 <div class="quarto-title">
-<h1 class="title">Autismo en Chile</h1>
-<p class="subtitle lead">Epidemiología hospitalaria (GRD), actividad ambulatoria y tamizaje (REM) y trayectorias diagnósticas</p>
+<h1 class="title">Metodología</h1>
+<p class="subtitle lead">Diseño, fuentes, definiciones, medidas y controles de los análisis REM y GRD</p>
 </div>
 
 
@@ -2204,101 +2289,149 @@ h2 { padding-top: .7rem; }
 <div class="report-nav">
 <p><a href="index.html">Inicio</a> <a href="metodologia.html">Metodología</a> <a href="rem.html">REM</a> <a href="grd.html">GRD</a></p>
 </div>
-<div id="cell-cargar-resumen" class="cell" data-execution_count="1">
-<div id="cargar-resumen" class="cell-output cell-output-display">
-<div class="metrics"><div class="metric"><strong>5.808.535</strong><span>Registros GRD leídos · 2019–2024</span></div><div class="metric"><strong>25.620</strong><span>Registros con código F84</span></div><div class="metric"><strong>40.678.929</strong><span>Filas REM Serie A · 2017–2024</span></div><div class="metric"><strong>15.493</strong><span>Identificadores en la cohorte de trayectorias · 2021–2024</span></div></div>
+<div id="cell-cargar-metodologia" class="cell" data-execution_count="1">
+<div id="cargar-metodologia" class="cell-output cell-output-display">
+<div class="metrics"><div class="metric"><strong>5.808.535</strong><span>Registros GRD leídos · 2019–2024</span></div><div class="metric"><strong>40.678.929</strong><span>Filas REM Serie A leídas · 2017–2024</span></div><div class="metric"><strong>25.620</strong><span>Registros GRD con código F84 analizados</span></div></div>
 </div>
 </div>
-<section id="tres-preguntas-dos-fuentes" class="level2">
-<h2 class="anchored" data-anchor-id="tres-preguntas-dos-fuentes">Tres preguntas, dos fuentes</h2>
-<p><strong><a href="grd.html">GRD: epidemiología hospitalaria y trayectorias</a>.</strong> Describe las hospitalizaciones con código de trastorno del espectro autista (TEA) en el sistema público: magnitud y tendencia, tasas por población estandarizadas por edad, sexo y edad, subcategorías, posición del código, características del episodio, codiagnósticos, rehospitalización, regiones, comunas y autocorrelación espacial. Reconstruye además qué diagnósticos hospitalarios preceden al primer registro observado de autismo y en qué posición se registra.</p>
-<p><strong><a href="rem.html">REM: actividad ambulatoria, tamizaje y rehabilitación</a>.</strong> Describe los ingresos y egresos de los programas de salud mental con código de autismo, sus tasas por población, edad, sexo, regiones, comunas y establecimientos, el tamizaje en controles de salud infantil (MCHAT y M-CHAT R/F) y los ingresos a rehabilitación, y compara ecológicamente ambas fuentes.</p>
-<p><strong><a href="metodologia.html">Metodología</a>.</strong> Fuentes, definiciones de caso, unidades, denominadores, estandarización, intervalos, tendencias, análisis espacial, reglas de lectura de REM, controles de calidad, sesgos, limitaciones y reproducibilidad. Es la referencia común de los dos informes.</p>
+<p>Este documento describe, en un solo lugar, cómo se construyen todos los resultados de los informes <a href="rem.html">REM</a> y <a href="grd.html">GRD</a>. Ambos informes leen tablas agregadas producidas por scripts reproducibles y aplican las mismas definiciones, denominadores y convenciones de presentación que se detallan aquí. Cuando un resultado tiene una limitación específica, el informe correspondiente la repite junto a la tabla o figura; esta sección concentra la justificación completa.</p>
+<section id="diseño-y-preguntas" class="level2">
+<h2 class="anchored" data-anchor-id="diseño-y-preguntas">Diseño y preguntas</h2>
+<p>El trabajo es un <strong>estudio observacional descriptivo basado en registros administrativos</strong> de salud, con tres componentes complementarios:</p>
+<ol type="1">
+<li><strong>Epidemiología descriptiva de la actividad hospitalaria con código de autismo</strong> (GRD, 2019–2024): magnitud, tendencia temporal, distribución por sexo y edad, subcategorías diagnósticas, posición del código en el episodio, características de la hospitalización, codiagnósticos, rehospitalización y distribución territorial, con tasas por población y análisis de autocorrelación espacial.</li>
+<li><strong>Trayectorias de codificación hospitalaria</strong> (GRD, identificadores enlazados dentro de 2019–2020 y 2021–2024): diagnósticos registrados antes del primer registro observado de autismo, posición principal o secundaria en el episodio índice y transiciones posteriores.</li>
+<li><strong>Actividad asistencial ambulatoria y de tamizaje</strong> (REM Serie A, 2017–2024): ingresos y egresos de los programas de salud mental con código de autismo, tamizaje en controles de salud infantil, rehabilitación y cobertura de establecimientos, con tasas de ingreso por población.</li>
+</ol>
+<p>Las preguntas se formulan en el marco clásico de <strong>persona, lugar y tiempo</strong>. Ninguna fuente identifica la incidencia ni la prevalencia del autismo en la población: GRD registra hospitalizaciones en las que un código F84 fue consignado, y REM registra conteos agregados de prestaciones. Por eso las medidas se denominan siempre por su unidad real (registros, identificadores, ingresos al programa) y se interpretan como indicadores de contacto con el sistema público de salud y de práctica de codificación.</p>
 </section>
-<section id="resultados-principales" class="level2">
-<h2 class="anchored" data-anchor-id="resultados-principales">Resultados principales</h2>
-<div id="cell-hallazgos-principales" class="cell" data-execution_count="2">
-<div id="hallazgos-principales" class="cell-output cell-output-display">
-<div class="metrics"><div class="metric"><strong>59,2</strong><span>Hospitalizaciones con código TEA por 100.000 personas-año, estandarizadas · 2024 (era 15,8 en 2019)</span></div><div class="metric"><strong>48,6</strong><span>Personas hospitalizadas con código TEA por 100.000 habitantes · 2024</span></div><div class="metric"><strong>52,1%</strong><span>Cambio porcentual anual promedio · 2021–2024 (IC 95%: 41,3 a 63,7)</span></div><div class="metric"><strong>2,03</strong><span>Razón hombre:mujer de tasas · 2024 (era 3,13 en 2019)</span></div><div class="metric"><strong>80,9</strong><span>Ingresos REM A05 con código de autismo por 100.000 habitantes, estandarizados · 2024 (11.842 ingresos)</span></div><div class="metric"><strong>0,34</strong><span>I de Moran de la razón de hospitalización comunal suavizada (p de permutación 0,001)</span></div><div class="metric"><strong>16,9%</strong><span>Cohorte 2021–2024 con hospitalizaciones anteriores observables</span></div></div>
-</div>
-</div>
-<p>Las hospitalizaciones y los ingresos ambulatorios con código de autismo crecen con rapidez desde 2021, más en mujeres que en hombres, con la mayor intensidad entre 5 y 14 años y con fuerte heterogeneidad territorial. Estos aumentos son coherentes con mayor detección, mayor demanda y cambios de codificación en el período de la Ley 21.545; <strong>no demuestran un aumento de la ocurrencia del autismo</strong>. Ninguna cifra de estos informes es incidencia ni prevalencia: son tasas de hospitalizaciones, de personas hospitalizadas y de ingresos registrados.</p>
-<p>En las trayectorias hospitalarias 2021–2024, el primer registro de autismo ocurre casi siempre con el código en posición secundaria y solo una minoría tiene hospitalizaciones anteriores observables. Los códigos anteriores no demuestran que se hayan descartado como diagnósticos diferenciales: pueden ser comorbilidades, síntomas o motivos de ingreso independientes.</p>
+<section id="contexto-epidemiológico" class="level2">
+<h2 class="anchored" data-anchor-id="contexto-epidemiológico">Contexto epidemiológico</h2>
+<p>Las revisiones sistemáticas más recientes sitúan la prevalencia mundial del autismo en torno a 1 de cada 100 personas, con una mediana de 100 por 10.000 y un rango muy amplio entre estudios, una razón hombre:mujer mediana de 4,2 y un tercio de casos con discapacidad intelectual concurrente <span class="citation" data-cites="zeidan2022">(<a href="#ref-zeidan2022" role="doc-biblioref">Zeidan et al. 2022</a>)</span>. Metaanálisis con criterios más restrictivos estiman prevalencias agrupadas menores, del orden de 0,7% <span class="citation" data-cites="talantseva2023">(<a href="#ref-talantseva2023" role="doc-biblioref">Talantseva et al. 2023</a>)</span>, mientras que el Estudio de Carga Global de Enfermedad 2021 estimó 61,8 millones de personas autistas, equivalente a 1 de cada 127, con una prevalencia estandarizada por edad de 788 por 100.000 <span class="citation" data-cites="santomauro2025">(<a href="#ref-santomauro2025" role="doc-biblioref">Santomauro et al. 2025</a>)</span>. En Estados Unidos, la vigilancia ADDM informó 32,2 por 1.000 niños de 8 años en 2022, es decir 1 de cada 31, con una prevalencia más de tres veces mayor en niños que en niñas <span class="citation" data-cites="shaw2025">(<a href="#ref-shaw2025" role="doc-biblioref">Shaw et al. 2025</a>)</span>.</p>
+<p>La razón hombre:mujer se considera sobreestimada por sesgos de identificación: el metaanálisis de Loomes y colaboradores estimó una razón cercana a 3:1 en estudios que tamizan a la población general, frente a 4,6:1 cuando solo se cuentan diagnósticos preexistentes <span class="citation" data-cites="loomes2017">(<a href="#ref-loomes2017" role="doc-biblioref">Loomes, Hull, y Mandy 2017</a>)</span>. Estudios de cohortes de nacimiento recientes muestran además que la razón disminuye con la edad al diagnóstico y con el período calendario <span class="citation" data-cites="fyfe2026">(<a href="#ref-fyfe2026" role="doc-biblioref">Fyfe et al. 2026</a>)</span>. La comorbilidad es frecuente y heterogénea: trastorno por déficit de atención e hiperactividad, ansiedad, depresión, epilepsia, discapacidad intelectual, trastornos del sueño y síntomas gastrointestinales aparecen con prevalencias muy variables según el diseño <span class="citation" data-cites="bougeard2021">(<a href="#ref-bougeard2021" role="doc-biblioref">Bougeard et al. 2021</a>)</span>. Estos antecedentes justifican que los informes presenten la razón de sexos con intervalos, estratifiquen por edad y describan codiagnósticos sin atribuirles una relación causal.</p>
+<p>En Chile, la evidencia poblacional es escasa. Un estudio en dos comunas urbanas de Santiago aplicó tamizaje M-CHAT a niños de 18 a 30 meses y confirmación clínica con ADOS-2, estimando una prevalencia de 1,95% (IC 95%: 0,81 a 4,63) y cuatro niños por cada niña diagnosticada <span class="citation" data-cites="yanez2021">(<a href="#ref-yanez2021" role="doc-biblioref">Yáñez et al. 2021</a>)</span>. La Ley 21.545, publicada el 10 de marzo de 2023, estableció obligaciones de detección temprana, diagnóstico y atención integral en salud y educación <span class="citation" data-cites="ley21545">(<a href="#ref-ley21545" role="doc-biblioref">Chile, Ministerio de Salud 2023</a>)</span>. El período de estudio abarca, por lo tanto, un cambio normativo y de visibilidad social que debe considerarse al interpretar las tendencias: un aumento de registros es compatible con mayor detección, mayor demanda y cambios de codificación, y no demuestra por sí solo un aumento de la ocurrencia del autismo.</p>
 </section>
-<section id="cómo-están-organizados-los-análisis" class="level2">
-<h2 class="anchored" data-anchor-id="cómo-están-organizados-los-análisis">Cómo están organizados los análisis</h2>
-<div id="cell-tabla-organizacion" class="cell" data-execution_count="3">
-<div id="tabla-organizacion" class="cell-output cell-output-display">
-<div class="analysis-table" role="region" aria-label="Secciones de los informes y tablas agregadas que las alimentan" tabindex="0">
+<section id="fuentes-de-datos" class="level2">
+<h2 class="anchored" data-anchor-id="fuentes-de-datos">Fuentes de datos</h2>
+<section id="egresos-hospitalarios-agrupados-por-grd" class="level3">
+<h3 class="anchored" data-anchor-id="egresos-hospitalarios-agrupados-por-grd">Egresos hospitalarios agrupados por GRD</h3>
+<p>La base pública de Grupos Relacionados por el Diagnóstico (IR-GRD) del Ministerio de Salud contiene un registro por episodio de hospitalización o cirugía mayor ambulatoria en los establecimientos públicos que participan del sistema GRD <span class="citation" data-cites="minsal_grd">(<a href="#ref-minsal_grd" role="doc-biblioref">Ministerio de Salud de Chile 2025a</a>)</span>. Cada registro incluye sexo, fecha de nacimiento, comuna de residencia, previsión, servicio de salud, hospital, tipo de ingreso y de actividad, especialidad, fechas de ingreso y alta, tipo de alta, 35 posiciones diagnósticas codificadas en CIE-10, 30 procedimientos, y el peso, severidad y riesgo de mortalidad asignados por el agrupador. Se utilizan los archivos canónicos 2019–2024 documentados en el almacén de datos externo; los archivos no se modifican ni se copian al repositorio.</p>
+<div id="cell-tabla-fuentes-grd" class="cell" data-execution_count="2">
+<div id="tabla-fuentes-grd" class="cell-output cell-output-display">
+<div class="analysis-table" role="region" aria-label="GRD: archivos canónicos y registros con código F84 tras deduplicación exacta" tabindex="0">
 <table class="dataframe table table-striped table-sm caption-top small" data-quarto-postprocess="true">
-<caption>Secciones de los informes y tablas agregadas que las alimentan</caption>
+<caption>GRD: archivos canónicos y registros con código F84 tras deduplicación exacta</caption>
 <thead>
 <tr class="header">
-<th data-quarto-table-cell-role="th">Sección</th>
-<th data-quarto-table-cell-role="th">Contenido</th>
-<th data-quarto-table-cell-role="th">Tablas en output_files/consolidacion</th>
+<th data-quarto-table-cell-role="th">Año</th>
+<th data-quarto-table-cell-role="th">Registros en el archivo</th>
+<th data-quarto-table-cell-role="th">Campo identificador</th>
+<th data-quarto-table-cell-role="th">Registros con código F84</th>
+<th data-quarto-table-cell-role="th">Registros F84 sin identificador válido</th>
 </tr>
 </thead>
 <tbody>
 <tr class="odd">
-<td>GRD · A1</td>
-<td>Universo, unidades y calidad</td>
-<td>grd_epi_quality, grd_annual_positions</td>
+<td>2019</td>
+<td>1.151.475</td>
+<td>CIP_ENCRIPTADO</td>
+<td>2.385</td>
+<td>4</td>
 </tr>
 <tr class="even">
-<td>GRD · A2</td>
-<td>Tendencia anual, tasas crudas y estandarizadas, CPA, estacionalidad, sensibilidad</td>
-<td>grd_rates_national, grd_trends_apc, grd_epi_monthly</td>
+<td>2020</td>
+<td>781.912</td>
+<td>CIP_ENCRIPTADO</td>
+<td>1.633</td>
+<td>0</td>
 </tr>
 <tr class="odd">
-<td>GRD · A3</td>
-<td>Razón de sexos, edad simple, tasas específicas por edad</td>
-<td>grd_sex_ratio, grd_epi_age_single, grd_rates_age_specific</td>
+<td>2021</td>
+<td>816.909</td>
+<td>CIP_ENCRIPTADO</td>
+<td>2.399</td>
+<td>0</td>
 </tr>
 <tr class="even">
-<td>GRD · A4</td>
-<td>Subcategorías F84 y posición del código</td>
-<td>grd_rates_subcodes, grd_epi_subcodes</td>
+<td>2022</td>
+<td>932.839</td>
+<td>CIP_ENCRIPTADO</td>
+<td>3.912</td>
+<td>3</td>
 </tr>
 <tr class="odd">
-<td>GRD · A5</td>
-<td>Ingreso, actividad, especialidad, previsión, alta, letalidad, estancia, severidad, hospitales</td>
-<td>grd_epi_features, grd_epi_los_*, grd_epi_grd_weight, grd_epi_hospitals</td>
+<td>2023</td>
+<td>1.039.587</td>
+<td>CIP_ENCRIPTADO</td>
+<td>6.473</td>
+<td>2</td>
 </tr>
 <tr class="even">
-<td>GRD · A6</td>
-<td>Rehospitalización y multiplicidad</td>
-<td>grd_epi_readmissions, grd_epi_multiplicity</td>
-</tr>
-<tr class="odd">
-<td>GRD · A7</td>
-<td>Codiagnósticos y diagnóstico principal</td>
-<td>grd_epi_codiagnoses</td>
-</tr>
-<tr class="even">
-<td>GRD · A8</td>
-<td>Regiones, comunas, estandarización indirecta, Moran, LISA</td>
-<td>grd_rates_regional, grd_rates_comunal, grd_spatial_*</td>
-</tr>
-<tr class="odd">
-<td>GRD · B</td>
-<td>Trayectorias: enlace, posición, antecedentes, secuencias, transiciones</td>
-<td>grd_cohort_*, grd_first_*, grd_previous_*, grd_sequences, grd_principal_transitions</td>
-</tr>
-<tr class="even">
-<td>REM</td>
-<td>Ingresos, tasas, edad y sexo, subcategorías, regiones, comunas, panel, tamizaje, rehabilitación, comparación ecológica</td>
-<td>rem_*</td>
+<td>2024</td>
+<td>1.085.813</td>
+<td>ID_BENEFICIARIO</td>
+<td>8.818</td>
+<td>1</td>
 </tr>
 </tbody>
 </table>
 </div>
 </div>
 </div>
-<p>Los cuatro documentos ejecutan <strong>Python</strong> y leen las tablas agregadas de <code>output_files/consolidacion/</code>. Las tablas y figuras se recalculan al renderizar; no contienen cifras pegadas manualmente. La extracción de los archivos originales se ejecuta por separado, mediante los scripts documentados en el <a href="../README.md">README del repositorio</a>. Los informes previos, sus HTML y sus recursos se conservaron en <code>others scripts/</code>, fuera de <code>docs</code>, solo para trazabilidad.</p>
+<p>El identificador de paciente es un campo encriptado (<code>CIP_ENCRIPTADO</code> en 2019–2023, <code>ID_BENEFICIARIO</code> en 2024). La auditoría de enlace comprobó que no existen identificadores compartidos entre 2019–2020 y 2021–2024, y que el cambio de nombre del campo en 2024 conserva coincidencias con 2021–2023. Por eso todos los análisis longitudinales trabajan en <strong>dos períodos de identificador</strong> separados y nunca enlazan a través de 2020/2021. La estabilidad del identificador es una comprobación empírica, no una certificación del productor.</p>
 </section>
-<section id="prioridades-de-interpretación" class="level2">
-<h2 class="anchored" data-anchor-id="prioridades-de-interpretación">Prioridades de interpretación</h2>
+<section id="resúmenes-estadísticos-mensuales-rem-serie-a" class="level3">
+<h3 class="anchored" data-anchor-id="resúmenes-estadísticos-mensuales-rem-serie-a">Resúmenes Estadísticos Mensuales (REM), Serie A</h3>
+<p>REM es el sistema de registro agregado de actividad de la red pública <span class="citation" data-cites="minsal_rem">(<a href="#ref-minsal_rem" role="doc-biblioref">Ministerio de Salud de Chile 2025b</a>)</span>. Cada fila corresponde a un establecimiento, mes y código de prestación, con hasta 50 columnas cuyo significado depende del formulario y del año. Se utilizan tres formularios:</p>
+<table class="caption-top table">
+<colgroup>
+<col style="width: 25%">
+<col style="width: 25%">
+<col style="width: 25%">
+<col style="width: 25%">
+</colgroup>
+<thead>
+<tr class="header">
+<th>Formulario</th>
+<th>Sección utilizada</th>
+<th>Contenido</th>
+<th>Años con códigos de autismo</th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td>A05</td>
+<td>N: ingresos al programa de salud mental; O: egresos por alta clínica</td>
+<td>Total, sexo y 17 grupos de edad por sexo</td>
+<td>2017–2020 (código genérico de TGD), 2021–2024 (autismo, Asperger, Rett, trastorno desintegrativo, TGD no específico)</td>
+</tr>
+<tr class="even">
+<td>A03</td>
+<td>F: tamizaje de trastorno del espectro autista; F1: 31 a 59 meses (2024)</td>
+<td>Controles, alteración de lenguaje/social, tamizaje realizado y alterado (MCHAT 2019–2022); categorías de riesgo y derivación (M-CHAT R/F 2023–2024)</td>
+<td>2019–2024</td>
+</tr>
+<tr class="odd">
+<td>A28</td>
+<td>A.2: ingresos por condición de salud; B.1: ingresos y egresos a rehabilitación integral</td>
+<td>Ingresos a rehabilitación con condición TEA</td>
+<td>2023–2024</td>
+</tr>
+</tbody>
+</table>
+<p>Los diccionarios anuales se leen directamente desde los archivos oficiales para asignar el significado de cada columna año a año; el catálogo <code>rem_code_catalogue.csv</code> conserva el archivo, la hoja y la fila de diccionario de cada código. Los archivos 2025 y 2026 existen pero no se incorporan: 2026 es parcial y 2025 requiere validar integridad y comparabilidad antes de ampliar las series.</p>
+</section>
+<section id="denominadores-poblacionales-y-cartografía" class="level3">
+<h3 class="anchored" data-anchor-id="denominadores-poblacionales-y-cartografía">Denominadores poblacionales y cartografía</h3>
+<p>Los denominadores son las <strong>estimaciones y proyecciones de población del INE basadas en el Censo 2017</strong>, por comuna, sexo y edad simple, para 2017–2024 <span class="citation" data-cites="ine2019">(<a href="#ref-ine2019" role="doc-biblioref">Instituto Nacional de Estadísticas 2019</a>)</span>. Las edades se agrupan en 17 grupos quinquenales con un grupo abierto de 80 y más años. La población de una región o del país es la suma de sus comunas. Las tasas agrupadas de varios años usan personas-año, es decir, la suma de las poblaciones anuales del período.</p>
+<p>La cartografía comunal corresponde a la división político-administrativa con 346 comunas (código único territorial, CUT) y la regional a 16 regiones, ambas en proyección EPSG:3857. Los registros GRD se asignan a la comuna de <strong>residencia</strong> informada; REM se asigna a la comuna y región del <strong>establecimiento</strong> que informa. Las comunas no continentales (Isla de Pascua, Juan Fernández, Antártica y Cabo de Hornos) se conservan en las tablas pero se excluyen de los estadísticos de contigüidad.</p>
+</section>
+</section>
+<section id="definiciones-de-caso" class="level2">
+<h2 class="anchored" data-anchor-id="definiciones-de-caso">Definiciones de caso</h2>
+<section id="códigos-cie-10-en-grd" class="level3">
+<h3 class="anchored" data-anchor-id="códigos-cie-10-en-grd">Códigos CIE-10 en GRD</h3>
+<p>Se usan tres definiciones anidadas, idénticas en la epidemiología descriptiva y en las trayectorias:</p>
 <table class="caption-top table">
 <colgroup>
 <col style="width: 33%">
@@ -2307,25 +2440,447 @@ h2 { padding-top: .7rem; }
 </colgroup>
 <thead>
 <tr class="header">
-<th>Fuente</th>
-<th>Ya disponible</th>
-<th>Siguiente extensión</th>
+<th>Definición</th>
+<th>Códigos CIE-10</th>
+<th>Uso</th>
 </tr>
 </thead>
 <tbody>
 <tr class="odd">
-<td>GRD</td>
-<td>Tasas crudas y estandarizadas con intervalos, tendencias, sexo y edad, subcategorías, posición, características del episodio, codiagnósticos, rehospitalización, regiones, comunas, Moran y LISA, cohortes y trayectorias</td>
-<td>Confirmar el enlace con el productor, modelos ajustados por edad, sexo, año, contactos y hospital, incorporar defunciones y urgencias, validar fichas clínicas</td>
+<td>Autismo específico</td>
+<td>F84.0</td>
+<td>Sensibilidad restrictiva</td>
 </tr>
 <tr class="even">
-<td>REM</td>
-<td>Series 2017–2024, tasas de ingreso estandarizadas, edad y sexo, subcategorías, regiones, comunas, panel de establecimientos, indicadores de tamizaje por etapa, rehabilitación, comparación ecológica</td>
-<td>Validar denominadores de tamizaje con los manuales, incorporar Serie P (población en control), revisar 2025–2026</td>
+<td><strong>TEA operacional</strong></td>
+<td>F84.0, F84.1, F84.5, F84.8, F84.9</td>
+<td><strong>Definición principal</strong> en todos los resultados</td>
+</tr>
+<tr class="odd">
+<td>F84 histórico</td>
+<td>F84 y todas sus subcategorías válidas, incluidas F84.2, F84.3 y F84.4</td>
+<td>Comparación con la categoría completa de trastornos generalizados del desarrollo</td>
 </tr>
 </tbody>
 </table>
-<p>Los datos originales permanecen en la raíz externa configurada mediante <code>ASESORIAS_DATA_ROOT</code>. La extracción utilizada no incorpora REM 2025–2026: esos archivos requieren revisar integridad, cobertura y comparabilidad antes de ampliar las series.</p>
+<p>La definición operacional aproxima el concepto de trastorno del espectro autista de DSM-5 con la nomenclatura de CIE-10 <span class="citation" data-cites="who_icd10">(<a href="#ref-who_icd10" role="doc-biblioref">World Health Organization 2019</a>)</span>, que sigue distinguiendo autismo infantil, autismo atípico y síndrome de Asperger; no es una equivalencia clínica exacta. F84.2 (síndrome de Rett), F84.3 (trastorno desintegrativo) y F84.4 (trastorno hiperactivo con retraso mental y estereotipias) se describen por separado como subcategorías.</p>
+<p>Los códigos se normalizan eliminando puntos y espacios. Un registro es <strong>caso</strong> cuando alguno de los 35 campos diagnósticos contiene un código de la definición. La <strong>posición</strong> se clasifica de forma excluyente: <em>principal</em> cuando solo <code>DIAGNOSTICO1</code> contiene el código, <em>solo secundario</em> cuando solo aparece en <code>DIAGNOSTICO2</code> a <code>DIAGNOSTICO35</code>, y <em>principal y secundario</em> cuando aparece en ambas. Esta semántica es operacional y debe confirmarse con el diccionario del productor; los informes la usan de manera consistente.</p>
+</section>
+<section id="códigos-rem" class="level3">
+<h3 class="anchored" data-anchor-id="códigos-rem">Códigos REM</h3>
+<p>Los códigos A05 de ingreso al programa de salud mental con código de autismo (<code>05990022</code>) constituyen la serie principal; Asperger (<code>05990023</code>), Rett (<code>05990024</code>), trastorno desintegrativo (<code>05990025</code>) y TGD no específico (<code>05990026</code>) se presentan como subcategorías, y sus egresos correspondientes (<code>05990027</code> a <code>05990031</code>) por separado. La serie genérica de trastornos generalizados del desarrollo de 2017–2020 (<code>06902600</code> ingresos y <code>05225000</code> egresos) se mantiene sin mezclar con las subcategorías posteriores. Los códigos A03 y A28 se listan en el informe REM con su etiqueta de diccionario.</p>
+</section>
+</section>
+<section id="unidades-de-análisis-y-medidas" class="level2">
+<h2 class="anchored" data-anchor-id="unidades-de-análisis-y-medidas">Unidades de análisis y medidas</h2>
+<table class="caption-top table">
+<colgroup>
+<col style="width: 25%">
+<col style="width: 25%">
+<col style="width: 25%">
+<col style="width: 25%">
+</colgroup>
+<thead>
+<tr class="header">
+<th>Medida</th>
+<th>Unidad</th>
+<th>Definición operacional</th>
+<th>Fuente</th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td>Registros con código TEA</td>
+<td>Episodio de hospitalización o cirugía mayor ambulatoria</td>
+<td>Filas del archivo anual con código de la definición, tras eliminar duplicados exactos</td>
+<td>GRD</td>
+</tr>
+<tr class="even">
+<td>Personas hospitalizadas</td>
+<td>Identificador válido distinto en el año o en el período</td>
+<td>Primer registro del año o del período define edad, sexo y comuna</td>
+<td>GRD</td>
+</tr>
+<tr class="odd">
+<td>Tasa de hospitalización</td>
+<td>Registros por 100.000 personas-año</td>
+<td>Numerador: registros con sexo y edad válidos; denominador: población INE</td>
+<td>GRD</td>
+</tr>
+<tr class="even">
+<td>Tasa de personas hospitalizadas</td>
+<td>Identificadores por 100.000 habitantes</td>
+<td>Anual, o del período 2021–2024 contra la población media anual</td>
+<td>GRD</td>
+</tr>
+<tr class="odd">
+<td>Posición diagnóstica</td>
+<td>Registro</td>
+<td>Principal, solo secundario, principal y secundario</td>
+<td>GRD</td>
+</tr>
+<tr class="even">
+<td>Estancia</td>
+<td>Días entre ingreso y alta</td>
+<td>Calculada solo con fechas válidas; la cirugía mayor ambulatoria se describe aparte</td>
+<td>GRD</td>
+</tr>
+<tr class="odd">
+<td>Letalidad hospitalaria</td>
+<td>Proporción de registros con tipo de alta «fallecido»</td>
+<td>Intervalo exacto binomial</td>
+<td>GRD</td>
+</tr>
+<tr class="even">
+<td>Rehospitalización a 30 y 90 días</td>
+<td>Registros con un nuevo ingreso con código de la definición del mismo identificador</td>
+<td>Solo registros con al menos ese horizonte antes del cierre del período</td>
+<td>GRD</td>
+</tr>
+<tr class="odd">
+<td>Codiagnósticos</td>
+<td>Categoría CIE-10 de tres caracteres</td>
+<td>Códigos distintos de F84 en el mismo registro; un registro cuenta una vez por categoría y posición</td>
+<td>GRD</td>
+</tr>
+<tr class="even">
+<td>Ingresos al programa</td>
+<td>Suma de valores observados de <code>Col01</code></td>
+<td>Filas con total informado; sin imputar ceros</td>
+<td>REM A05</td>
+</tr>
+<tr class="odd">
+<td>Tasa de ingresos</td>
+<td>Ingresos por 100.000 habitantes</td>
+<td>Numerador: celdas de edad y sexo observadas; denominador: población INE</td>
+<td>REM A05</td>
+</tr>
+<tr class="even">
+<td>Indicadores de tamizaje</td>
+<td>Proporciones entre códigos de la misma sección</td>
+<td>Solo cuando numerador y denominador comparten instrumento, etapa y edad</td>
+<td>REM A03</td>
+</tr>
+</tbody>
+</table>
+<p>Las unidades no se mezclan: los registros no se suman con las personas, los períodos de identificador no se enlazan y las definiciones anidadas no se suman entre sí.</p>
+</section>
+<section id="tasas-estandarización-e-intervalos" class="level2">
+<h2 class="anchored" data-anchor-id="tasas-estandarización-e-intervalos">Tasas, estandarización e intervalos</h2>
+<section id="tasas-crudas-y-específicas" class="level3">
+<h3 class="anchored" data-anchor-id="tasas-crudas-y-específicas">Tasas crudas y específicas</h3>
+<p>Para un conjunto de <span class="math inline">\(d\)</span> eventos y <span class="math inline">\(n\)</span> personas-año, la tasa cruda es <span class="math inline">\(r = 10^5 \cdot d / n\)</span>. Los límites de confianza al 95% se obtienen del intervalo exacto de Poisson para <span class="math inline">\(d\)</span> mediante la distribución ji cuadrado, <span class="math inline">\(d_L = \chi^2_{2d,\,0{,}025}/2\)</span> y <span class="math inline">\(d_U = \chi^2_{2d+2,\,0{,}975}/2\)</span>, divididos por <span class="math inline">\(n\)</span> <span class="citation" data-cites="breslow1987">(<a href="#ref-breslow1987" role="doc-biblioref">Breslow y Day 1987</a>)</span>. Las tasas específicas por grupo de edad y sexo usan la misma regla.</p>
+</section>
+<section id="estandarización-directa" class="level3">
+<h3 class="anchored" data-anchor-id="estandarización-directa">Estandarización directa</h3>
+<p>Las tasas estandarizadas por edad (TEE) se calculan por el método directo con la <strong>población estándar mundial de la OMS</strong> <span class="citation" data-cites="ahmad2001">(<a href="#ref-ahmad2001" role="doc-biblioref">Ahmad et al. 2001</a>)</span>, colapsada al grupo 80 y más años:</p>
+<p><span class="math display">\[\mathrm{TEE} = \sum_{i} w_i \, \frac{d_i}{n_i}, \qquad w_i = \frac{p_i}{\sum_j p_j}\]</span></p>
+<p>donde <span class="math inline">\(d_i\)</span>, <span class="math inline">\(n_i\)</span> y <span class="math inline">\(p_i\)</span> son los eventos, las personas-año y el peso estándar del grupo de edad <span class="math inline">\(i\)</span>. Los grupos sin población se excluyen y los pesos se renormalizan; los grupos sin eventos aportan cero. Los intervalos al 95% se calculan con el método gamma de Fay y Feuer <span class="citation" data-cites="fay1997">(<a href="#ref-fay1997" role="doc-biblioref">Fay y Feuer 1997</a>)</span>, que respeta la asimetría de las tasas con pocos eventos:</p>
+<p><span class="math display">\[\mathrm{Var}(\mathrm{TEE}) = \sum_i w_i^2 \frac{d_i}{n_i^2}, \qquad w_M = \max_i \frac{w_i}{n_i}\]</span></p>
+<p><span class="math display">\[L = G^{-1}\!\left(0{,}025;\ \tfrac{\mathrm{TEE}^2}{\mathrm{Var}},\ \tfrac{\mathrm{Var}}{\mathrm{TEE}}\right), \qquad U = G^{-1}\!\left(0{,}975;\ \tfrac{(\mathrm{TEE}+w_M)^2}{\mathrm{Var}+w_M^2},\ \tfrac{\mathrm{Var}+w_M^2}{\mathrm{TEE}+w_M}\right)\]</span></p>
+<p>con <span class="math inline">\(G^{-1}(q; a, b)\)</span> el cuantil de una distribución gamma de forma <span class="math inline">\(a\)</span> y escala <span class="math inline">\(b\)</span>.</p>
+<div id="cell-tabla-estandar-oms" class="cell" data-execution_count="3">
+<div id="tabla-estandar-oms" class="cell-output cell-output-display">
+<div class="analysis-table" role="region" aria-label="Población estándar mundial de la OMS utilizada en la estandarización directa" tabindex="0">
+<table class="dataframe table table-striped table-sm caption-top small" data-quarto-postprocess="true">
+<caption>Población estándar mundial de la OMS utilizada en la estandarización directa</caption>
+<thead>
+<tr class="header">
+<th data-quarto-table-cell-role="th">Grupo de edad</th>
+<th data-quarto-table-cell-role="th">Peso por 100.000</th>
+<th data-quarto-table-cell-role="th">Peso (%)</th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td>0-4</td>
+<td>8.860</td>
+<td>8,86</td>
+</tr>
+<tr class="even">
+<td>5-9</td>
+<td>8.690</td>
+<td>8,69</td>
+</tr>
+<tr class="odd">
+<td>10-14</td>
+<td>8.600</td>
+<td>8,60</td>
+</tr>
+<tr class="even">
+<td>15-19</td>
+<td>8.470</td>
+<td>8,47</td>
+</tr>
+<tr class="odd">
+<td>20-24</td>
+<td>8.220</td>
+<td>8,22</td>
+</tr>
+<tr class="even">
+<td>25-29</td>
+<td>7.930</td>
+<td>7,93</td>
+</tr>
+<tr class="odd">
+<td>30-34</td>
+<td>7.610</td>
+<td>7,61</td>
+</tr>
+<tr class="even">
+<td>35-39</td>
+<td>7.150</td>
+<td>7,15</td>
+</tr>
+<tr class="odd">
+<td>40-44</td>
+<td>6.590</td>
+<td>6,59</td>
+</tr>
+<tr class="even">
+<td>45-49</td>
+<td>6.040</td>
+<td>6,04</td>
+</tr>
+<tr class="odd">
+<td>50-54</td>
+<td>5.370</td>
+<td>5,37</td>
+</tr>
+<tr class="even">
+<td>55-59</td>
+<td>4.550</td>
+<td>4,55</td>
+</tr>
+<tr class="odd">
+<td>60-64</td>
+<td>3.720</td>
+<td>3,72</td>
+</tr>
+<tr class="even">
+<td>65-69</td>
+<td>2.960</td>
+<td>2,96</td>
+</tr>
+<tr class="odd">
+<td>70-74</td>
+<td>2.210</td>
+<td>2,21</td>
+</tr>
+<tr class="even">
+<td>75-79</td>
+<td>1.520</td>
+<td>1,52</td>
+</tr>
+<tr class="odd">
+<td>80+</td>
+<td>1.545</td>
+<td>1,54</td>
+</tr>
+</tbody>
+</table>
+</div>
+</div>
+</div>
+</section>
+<section id="razón-de-tasas-entre-sexos" class="level3">
+<h3 class="anchored" data-anchor-id="razón-de-tasas-entre-sexos">Razón de tasas entre sexos</h3>
+<p>La razón entre las TEE de hombres y mujeres se acompaña de un intervalo log-normal, <span class="math inline">\(\exp\{\ln(\mathrm{RR}) \pm 1{,}96 \cdot \mathrm{se}\}\)</span> con <span class="math inline">\(\mathrm{se}^2 = \mathrm{Var}_H/\mathrm{TEE}_H^2 + \mathrm{Var}_M/\mathrm{TEE}_M^2\)</span>. La razón de conteos hombre:mujer se presenta con el intervalo exacto binomial condicional (Clopper–Pearson sobre la proporción de hombres entre los casos). Ambas razones describen la composición de los registros y no la razón de prevalencia del autismo.</p>
+</section>
+<section id="estandarización-indirecta-y-suavizado-empírico-bayesiano" class="level3">
+<h3 class="anchored" data-anchor-id="estandarización-indirecta-y-suavizado-empírico-bayesiano">Estandarización indirecta y suavizado empírico bayesiano</h3>
+<p>Para el análisis comunal, donde los conteos son pequeños, se calcula además la <strong>razón de hospitalización estandarizada</strong> (RHE), cociente entre los registros observados y los esperados si cada comuna tuviera las tasas nacionales específicas por sexo y edad del mismo período, con intervalos exactos de Poisson <span class="citation" data-cites="ulm1990">(<a href="#ref-ulm1990" role="doc-biblioref">Ulm 1990</a>)</span>. Las razones se suavizan con el estimador empírico bayesiano global de Marshall <span class="citation" data-cites="marshall1991">(<a href="#ref-marshall1991" role="doc-biblioref">Marshall 1991</a>)</span>: cada RHE se contrae hacia la razón nacional con un peso <span class="math inline">\(E_i/(E_i + m/v)\)</span>, donde <span class="math inline">\(E_i\)</span> son los eventos esperados de la comuna, y <span class="math inline">\(m\)</span> y <span class="math inline">\(v\)</span> la media y varianza a priori estimadas por el método de momentos. Las tablas informan la razón cruda, la suavizada y el peso de contracción; los mapas y los estadísticos espaciales usan la suavizada para reducir la inestabilidad de las comunas pequeñas.</p>
+</section>
+<section id="tendencias" class="level3">
+<h3 class="anchored" data-anchor-id="tendencias">Tendencias</h3>
+<p>La tendencia temporal se resume con el <strong>cambio porcentual anual promedio</strong> (CPA) estimado con un modelo log-lineal de conteos con <em>offset</em> del logaritmo de la población, <span class="math inline">\(\log E[d_t] = \alpha + \beta t + \log n_t\)</span>, de modo que <span class="math inline">\(\mathrm{CPA} = 100\,(e^{\beta} - 1)\)</span> <span class="citation" data-cites="clegg2009">(<a href="#ref-clegg2009" role="doc-biblioref">Clegg et al. 2009</a>)</span>. La sobredispersión se corrige con un factor de escala de Pearson (cuasi-Poisson), lo que amplía los intervalos cuando la serie se aparta de una tendencia exponencial, como ocurre con la caída de 2020. Se estiman dos períodos: 2019–2024 completo y 2021–2024, que coincide con el período de identificador principal y con los códigos REM específicos. La estacionalidad se describe con índices mensuales, cociente entre el promedio de cada mes y el promedio mensual general.</p>
+</section>
+</section>
+<section id="análisis-territorial-y-espacial" class="level2">
+<h2 class="anchored" data-anchor-id="análisis-territorial-y-espacial">Análisis territorial y espacial</h2>
+<p>Las tasas regionales se calculan por región de residencia (GRD) o de establecimiento (REM), anuales y agrupadas, con estandarización directa e intervalos gamma. Las tasas comunales se agrupan en todo el período disponible para ganar estabilidad: registros 2019–2024 contra personas-año, y personas hospitalizadas 2021–2024 contra la población media anual del período.</p>
+<p>La <strong>autocorrelación espacial global</strong> se evalúa con el índice I de Moran <span class="citation" data-cites="moran1950">(<a href="#ref-moran1950" role="doc-biblioref">Moran 1950</a>)</span> sobre las comunas continentales, con una matriz de contigüidad tipo reina estandarizada por filas y la inferencia por 999 permutaciones aleatorias, con semilla fija para reproducibilidad. Los <strong>indicadores locales de asociación espacial</strong> (LISA) de Anselin <span class="citation" data-cites="anselin1995">(<a href="#ref-anselin1995" role="doc-biblioref">Anselin 1995</a>)</span> clasifican cada comuna en cuadrantes alto-alto, bajo-bajo, alto-bajo y bajo-alto; la significación local se informa con el pseudovalor p de 999 permutaciones y, además, con un umbral corregido por tasa de falsos descubrimientos <span class="citation" data-cites="benjamini1995">(<a href="#ref-benjamini1995" role="doc-biblioref">Benjamini y Hochberg 1995</a>)</span>, que es la lectura recomendada dado el número de comunas. Los cálculos usan la biblioteca PySAL <span class="citation" data-cites="rey2010">(<a href="#ref-rey2010" role="doc-biblioref">Rey y Anselin 2010</a>)</span>. Las comunas sin vecinos (islas contiguas) permanecen en el mapa sin contribuir a los rezagos.</p>
+<p>El análisis espacial es <strong>exploratorio y ecológico</strong> <span class="citation" data-cites="elliott2000">(<a href="#ref-elliott2000" role="doc-biblioref">Elliott et al. 2000</a>)</span>: las agrupaciones de tasas altas pueden reflejar oferta hospitalaria, prácticas de codificación, acceso y composición socioeconómica, y no un riesgo territorial de autismo. La unidad comunal introduce el problema de la unidad de área modificable y la comuna de residencia no siempre coincide con el lugar de atención.</p>
+</section>
+<section id="características-de-la-hospitalización-y-codiagnósticos" class="level2">
+<h2 class="anchored" data-anchor-id="características-de-la-hospitalización-y-codiagnósticos">Características de la hospitalización y codiagnósticos</h2>
+<p>Las variables del episodio se describen como distribuciones de registros por año y posición del código: tipo de ingreso, tipo de actividad, especialidad médica, procedencia, previsión (agrupada en tramos FONASA MAI, libre elección, ISAPRE, Fuerzas Armadas, particular y otras), tipo de alta, severidad y riesgo de mortalidad del agrupador, peso relativo GRD, hospital y servicio de salud. La estancia se resume con mediana, cuartiles y percentil 90 y se estratifica por tipo de actividad y grupo de edad, porque la cirugía mayor ambulatoria tiene estancia nula por definición.</p>
+<p>Los codiagnósticos son los códigos distintos de F84 presentes en cualquier posición del mismo registro, resumidos en categorías CIE-10 de tres caracteres, en capítulos y en bloques de salud mental. Cuando el código de autismo es secundario, el diagnóstico principal describe el motivo codificado de la hospitalización. Estas coocurrencias describen codificación conjunta en un episodio: no establecen secuencia, causalidad ni prevalencia de comorbilidad en la población autista.</p>
+</section>
+<section id="trayectorias-de-codificación-hospitalaria" class="level2">
+<h2 class="anchored" data-anchor-id="trayectorias-de-codificación-hospitalaria">Trayectorias de codificación hospitalaria</h2>
+<p>El componente longitudinal reconstruye, dentro de cada período de identificador, todos los egresos de los identificadores con algún código F84. La <strong>fecha índice</strong> es la primera alta observada con la definición seleccionada; la edad es la del ingreso a ese episodio. Un <strong>antecedente estricto</strong> debe haber egresado antes del ingreso al episodio índice; los episodios superpuestos o del mismo día se cuantifican aparte. Se describen el primer diagnóstico principal observado, el último principal previo, los códigos y grupos previos en ventanas de 365 días, 730 días y todo el período, las secuencias sin empates y el paso posterior de secundario a principal, con proporciones calculadas solo entre quienes disponen de 365 días calendario antes del cierre. Las exclusiones (identificadores con nacimiento o sexo inconsistentes, episodios ambiguos, fechas inválidas, edades implausibles) se documentan y no se imputan. La oportunidad de observación se distingue del seguimiento clínico: disponer de calendario no acredita observación continua, y la ausencia de hospitalizaciones previas no implica ausencia de diagnósticos ambulatorios.</p>
+</section>
+<section id="reglas-de-lectura-de-rem" class="level2">
+<h2 class="anchored" data-anchor-id="reglas-de-lectura-de-rem">Reglas de lectura de REM</h2>
+<ul>
+<li><strong>A05.</strong> <code>Col01</code> es el total, <code>Col02</code> hombres y <code>Col03</code> mujeres; los 17 grupos de edad ocupan <code>Col04</code> a <code>Col37</code> en pares hombre/mujer. Las tasas se calculan con las celdas de edad y sexo; el total <code>Col01</code> puede ser levemente distinto cuando faltan celdas.</li>
+<li><strong>A03.</strong> En las secciones de tamizaje <code>Col01</code> son hombres y <code>Col02</code> mujeres; desde 2023 <code>Col03</code> y <code>Col04</code> corresponden a pueblos originarios y migrantes y no se suman al total. El total de una fila requiere ambas columnas de sexo; las filas incompletas se contabilizan aparte.</li>
+<li><strong>A28.</strong> <code>Col01</code> reúne ambos sexos; las secciones A.2 y B.1 se mantienen separadas y no se suman como personas distintas.</li>
+<li><strong>Panel de establecimientos.</strong> Un establecimiento informa un código en un mes cuando existe una fila; la ausencia de fila, la celda vacía y el cero explícito se distinguen. Un panel estable se define como el conjunto de establecimientos con al menos un ingreso informado en cada uno de los años 2021–2024, y sirve para comprobar que la tendencia no depende únicamente de la incorporación de nuevos informantes.</li>
+<li><strong>Indicadores de tamizaje.</strong> Solo se calculan cocientes entre códigos de la misma sección, instrumento, etapa y grupo de edad. En la serie 2019–2022 se informa el tamizaje alterado entre los tamizajes realizados; en 2023–2024 se informa la distribución de riesgo de la primera parte del M-CHAT R/F y la derivación en la segunda parte. Ninguno de estos cocientes es una positividad poblacional, porque el denominador no son todos los niños tamizados.</li>
+<li><strong>Comparación ecológica.</strong> Las tasas regionales de ingresos REM y de hospitalizaciones GRD se comparan por región y año con correlación de Spearman, como descripción de la coherencia territorial entre fuentes con unidades distintas.</li>
+</ul>
+</section>
+<section id="calidad-de-datos-y-controles" class="level2">
+<h2 class="anchored" data-anchor-id="calidad-de-datos-y-controles">Calidad de datos y controles</h2>
+<p>Cada script escribe tablas de control que los informes muestran junto a los resultados: registros leídos, duplicados exactos retirados, identificadores faltantes o inválidos, fechas inválidas, edades implausibles (negativas o mayores de 110 años), registros sin sexo o sin edad, comunas no asignadas al catálogo INE, y en REM la coherencia entre el total y las sumas por sexo y edad de las filas completas. Las comunas de residencia se enlazan al código único territorial por nombre normalizado, con tres alias documentados (Coyhaique, Concón y Aysén); solo los registros con comuna «desconocido» quedan sin región. El código analítico tiene pruebas unitarias con datos sintéticos para las reglas de fechas, posiciones, antecedentes y empates, y para las funciones de tasas e intervalos.</p>
+</section>
+<section id="sesgos-y-limitaciones" class="level2">
+<h2 class="anchored" data-anchor-id="sesgos-y-limitaciones">Sesgos y limitaciones</h2>
+<ul>
+<li><strong>Selección.</strong> GRD cubre hospitalizaciones en establecimientos públicos que participan del sistema GRD; las personas autistas sin hospitalización, atendidas en el sistema privado o en hospitales sin GRD no aparecen. Las tasas describen actividad hospitalaria con el código, no ocurrencia del autismo.</li>
+<li><strong>Detección y codificación.</strong> La probabilidad de que un código F84 se registre en una hospitalización depende de la conciencia clínica, de la disponibilidad de diagnóstico previo y de las reglas de codificación. La Ley 21.545 y el aumento de la demanda de evaluación probablemente elevaron el registro entre 2021 y 2024 con independencia de cambios en la ocurrencia.</li>
+<li><strong>Censura por la izquierda.</strong> El primer registro hospitalario observado no es el primer diagnóstico; una persona puede haber sido diagnosticada años antes en atención ambulatoria.</li>
+<li><strong>Denominadores.</strong> Las proyecciones INE son estimaciones y no incorporan los resultados del Censo 2024; la comuna de residencia puede estar desactualizada o mal informada.</li>
+<li><strong>Comparabilidad de REM.</strong> Cambios de códigos (2021), de instrumentos de tamizaje (2023) y de secciones (2024) impiden series homogéneas; el número de establecimientos informantes cambia cada año.</li>
+<li><strong>Falacia ecológica y unidad de área.</strong> Las asociaciones territoriales no se aplican a personas y dependen de la división comunal.</li>
+<li><strong>Comparaciones múltiples.</strong> Con más de 300 comunas, la lectura con p &lt; 0,05 produce falsos positivos; se prefiere la corrección por tasa de falsos descubrimientos.</li>
+<li><strong>Sin inferencia causal.</strong> No se estiman modelos de riesgo ni supervivencia; las diferencias entre grupos se describen sin ajuste multivariable.</li>
+</ul>
+</section>
+<section id="ética-y-protección-de-datos" class="level2">
+<h2 class="anchored" data-anchor-id="ética-y-protección-de-datos">Ética y protección de datos</h2>
+<p>Las bases GRD y REM son públicas o de uso autorizado y no contienen nombres. Los identificadores encriptados se procesan en memoria y nunca se exportan; todas las tablas del repositorio son agregados sin identificadores, sin fechas individuales y sin combinaciones que permitan reidentificación. Las tablas comunales con conteos pequeños se publican con sus intervalos para evitar sobreinterpretación.</p>
+</section>
+<section id="reproducibilidad-y-software" class="level2">
+<h2 class="anchored" data-anchor-id="reproducibilidad-y-software">Reproducibilidad y software</h2>
+<div id="cell-tabla-pipeline" class="cell" data-execution_count="4">
+<div id="tabla-pipeline" class="cell-output cell-output-display">
+<div class="analysis-table" role="region" aria-label="Cadena de procesamiento; el orden de la tabla es el orden de ejecución" tabindex="0">
+<table class="dataframe table table-striped table-sm caption-top small" data-quarto-postprocess="true">
+<caption>Cadena de procesamiento; el orden de la tabla es el orden de ejecución</caption>
+<thead>
+<tr class="header">
+<th data-quarto-table-cell-role="th">Script</th>
+<th data-quarto-table-cell-role="th">Entrada</th>
+<th data-quarto-table-cell-role="th">Función</th>
+<th data-quarto-table-cell-role="th">Salidas en output_files/consolidacion</th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td>scripts/audit_grd_linkage.py</td>
+<td>GRD completo</td>
+<td>Inventario, continuidad del identificador, concordancia entre años</td>
+<td>grd_source_inventory, grd_linkage_*</td>
+</tr>
+<tr class="even">
+<td>scripts/audit_rem.py</td>
+<td>REM Serie A + diccionarios</td>
+<td>Catálogo anual, validación de columnas, agregados por región, comuna, edad/sexo y panel de establecimientos</td>
+<td>rem_*</td>
+</tr>
+<tr class="odd">
+<td>scripts/grd_trajectories.py</td>
+<td>GRD completo</td>
+<td>Historias hospitalarias, cohortes por período y definición, posición, antecedentes, transiciones</td>
+<td>grd_cohort_*, grd_first_*, grd_previous_*, grd_sequences, grd_principal_transitions</td>
+</tr>
+<tr class="even">
+<td>scripts/grd_epidemiology.py</td>
+<td>GRD completo</td>
+<td>Registros F84 por año, edad, sexo, comuna, posición, subcódigo, características, codiagnósticos, estancia, rehospitalización</td>
+<td>grd_epi_*</td>
+</tr>
+<tr class="odd">
+<td>scripts/epi_rates.py</td>
+<td>Agregados + INE + cartografía</td>
+<td>Tasas crudas y estandarizadas, intervalos, razones, tendencias, estandarización indirecta, suavizado, Moran y LISA</td>
+<td>grd_rates_*, grd_sex_ratio, grd_trends_apc, grd_spatial_*, rem_rates_*, rem_grd_ecological</td>
+</tr>
+<tr class="even">
+<td>scripts/render_reports.py</td>
+<td>Tablas agregadas</td>
+<td>Renderiza los cuatro documentos de docs/</td>
+<td>docs/*.html</td>
+</tr>
+</tbody>
+</table>
+</div>
+</div>
+</div>
+<p>Los scripts son Python (pandas, numpy, scipy, statsmodels, geopandas, libpysal, esda) con versiones fijadas en <code>requirements-analysis.txt</code>; los documentos se renderizan con Quarto. Las tablas y figuras se recalculan en cada renderización a partir de los agregados; ningún valor está pegado manualmente. La semilla de las permutaciones espaciales es fija. Los informes históricos de <code>others scripts/</code> se conservan solo para trazabilidad y no alimentan los documentos actuales.</p>
+</section>
+<section id="referencias" class="level2">
+<h2 class="anchored" data-anchor-id="referencias">Referencias</h2>
+<div id="refs" class="references csl-bib-body hanging-indent" data-entry-spacing="0" role="list">
+<div id="ref-ahmad2001" class="csl-entry" role="listitem">
+Ahmad, Omar B., Cynthia Boschi-Pinto, Alan D. Lopez, Christopher J. L. Murray, Rafael Lozano, y Mie Inoue. 2001. <span>«Age standardization of rates: a new <span>WHO</span> standard»</span>. GPE Discussion Paper Series No. 31. World Health Organization.
+</div>
+<div id="ref-anselin1995" class="csl-entry" role="listitem">
+Anselin, Luc. 1995. <span>«Local indicators of spatial association: <span>LISA</span>»</span>. <em>Geographical Analysis</em> 27 (2): 93-115. <a href="https://doi.org/10.1111/j.1538-4632.1995.tb00338.x">https://doi.org/10.1111/j.1538-4632.1995.tb00338.x</a>.
+</div>
+<div id="ref-benjamini1995" class="csl-entry" role="listitem">
+Benjamini, Yoav, y Yosef Hochberg. 1995. <span>«Controlling the false discovery rate: a practical and powerful approach to multiple testing»</span>. <em>Journal of the Royal Statistical Society: Series B</em> 57 (1): 289-300.
+</div>
+<div id="ref-bougeard2021" class="csl-entry" role="listitem">
+Bougeard, Clémence, Françoise Picarel-Blanchot, Ramona Schmid, Rosanna Campbell, y Jan Buitelaar. 2021. <span>«Prevalence of autism spectrum disorder and co-morbidities in children and adolescents: A systematic literature review»</span>. <em>Frontiers in Psychiatry</em> 12: 744709. <a href="https://doi.org/10.3389/fpsyt.2021.744709">https://doi.org/10.3389/fpsyt.2021.744709</a>.
+</div>
+<div id="ref-breslow1987" class="csl-entry" role="listitem">
+Breslow, Norman E., y Nicholas E. Day. 1987. <em>Statistical Methods in Cancer Research. Volume <span>II</span>: The Design and Analysis of Cohort Studies</em>. Lyon: International Agency for Research on Cancer.
+</div>
+<div id="ref-ley21545" class="csl-entry" role="listitem">
+Chile, Ministerio de Salud. 2023. <span>«Ley 21.545: establece la promoci<span>ó</span>n de la inclusi<span>ó</span>n, la atenci<span>ó</span>n integral y la protecci<span>ó</span>n de los derechos de las personas con trastorno del espectro autista en el <span>á</span>mbito social, de salud y educaci<span>ó</span>n»</span>. Diario Oficial de la Rep<span>ú</span>blica de Chile, 10 de marzo de 2023. <a href="https://www.diariooficial.interior.gob.cl/publicaciones/2023/03/10/43498/01/2284193.pdf">https://www.diariooficial.interior.gob.cl/publicaciones/2023/03/10/43498/01/2284193.pdf</a>.
+</div>
+<div id="ref-clegg2009" class="csl-entry" role="listitem">
+Clegg, Limin X., Benjamin F. Hankey, Ram Tiwari, Eric J. Feuer, y Brenda K. Edwards. 2009. <span>«Estimating average annual per cent change in trend analysis»</span>. <em>Statistics in Medicine</em> 28 (29): 3670-82. <a href="https://doi.org/10.1002/sim.3733">https://doi.org/10.1002/sim.3733</a>.
+</div>
+<div id="ref-elliott2000" class="csl-entry" role="listitem">
+Elliott, Paul, Jon C. Wakefield, Nicola G. Best, y David J. Briggs, eds. 2000. <em>Spatial Epidemiology: Methods and Applications</em>. Oxford University Press.
+</div>
+<div id="ref-fay1997" class="csl-entry" role="listitem">
+Fay, Michael P., y Eric J. Feuer. 1997. <span>«Confidence intervals for directly standardized rates: a method based on the gamma distribution»</span>. <em>Statistics in Medicine</em> 16 (7): 791-801. <a href="https://doi.org/10.1002/(SICI)1097-0258(19970415)16:7&lt;791::AID-SIM500&gt;3.0.CO;2-\#">https://doi.org/10.1002/(SICI)1097-0258(19970415)16:7&lt;791::AID-SIM500&gt;3.0.CO;2-\#</a>.
+</div>
+<div id="ref-fyfe2026" class="csl-entry" role="listitem">
+Fyfe, Caro et al. 2026. <span>«Time trends in the male to female ratio for autism incidence: population based, prospectively collected, birth cohort study»</span>. <em>BMJ</em>. <a href="https://doi.org/10.1136/bmj-2025-084164">https://doi.org/10.1136/bmj-2025-084164</a>.
+</div>
+<div id="ref-ine2019" class="csl-entry" role="listitem">
+Instituto Nacional de Estadísticas. 2019. <span>«Estimaciones y proyecciones de la poblaci<span>ó</span>n de Chile 2002–2035, totales regionales, poblaci<span>ó</span>n urbana y rural y comunas, base <span>Censo</span> 2017»</span>. INE, Santiago de Chile.
+</div>
+<div id="ref-loomes2017" class="csl-entry" role="listitem">
+Loomes, Rachel, Laura Hull, y William Polmear Locke Mandy. 2017. <span>«What is the male-to-female ratio in autism spectrum disorder? <span>A</span> systematic review and meta-analysis»</span>. <em>Journal of the American Academy of Child and Adolescent Psychiatry</em> 56 (6): 466-74. <a href="https://doi.org/10.1016/j.jaac.2017.03.013">https://doi.org/10.1016/j.jaac.2017.03.013</a>.
+</div>
+<div id="ref-marshall1991" class="csl-entry" role="listitem">
+Marshall, Roger J. 1991. <span>«Mapping disease and mortality rates using empirical <span>Bayes</span> estimators»</span>. <em>Journal of the Royal Statistical Society: Series C (Applied Statistics)</em> 40 (2): 283-94. <a href="https://doi.org/10.2307/2347593">https://doi.org/10.2307/2347593</a>.
+</div>
+<div id="ref-minsal_grd" class="csl-entry" role="listitem">
+Ministerio de Salud de Chile. 2025a. <span>«Bases de datos de egresos hospitalarios agrupados por <span>GRD</span> (<span>IR-GRD</span>), establecimientos p<span>ú</span>blicos, 2019–2024»</span>. Departamento de Estad<span>í</span>sticas e Informaci<span>ó</span>n de Salud y Unidad GRD.
+</div>
+<div id="ref-minsal_rem" class="csl-entry" role="listitem">
+———. 2025b. <span>«Res<span>ú</span>menes Estad<span>í</span>sticos Mensuales (<span>REM</span>), Serie A: bases de datos y diccionarios de c<span>ó</span>digos 2017–2024»</span>. Departamento de Estad<span>í</span>sticas e Informaci<span>ó</span>n de Salud (DEIS).
+</div>
+<div id="ref-moran1950" class="csl-entry" role="listitem">
+Moran, P. A. P. 1950. <span>«Notes on continuous stochastic phenomena»</span>. <em>Biometrika</em> 37 (1/2): 17-23. <a href="https://doi.org/10.2307/2332142">https://doi.org/10.2307/2332142</a>.
+</div>
+<div id="ref-rey2010" class="csl-entry" role="listitem">
+Rey, Sergio J., y Luc Anselin. 2010. <span>«<span>PySAL</span>: A <span>Python</span> library of spatial analytical methods»</span>. En <em>Handbook of Applied Spatial Analysis</em>, editado por Manfred M. Fischer y Arthur Getis, 175-93. Springer.
+</div>
+<div id="ref-santomauro2025" class="csl-entry" role="listitem">
+Santomauro, Damian F., Darren Hedley, Ensu Sahin, Traolach S. Brugha, Mohsen Naghavi, Theo Vos, Harvey A. Whiteford, Alize J. Ferrari, y Mark A. Stokes. 2025. <span>«The global epidemiology and health burden of the autism spectrum: findings from the <span>Global Burden of Disease Study</span> 2021»</span>. <em>The Lancet Psychiatry</em> 12 (2): 111-21. <a href="https://doi.org/10.1016/S2215-0366(24)00363-8">https://doi.org/10.1016/S2215-0366(24)00363-8</a>.
+</div>
+<div id="ref-shaw2025" class="csl-entry" role="listitem">
+Shaw, Kelly A., Susan Williams, Mary E. Patrick, et al. 2025. <span>«Prevalence and early identification of autism spectrum disorder among children aged 4 and 8 years, <span>Autism and Developmental Disabilities Monitoring Network</span>, 16 sites, <span>United States</span>, 2022»</span>. <em>MMWR Surveillance Summaries</em> 74 (SS-2): 1-22. <a href="https://doi.org/10.15585/mmwr.ss7402a1">https://doi.org/10.15585/mmwr.ss7402a1</a>.
+</div>
+<div id="ref-talantseva2023" class="csl-entry" role="listitem">
+Talantseva, Oksana I., Raisa S. Romanova, Ekaterina M. Shurdova, Tatiana A. Dolgorukova, Polina S. Sologub, Olga S. Titova, Daria F. Kleeva, y Elena L. Grigorenko. 2023. <span>«The global prevalence of autism spectrum disorder: A three-level meta-analysis»</span>. <em>Frontiers in Psychiatry</em> 14: 1071181. <a href="https://doi.org/10.3389/fpsyt.2023.1071181">https://doi.org/10.3389/fpsyt.2023.1071181</a>.
+</div>
+<div id="ref-ulm1990" class="csl-entry" role="listitem">
+Ulm, Kurt. 1990. <span>«A simple method to calculate the confidence interval of a standardized mortality ratio (<span>SMR</span>)»</span>. <em>American Journal of Epidemiology</em> 131 (2): 373-75.
+</div>
+<div id="ref-who_icd10" class="csl-entry" role="listitem">
+World Health Organization. 2019. <span>«International Statistical Classification of Diseases and Related Health Problems, 10th Revision (<span>ICD-10</span>), 2019 version»</span>. WHO, Geneva.
+</div>
+<div id="ref-yanez2021" class="csl-entry" role="listitem">
+Yáñez, Carolina, Paulina Maira, Consuelo Elgueta, María Brito, Marcelo A. Crockett, Ledia Troncoso, Carolina López, y Mónica Troncoso. 2021. <span>«Estimaci<span>ó</span>n de la prevalencia de trastorno del espectro autista en poblaci<span>ó</span>n urbana chilena»</span>. <em>Andes Pediatrica</em> 92 (4): 519-25. <a href="https://www.scielo.cl/scielo.php?script=sci_arttext&amp;pid=S2452-60532021005000606">https://www.scielo.cl/scielo.php?script=sci_arttext&amp;pid=S2452-60532021005000606</a>.
+</div>
+<div id="ref-zeidan2022" class="csl-entry" role="listitem">
+Zeidan, Jinan, Eric Fombonne, Julie Scorah, Alaa Ibrahim, Maureen S. Durkin, Shekhar Saxena, Afiqah Yusuf, Andy Shih, y Mayada Elsabbagh. 2022. <span>«Global prevalence of autism: A systematic review update»</span>. <em>Autism Research</em> 15 (5): 778-90. <a href="https://doi.org/10.1002/aur.2696">https://doi.org/10.1002/aur.2696</a>.
+</div>
+</div>
+<div class="report-nav">
+<p><a href="index.html">Volver al inicio</a> <a href="rem.html">Ver análisis REM</a> <a href="grd.html">Ver análisis GRD</a></p>
+</div>
 </section>
 
 </main>

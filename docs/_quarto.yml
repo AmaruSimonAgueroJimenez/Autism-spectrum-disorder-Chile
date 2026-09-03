@@ -3,6 +3,7 @@ project:
   execute-dir: project
   render:
     - index.qmd
+    - metodologia.qmd
     - rem.qmd
     - grd.qmd
 
@@ -13,14 +14,18 @@ format:
   html:
     theme: cosmo
     toc: true
-    toc-depth: 2
+    toc-depth: 3
+    toc-location: right
     embed-resources: true
     css: styles.css
     code-fold: true
     code-summary: "Ver Python"
     fig-cap-location: bottom
+    number-sections: false
+    smooth-scroll: true
 execute:
   echo: false
   error: false
+  warning: false
   cache: false
   daemon: false

@@ -1,0 +1,7 @@
+year,identifier_column,records_scanned,prefiltered_rows,f84_records,exact_duplicates_removed,records_kept,records_missing_id,records_missing_sex,records_invalid_dates,records_missing_birth,records_implausible_age,records_missing_age_group,records_missing_comuna,records_deaths
+2019,CIP_ENCRIPTADO,1151475,2385,2385,0,2385,4,1,0,0,0,0,0,16
+2020,CIP_ENCRIPTADO,781912,1633,1633,0,1633,0,0,0,0,0,0,0,17
+2021,CIP_ENCRIPTADO,816909,2399,2399,0,2399,0,1,0,0,0,0,0,7
+2022,CIP_ENCRIPTADO,932839,3912,3912,0,3912,3,1,0,0,0,0,0,18
+2023,CIP_ENCRIPTADO,1039587,6473,6473,0,6473,2,2,0,0,0,0,0,21
+2024,ID_BENEFICIARIO,1085813,8818,8818,0,8818,1,4,3,0,0,3,0,32

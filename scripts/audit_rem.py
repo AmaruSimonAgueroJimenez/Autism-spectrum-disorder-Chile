@@ -77,6 +77,7 @@ def run(root: Path, output: Path, years: list[int]) -> None:
     numeric = [f"Col{i:02d}" for i in range(1, 51)]
     keys = ["Ano", "Mes", "IdServicio", "IdEstablecimiento", "CodigoPrestacion", "IdRegion", "IdComuna"]
     all_totals, annual, ages, audits = [], [], [], []
+    region_ages, comunas, panels = [], [], []
     for year in years:
         path = root / "REM/SerieA" / f"SerieA_{year}.csv"
         codes = set(cat.loc[cat.year == year, "code"])
@@ -126,6 +127,27 @@ def run(root: Path, output: Path, years: list[int]) -> None:
                     ages.append(dict(year=year, code=row["code"], label=row["label"], section=row["section"],
                                      age_group=age, sex=sex, count=row[f"Col{4 + 2*index + sex_index:02d}"]))
         a05_data = data.loc[data.CodigoPrestacion.isin(set(a05.code))]
+        # Regional age/sex sums of the A05 columns 04–37 (observed cells only).
+        region_cells = a05_data.groupby(["year", "CodigoPrestacion", "IdRegion"], dropna=False)[numeric[3:37]].sum(min_count=1).reset_index()
+        for row in region_cells.to_dict("records"):
+            for index, age in enumerate(AGE_GROUPS):
+                for sex_index, sex in enumerate(["Hombres", "Mujeres"]):
+                    region_ages.append(dict(year=year, code=row["CodigoPrestacion"], IdRegion=row["IdRegion"],
+                                            age_group=age, sex=sex, count=row[f"Col{4 + 2*index + sex_index:02d}"]))
+        # Comuna of the reporting establishment: sums and coverage, all selected codes.
+        comuna = data.groupby(["year", "CodigoPrestacion", "IdRegion", "IdComuna"], dropna=False).agg(
+            Col01=("Col01", lambda s: s.sum(min_count=1)), Col02=("Col02", lambda s: s.sum(min_count=1)),
+            Col03=("Col03", lambda s: s.sum(min_count=1)), total_known=("total_known", lambda s: s.sum(min_count=1)),
+            rows=("Col01", "size"), rows_total_known=("total_known", "count"),
+            reporting_establishments=("IdEstablecimiento", "nunique")).reset_index().rename(columns={"CodigoPrestacion": "code"})
+        comunas.append(comuna)
+        # Establishment panel: months with a row, months with a positive total, sums by establishment and code.
+        panel = data.assign(positive=data.total_known > 0).groupby(
+            ["year", "CodigoPrestacion", "IdServicio", "IdRegion", "IdComuna", "IdEstablecimiento"], dropna=False).agg(
+            months_with_rows=("Mes", "nunique"), rows=("Col01", "size"), rows_total_known=("total_known", "count"),
+            months_positive=("positive", "sum"), total_known=("total_known", lambda s: s.sum(min_count=1)),
+            Col01=("Col01", lambda s: s.sum(min_count=1))).reset_index().rename(columns={"CodigoPrestacion": "code"})
+        panels.append(panel)
         valid_sex = a05_data[["Col01", "Col02", "Col03"]].notna().all(axis=1)
         valid_age = a05_data[["Col01"] + numeric[3:37]].notna().all(axis=1)
         audits.append(dict(year=year, records=nrows, selected_records=len(data),
@@ -141,6 +163,9 @@ def run(root: Path, output: Path, years: list[int]) -> None:
     pd.concat(annual).to_csv(output / "rem_annual_by_code.csv", index=False)
     pd.DataFrame(ages).to_csv(output / "rem_a05_age_sex.csv", index=False)
     pd.DataFrame(audits).to_csv(output / "rem_quality.csv", index=False)
+    pd.DataFrame(region_ages).to_csv(output / "rem_a05_region_age_sex.csv", index=False)
+    pd.concat(comunas).to_csv(output / "rem_annual_comuna.csv", index=False)
+    pd.concat(panels).to_csv(output / "rem_establishment_panel.csv", index=False)
 
 
 if __name__ == "__main__":

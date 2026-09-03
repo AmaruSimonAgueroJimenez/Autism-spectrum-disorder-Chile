@@ -1,10 +1,10 @@
 ---
 title: "Autismo en Chile"
-subtitle: "Análisis de REM y trayectorias hospitalarias GRD"
+subtitle: "Epidemiología hospitalaria (GRD), actividad ambulatoria y tamizaje (REM) y trayectorias diagnósticas"
 ---
 
 ::: {.report-nav}
-[Inicio](index.html) [REM](rem.html) [GRD](grd.html)
+[Inicio](index.html) [Metodología](metodologia.html) [REM](rem.html) [GRD](grd.html)
 :::
 
 ```{python}
@@ -14,55 +14,91 @@ import sys
 
 ROOT = Path.cwd().parent if Path.cwd().name == "docs" else Path.cwd()
 sys.path.insert(0, str(ROOT / "scripts"))
-from report_helpers import read_result, kpis, number, share, show_table
+from report_helpers import read_result, kpis, number, share, show_table, ci
 
 grd_sources = read_result("grd_source_inventory.csv")
 rem_quality = read_result("rem_quality.csv")
+epi_quality = read_result("grd_epi_quality.csv")
 grd_summary = read_result("grd_cohort_summary.csv")
+rates = read_result("grd_rates_national.csv")
+trends = read_result("grd_trends_apc.csv")
+sex_ratio = read_result("grd_sex_ratio.csv")
+rem_rates = read_result("rem_rates_national.csv")
+rem_annual = read_result("rem_annual_by_code.csv")
+moran = read_result("grd_spatial_moran.csv")
 cohort = grd_summary.query("era == '2021-2024' and definition == 'TEA_operacional'").iloc[0]
+main = rates.loc[(rates.definition == "TEA_operacional") & (rates.role == "cualquiera") & (rates.sex == "TOTAL")]
+records = main.loc[main.unit == "records"].set_index("year")
+persons = main.loc[main.unit == "persons"].set_index("year")
+last_year = int(records.index.max())
+apc = trends.query("definition == 'TEA_operacional' and unit == 'records' and role == 'cualquiera' and sex == 'TOTAL' and period == '2021-2024'").iloc[0]
+ratio = sex_ratio.query("definition == 'TEA_operacional' and unit == 'records' and role == 'cualquiera'").set_index("year")
+rem_last = rem_rates.loc[(rem_rates.series == "05990022") & (rem_rates.sex == "TOTAL")].set_index("year")
+rem_ingresos = rem_annual.loc[rem_annual.code == "05990022"].set_index("year").Col01
+moran_main = moran.query("unit == 'records' and variable == 'sir_eb'").iloc[0]
+
 kpis([
-    (number(grd_sources.records.sum()), "Registros GRD · 2019–2024"),
-    (number(rem_quality.records.sum()), "Filas REM · 2017–2024"),
-    (number(cohort.patients), "Identificadores en la cohorte TEA · 2021–2024"),
+    (number(grd_sources.records.sum()), "Registros GRD leídos · 2019–2024"),
+    (number(epi_quality.records_kept.sum()), "Registros con código F84"),
+    (number(rem_quality.records.sum()), "Filas REM Serie A · 2017–2024"),
+    (number(cohort.patients), "Identificadores en la cohorte de trayectorias · 2021–2024"),
 ])
 ```
 
-## Dos fuentes, dos preguntas
+## Tres preguntas, dos fuentes
 
-**[REM: actividad asistencial, tamizaje y acceso](rem.html).** Describe ingresos y egresos de salud mental, edad y sexo, registros mensuales, cobertura de campos y actividad de rehabilitación. Los formularios contienen conteos agregados; no permiten seguir personas entre prestaciones.
+**[GRD: epidemiología hospitalaria y trayectorias](grd.html).** Describe las hospitalizaciones con código de trastorno del espectro autista (TEA) en el sistema público: magnitud y tendencia, tasas por población estandarizadas por edad, sexo y edad, subcategorías, posición del código, características del episodio, codiagnósticos, rehospitalización, regiones, comunas y autocorrelación espacial. Reconstruye además qué diagnósticos hospitalarios preceden al primer registro observado de autismo y en qué posición se registra.
 
-**[GRD: diagnósticos anteriores al primer registro de autismo](grd.html).** Reconstruye antecedentes hospitalarios, distingue diagnóstico principal y secundario y describe cuándo aparece posteriormente como principal. El período 2021–2024 es el análisis prioritario; 2019–2020 se mantiene separado.
+**[REM: actividad ambulatoria, tamizaje y rehabilitación](rem.html).** Describe los ingresos y egresos de los programas de salud mental con código de autismo, sus tasas por población, edad, sexo, regiones, comunas y establecimientos, el tamizaje en controles de salud infantil (MCHAT y M-CHAT R/F) y los ingresos a rehabilitación, y compara ecológicamente ambas fuentes.
 
-## Primeros resultados
+**[Metodología](metodologia.html).** Fuentes, definiciones de caso, unidades, denominadores, estandarización, intervalos, tendencias, análisis espacial, reglas de lectura de REM, controles de calidad, sesgos, limitaciones y reproducibilidad. Es la referencia común de los dos informes.
+
+## Resultados principales
 
 ```{python}
 #| label: hallazgos-principales
-positions = read_result("grd_first_position.csv")
-secondary = positions.query(
-    "era == '2021-2024' and definition == 'TEA_operacional' and index_role == 'solo_secundario'"
-).patients.sum()
 kpis([
-    (number(share(secondary, cohort.patients), 1) + "%", "Primer registro GRD solo como secundario"),
-    (number(share(cohort.prior_hospitalization, cohort.patients), 1) + "%", "Con hospitalizaciones anteriores observables"),
-    ("2 períodos", "Sin enlace de identificadores entre 2020 y 2021"),
+    (number(records.loc[last_year, "asr"], 1), f"Hospitalizaciones con código TEA por 100.000 personas-año, estandarizadas · {last_year} (era {number(records.asr.iloc[0], 1)} en {int(records.index.min())})"),
+    (number(persons.loc[last_year, "asr"], 1), f"Personas hospitalizadas con código TEA por 100.000 habitantes · {last_year}"),
+    (number(apc.apc, 1) + "%", f"Cambio porcentual anual promedio · 2021–2024 (IC 95%: {ci(apc.apc_lo, apc.apc_hi)})"),
+    (number(ratio.loc[last_year, "asr_ratio"], 2), f"Razón hombre:mujer de tasas · {last_year} (era {number(ratio.asr_ratio.iloc[0], 2)} en {int(ratio.index.min())})"),
+    (number(rem_last.loc[last_year, "asr"], 1), f"Ingresos REM A05 con código de autismo por 100.000 habitantes, estandarizados · {last_year} ({number(rem_ingresos.loc[last_year])} ingresos)"),
+    (number(moran_main.moran_i, 2), "I de Moran de la razón de hospitalización comunal suavizada (p de permutación " + number(moran_main.p_sim, 3) + ")"),
+    (number(share(cohort.prior_hospitalization, cohort.patients), 1) + "%", "Cohorte 2021–2024 con hospitalizaciones anteriores observables"),
 ])
 ```
 
-Estas cifras corresponden a una cohorte hospitalaria depurada y a una definición operacional de TEA. El **primer registro hospitalario observado no equivale al primer diagnóstico clínico**. Los códigos anteriores tampoco demuestran que se hayan descartado como diagnósticos diferenciales: pueden ser comorbilidades, síntomas o motivos de ingreso independientes.
+Las hospitalizaciones y los ingresos ambulatorios con código de autismo crecen con rapidez desde 2021, más en mujeres que en hombres, con la mayor intensidad entre 5 y 14 años y con fuerte heterogeneidad territorial. Estos aumentos son coherentes con mayor detección, mayor demanda y cambios de codificación en el período de la Ley 21.545; **no demuestran un aumento de la ocurrencia del autismo**. Ninguna cifra de estos informes es incidencia ni prevalencia: son tasas de hospitalizaciones, de personas hospitalizadas y de ingresos registrados.
 
-REM y GRD tienen unidades y coberturas diferentes. Sus conteos no se suman y no se enlazan individualmente con los archivos disponibles.
+En las trayectorias hospitalarias 2021–2024, el primer registro de autismo ocurre casi siempre con el código en posición secundaria y solo una minoría tiene hospitalizaciones anteriores observables. Los códigos anteriores no demuestran que se hayan descartado como diagnósticos diferenciales: pueden ser comorbilidades, síntomas o motivos de ingreso independientes.
 
 ## Cómo están organizados los análisis
 
-Los tres documentos actuales ejecutan **Python** y leen las tablas agregadas de `output_files/consolidacion/`. Las tablas y figuras se recalculan al renderizar; no contienen cifras pegadas manualmente. La extracción de los archivos originales se ejecuta por separado, mediante los scripts documentados en el [README del repositorio](../README.md).
+```{python}
+#| label: tabla-organizacion
+import pandas as pd
+organisation = pd.DataFrame([
+    ("GRD · A1", "Universo, unidades y calidad", "grd_epi_quality, grd_annual_positions"),
+    ("GRD · A2", "Tendencia anual, tasas crudas y estandarizadas, CPA, estacionalidad, sensibilidad", "grd_rates_national, grd_trends_apc, grd_epi_monthly"),
+    ("GRD · A3", "Razón de sexos, edad simple, tasas específicas por edad", "grd_sex_ratio, grd_epi_age_single, grd_rates_age_specific"),
+    ("GRD · A4", "Subcategorías F84 y posición del código", "grd_rates_subcodes, grd_epi_subcodes"),
+    ("GRD · A5", "Ingreso, actividad, especialidad, previsión, alta, letalidad, estancia, severidad, hospitales", "grd_epi_features, grd_epi_los_*, grd_epi_grd_weight, grd_epi_hospitals"),
+    ("GRD · A6", "Rehospitalización y multiplicidad", "grd_epi_readmissions, grd_epi_multiplicity"),
+    ("GRD · A7", "Codiagnósticos y diagnóstico principal", "grd_epi_codiagnoses"),
+    ("GRD · A8", "Regiones, comunas, estandarización indirecta, Moran, LISA", "grd_rates_regional, grd_rates_comunal, grd_spatial_*"),
+    ("GRD · B", "Trayectorias: enlace, posición, antecedentes, secuencias, transiciones", "grd_cohort_*, grd_first_*, grd_previous_*, grd_sequences, grd_principal_transitions"),
+    ("REM", "Ingresos, tasas, edad y sexo, subcategorías, regiones, comunas, panel, tamizaje, rehabilitación, comparación ecológica", "rem_*"),
+], columns=["Sección", "Contenido", "Tablas en output_files/consolidacion"])
+show_table(organisation, "Secciones de los informes y tablas agregadas que las alimentan")
+```
 
-Los informes previos, sus HTML y sus recursos se conservaron en **`others scripts/`**, fuera de `docs`. Esa carpeta contiene también la propuesta metodológica y un inventario de la migración. Los resultados antiguos permanecen disponibles para trazabilidad.
+Los cuatro documentos ejecutan **Python** y leen las tablas agregadas de `output_files/consolidacion/`. Las tablas y figuras se recalculan al renderizar; no contienen cifras pegadas manualmente. La extracción de los archivos originales se ejecuta por separado, mediante los scripts documentados en el [README del repositorio](../README.md). Los informes previos, sus HTML y sus recursos se conservaron en `others scripts/`, fuera de `docs`, solo para trazabilidad.
 
 ## Prioridades de interpretación
 
-| Fuente | Ya disponible | Siguiente extensión metodológica |
+| Fuente | Ya disponible | Siguiente extensión |
 |---|---|---|
-| REM | Catálogo anual, series mensuales, edad/sexo A05, cobertura de campos, A03 y A28 separados | Validar denominadores de tamizaje y construir un panel estable de establecimientos |
-| GRD | Cohortes por período, posición diagnóstica, antecedentes, ventanas temporales, sensibilidad de definición y transición a principal | Confirmar enlace con el productor y estimar resultados restringidos por oportunidad de observación antes de modelos ajustados |
+| GRD | Tasas crudas y estandarizadas con intervalos, tendencias, sexo y edad, subcategorías, posición, características del episodio, codiagnósticos, rehospitalización, regiones, comunas, Moran y LISA, cohortes y trayectorias | Confirmar el enlace con el productor, modelos ajustados por edad, sexo, año, contactos y hospital, incorporar defunciones y urgencias, validar fichas clínicas |
+| REM | Series 2017–2024, tasas de ingreso estandarizadas, edad y sexo, subcategorías, regiones, comunas, panel de establecimientos, indicadores de tamizaje por etapa, rehabilitación, comparación ecológica | Validar denominadores de tamizaje con los manuales, incorporar Serie P (población en control), revisar 2025–2026 |
 
 Los datos originales permanecen en la raíz externa configurada mediante `ASESORIAS_DATA_ROOT`. La extracción utilizada no incorpora REM 2025–2026: esos archivos requieren revisar integridad, cobertura y comparabilidad antes de ampliar las series.
