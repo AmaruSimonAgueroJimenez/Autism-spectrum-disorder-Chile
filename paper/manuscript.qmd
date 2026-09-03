@@ -1,0 +1,631 @@
+---
+title: "Autismo en los registros administrativos del sistema público de salud de Chile, 2017–2024: hospitalizaciones, ingresos ambulatorios, distribución territorial y trayectorias de codificación"
+subtitle: "Manuscrito preliminar (preprint), no revisado por pares"
+author:
+  - name: Amaru Simón Agüero Jiménez
+    email: amaruaguero2004@ug.uchile.cl
+    affiliations:
+      - name: "[Afiliación institucional por completar]"
+date: today
+---
+
+```{python}
+#| label: setup
+#| include: false
+from pathlib import Path
+import sys
+import warnings
+import numpy as np
+import pandas as pd
+import matplotlib.pyplot as plt
+from scipy import stats
+
+ROOT = next(p for p in [Path.cwd(), *Path.cwd().parents] if (p / "scripts" / "report_helpers.py").is_file())
+sys.path.insert(0, str(ROOT / "scripts"))
+from report_helpers import (read_result, markdown_table, number, ci, share, plot_style, load_comunas, load_regions, choropleth,
+                            cluster_map, icd_label, icd_chapter, POSITION_LABELS, GROUP_LABELS, SUBCODE_LABELS, AGE_GROUPS,
+                            SEX_LABELS, SEX_COLORS, REGION_NAMES, REGION_ORDER, COLORS)
+from epi_helpers import annual_percent_change, direct_standardization, rate_ratio
+
+warnings.filterwarnings("ignore")
+plot_style()
+plt.rcParams.update({"font.size": 7.5, "axes.titlesize": 8.5, "axes.labelsize": 7.5, "legend.fontsize": 6.5,
+                     "xtick.labelsize": 6.5, "ytick.labelsize": 6.5, "figure.dpi": 110, "savefig.dpi": 300})
+DEFINITION = "TEA_operacional"
+AUTISM = "05990022"
+ERA = "2021-2024"
+YEARS = list(range(2019, 2025))
+
+
+def finish_panels(axes, letters="ABCDEFGH"):
+    """Left-align titles and draw the panel letter just outside the top-left corner of each axes."""
+    for ax, letter in zip(np.ravel(axes), letters):
+        title = ax.get_title()
+        ax.set_title("", loc="center")
+        ax.set_title(title, loc="left", fontsize=8.5, fontweight="bold")
+        ax.annotate(letter, xy=(0, 1), xycoords="axes fraction", xytext=(-6, 3), textcoords="offset points",
+                    ha="right", va="bottom", fontsize=11, fontweight="bold")
+
+
+def p_text(p):
+    return "< 0,001" if p < 0.001 else number(p, 3)
+
+
+rates = read_result("grd_rates_national.csv")
+age_specific = read_result("grd_rates_age_specific.csv")
+sex_ratio = read_result("grd_sex_ratio.csv")
+trends = read_result("grd_trends_apc.csv")
+positions_year = read_result("grd_annual_positions.csv")
+subcodes = read_result("grd_epi_subcodes.csv")
+features = read_result("grd_epi_features.csv")
+los_summary = read_result("grd_epi_los_summary.csv")
+readmissions = read_result("grd_epi_readmissions.csv")
+codiagnoses = read_result("grd_epi_codiagnoses.csv")
+quality = read_result("grd_epi_quality.csv")
+grd_sources = read_result("grd_source_inventory.csv")
+regional = read_result("grd_rates_regional.csv")
+comunal = read_result("grd_rates_comunal.csv")
+moran = read_result("grd_spatial_moran.csv")
+lisa = read_result("grd_spatial_lisa.csv")
+rem_rates = read_result("rem_rates_national.csv")
+rem_age = read_result("rem_rates_age_specific.csv")
+rem_regional = read_result("rem_rates_regional.csv")
+rem_annual = read_result("rem_annual_by_code.csv")
+rem_quality = read_result("rem_quality.csv")
+ecological = read_result("rem_grd_ecological.csv")
+ecological_com = read_result("rem_grd_ecological_comunal.csv")
+summary = read_result("grd_cohort_summary.csv")
+first_position = read_result("grd_first_position.csv")
+previous_groups = read_result("grd_previous_groups.csv")
+transitions = read_result("grd_principal_transitions.csv")
+cohort_strata = read_result("grd_cohort_strata.csv")
+first_principal = read_result("grd_first_hospital_principal.csv")
+
+# --- National series -------------------------------------------------------
+grd_nat = rates.loc[(rates.definition == DEFINITION) & (rates.role == "cualquiera")]
+rec = grd_nat.loc[(grd_nat.unit == "records") & (grd_nat.sex == "TOTAL")].set_index("year").sort_index()
+per = grd_nat.loc[(grd_nat.unit == "persons") & (grd_nat.sex == "TOTAL")].set_index("year").sort_index()
+first_year, last_year = int(rec.index.min()), int(rec.index.max())
+rem_nat = rem_rates.loc[rem_rates.series == AUTISM]
+rem_tot = rem_nat.loc[rem_nat.sex == "TOTAL"].set_index("year").sort_index()
+rem_first = int(rem_tot.index.min())
+apc = trends.loc[(trends.definition == DEFINITION) & (trends.role == "cualquiera") & (trends.sex == "TOTAL")].set_index(["unit", "period"])
+apc_rec = apc.loc[("records", "2021-2024")]
+apc_per = apc.loc[("persons", "2021-2024")]
+rem_apc = annual_percent_change(rem_tot.reset_index())
+sr = sex_ratio.loc[(sex_ratio.definition == DEFINITION) & (sex_ratio.unit == "records") & (sex_ratio.role == "cualquiera")].set_index("year").sort_index()
+
+
+def rem_sex_ratio(year):
+    men = rem_nat.loc[(rem_nat.sex == "HOMBRE") & (rem_nat.year == year)].iloc[0]
+    women = rem_nat.loc[(rem_nat.sex == "MUJER") & (rem_nat.year == year)].iloc[0]
+    return rate_ratio(men.asr, men.asr_var, women.asr, women.asr_var)
+
+
+rem_sr = pd.DataFrame([dict(year=int(y), **dict(zip(["ratio", "lo", "hi"], rem_sex_ratio(y)))) for y in rem_tot.index]).set_index("year")
+
+# --- Positions, subcategories, co-diagnoses --------------------------------
+pos = positions_year.loc[positions_year.definition == DEFINITION].groupby(["source_year", "role"]).records.sum().unstack("role").fillna(0)
+pos_total = pos.sum(axis=1)
+pct_secondary = 100 * pos["solo_secundario"] / pos_total
+n_main = float(pos_total.sum())
+n_secondary = float(pos["solo_secundario"].sum())
+mentions = subcodes.groupby(["year", "code"]).records.sum().unstack("code").fillna(0)
+mentions["F842-F844"] = mentions[[c for c in ["F842", "F843", "F844"] if c in mentions]].sum(axis=1)
+subcode_keep = [c for c in ["F840", "F841", "F845", "F848", "F849", "F842-F844"] if c in mentions]
+subcode_pct = mentions[subcode_keep].div(mentions[subcode_keep].sum(axis=1), axis=0) * 100
+co = codiagnoses.loc[codiagnoses.definition == DEFINITION].copy()
+co["chapter"] = co.code3.map(icd_chapter)
+chapters = (100 * co.groupby("chapter").records.sum() / n_main).sort_values()
+principal_secondary = co.loc[(co.code_position == "principal") & (co.role == "solo_secundario")].groupby("code3").records.sum().sort_values(ascending=False)
+principal_top = (100 * principal_secondary.head(12) / n_secondary)
+
+# --- Episode features ------------------------------------------------------
+feat = features.loc[features.definition == DEFINITION]
+
+
+def feature_share(variable, values, years):
+    frame = feat.loc[(feat.variable == variable) & feat.year.isin(years)]
+    total = frame.records.sum()
+    return 100 * frame.loc[frame.value.isin(values)].records.sum() / total if total else np.nan
+
+
+hosp_los = los_summary.loc[(los_summary.definition == DEFINITION) & (los_summary.TIPO_ACTIVIDAD == "HOSPITALIZACIÓN")
+                           & los_summary.role.isin(["principal", "solo_secundario"])]
+re = readmissions.loc[readmissions.definition == DEFINITION]
+
+# --- Territory -------------------------------------------------------------
+reg_rec = regional.loc[(regional.unit == "records") & (regional.sex == "TOTAL") & (regional.period == "2019-2024")].set_index("cut_region")
+reg_per = regional.loc[(regional.unit == "persons") & (regional.sex == "TOTAL") & (regional.period == "2021-2024")].set_index("cut_region")
+reg_rem = rem_regional.loc[(rem_regional.series == AUTISM) & (rem_regional.sex == "TOTAL") & (rem_regional.period == "2021-2024")].set_index("cut_region")
+sex_rec = regional.loc[(regional.unit == "records") & (regional.period == "2019-2024")].pivot(index="cut_region", columns="sex", values="asr")
+sex_rem = rem_regional.loc[(rem_regional.series == AUTISM) & (rem_regional.period == "2021-2024")].pivot(index="cut_region", columns="sex", values="asr")
+nat_rec = direct_standardization(age_specific.loc[(age_specific.definition == DEFINITION) & (age_specific.unit == "records") & (age_specific.sex == "TOTAL")])
+nat_per = direct_standardization(age_specific.loc[(age_specific.definition == DEFINITION) & (age_specific.unit == "persons") & (age_specific.sex == "TOTAL") & age_specific.year.between(2021, 2024)])
+nat_rem = direct_standardization(rem_age.loc[(rem_age.series == AUTISM) & (rem_age.sex == "TOTAL") & (rem_age.year >= 2021)])
+com_rec = comunal.loc[(comunal.unit == "records") & comunal.continental].copy()
+moran_rec = moran.loc[(moran.unit == "records") & (moran.variable == "sir_eb")].iloc[0]
+moran_per = moran.loc[(moran.unit == "persons") & (moran.variable == "sir_eb")].iloc[0]
+lisa_rec = lisa.loc[(lisa.unit == "records") & (lisa.variable == "sir_eb")]
+lisa_counts = lisa_rec.cluster_fdr.value_counts()
+
+# --- Ecological comparison ---------------------------------------------------
+reg_pool = reg_rem[["asr"]].rename(columns={"asr": "rem_asr"}).join(reg_per[["asr"]].rename(columns={"asr": "grd_persons_asr"}), how="inner")
+rho_reg_pool, p_reg_pool = stats.spearmanr(reg_pool.rem_asr, reg_pool.grd_persons_asr)
+reg_by_year = {int(y): stats.spearmanr(f.rem_asr, f.grd_persons_asr) for y, f in ecological.groupby("year")}
+com_periods = list(dict.fromkeys(ecological_com.period))
+
+
+def comuna_sets(period):
+    frame = ecological_com.loc[(ecological_com.period == period) & ecological_com.continental]
+    reported = frame.loc[frame.rem_reported]
+    return {"Comunas con establecimiento informante": reported,
+            "Comunas con ≥ 20 ingresos y ≥ 20 personas hospitalizadas": reported.loc[(reported.rem_ingresos >= 20) & (reported.grd_persons >= 20)],
+            "Todas las comunas continentales (sin fila REM = 0)": frame.assign(rem_crude=frame.rem_crude.fillna(0.0), rem_sir=frame.rem_sir.fillna(0.0))}
+
+
+corr = {}
+for period in com_periods:
+    for name, frame in comuna_sets(period).items():
+        rho, p = stats.spearmanr(frame.rem_crude, frame.grd_persons_crude, nan_policy="omit")
+        rho_s, p_s = stats.spearmanr(frame.rem_sir, frame.grd_persons_sir, nan_policy="omit")
+        corr[(name, period)] = dict(n=len(frame), rho=rho, p=p, rho_sir=rho_s, p_sir=p_s)
+pool_com = ecological_com.loc[(ecological_com.period == ERA) & ecological_com.continental]
+informantes = pool_com.loc[pool_com.rem_reported]
+big = corr[("Comunas con ≥ 20 ingresos y ≥ 20 personas hospitalizadas", ERA)]
+rep = corr[("Comunas con establecimiento informante", ERA)]
+
+# --- Trajectories ------------------------------------------------------------
+core = summary.loc[summary.definition == DEFINITION].set_index("era")
+cohort = core.loc[ERA]
+fp = first_position.loc[first_position.definition == DEFINITION].copy()
+fp["pct"] = 100 * fp.patients / fp.groupby("era").patients.transform("sum")
+fp_era = fp.loc[fp.era == ERA].set_index("index_role")
+groups_all = previous_groups.loc[(previous_groups.definition == DEFINITION) & (previous_groups.era == ERA) & (previous_groups.window == "all")
+                                 & (previous_groups.position == "any")].sort_values("patients", ascending=False)
+trans = transitions.loc[(transitions.definition == DEFINITION) & (transitions.index_role == "solo_secundario")].set_index("era")
+strata_era = cohort_strata.loc[(cohort_strata.definition == DEFINITION) & (cohort_strata.era == ERA)]
+first_top = first_principal.loc[(first_principal.definition == DEFINITION) & (first_principal.era == ERA)].sort_values("patients", ascending=False).head(10)
+
+# --- Formatted values used in the text ------------------------------------------
+V = {
+    "grd_scanned": number(grd_sources.records.sum()),
+    "f84_records": number(quality.records_kept.sum()),
+    "rem_rows": number(rem_quality.records.sum()),
+    "rec_first_n": number(rec.loc[first_year, "count"]), "rec_last_n": number(rec.loc[last_year, "count"]),
+    "rec_first_asr": number(rec.loc[first_year, "asr"], 1), "rec_first_ci": ci(rec.loc[first_year, "asr_lo"], rec.loc[first_year, "asr_hi"]),
+    "rec_last_asr": number(rec.loc[last_year, "asr"], 1), "rec_last_ci": ci(rec.loc[last_year, "asr_lo"], rec.loc[last_year, "asr_hi"]),
+    "rec_2020_asr": number(rec.loc[2020, "asr"], 1),
+    "per_last_n": number(per.loc[last_year, "count"]), "per_last_asr": number(per.loc[last_year, "asr"], 1),
+    "per_last_ci": ci(per.loc[last_year, "asr_lo"], per.loc[last_year, "asr_hi"]),
+    "apc_rec": number(apc_rec.apc, 1), "apc_rec_ci": ci(apc_rec.apc_lo, apc_rec.apc_hi),
+    "apc_per": number(apc_per.apc, 1), "apc_per_ci": ci(apc_per.apc_lo, apc_per.apc_hi),
+    "rem_first_n": number(rem_tot.loc[rem_first, "count"]), "rem_last_n": number(rem_tot.loc[last_year, "count"]),
+    "rem_first_asr": number(rem_tot.loc[rem_first, "asr"], 1), "rem_last_asr": number(rem_tot.loc[last_year, "asr"], 1),
+    "rem_last_ci": ci(rem_tot.loc[last_year, "asr_lo"], rem_tot.loc[last_year, "asr_hi"]),
+    "rem_apc": number(rem_apc["apc"], 1), "rem_apc_ci": ci(rem_apc["apc_lo"], rem_apc["apc_hi"]),
+    "sr_first": number(sr.loc[first_year, "asr_ratio"], 2), "sr_first_ci": ci(sr.loc[first_year, "asr_ratio_lo"], sr.loc[first_year, "asr_ratio_hi"], 2),
+    "sr_last": number(sr.loc[last_year, "asr_ratio"], 2), "sr_last_ci": ci(sr.loc[last_year, "asr_ratio_lo"], sr.loc[last_year, "asr_ratio_hi"], 2),
+    "rem_sr_first": number(rem_sr.loc[rem_first, "ratio"], 2), "rem_sr_last": number(rem_sr.loc[last_year, "ratio"], 2),
+    "pct_sec_first": number(pct_secondary.loc[first_year], 1), "pct_sec_last": number(pct_secondary.loc[last_year], 1),
+    "f840_first": number(subcode_pct.loc[first_year, "F840"], 1), "f840_last": number(subcode_pct.loc[last_year, "F840"], 1),
+    "urgencia": number(feature_share("TIPO_INGRESO", ["URGENCIA"], YEARS), 1),
+    "cma": number(feature_share("TIPO_ACTIVIDAD", ["CIRUGÍA MAYOR AMBULATORIA (CMA)"], YEARS), 1),
+    "fonasa_ab": number(feature_share("prevision_grupo", ["FONASA MAI A", "FONASA MAI B"], YEARS), 1),
+    "letalidad": number(feature_share("TIPOALTA", ["FALLECIDO"], YEARS), 2),
+    "re30": number(100 * re.loc[re.horizon_days == 30].readmitted.sum() / re.loc[re.horizon_days == 30].eligible.sum(), 1),
+    "re90": number(100 * re.loc[re.horizon_days == 90].readmitted.sum() / re.loc[re.horizon_days == 90].eligible.sum(), 1),
+    "moran_rec": number(moran_rec.moran_i, 2), "moran_rec_p": number(moran_rec.p_sim, 3),
+    "moran_per": number(moran_per.moran_i, 2),
+    "lisa_hh": number(lisa_counts.get("Alto-Alto", 0)), "lisa_ll": number(lisa_counts.get("Bajo-Bajo", 0)),
+    "n_com": number(len(com_rec)), "n_com_rec": number(int((com_rec["count"] > 0).sum())),
+    "rho_reg_pool": number(rho_reg_pool, 2), "p_reg_pool": p_text(p_reg_pool),
+    "rho_reg_min": number(min(r[0] for r in reg_by_year.values()), 2), "rho_reg_max": number(max(r[0] for r in reg_by_year.values()), 2),
+    "n_inf": number(rep["n"]), "n_pool_com": number(len(pool_com)), "rho_com": number(rep["rho"], 2), "p_com": p_text(rep["p"]),
+    "rho_com_sir": number(rep["rho_sir"], 2), "n_big": number(big["n"]), "rho_big": number(big["rho"], 2), "p_big": p_text(big["p"]),
+    "cohort_n": number(cohort.patients), "cohort_age": number(cohort.age_median, 1),
+    "cohort_age_iqr": ci(cohort.age_q25, cohort.age_q75, 1),
+    "fp_sec": number(fp_era.loc["solo_secundario", "pct"], 1), "fp_prin": number(fp_era.loc["principal", "pct"], 1),
+    "prior_n": number(cohort.prior_hospitalization), "prior_pct": number(100 * cohort.prior_hospitalization / cohort.patients, 1),
+    "group_pct": number(100 * cohort.prior_candidate_group / cohort.patients, 1),
+    "prior_days": number(cohort.days_first_prior_to_index_median),
+    "trans_pct": number(100 * trans.loc[ERA, "later_principal_365d"] / trans.loc[ERA, "eligible_followup_365d"], 1),
+    "trans_days": number(trans.loc[ERA, "days_to_principal_median"]),
+    "top_group": GROUP_LABELS.get(groups_all.group.iloc[0], groups_all.group.iloc[0]).lower(),
+    "top_group_pct": number(100 * groups_all.patients.iloc[0] / cohort.patients, 1),
+    "second_group": GROUP_LABELS.get(groups_all.group.iloc[1], groups_all.group.iloc[1]).lower(),
+    "second_group_pct": number(100 * groups_all.patients.iloc[1] / cohort.patients, 1),
+    "first_year": str(first_year), "last_year": str(last_year), "rem_first": str(rem_first),
+}
+```
+
+# Resumen {.unnumbered}
+
+**Antecedentes.** Chile no dispone de estimaciones poblacionales periódicas sobre autismo. Los registros administrativos del sistema público permiten describir el contacto de las personas con código de trastorno del espectro autista (TEA) con la atención hospitalaria y ambulatoria, aunque no miden incidencia ni prevalencia.
+
+**Métodos.** Estudio observacional descriptivo con dos fuentes: los egresos hospitalarios agrupados por GRD de establecimientos públicos (2019–2024, `{python} V['f84_records']` registros con código F84 entre `{python} V['grd_scanned']` egresos) y los Resúmenes Estadísticos Mensuales (REM) de ingresos a programas de salud mental con código de autismo (2017–2024, `{python} V['rem_rows']` filas de la Serie A). Se calcularon tasas por 100.000 personas-año estandarizadas por edad con la población estándar de la OMS, razones hombre:mujer, cambio porcentual anual promedio, razones de hospitalización e ingreso estandarizadas por comuna, autocorrelación espacial (I de Moran, LISA), correlaciones ecológicas entre fuentes por región y comuna, y trayectorias de codificación hospitalaria con identificadores encriptados.
+
+**Resultados.** La tasa estandarizada de hospitalizaciones con código TEA pasó de `{python} V['rec_first_asr']` por 100.000 personas-año en `{python} V['first_year']` a `{python} V['rec_last_asr']` en `{python} V['last_year']` (IC 95%: `{python} V['rec_last_ci']`), con un cambio anual promedio de `{python} V['apc_rec']`% entre 2021 y 2024 (IC 95%: `{python} V['apc_rec_ci']`). Los ingresos REM con código de autismo aumentaron de `{python} V['rem_first_asr']` a `{python} V['rem_last_asr']` por 100.000 habitantes entre `{python} V['rem_first']` y `{python} V['last_year']`. La razón hombre:mujer de las tasas hospitalarias bajó de `{python} V['sr_first']` a `{python} V['sr_last']`. En `{python} V['pct_sec_last']`% de los episodios de `{python} V['last_year']` el código ocupó solo posiciones secundarias. La razón de hospitalización comunal mostró autocorrelación espacial positiva (I = `{python} V['moran_rec']`) con agrupaciones alto-alto en Ñuble y Biobío. La coherencia entre fuentes fue débil por regiones (ρ = `{python} V['rho_reg_pool']`) y por comunas informantes (ρ = `{python} V['rho_com']`), y moderada entre comunas con volúmenes suficientes en ambas fuentes (ρ = `{python} V['rho_big']`). En la cohorte 2021–2024 (`{python} V['cohort_n']` identificadores), `{python} V['fp_sec']`% de los primeros registros tuvo el código en posición secundaria y `{python} V['prior_pct']`% tenía hospitalizaciones previas observables.
+
+**Conclusiones.** El registro de autismo en el sistema público chileno creció con rapidez entre 2021 y 2024 en las dos fuentes, con mayor aumento relativo en mujeres y concentración en la niñez. El patrón es compatible con mayor detección, demanda y cambios de codificación en el período de la Ley 21.545, y no demuestra un cambio en la ocurrencia. Las diferencias territoriales describen la organización de la red y la práctica de registro.
+
+**Palabras clave:** trastorno del espectro autista; registros administrativos; hospitalización; grupos relacionados por el diagnóstico; salud mental; análisis espacial; Chile.
+
+# Métodos
+
+## Diseño y fuentes de datos
+
+Se realizó un estudio observacional descriptivo basado en registros administrativos del sistema público de salud chileno, con tres componentes: epidemiología descriptiva de la actividad hospitalaria con código de autismo, actividad ambulatoria de los programas de salud mental y trayectorias de codificación hospitalaria. Ninguna de las fuentes identifica casos incidentes ni prevalentes de autismo; las medidas se interpretan como indicadores de contacto con el sistema público y de práctica de codificación, en el marco de persona, lugar y tiempo.
+
+La primera fuente es la base pública de egresos hospitalarios agrupados por GRD (IR-GRD) del Ministerio de Salud, con un registro por episodio de hospitalización o cirugía mayor ambulatoria en los establecimientos públicos que participan del sistema, para 2019–2024 [@minsal_grd]. Cada registro incluye sexo, fecha de nacimiento, comuna de residencia, previsión, establecimiento, tipo de ingreso y de actividad, fechas de ingreso y alta, tipo de alta, 35 posiciones diagnósticas codificadas en CIE-10 [@who_icd10] y un identificador de paciente encriptado. La auditoría de enlace mostró que no existen identificadores compartidos entre 2019–2020 y 2021–2024, por lo que los análisis longitudinales se realizaron dentro de cada uno de esos dos períodos, sin enlazar entre ellos.
+
+La segunda fuente es la Serie A de los Resúmenes Estadísticos Mensuales (REM), el sistema de registro agregado de actividad de la red pública, en la que cada fila corresponde a un establecimiento, un mes y un código de prestación [@minsal_rem]. Se utilizaron los ingresos y egresos de los programas de salud mental con código de autismo del formulario A05 (2017–2024), cuyos diccionarios anuales se leyeron directamente desde los archivos oficiales para asignar el significado de cada columna año a año. Los códigos específicos de autismo existen desde 2021; la serie genérica de trastornos generalizados del desarrollo de 2017–2020 se mantuvo separada. Los denominadores fueron las estimaciones y proyecciones de población del Instituto Nacional de Estadísticas basadas en el Censo 2017, por comuna, sexo y edad simple [@ine2019]. Las tasas agrupadas de varios años usaron personas-año. La cartografía correspondió a la división político-administrativa de 346 comunas y 16 regiones; las cuatro comunas no continentales se conservaron en las tablas y se excluyeron de los estadísticos de contigüidad.
+
+## Definiciones de caso y unidades de análisis
+
+La definición principal, denominada TEA operacional, comprende los códigos F84.0, F84.1, F84.5, F84.8 y F84.9 en cualquiera de las 35 posiciones diagnósticas; aproxima el concepto de trastorno del espectro autista de DSM-5 con la nomenclatura de CIE-10 y no constituye una equivalencia clínica exacta. Como análisis de sensibilidad se usaron F84.0 específico y la categoría F84 completa. La posición del código se clasificó de forma excluyente en principal (solo `DIAGNOSTICO1`), solo secundario (solo `DIAGNOSTICO2` a `DIAGNOSTICO35`) y principal y secundario. Las unidades fueron el registro (episodio tras eliminar duplicados exactos), la persona (identificador válido distinto dentro del año o del período) y, en REM, el ingreso al programa de salud mental (suma de valores observados del total de la fila, sin imputar ceros). Las unidades no se mezclan ni se suman entre sí.
+
+## Tasas, estandarización, intervalos y tendencias
+
+Las tasas crudas se expresaron por 100.000 personas-año con intervalos exactos de Poisson [@breslow1987]. Las tasas estandarizadas por edad (TEE) se calcularon por el método directo con la población estándar mundial de la OMS [@ahmad2001], con intervalos gamma de Fay y Feuer [@fay1997]. Las tasas REM usaron como numerador las celdas de edad y sexo informadas del formulario A05. La razón hombre:mujer se calculó como cociente de TEE con intervalo log-normal. El cambio porcentual anual promedio (CPA) se estimó con un modelo log-lineal de conteos con *offset* del logaritmo de la población y corrección de sobredispersión cuasi-Poisson [@clegg2009], para 2019–2024 y para 2021–2024, período que coincide con el identificador principal y con los códigos REM específicos. Las características de los episodios (tipo de ingreso, tipo de actividad, previsión, tipo de alta, estancia, rehospitalización con código de la definición a 30 y 90 días) y los codiagnósticos (categorías CIE-10 de tres caracteres distintas de F84 presentes en el mismo registro) se describieron como distribuciones de registros.
+
+## Análisis territorial y espacial
+
+Las tasas regionales se calcularon por región de residencia (GRD) o del establecimiento informante (REM), anuales y agrupadas, con estandarización directa. A escala comunal, donde los conteos son pequeños, se calculó la razón de hospitalización estandarizada (RHE), cociente entre los registros observados y los esperados según las tasas nacionales por sexo y edad del mismo período, con intervalos exactos de Poisson [@ulm1990], y se suavizó con el estimador empírico bayesiano global de Marshall [@marshall1991]. La autocorrelación espacial global se evaluó con el índice I de Moran [@moran1950] sobre las comunas continentales, con contigüidad tipo reina estandarizada por filas e inferencia por 999 permutaciones con semilla fija; los indicadores locales de asociación espacial (LISA) de Anselin [@anselin1995] clasificaron cada comuna en cuadrantes alto-alto, bajo-bajo, alto-bajo y bajo-alto, con significación por permutación y umbral corregido por tasa de falsos descubrimientos [@benjamini1995]. Los cálculos usaron PySAL [@rey2010]. El análisis es exploratorio y ecológico [@elliott2000].
+
+## Comparación ecológica entre fuentes
+
+La coherencia territorial entre ambas fuentes se describió con la correlación de Spearman entre las TEE regionales de ingresos REM y de personas hospitalizadas GRD, por año y para 2021–2024 agrupado. A escala comunal, donde REM solo entrega totales por comuna del establecimiento y GRD la comuna de residencia, se compararon tasas crudas por 100.000 personas-año y razones estandarizadas indirectas de cada fuente (razón de ingresos estandarizada, RIE, en REM; RHE en GRD), calculadas con los esperados según las tasas nacionales por sexo y edad de la misma fuente y período. El análisis principal usó las comunas continentales con al menos un establecimiento que informó el código; como sensibilidad se repitió entre las comunas con al menos 20 ingresos y 20 personas hospitalizadas y entre todas las comunas continentales con cero imputado a las no informantes, porque la ausencia de fila REM no se interpreta automáticamente como cero.
+
+## Trayectorias de codificación hospitalaria
+
+Dentro de cada período de identificador se recuperaron todos los egresos de los identificadores con algún código F84. La fecha índice fue la primera alta observada con la definición seleccionada; la edad, la del ingreso a ese episodio. Un antecedente estricto debió egresar antes del ingreso al episodio índice. Se describieron la posición del código en el episodio índice, la proporción con hospitalizaciones previas observables, los grupos diagnósticos previos de interés (agrupaciones exploratorias de códigos CIE-10, no diagnósticos diferenciales confirmados), el primer diagnóstico principal hospitalario observado y el paso posterior de posición secundaria a principal, con proporciones calculadas solo entre los índices con al menos 365 días calendario hasta el cierre del período. El primer registro hospitalario no equivale al primer diagnóstico clínico y la ausencia de hospitalizaciones previas no implica ausencia de diagnósticos ambulatorios.
+
+## Calidad de datos, ética y reproducibilidad
+
+Cada etapa produjo tablas de control (registros leídos, duplicados exactos, identificadores faltantes, fechas inválidas, edades implausibles, comunas no asignadas y coherencia entre totales y sumas por sexo y edad en REM). Los identificadores encriptados se procesaron en memoria y no se exportaron; todas las tablas derivadas son agregados sin identificadores. Los análisis se implementaron en Python (pandas, scipy, statsmodels, geopandas, libpysal, esda) con pruebas unitarias sobre datos sintéticos, y este manuscrito recalcula todas las cifras, tablas y figuras a partir de los agregados en cada renderización.
+
+# Resultados
+
+## Magnitud y tendencia temporal
+
+Entre `{python} V['first_year']` y `{python} V['last_year']` se identificaron `{python} V['f84_records']` registros hospitalarios con algún código F84 entre `{python} V['grd_scanned']` egresos del sistema GRD público, y `{python} V['rem_rows']` filas de la Serie A de REM fueron revisadas para 2017–2024. Los registros con código TEA operacional pasaron de `{python} V['rec_first_n']` en `{python} V['first_year']` a `{python} V['rec_last_n']` en `{python} V['last_year']`, y la TEE de hospitalizaciones de `{python} V['rec_first_asr']` (IC 95%: `{python} V['rec_first_ci']`) a `{python} V['rec_last_asr']` por 100.000 personas-año (IC 95%: `{python} V['rec_last_ci']`), con una caída en 2020 (`{python} V['rec_2020_asr']`) coincidente con la contracción general de la actividad hospitalaria durante la pandemia (@tbl-magnitud, @fig-tendencias A). En `{python} V['last_year']` se hospitalizaron `{python} V['per_last_n']` personas distintas con el código, `{python} V['per_last_asr']` por 100.000 habitantes (IC 95%: `{python} V['per_last_ci']`). El CPA de 2021–2024 fue de `{python} V['apc_rec']`% para registros (IC 95%: `{python} V['apc_rec_ci']`) y de `{python} V['apc_per']`% para personas (IC 95%: `{python} V['apc_per_ci']`).
+
+Los ingresos a programas de salud mental con código de autismo en REM aumentaron de `{python} V['rem_first_n']` en `{python} V['rem_first']` a `{python} V['rem_last_n']` en `{python} V['last_year']`, es decir de `{python} V['rem_first_asr']` a `{python} V['rem_last_asr']` ingresos por 100.000 habitantes estandarizados por edad (IC 95% en `{python} V['last_year']`: `{python} V['rem_last_ci']`), con un CPA de `{python} V['rem_apc']`% (IC 95%: `{python} V['rem_apc_ci']`). En `{python} V['last_year']` la tasa de ingresos ambulatorios superó a la de hospitalizaciones, aunque ambas fuentes miden unidades distintas.
+
+```{python}
+#| label: tbl-magnitud
+#| output: asis
+rows = []
+for year in YEARS:
+    row = {"Año": year,
+           "GRD: registros, n (TEE; IC 95%)": f"{number(rec.loc[year, 'count'])} ({number(rec.loc[year, 'asr'], 1)}; {ci(rec.loc[year, 'asr_lo'], rec.loc[year, 'asr_hi'])})",
+           "GRD: personas, n (TEE)": f"{number(per.loc[year, 'count'])} ({number(per.loc[year, 'asr'], 1)})",
+           "REM: ingresos, n (TEE; IC 95%)": (f"{number(rem_tot.loc[year, 'count'])} ({number(rem_tot.loc[year, 'asr'], 1)}; {ci(rem_tot.loc[year, 'asr_lo'], rem_tot.loc[year, 'asr_hi'])})" if year in rem_tot.index else "—"),
+           "Razón H:M GRD (IC 95%)": f"{number(sr.loc[year, 'asr_ratio'], 2)} ({ci(sr.loc[year, 'asr_ratio_lo'], sr.loc[year, 'asr_ratio_hi'], 2)})",
+           "Razón H:M REM (IC 95%)": (f"{number(rem_sr.loc[year, 'ratio'], 2)} ({ci(rem_sr.loc[year, 'lo'], rem_sr.loc[year, 'hi'], 2)})" if year in rem_sr.index else "—")}
+    rows.append(row)
+markdown_table(pd.DataFrame(rows), "Hospitalizaciones y personas hospitalizadas con código TEA (GRD) e ingresos a programas de salud mental con código de autismo (REM): conteos, tasas estandarizadas por edad (TEE, por 100.000 personas-año, población estándar OMS) y razón hombre:mujer de las TEE, por año.", "magnitud")
+```
+
+## Sexo y edad
+
+La razón hombre:mujer de las TEE hospitalarias bajó de `{python} V['sr_first']` (IC 95%: `{python} V['sr_first_ci']`) en `{python} V['first_year']` a `{python} V['sr_last']` (IC 95%: `{python} V['sr_last_ci']`) en `{python} V['last_year']`, por un crecimiento proporcionalmente mayor de las hospitalizaciones de mujeres; en REM la razón de ingresos descendió de `{python} V['rem_sr_first']` a `{python} V['rem_sr_last']` en el mismo sentido (@fig-tendencias B y C). Las tasas específicas máximas se observaron entre los 5 y los 14 años en ambas fuentes, con una razón de sexos mayor en la niñez que en la adolescencia y la adultez (@fig-tendencias D).
+
+```{python}
+#| label: fig-tendencias
+#| fig-cap: "Tendencia y estructura demográfica del registro de autismo en el sistema público, 2019–2024. (A) Tasas estandarizadas por edad (TEE) de registros y de personas hospitalizadas con código TEA (GRD) y de ingresos a salud mental con código de autismo (REM), con intervalos al 95%. (B) TEE por sexo en ambas fuentes. (C) Razón hombre:mujer de las TEE con intervalos al 95%; las líneas punteadas marcan 3:1 y 4:1. (D) Tasas específicas por grupo de edad y sexo en el último año, con intervalos exactos de Poisson."
+#| fig-width: 6.5
+#| fig-height: 5.8
+fig, axes = plt.subplots(2, 2, figsize=(6.5, 5.8), layout="constrained")
+ax = axes[0, 0]
+for frame, label, color, style in [(rec, "GRD: registros", COLORS[0], "o-"), (per, "GRD: personas", COLORS[3], "s-"), (rem_tot, "REM: ingresos", COLORS[2], "^-")]:
+    ax.plot(frame.index, frame.asr, style, color=color, label=label, markersize=3.5, linewidth=1.3)
+    ax.fill_between(frame.index, frame.asr_lo, frame.asr_hi, color=color, alpha=.15)
+ax.set(title="TEE por fuente y unidad", xlabel="Año", ylabel="Por 100.000 personas-año", xticks=YEARS)
+ax.legend()
+ax = axes[0, 1]
+for sex in ["HOMBRE", "MUJER"]:
+    g = grd_nat.loc[(grd_nat.unit == "records") & (grd_nat.sex == sex)].sort_values("year")
+    r = rem_nat.loc[rem_nat.sex == sex].sort_values("year")
+    ax.plot(g.year, g.asr, "o-", color=SEX_COLORS[sex], label=f"GRD registros · {SEX_LABELS[sex]}", markersize=3.5, linewidth=1.3)
+    ax.plot(r.year, r.asr, "^--", color=SEX_COLORS[sex], label=f"REM ingresos · {SEX_LABELS[sex]}", markersize=3.5, linewidth=1.1)
+ax.set(title="TEE por sexo", xlabel="Año", ylabel="Por 100.000 personas-año", xticks=YEARS)
+ax.legend()
+ax = axes[1, 0]
+ax.errorbar(sr.index, sr.asr_ratio, yerr=[sr.asr_ratio - sr.asr_ratio_lo, sr.asr_ratio_hi - sr.asr_ratio], fmt="o-", color=COLORS[0], capsize=2, markersize=3.5, linewidth=1.3, label="GRD: registros")
+ax.errorbar(rem_sr.index, rem_sr.ratio, yerr=[rem_sr.ratio - rem_sr.lo, rem_sr.hi - rem_sr.ratio], fmt="^--", color=COLORS[2], capsize=2, markersize=3.5, linewidth=1.1, label="REM: ingresos")
+ax.axhline(3, color="#999999", linestyle=":", linewidth=.9)
+ax.axhline(4, color="#cccccc", linestyle=":", linewidth=.9)
+ax.set(title="Razón hombre:mujer de las TEE", xlabel="Año", ylabel="Razón H:M", xticks=YEARS, ylim=(0, 5))
+ax.legend()
+ax = axes[1, 1]
+order = AGE_GROUPS[:10]
+x = np.arange(len(order))
+spec_g = age_specific.loc[(age_specific.definition == DEFINITION) & (age_specific.unit == "records") & (age_specific.year == last_year)]
+spec_r = rem_age.loc[(rem_age.series == AUTISM) & (rem_age.year == last_year)]
+for sex in ["HOMBRE", "MUJER"]:
+    g = spec_g.loc[spec_g.sex == sex].set_index("age_group").reindex(order)
+    r = spec_r.loc[spec_r.sex == sex].set_index("age_group").reindex(order)
+    ax.errorbar(x - .08, g.rate, yerr=[g.rate - g.rate_lo, g.rate_hi - g.rate], fmt="o-", color=SEX_COLORS[sex], capsize=1.5, markersize=3, linewidth=1.2, label=f"GRD registros · {SEX_LABELS[sex]}")
+    ax.errorbar(x + .08, r.rate, yerr=[r.rate - r.rate_lo, r.rate_hi - r.rate], fmt="^--", color=SEX_COLORS[sex], capsize=1.5, markersize=3, linewidth=1, label=f"REM ingresos · {SEX_LABELS[sex]}")
+ax.set(title=f"Tasas específicas por edad y sexo · {last_year}", xlabel="Grupo de edad (años)", ylabel="Por 100.000 personas-año", xticks=x, xticklabels=order)
+ax.tick_params(axis="x", rotation=60)
+ax.legend()
+finish_panels(axes)
+plt.show()
+```
+
+## Características de los episodios y codiagnósticos
+
+La proporción de episodios en que el código TEA ocupó solo posiciones secundarias fue de `{python} V['pct_sec_first']`% en `{python} V['first_year']` y de `{python} V['pct_sec_last']`% en `{python} V['last_year']`: el crecimiento reciente ocurrió sobre todo en hospitalizaciones por otras causas en las que la condición se consignó como diagnóstico acompañante (@fig-episodios A). La subcategoría F84.0 (autismo infantil) concentró `{python} V['f840_first']`% de las menciones F84 en `{python} V['first_year']` y `{python} V['f840_last']`% en `{python} V['last_year']`, mientras F84.5 (Asperger) y F84.1 (autismo atípico) perdieron peso relativo (@fig-episodios B). En el conjunto 2019–2024, `{python} V['urgencia']`% de los episodios ingresó por urgencia, `{python} V['cma']`% correspondió a cirugía mayor ambulatoria y `{python} V['fonasa_ab']`% a beneficiarios de los tramos A y B de FONASA; la letalidad hospitalaria fue de `{python} V['letalidad']`% de los episodios, y `{python} V['re30']`% y `{python} V['re90']`% de los egresos elegibles tuvieron un nuevo ingreso con código TEA a 30 y 90 días (@tbl-episodios). Las hospitalizaciones con el autismo como diagnóstico principal fueron más largas que aquellas con el código en posición secundaria.
+
+Cuando el código fue secundario, los diagnósticos principales más frecuentes fueron patología dental, epilepsia, infecciones respiratorias, apendicitis y causas psiquiátricas (@fig-episodios C). Entre los codiagnósticos predominaron los capítulos de trastornos mentales y del comportamiento, enfermedades del sistema nervioso, factores que influyen en el estado de salud (códigos Z) y enfermedades respiratorias (@fig-episodios D).
+
+```{python}
+#| label: tbl-episodios
+#| output: asis
+columns = [(first_year, [first_year]), (2022, [2022]), (last_year, [last_year]), ("2019–2024", YEARS)]
+
+
+def los_row(role, years):
+    frame = hosp_los.loc[(hosp_los.role == role) & hosp_los.year.isin(years)]
+    if frame.empty:
+        return "—"
+    if len(years) == 1:
+        r = frame.iloc[0]
+        return f"{number(r['median'], 1)} ({number(r.q25, 1)}–{number(r.q75, 1)})"
+    return "—"
+
+
+def re_row(horizon, years):
+    frame = re.loc[(re.horizon_days == horizon) & re.year.isin(years)]
+    return number(100 * frame.readmitted.sum() / frame.eligible.sum(), 1) if frame.eligible.sum() else "—"
+
+
+rows = [
+    {"Indicador": "Registros con código TEA, n", **{str(c): number(rec.loc[y, "count"].sum()) for c, y in columns}},
+    {"Indicador": "Personas hospitalizadas distintas en el año, n", **{str(c): (number(per.loc[y[0], "count"]) if len(y) == 1 else "—") for c, y in columns}},
+    {"Indicador": "Código solo en posición secundaria, %", **{str(c): number(100 * pos.loc[y, "solo_secundario"].sum() / pos_total.loc[y].sum(), 1) for c, y in columns}},
+    {"Indicador": "Ingreso por urgencia, %", **{str(c): number(feature_share("TIPO_INGRESO", ["URGENCIA"], y), 1) for c, y in columns}},
+    {"Indicador": "Cirugía mayor ambulatoria, %", **{str(c): number(feature_share("TIPO_ACTIVIDAD", ["CIRUGÍA MAYOR AMBULATORIA (CMA)"], y), 1) for c, y in columns}},
+    {"Indicador": "Previsión FONASA tramos A y B, %", **{str(c): number(feature_share("prevision_grupo", ["FONASA MAI A", "FONASA MAI B"], y), 1) for c, y in columns}},
+    {"Indicador": "Estancia, mediana (Q1–Q3) en días, código principal", **{str(c): los_row("principal", y) for c, y in columns}},
+    {"Indicador": "Estancia, mediana (Q1–Q3) en días, código secundario", **{str(c): los_row("solo_secundario", y) for c, y in columns}},
+    {"Indicador": "Alta por fallecimiento, % de episodios", **{str(c): number(feature_share("TIPOALTA", ["FALLECIDO"], y), 2) for c, y in columns}},
+    {"Indicador": "Nuevo ingreso con código TEA a 30 días, % de egresos elegibles", **{str(c): re_row(30, y) for c, y in columns}},
+    {"Indicador": "Nuevo ingreso con código TEA a 90 días, % de egresos elegibles", **{str(c): re_row(90, y) for c, y in columns}},
+]
+markdown_table(pd.DataFrame(rows), "Características de los episodios hospitalarios con código TEA operacional en el sistema GRD público, en años seleccionados y en el conjunto 2019–2024. La estancia corresponde a hospitalizaciones (excluye cirugía mayor ambulatoria) y no se agrupa entre años; la rehospitalización se calcula dentro de cada período de identificador.", "episodios")
+```
+
+```{python}
+#| label: fig-episodios
+#| fig-cap: "Posición del código, subcategorías y diagnósticos acompañantes de los episodios con código TEA, GRD 2019–2024. (A) Registros según posición del código en el episodio. (B) Composición de las menciones de subcategorías F84 por año: F84.0 autismo infantil, F84.1 autismo atípico, F84.5 síndrome de Asperger, F84.8 otros trastornos generalizados del desarrollo, F84.9 trastorno generalizado del desarrollo no especificado y F84.2 a F84.4 agrupados por su baja frecuencia. (C) Diagnóstico principal más frecuente cuando el código TEA ocupa solo posiciones secundarias, como porcentaje de esos episodios. (D) Capítulos CIE-10 de los codiagnósticos, como menciones por 100 registros TEA; un registro puede aportar varias categorías del mismo capítulo."
+#| fig-width: 6.5
+#| fig-height: 6.6
+fig, axes = plt.subplots(2, 2, figsize=(6.5, 6.6), layout="constrained")
+ax = axes[0, 0]
+bottom = np.zeros(len(pos))
+for role, color in zip(["principal", "principal_y_secundario", "solo_secundario"], [COLORS[0], COLORS[3], COLORS[1]]):
+    if role in pos:
+        ax.bar(pos.index.astype(str), pos[role], bottom=bottom, color=color, label=POSITION_LABELS[role])
+        bottom += pos[role].values
+ax.set(title="Registros por posición del código", xlabel="Año", ylabel="Registros")
+ax.tick_params(axis="x", labelsize=6, rotation=45)
+ax.legend(loc="upper left")
+ax = axes[0, 1]
+bottom = np.zeros(len(subcode_pct))
+short_labels = {"F840": "F84.0", "F841": "F84.1", "F845": "F84.5", "F848": "F84.8", "F849": "F84.9", "F842-F844": "F84.2–.4"}
+for code, color in zip(subcode_keep, COLORS):
+    ax.bar(subcode_pct.index.astype(str), subcode_pct[code], bottom=bottom, color=color, label=short_labels.get(code, code))
+    bottom += subcode_pct[code].values
+ax.set(title="Subcategorías F84 (% de menciones)", xlabel="Año", ylabel="% de menciones", ylim=(0, 100), xlim=(-0.6, len(subcode_pct) + 3.0))
+ax.tick_params(axis="x", labelsize=6, rotation=45)
+ax.legend(loc="center right", fontsize=6, handlelength=1.0, borderaxespad=0.3)
+ax = axes[1, 0]
+labels = [f"{code} {icd_label(code)[:34]}" for code in principal_top.index[::-1]]
+ax.barh(labels, principal_top.values[::-1], color=COLORS[0])
+ax.set(title="Principal cuando TEA es secundario", xlabel="% de episodios con TEA secundario")
+ax.tick_params(axis="y", labelsize=5.8)
+ax = axes[1, 1]
+ax.barh([c[:38] for c in chapters.index], chapters.values, color=COLORS[1])
+ax.set(title="Capítulos CIE-10 de los codiagnósticos", xlabel="Menciones por 100 registros TEA")
+ax.tick_params(axis="y", labelsize=5.8)
+finish_panels(axes)
+plt.show()
+```
+
+## Distribución territorial
+
+Las TEE regionales de hospitalizaciones y de ingresos ambulatorios variaron varias veces entre regiones, con órdenes parcialmente distintos según la fuente (@tbl-regiones, @fig-mapas A y B). En GRD, las mayores tasas correspondieron a Ñuble, Magallanes, Arica y Parinacota, Biobío y Antofagasta, y la Región Metropolitana presentó tasas bajas pese a concentrar el mayor número absoluto de registros; en REM destacaron Ñuble y Atacama, con Magallanes, Tarapacá y la Región Metropolitana en el extremo inferior. A escala comunal, `{python} V['n_com_rec']` de las `{python} V['n_com']` comunas continentales registraron hospitalizaciones con el código en 2019–2024. La razón de hospitalización estandarizada suavizada mostró autocorrelación espacial positiva (I de Moran = `{python} V['moran_rec']` para registros 2019–2024 y `{python} V['moran_per']` para personas 2021–2024; p de permutación = `{python} V['moran_rec_p']`), con `{python} V['lisa_hh']` comunas en agrupaciones alto-alto y `{python} V['lisa_ll']` en agrupaciones bajo-bajo tras la corrección por tasa de falsos descubrimientos. Las agrupaciones alto-alto se concentraron en Ñuble y Biobío, en torno a Chillán y al Gran Concepción, y las bajo-bajo en la Región Metropolitana y regiones vecinas (@fig-mapas C y D).
+
+```{python}
+#| label: tbl-regiones
+#| output: asis
+rows = []
+for r in REGION_ORDER:
+    rows.append({"Región": REGION_NAMES[r],
+                 "GRD registros 2019–2024: TEE (IC 95%)": f"{number(reg_rec.loc[r, 'asr'], 1)} ({ci(reg_rec.loc[r, 'asr_lo'], reg_rec.loc[r, 'asr_hi'])})",
+                 "GRD personas 2021–2024: TEE": number(reg_per.loc[r, "asr"], 1),
+                 "REM ingresos 2021–2024: TEE (IC 95%)": f"{number(reg_rem.loc[r, 'asr'], 1)} ({ci(reg_rem.loc[r, 'asr_lo'], reg_rem.loc[r, 'asr_hi'])})",
+                 "Razón H:M GRD": number(sex_rec.loc[r, "HOMBRE"] / sex_rec.loc[r, "MUJER"], 2),
+                 "Razón H:M REM": number(sex_rem.loc[r, "HOMBRE"] / sex_rem.loc[r, "MUJER"], 2)})
+rows.append({"Región": "Chile",
+             "GRD registros 2019–2024: TEE (IC 95%)": f"{number(nat_rec['asr'], 1)} ({ci(nat_rec['asr_lo'], nat_rec['asr_hi'])})",
+             "GRD personas 2021–2024: TEE": number(nat_per["asr"], 1),
+             "REM ingresos 2021–2024: TEE (IC 95%)": f"{number(nat_rem['asr'], 1)} ({ci(nat_rem['asr_lo'], nat_rem['asr_hi'])})",
+             "Razón H:M GRD": "—", "Razón H:M REM": "—"})
+markdown_table(pd.DataFrame(rows), "Tasas estandarizadas por edad (por 100.000 personas-año) de registros y personas hospitalizadas con código TEA por región de residencia (GRD) y de ingresos con código de autismo por región del establecimiento (REM), períodos agrupados, y razón hombre:mujer de las TEE.", "regiones")
+```
+
+```{python}
+#| label: fig-mapas
+#| fig-cap: "Distribución territorial del registro de autismo. (A) TEE de personas hospitalizadas con código TEA por región de residencia, GRD 2021–2024. (B) TEE de ingresos con código de autismo por región del establecimiento, REM 2021–2024. (C) Razón de hospitalización estandarizada (RHE) suavizada por empirical Bayes de registros TEA por comuna de residencia, 2019–2024; 1 equivale a las tasas nacionales por sexo y edad. (D) Agrupaciones LISA de la RHE suavizada con corrección por tasa de falsos descubrimientos. Solo comunas continentales; las escalas de color se recortan en el percentil 98."
+#| fig-width: 6.5
+#| fig-height: 8.6
+regions_shp = load_regions()
+regions_shp = regions_shp.merge(reg_per[["asr"]].rename(columns={"asr": "asr_persons"}), left_on="cut_region", right_index=True, how="left")
+regions_shp = regions_shp.merge(reg_rem[["asr"]].rename(columns={"asr": "asr_rem"}), left_on="cut_region", right_index=True, how="left")
+comunas_shp = load_comunas()
+comunas_map = comunas_shp.merge(comunal.loc[comunal.unit == "records", ["cut_comuna", "sir_eb"]], on="cut_comuna", how="left")
+comunas_map = comunas_map.merge(lisa_rec[["cut_comuna", "cluster_fdr"]], on="cut_comuna", how="left")
+fig, axes = plt.subplots(2, 2, figsize=(6.5, 8.6), layout="constrained")
+choropleth(axes[0, 0], regions_shp, "asr_persons", "GRD: personas hospitalizadas 2021–2024 (TEE)", legend_label="Personas por 100.000")
+choropleth(axes[0, 1], regions_shp, "asr_rem", "REM: ingresos 2021–2024 (TEE)", cmap="YlOrBr", legend_label="Ingresos por 100.000")
+choropleth(axes[1, 0], comunas_map, "sir_eb", "GRD: RHE suavizada 2019–2024", cmap="RdBu_r", legend_label="RHE (1 = tasas nacionales)", diverging_center=1.0)
+cluster_map(axes[1, 1], comunas_map, "cluster_fdr", "LISA de la RHE suavizada (FDR)")
+finish_panels(axes)
+plt.show()
+```
+
+## Comparación ecológica entre fuentes
+
+La correlación de Spearman entre las TEE regionales de ingresos REM y de personas hospitalizadas GRD fue de `{python} V['rho_reg_pool']` para 2021–2024 agrupado (p = `{python} V['p_reg_pool']`), con valores anuales entre `{python} V['rho_reg_min']` y `{python} V['rho_reg_max']` (@tbl-correlaciones, @fig-ecologica A). Atacama ilustró la disociación entre fuentes, con la segunda tasa de ingresos ambulatorios más alta y hospitalizaciones bajas. A escala comunal, `{python} V['n_inf']` de las `{python} V['n_pool_com']` comunas continentales tuvieron al menos un establecimiento que informó ingresos por autismo en 2021–2024; entre ellas la correlación fue de `{python} V['rho_com']` con tasas crudas (p `{python} V['p_com']`) y de `{python} V['rho_com_sir']` con razones estandarizadas (@fig-ecologica B y C). Al restringir el análisis a las `{python} V['n_big']` comunas con al menos 20 ingresos y 20 personas hospitalizadas la correlación subió a `{python} V['rho_big']` (p `{python} V['p_big']`). La inclusión de todas las comunas con cero imputado a las no informantes aumentó la correlación por un motivo distinto: las comunas sin establecimiento informante son en su mayoría pequeñas y también tienen pocas hospitalizaciones (@fig-ecologica D).
+
+```{python}
+#| label: tbl-correlaciones
+#| output: asis
+def cell(rho, p, n):
+    return f"{number(rho, 2)} ({number(n)}){'' if p < 0.05 else '†'}"
+
+
+rows = [{"Unidad y conjunto": "Regiones de residencia (GRD) o del establecimiento (REM)",
+         **{str(y): cell(reg_by_year[y][0], reg_by_year[y][1], len(ecological.loc[ecological.year == y])) for y in sorted(reg_by_year)},
+         "2021–2024": cell(rho_reg_pool, p_reg_pool, len(reg_pool))}]
+for name in ["Comunas con establecimiento informante", "Comunas con ≥ 20 ingresos y ≥ 20 personas hospitalizadas", "Todas las comunas continentales (sin fila REM = 0)"]:
+    row = {"Unidad y conjunto": name}
+    for period in com_periods:
+        c = corr[(name, period)]
+        row[period.replace("-", "–")] = cell(c["rho"], c["p"], c["n"])
+    rows.append(row)
+markdown_table(pd.DataFrame(rows), "Correlación de Spearman entre las tasas de ingresos REM y de personas hospitalizadas GRD por región (TEE) y por comuna (tasas crudas por 100.000 personas-año), por año y para 2021–2024 agrupado. Cada celda muestra ρ y, entre paréntesis, el número de unidades; † indica p ≥ 0,05.", "correlaciones")
+```
+
+```{python}
+#| label: fig-ecologica
+#| fig-cap: "Coherencia territorial entre ingresos ambulatorios (REM, comuna o región del establecimiento) y hospitalizaciones (GRD, residencia), 2021–2024 agrupado. (A) TEE regionales de ingresos REM frente a TEE de personas hospitalizadas GRD. (B) Comunas continentales con establecimiento informante: tasas crudas por 100.000 personas-año, escala logarítmica, tamaño proporcional a la población. (C) Razón de ingresos estandarizada (RIE, REM) frente a razón de hospitalización estandarizada (RHE, GRD); las líneas marcan el valor 1. (D) Correlación de Spearman por año y agrupada, según unidad y conjunto de comunas. Las comunas con cero en alguna fuente no aparecen en las escalas logarítmicas pero sí en las correlaciones."
+#| fig-width: 6.5
+#| fig-height: 5.8
+fig, axes = plt.subplots(2, 2, figsize=(6.5, 5.8), layout="constrained")
+ax = axes[0, 0]
+ax.scatter(reg_pool.rem_asr, reg_pool.grd_persons_asr, color=COLORS[0], s=18)
+for r, row in reg_pool.iterrows():
+    ax.annotate(REGION_NAMES.get(int(r), "")[:14], (row.rem_asr, row.grd_persons_asr), fontsize=5.5, xytext=(2, 2), textcoords="offset points")
+ax.set(title=f"Regiones · ρ = {number(rho_reg_pool, 2)}", xlabel="REM: ingresos por 100.000 (TEE)", ylabel="GRD: personas por 100.000 (TEE)")
+sizes = 4 + 40 * informantes.population / informantes.population.max()
+labelled = informantes.sort_values("rem_ingresos", ascending=False).head(5)
+for ax, xcol, ycol, xlabel, ylabel, title, reference, letter in [
+        (axes[0, 1], "rem_crude", "grd_persons_crude", "REM: ingresos por 100.000 personas-año", "GRD: personas por 100.000", f"Comunas informantes · ρ = {number(rep['rho'], 2)}", None, "B"),
+        (axes[1, 0], "rem_sir", "grd_persons_sir", "REM: RIE", "GRD: RHE", f"Razones estandarizadas · ρ = {number(rep['rho_sir'], 2)}", 1.0, "C")]:
+    positive = informantes.loc[(informantes[xcol] > 0) & (informantes[ycol] > 0)]
+    ax.scatter(positive[xcol], positive[ycol], s=sizes.loc[positive.index], color=COLORS[0], alpha=.55, edgecolor="white", linewidth=.3)
+    for _, row in labelled.iterrows():
+        if row[xcol] > 0 and row[ycol] > 0:
+            ax.annotate(row.comuna, (row[xcol], row[ycol]), fontsize=5.5, xytext=(2, 2), textcoords="offset points")
+    if reference is not None:
+        ax.axhline(reference, color="#999999", linestyle="--", linewidth=.9)
+        ax.axvline(reference, color="#999999", linestyle="--", linewidth=.9)
+    ax.set(title=title, xlabel=xlabel, ylabel=ylabel, xscale="log", yscale="log")
+ax = axes[1, 1]
+xs = list(range(len(com_periods)))
+ax.plot(xs, [reg_by_year[int(p)][0] if "-" not in p else rho_reg_pool for p in com_periods], "D-", color=COLORS[3], label="Regiones", markersize=4)
+for name, color, marker in [("Comunas con establecimiento informante", COLORS[0], "o"), ("Comunas con ≥ 20 ingresos y ≥ 20 personas hospitalizadas", COLORS[2], "s"), ("Todas las comunas continentales (sin fila REM = 0)", COLORS[6], "^")]:
+    ax.plot(xs, [corr[(name, p)]["rho"] for p in com_periods], marker + "-", color=color, label=name.replace(" hospitalizadas", "").replace("Todas las comunas continentales", "Todas las comunas"), markersize=4)
+ax.axhline(0, color="#999999", linewidth=.8)
+ax.set(title="Correlación por período", xlabel="Período", ylabel="ρ de Spearman", xticks=xs, xticklabels=[p.replace("-", "–") for p in com_periods], ylim=(-0.2, 1))
+ax.legend(fontsize=5.5, loc="upper left")
+finish_panels(axes)
+plt.show()
+```
+
+## Trayectorias de codificación hospitalaria
+
+La cohorte 2021–2024 incluyó `{python} V['cohort_n']` identificadores con primer registro hospitalario de TEA operacional, con edad mediana de `{python} V['cohort_age']` años (Q1–Q3: `{python} V['cohort_age_iqr']`) al ingreso índice y predominio de hombres en todas las bandas de edad (@fig-trayectorias A). En `{python} V['fp_sec']`% de los identificadores el primer registro tuvo el código solo en posiciones secundarias y en `{python} V['fp_prin']`% como diagnóstico principal (@fig-trayectorias B). Solo `{python} V['prior_n']` identificadores (`{python} V['prior_pct']`%) tenían hospitalizaciones anteriores observables dentro del período, con una mediana de `{python} V['prior_days']` días entre el primer egreso previo y el ingreso índice, y `{python} V['group_pct']`% presentaba algún grupo diagnóstico previo de interés, encabezado por `{python} V['top_group']` (`{python} V['top_group_pct']`%) y `{python} V['second_group']` (`{python} V['second_group_pct']`%) (@fig-trayectorias C, @tbl-trayectorias). El primer diagnóstico principal hospitalario observado correspondió mayoritariamente al propio episodio índice, con predominio de causas dentales, respiratorias, neurológicas y psiquiátricas (@fig-trayectorias D). Entre los índices con el código en posición secundaria y al menos 365 días calendario disponibles, `{python} V['trans_pct']`% tuvo una hospitalización posterior con el autismo como diagnóstico principal en ese plazo, con una mediana de `{python} V['trans_days']` días entre quienes transitaron.
+
+```{python}
+#| label: tbl-trayectorias
+#| output: asis
+table = {"Identificadores incluidos, n": lambda c, f, t: number(c.patients),
+         "Edad al ingreso índice, mediana (Q1–Q3)": lambda c, f, t: f"{number(c.age_median, 1)} ({ci(c.age_q25, c.age_q75, 1)})",
+         "Primer registro con código solo secundario, %": lambda c, f, t: number(f.loc["solo_secundario", "pct"], 1),
+         "Primer registro con código principal, %": lambda c, f, t: number(f.loc["principal", "pct"], 1),
+         "Con hospitalizaciones previas observables, %": lambda c, f, t: number(100 * c.prior_hospitalization / c.patients, 1),
+         "Con grupo diagnóstico previo de interés, %": lambda c, f, t: number(100 * c.prior_candidate_group / c.patients, 1),
+         "Días del primer egreso previo al ingreso índice, mediana": lambda c, f, t: number(c.days_first_prior_to_index_median),
+         "Índices secundarios con 365 días calendario disponibles, n": lambda c, f, t: number(t.eligible_followup_365d),
+         "Transición a diagnóstico principal en 365 días, %": lambda c, f, t: number(100 * t.later_principal_365d / t.eligible_followup_365d, 1),
+         "Días hasta el episodio principal, mediana entre quienes transitan": lambda c, f, t: number(t.days_to_principal_median)}
+rows = []
+for name, fn in table.items():
+    row = {"Indicador": name}
+    for era in ["2019-2020", "2021-2024"]:
+        row[era.replace("-", "–")] = fn(core.loc[era], fp.loc[fp.era == era].set_index("index_role"), trans.loc[era])
+    rows.append(row)
+markdown_table(pd.DataFrame(rows), "Cohortes de trayectorias de codificación hospitalaria con definición TEA operacional, por período de identificador. Los períodos no se enlazan entre sí; la transición a principal se calcula entre los índices con el código solo en posición secundaria.", "trayectorias")
+```
+
+```{python}
+#| label: fig-trayectorias
+#| fig-cap: "Cohorte de trayectorias 2021–2024 (definición TEA operacional). (A) Identificadores según banda de edad al ingreso índice y sexo registrado. (B) Posición del código TEA en el primer registro observado. (C) Grupos diagnósticos previos de interés en todo el período previo observable, como porcentaje de la cohorte; un identificador puede contribuir a varios grupos. (D) Primer diagnóstico principal hospitalario observado, diez códigos más frecuentes, como porcentaje de la cohorte; puede corresponder al propio episodio índice."
+#| fig-width: 6.5
+#| fig-height: 6
+fig, axes = plt.subplots(2, 2, figsize=(6.5, 6), layout="constrained")
+ax = axes[0, 0]
+by_age_sex = strata_era.groupby(["age_band", "sex"]).patients.sum().unstack("sex", fill_value=0).reindex(["0-4", "5-9", "10-14", "15-19", "20+"])
+x = np.arange(len(by_age_sex))
+ax.bar(x - .18, by_age_sex.get("HOMBRE", 0), width=.36, color=SEX_COLORS["HOMBRE"], label="Hombres")
+ax.bar(x + .18, by_age_sex.get("MUJER", 0), width=.36, color=SEX_COLORS["MUJER"], label="Mujeres")
+ax.set(title="Edad y sexo al ingreso índice", xlabel="Edad (años)", ylabel="Identificadores", xticks=x, xticklabels=by_age_sex.index,
+       ylim=(0, float(by_age_sex.values.max()) * 1.25))
+ax.legend(loc="upper right")
+ax = axes[0, 1]
+current = fp.loc[fp.era == ERA].sort_values("patients")
+current["label"] = current.index_role.map(POSITION_LABELS)
+ax.barh(current.label, current.pct, color=COLORS[1])
+for i, value in enumerate(current.pct):
+    ax.text(value + 1, i, "< 0,1%" if 0 < value < .1 else number(value, 1) + "%", va="center", fontsize=6.5)
+ax.set(title="Posición del código en el primer registro", xlabel="% de la cohorte", xlim=(0, 118))
+ax = axes[1, 0]
+g = groups_all.iloc[::-1]
+ax.barh([GROUP_LABELS.get(v, v) for v in g.group], 100 * g.patients / cohort.patients, color=COLORS[0])
+ax.set(title="Grupos diagnósticos previos", xlabel="% de la cohorte")
+ax = axes[1, 1]
+f = first_top.iloc[::-1]
+ax.barh([f"{code} {icd_label(code[:3])[:30]}" for code in f.code], 100 * f.patients / cohort.patients, color=COLORS[3])
+ax.set(title="Primer diagnóstico principal observado", xlabel="% de la cohorte")
+ax.tick_params(axis="y", labelsize=5.8)
+finish_panels(axes)
+plt.show()
+```
+
+# Discusión
+
+Este estudio describe, con dos fuentes administrativas independientes, cómo se registró el autismo en el sistema público de salud chileno entre 2017 y 2024. Los hallazgos principales son cuatro. Primero, la actividad con código de autismo creció con rapidez desde 2021 en ambas fuentes: la tasa estandarizada de hospitalizaciones se multiplicó por cerca de cuatro entre 2019 y 2024 y la de ingresos ambulatorios por cerca de seis entre 2021 y 2024, con cambios anuales promedio superiores al 50%. Segundo, el crecimiento fue proporcionalmente mayor en mujeres, de modo que la razón hombre:mujer de las tasas descendió desde valores cercanos a 3:1 hacia 2:1 en las dos fuentes, y se concentró en la niñez, con tasas máximas entre los 5 y los 14 años. Tercero, la mayor parte de los episodios hospitalarios no tuvo al autismo como motivo codificado de la atención: en más de nueve de cada diez registros el código ocupó posiciones secundarias, en hospitalizaciones por causas dentales, respiratorias, neurológicas, quirúrgicas o psiquiátricas, y el crecimiento reciente ocurrió sobre todo en esa posición. Cuarto, la distribución territorial fue marcadamente heterogénea, con autocorrelación espacial positiva y agrupaciones de razones altas en Ñuble y Biobío, y la coherencia entre fuentes fue débil por regiones y por comunas, aunque moderada entre las comunas con volúmenes suficientes en ambas.
+
+La magnitud absoluta de las tasas debe leerse en su unidad. Las revisiones sistemáticas sitúan la prevalencia del autismo en torno a 1 de cada 100 personas, con estimaciones agrupadas de 0,7% a 1% y valores cercanos a 3% en la vigilancia estadounidense de niños de 8 años [@zeidan2022; @talantseva2023; @santomauro2025; @shaw2025]; en Chile, un estudio con tamizaje y confirmación clínica en dos comunas de Santiago estimó 1,95% en niños de 18 a 30 meses [@yanez2021]. Frente a esas cifras, una tasa de 59 hospitalizaciones o de 49 personas hospitalizadas por 100.000 en 2024 representa una fracción pequeña de la población autista esperada, lo que es coherente con que GRD solo capte a quienes se hospitalizan en establecimientos públicos con el sistema y a quienes, además, reciben el código durante ese episodio. La tasa de ingresos ambulatorios de 81 por 100.000 en 2024 tampoco es una incidencia: cuenta ingresos registrados a programas de salud mental, no personas nuevas ni diagnósticos confirmados.
+
+El crecimiento observado admite varias explicaciones no excluyentes, y los datos no permiten separar su contribución. El período abarca la publicación de la Ley 21.545 en marzo de 2023, que estableció obligaciones de detección, diagnóstico y atención integral [@ley21545], una mayor visibilidad social del autismo, la expansión de la oferta de evaluación en la red pública y cambios en las prácticas de codificación, ilustrados por el desplazamiento de las subcategorías Asperger y autismo atípico hacia F84.0 en ambas fuentes, coherente con la nomenclatura de DSM-5. El aumento sostenido de la proporción de registros con el código en posición secundaria apunta a que la condición se consigna cada vez más en cualquier contacto hospitalario, con independencia del motivo de ingreso. Las tendencias en registros administrativos de otros países muestran aumentos comparables atribuidos a detección y criterios diagnósticos más que a cambios en la ocurrencia [@fombonne2021; @solmi2022]. Por ello, los resultados son compatibles con una mayor detección, demanda y registro, y no demuestran un aumento de la ocurrencia del autismo.
+
+El descenso de la razón hombre:mujer es uno de los hallazgos más consistentes entre fuentes. El metaanálisis de Loomes y colaboradores estimó una razón cercana a 3:1 en estudios con tamizaje poblacional, frente a valores mayores cuando solo se cuentan diagnósticos preexistentes, lo que atribuye parte de la brecha a un sesgo de identificación en niñas y mujeres [@loomes2017]; cohortes de nacimiento recientes muestran que la razón disminuye con el período calendario y con la edad al diagnóstico [@fyfe2026]. La convergencia hacia 2:1 en hospitalizaciones e ingresos ambulatorios chilenos es coherente con una detección proporcionalmente mayor en mujeres durante el período, aunque una razón hospitalaria depende también de las causas de hospitalización, que difieren por sexo y edad.
+
+El perfil de los episodios y de los codiagnósticos coincide con la literatura sobre comorbilidad en la población autista, que describe alta frecuencia de epilepsia, trastorno por déficit de atención e hiperactividad, discapacidad intelectual, ansiedad y depresión [@bougeard2021]. La presencia de patología dental bajo anestesia general, cirugías electivas frecuentes en la infancia y causas psiquiátricas entre los diagnósticos principales describe las razones por las que las personas con código de autismo llegan al hospital público, no la frecuencia de esas condiciones en la población autista. La baja letalidad hospitalaria y las estancias más largas cuando el autismo es el diagnóstico principal son consistentes con ingresos psiquiátricos o de evaluación de conducta, que constituyen una minoría de los episodios.
+
+La heterogeneidad territorial y la autocorrelación espacial describen la geografía del registro, no el riesgo de autismo [@elliott2000]. Las agrupaciones alto-alto en torno a Chillán y al Gran Concepción son coherentes con la captación regional de sus hospitales y con prácticas de codificación probablemente más exhaustivas, y las tasas bajas de la Región Metropolitana pese a su volumen absoluto sugieren diferencias en la cobertura del sistema GRD, en la derivación al sistema privado y en el registro. La comparación ecológica añade una lectura complementaria: las regiones y comunas con más ingresos ambulatorios no son necesariamente las de más hospitalizaciones, porque la oferta ambulatoria, la oferta hospitalaria y las prácticas de registro varían de forma independiente, y porque REM asigna la actividad al establecimiento y GRD a la residencia. La correlación moderada entre comunas con volúmenes suficientes indica, sin embargo, que existe una señal territorial común en las comunas de mayor tamaño, mientras que en las pequeñas el azar y la ausencia de establecimientos informantes dominan la comparación.
+
+Las trayectorias hospitalarias muestran que el primer registro de autismo ocurre casi siempre como diagnóstico acompañante y que solo una minoría tiene hospitalizaciones anteriores observables. Los antecedentes registrados, principalmente trastornos del ánimo y de ansiedad, epilepsia y problemas del desarrollo, del habla y de la conducta, son coherentes con las comorbilidades conocidas y con motivos de consulta que preceden a la identificación del autismo, pero la secuencia de códigos hospitalarios no demuestra que se tratara de diagnósticos diferenciales descartados: pueden ser comorbilidades, síntomas o motivos de ingreso independientes. La censura por la izquierda es sustancial, porque una persona puede haber sido diagnosticada años antes en atención ambulatoria, y la oportunidad de observación dentro de un período de cuatro años es limitada.
+
+Las fortalezas del estudio son la cobertura nacional de ambas fuentes, la lectura año a año de los diccionarios REM, el uso de definiciones de caso explícitas con análisis de sensibilidad, la estandarización con intervalos apropiados para conteos pequeños, la corrección por comparaciones múltiples en el análisis local y la reproducibilidad completa del procesamiento. Las limitaciones principales son la naturaleza administrativa de los datos, sin validación clínica de los códigos; la restricción de GRD a establecimientos públicos con el sistema y la exclusión del sistema privado y de la atención primaria; la imposibilidad de contar personas únicas en REM y de enlazar los períodos de identificador en GRD; la dependencia de las proyecciones de población anteriores al Censo 2024; la asignación de REM al establecimiento y no a la residencia; el problema de la unidad de área modificable en los análisis comunales; y la ausencia de ajuste multivariable y de inferencia causal, que no eran objetivos del diseño descriptivo.
+
+# Conclusiones
+
+Entre 2019 y 2024 el registro de autismo en el sistema público de salud chileno creció con rapidez y de forma coherente en las hospitalizaciones y en los ingresos ambulatorios, con mayor aumento relativo en mujeres, concentración en la niñez y predominio del código como diagnóstico acompañante de hospitalizaciones por otras causas. La distribución territorial fue heterogénea, con agrupaciones espaciales que describen la organización de la red asistencial y la práctica de codificación, y la coherencia entre fuentes fue débil salvo entre comunas de mayor volumen. Estos indicadores describen el contacto con el sistema y el registro de la condición durante el período de la Ley 21.545, y no la incidencia ni la prevalencia del autismo. Su utilidad principal es servir de línea de base reproducible para el seguimiento de la política pública, cuya interpretación requerirá integrar la atención primaria, el sistema privado, las defunciones y una validación clínica de los códigos.
+
+# Declaraciones {.unnumbered}
+
+**Financiamiento.** Por completar. **Conflictos de interés.** El autor declara no tener conflictos de interés. **Disponibilidad de datos y código.** Las bases GRD y REM son de acceso público o autorizado y no contienen nombres; los identificadores encriptados se procesaron en memoria y no se exportaron. Los agregados, el código de procesamiento y este manuscrito reproducible están disponibles en el repositorio del proyecto. **Aprobación ética.** El estudio usa bases de datos administrativas sin identificadores personales; no se realizó contacto con personas ni se accedió a fichas clínicas.
+
+# Referencias {.unnumbered}
+
+::: {#refs}
+:::

@@ -21,7 +21,7 @@ import numpy as np
 import pandas as pd
 
 from epi_helpers import (AGE_GROUPS, NON_CONTINENTAL, REGION_NAMES, annual_percent_change, comuna_catalogue,
-                         count_ratio, empirical_bayes_ratio, expected_counts, load_population, normalize_name,
+                         count_ratio, crude_rate, empirical_bayes_ratio, expected_counts, load_population, normalize_name,
                          rate_ratio, standardized_ratio, summarise_rates)
 
 ROOT = Path(__file__).resolve().parents[1]
@@ -308,6 +308,113 @@ def ecological(output: Path) -> None:
     panel.to_csv(output / "rem_grd_ecological.csv", index=False)
 
 
+def comuna_summary(observed: pd.DataFrame, grid: pd.DataFrame, reference: pd.DataFrame, strata: list[str],
+                   prefix: str, absent_is_zero: bool = True) -> pd.DataFrame:
+    """Per-comuna crude rate (exact Poisson limits) and indirectly standardised ratio.
+
+    `observed` carries `cut_comuna` and `count` already summed over the period.
+    Comunas absent from it count zero when the source enumerates every event
+    (GRD residence); with `absent_is_zero=False` they keep a missing count and no
+    rates, because the source only has rows for reporting establishments (REM).
+    `grid` is the population by `cut_comuna` and `strata`; `reference` holds the
+    national `count` and `population` by `strata`, whose rates give the expected
+    counts. Columns are prefixed so several sources can share one panel.
+    """
+    expected = expected_counts(grid.assign(count=0.0), reference, ["cut_comuna"], strata)[["cut_comuna", "expected", "population"]]
+    table = expected.merge(observed[["cut_comuna", "count"]], how="left", on="cut_comuna")
+    if absent_is_zero:
+        table["count"] = table["count"].fillna(0.0)
+    count = table["count"].fillna(0.0)
+    crude = crude_rate(count, table.population)
+    ratio = standardized_ratio(count, table.expected)
+    out = pd.DataFrame({"cut_comuna": table.cut_comuna, prefix: table["count"], f"{prefix}_population": table.population,
+                        f"{prefix}_crude": crude.rate, f"{prefix}_crude_lo": crude.rate_lo, f"{prefix}_crude_hi": crude.rate_hi,
+                        f"{prefix}_expected": table.expected, f"{prefix}_sir": ratio.sir, f"{prefix}_sir_lo": ratio.sir_lo,
+                        f"{prefix}_sir_hi": ratio.sir_hi})
+    missing = table["count"].isna()
+    out.loc[missing, [f"{prefix}_crude", f"{prefix}_crude_lo", f"{prefix}_crude_hi", f"{prefix}_sir", f"{prefix}_sir_lo", f"{prefix}_sir_hi"]] = np.nan
+    return out
+
+
+def ecological_comunal(output: Path, population: pd.DataFrame, catalogue: pd.DataFrame) -> None:
+    """Comuna panel joining REM autism admissions (comuna of the reporting establishment) and GRD
+    hospitalisations (comuna of residence): annual 2021–2024 and pooled 2021–2024.
+
+    REM is only available as comuna totals, so both sources are compared with crude rates per
+    100,000 person-years and with indirectly standardised ratios (observed / expected from the
+    national sex- and age-specific rates of the same source and period). Comunas without a REM
+    row for the code keep a missing REM count: the reports decide whether to treat them as zero.
+    """
+    years = ERAS["2021-2024"]
+    pop = population.loc[population.year.isin(years)]
+    grid_years = pop.groupby(["cut_comuna", "year", "sex", "age_group"], observed=True).population.sum().reset_index()
+    national_years = pop.groupby(["year", "sex", "age_group"], observed=True).population.sum().reset_index()
+    # REM: comuna totals of the autism admission code and national age/sex cells for the reference rates.
+    rem_com = read(output, "rem_annual_comuna.csv")
+    rem_com = rem_com.loc[(rem_com.code == "05990022") & rem_com.year.isin(years)].copy()
+    rem_com["cut_comuna"] = pd.to_numeric(rem_com.IdComuna, errors="coerce")
+    rem_com = rem_com.dropna(subset=["cut_comuna"]).astype({"cut_comuna": int})
+    rem_cells = read(output, "rem_a05_age_sex.csv")
+    rem_cells = rem_cells.loc[(rem_cells.code == "05990022") & rem_cells.year.isin(years)].copy()
+    rem_cells["sex"] = rem_cells.sex.map({"Hombres": "HOMBRE", "Mujeres": "MUJER"})
+    rem_cells = rem_cells.groupby(["year", "sex", "age_group"], observed=True)["count"].sum().reset_index()
+    # GRD: records (any role) and persons of the main definition by comuna of residence.
+    def with_cut(frame: pd.DataFrame) -> pd.DataFrame:
+        frame = frame.dropna(subset=["sex", "age_group"]).loc[lambda d: d.definition == MAIN].copy()
+        frame["comuna_norm"] = frame.comuna_norm.fillna("").map(normalize_name)
+        frame = frame.merge(catalogue[["comuna_norm", "cut_comuna"]], how="left", on="comuna_norm")
+        return frame.dropna(subset=["cut_comuna"]).astype({"cut_comuna": int})
+    rec = with_cut(read(output, "grd_epi_strata.csv")).loc[lambda d: d.year.isin(years)]
+    rec = rec.groupby(["year", "cut_comuna", "sex", "age_group"], observed=True).records.sum().reset_index().rename(columns={"records": "count"})
+    per_year = with_cut(read(output, "grd_epi_persons_year.csv")).loc[lambda d: d.year.isin(years)]
+    per_year = per_year.groupby(["year", "cut_comuna", "sex", "age_group"], observed=True).persons.sum().reset_index().rename(columns={"persons": "count"})
+    per_era = with_cut(read(output, "grd_epi_persons_era.csv")).loc[lambda d: d.era == "2021-2024"]
+    per_era = per_era.groupby(["cut_comuna", "sex", "age_group"], observed=True).persons.sum().reset_index().rename(columns={"persons": "count"})
+    periods = [(str(y), [y]) for y in years] + [("2021-2024", years)]
+    panels = []
+    for label, span in periods:
+        grid = grid_years.loc[grid_years.year.isin(span)]
+        national = national_years.loc[national_years.year.isin(span)]
+        strata = ["year", "sex", "age_group"]
+        rem_obs = rem_com.loc[rem_com.year.isin(span)].groupby("cut_comuna").agg(
+            count=("Col01", lambda s: s.sum(min_count=1)), rem_rows=("rows", "sum"),
+            rem_establishments=("reporting_establishments", "max")).reset_index()
+        rem_ref = national.merge(rem_cells.loc[rem_cells.year.isin(span)], how="left", on=strata).fillna({"count": 0.0})
+        rem_part = comuna_summary(rem_obs, grid, rem_ref, strata, "rem_ingresos", absent_is_zero=False)
+        rec_obs = rec.loc[rec.year.isin(span)].groupby("cut_comuna")["count"].sum().reset_index()
+        rec_ref = national.merge(rec.loc[rec.year.isin(span)].groupby(strata, observed=True)["count"].sum().reset_index(), how="left", on=strata).fillna({"count": 0.0})
+        rec_part = comuna_summary(rec_obs, grid, rec_ref, strata, "grd_records")
+        if len(span) == 1:
+            per_obs = per_year.loc[per_year.year.isin(span)].groupby("cut_comuna")["count"].sum().reset_index()
+            per_ref = national.merge(per_year.loc[per_year.year.isin(span)].groupby(strata, observed=True)["count"].sum().reset_index(), how="left", on=strata).fillna({"count": 0.0})
+            per_part = comuna_summary(per_obs, grid, per_ref, strata, "grd_persons")
+        else:
+            # Distinct persons over the period against the mean annual population (person-period denominator).
+            mean_grid = grid.groupby(["cut_comuna", "sex", "age_group"], observed=True).population.sum().reset_index().assign(population=lambda d: d.population / len(span))
+            mean_national = national.groupby(["sex", "age_group"], observed=True).population.sum().reset_index().assign(population=lambda d: d.population / len(span))
+            per_obs = per_era.groupby("cut_comuna")["count"].sum().reset_index()
+            per_ref = mean_national.merge(per_era.groupby(["sex", "age_group"], observed=True)["count"].sum().reset_index(), how="left", on=["sex", "age_group"]).fillna({"count": 0.0})
+            per_part = comuna_summary(per_obs, mean_grid, per_ref, ["sex", "age_group"], "grd_persons")
+        panel = rem_part.merge(rec_part.drop(columns="grd_records_population"), on="cut_comuna").merge(per_part, on="cut_comuna")
+        panel = panel.merge(rem_obs[["cut_comuna", "rem_rows", "rem_establishments"]], how="left", on="cut_comuna")
+        panel["rem_rows"] = panel.rem_rows.fillna(0).astype(int)
+        panel["rem_reported"] = panel.rem_rows > 0
+        panel.insert(0, "period", label)
+        panel.insert(1, "year", span[0] if len(span) == 1 else np.nan)
+        panels.append(panel)
+    panel = pd.concat(panels, ignore_index=True).rename(columns={"rem_ingresos_population": "population"})
+    panel = panel.merge(catalogue[["cut_comuna", "comuna", "cut_region", "region_short", "continental"]], how="left", on="cut_comuna")
+    ordered = ["period", "year", "cut_comuna", "comuna", "cut_region", "region_short", "continental", "population",
+               "rem_reported", "rem_rows", "rem_establishments", "rem_ingresos", "rem_ingresos_crude", "rem_ingresos_crude_lo",
+               "rem_ingresos_crude_hi", "rem_ingresos_expected", "rem_ingresos_sir", "rem_ingresos_sir_lo", "rem_ingresos_sir_hi",
+               "grd_records", "grd_records_crude", "grd_records_crude_lo", "grd_records_crude_hi", "grd_records_expected",
+               "grd_records_sir", "grd_records_sir_lo", "grd_records_sir_hi", "grd_persons", "grd_persons_population",
+               "grd_persons_crude", "grd_persons_crude_lo", "grd_persons_crude_hi", "grd_persons_expected", "grd_persons_sir",
+               "grd_persons_sir_lo", "grd_persons_sir_hi"]
+    panel = panel[ordered].rename(columns={c: c.replace("rem_ingresos_", "rem_") for c in ordered if c.startswith("rem_ingresos_")})
+    panel.to_csv(output / "rem_grd_ecological_comunal.csv", index=False)
+
+
 def main() -> None:
     parser = argparse.ArgumentParser(description=__doc__)
     parser.add_argument("--output", type=Path, default=ROOT / "output_files" / "consolidacion")
@@ -329,6 +436,8 @@ def main() -> None:
     rem_rates(args.output, population)
     print("REM: tasas de ingresos A05 calculadas", flush=True)
     ecological(args.output)
+    ecological_comunal(args.output, population, catalogue)
+    print("Ecológico: paneles regional y comunal REM–GRD calculados", flush=True)
     if not args.skip_spatial:
         spatial(args.output, args.shapefile, catalogue)
         print("Espacial: Moran global y LISA calculados", flush=True)

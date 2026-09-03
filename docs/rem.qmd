@@ -34,6 +34,7 @@ rates = read_result("rem_rates_national.csv")
 age_rates = read_result("rem_rates_age_specific.csv")
 regional_rates = read_result("rem_rates_regional.csv")
 ecological = read_result("rem_grd_ecological.csv")
+ecological_com = read_result("rem_grd_ecological_comunal.csv")
 young = read_result("population_regional_young.csv")
 comuna_catalogue = read_result("catalogo_comunas.csv")
 plot_style()
@@ -552,7 +553,9 @@ show_table(table, f"A28 por región del establecimiento · {last_year}")
 
 ## Comparación ecológica entre REM y GRD
 
-Las tasas regionales de ingresos REM (establecimiento) y de hospitalizaciones GRD (residencia) se comparan por región y año. Miden actividades distintas con unidades distintas; la correlación describe solo la coherencia territorial entre fuentes.
+Las tasas de ingresos REM (región o comuna del establecimiento) y de hospitalizaciones GRD (residencia) se comparan por región y año y, más abajo, por comuna. Miden actividades distintas con unidades distintas; la correlación describe solo la coherencia territorial entre fuentes.
+
+### Correlación regional
 
 ```{python}
 #| label: fig-rem-grd-ecologica
@@ -576,6 +579,76 @@ show_table(pd.DataFrame(corr_rows), "Correlación de Spearman entre tasas region
 
 Las correlaciones son positivas y débiles: las regiones con más ingresos ambulatorios no son necesariamente las de más hospitalizaciones, porque la oferta ambulatoria, la oferta hospitalaria y las prácticas de registro varían de forma independiente. Atacama, con tasas de ingreso muy altas y hospitalizaciones bajas, ilustra esa disociación.
 
+### Correlación comunal
+
+A escala comunal la comparación es más exigente: REM asigna los ingresos a la comuna del establecimiento y GRD a la comuna de residencia, de modo que una comuna sin establecimiento que informe el código no tiene ingresos REM aunque sus residentes se hospitalicen. Como REM solo entrega totales por comuna, ambas fuentes se comparan con tasas crudas por 100.000 personas-año y con razones estandarizadas indirectas, es decir, observados sobre esperados según las tasas nacionales por sexo y edad de la misma fuente y período: razón de ingresos estandarizada (RIE) en REM y razón de hospitalización estandarizada (RHE) en GRD. El análisis principal usa las comunas continentales con al menos un establecimiento informante; como sensibilidad se agregan las comunas con al menos 20 ingresos y 20 personas hospitalizadas, donde las tasas son más estables, y todas las comunas continentales con cero imputado a las que no informaron.
+
+```{python}
+#| label: fig-rem-grd-comunas
+#| fig-cap: "Comunas continentales con establecimiento informante, 2021–2024 agrupado: tasa cruda de ingresos REM (comuna del establecimiento) frente a personas hospitalizadas GRD (comuna de residencia), y razón de ingresos estandarizada frente a razón de hospitalización estandarizada; escalas logarítmicas, tamaño proporcional a la población y correlación de Spearman. Las comunas con cero en alguna fuente no aparecen en la escala logarítmica pero sí en la correlación."
+#| fig-width: 12
+#| fig-height: 5
+pool = ecological_com.loc[(ecological_com.period == "2021-2024") & ecological_com.continental].copy()
+informantes = pool.loc[pool.rem_reported]
+fig, axes = plt.subplots(1, 2, figsize=(12, 5), layout="constrained")
+sizes = 6 + 60 * informantes.population / informantes.population.max()
+labelled = informantes.sort_values("rem_ingresos", ascending=False).head(6)
+panels = [(axes[0], "rem_crude", "grd_persons_crude", "REM: ingresos por 100.000 personas-año", "GRD: personas hospitalizadas por 100.000", "Tasas crudas", None),
+          (axes[1], "rem_sir", "grd_persons_sir", "REM: razón de ingresos estandarizada (RIE)", "GRD: razón de hospitalización estandarizada (RHE)", "Razones estandarizadas indirectas", 1.0)]
+for ax, x, y, xlabel, ylabel, title, reference in panels:
+    rho, p = stats.spearmanr(informantes[x], informantes[y], nan_policy="omit")
+    positive = informantes.loc[(informantes[x] > 0) & (informantes[y] > 0)]
+    ax.scatter(positive[x], positive[y], s=sizes.loc[positive.index], color=COLORS[0], alpha=.55, edgecolor="white", linewidth=.3)
+    for _, row in labelled.iterrows():
+        if row[x] > 0 and row[y] > 0:
+            ax.annotate(row.comuna, (row[x], row[y]), fontsize=7, xytext=(3, 3), textcoords="offset points")
+    if reference is not None:
+        ax.axhline(reference, color="#999999", linestyle="--", linewidth=1)
+        ax.axvline(reference, color="#999999", linestyle="--", linewidth=1)
+    ax.set(title=f"{title} · ρ = {rho:.2f} (n = {len(informantes)})", xlabel=xlabel, ylabel=ylabel, xscale="log", yscale="log")
+plt.show()
+```
+
+```{python}
+#| label: tabla-rem-grd-comunas
+def spearman_row(frame, period, subset):
+    row = {"Período": period, "Comunas": subset, "n": len(frame)}
+    for label, x, y in [("ingresos–personas", "rem_crude", "grd_persons_crude"), ("RIE–RHE", "rem_sir", "grd_persons_sir"),
+                        ("ingresos–registros", "rem_crude", "grd_records_crude")]:
+        rho, p = stats.spearmanr(frame[x], frame[y], nan_policy="omit")
+        row[f"ρ {label}"] = rho
+        row[f"p {label}"] = p
+    return row
+rows = []
+for period in list(dict.fromkeys(ecological_com.period)):
+    frame = ecological_com.loc[(ecological_com.period == period) & ecological_com.continental]
+    reported = frame.loc[frame.rem_reported]
+    rows.append(spearman_row(reported, period, "Con establecimiento informante"))
+    rows.append(spearman_row(reported.loc[(reported.rem_ingresos >= 20) & (reported.grd_persons >= 20)], period, "≥ 20 ingresos y ≥ 20 personas"))
+    rows.append(spearman_row(frame.assign(rem_crude=frame.rem_crude.fillna(0.0), rem_sir=frame.rem_sir.fillna(0.0)), period, "Todas (sin fila = 0)"))
+corr_com = pd.DataFrame(rows)
+decimals = {c: 2 for c in corr_com.columns if c.startswith("ρ")} | {c: 3 for c in corr_com.columns if c.startswith("p ")}
+show_table(corr_com, "Correlación de Spearman entre tasas comunales REM y GRD por período y conjunto de comunas continentales", decimals)
+```
+
+```{python}
+#| label: tabla-rem-grd-comunas-lista
+top = informantes.sort_values("rem_ingresos", ascending=False).head(15)
+table = pd.DataFrame({
+    "Comuna": top.comuna.values, "Región": top.region_short.values, "Ingresos REM": top.rem_ingresos.values, "Tasa REM": top.rem_crude.values,
+    "RIE": top.rem_sir.values, "IC 95% RIE": [ci(lo, hi, 2) for lo, hi in zip(top.rem_sir_lo, top.rem_sir_hi)],
+    "Personas GRD": top.grd_persons.values, "Tasa GRD": top.grd_persons_crude.values, "RHE": top.grd_persons_sir.values,
+    "IC 95% RHE": [ci(lo, hi, 2) for lo, hi in zip(top.grd_persons_sir_lo, top.grd_persons_sir_hi)],
+})
+show_table(table, "Quince comunas con más ingresos REM con código de autismo · 2021–2024: tasas crudas por 100.000 y razones estandarizadas de ambas fuentes",
+           {"Tasa REM": 1, "RIE": 2, "Tasa GRD": 1, "RHE": 2})
+note(f"Comunas continentales con al menos un establecimiento que informó ingresos por autismo en 2021–2024: {len(informantes)} de {len(pool)}; "
+     f"con al menos 20 ingresos y 20 personas hospitalizadas: {int(((informantes.rem_ingresos >= 20) & (informantes.grd_persons >= 20)).sum())}. "
+     "La RIE usa como referencia las tasas nacionales de ingreso por sexo y edad de REM; la RHE, las tasas nacionales de personas hospitalizadas de GRD.")
+```
+
+La correlación comunal es positiva y débil entre las comunas con establecimiento informante (ρ cercano a 0,3 en 2021–2024 y entre 0,1 y 0,25 en los años individuales), similar con tasas crudas y con razones estandarizadas, y sube a cerca de 0,6 al restringir el análisis a comunas con al menos 20 ingresos y 20 personas hospitalizadas, donde las tasas dependen menos del azar. Incluir todas las comunas con cero imputado eleva la correlación por un motivo distinto: las comunas sin establecimiento informante son en su mayoría pequeñas y también tienen pocas hospitalizaciones. Chillán combina las tasas más altas de ambas fuentes, mientras Copiapó reproduce la disociación de Atacama, con ingresos ambulatorios muy altos y hospitalizaciones bajas. La diferencia de unidad territorial, establecimiento frente a residencia, desplaza los ingresos hacia las comunas que concentran la oferta ambulatoria y limita por sí sola la coherencia esperable.
+
 ## Calidad y comparabilidad
 
 ```{python}
@@ -598,7 +671,7 @@ Los controles por sexo o edad solo comparan filas con todas las celdas necesaria
 - Cerca de la mitad de los ingresos corresponde a menores de 10 años, con una proporción creciente de adolescentes y adultos; el autismo específico desplaza a Asperger y TGD no específico como categoría de codificación.
 - Las tasas regionales de ingreso varían más de seis veces entre regiones (Ñuble y Atacama frente a Magallanes, Tarapacá y Metropolitana); el crecimiento ocurre en el panel estable de establecimientos y también por nuevos informantes.
 - El tamizaje en controles de 18 meses muestra que la aplicación registrada del M-CHAT R/F es muy inferior al número de controles y que alrededor de un tercio de los niños con riesgo medio o alto requiere derivación tras la segunda parte; ningún cociente de esta fuente equivale a una positividad poblacional.
-- La coherencia territorial entre ingresos ambulatorios (REM) y hospitalizaciones (GRD) es débil, lo que subraya que cada fuente describe una parte distinta del contacto con el sistema.
+- La coherencia territorial entre ingresos ambulatorios (REM) y hospitalizaciones (GRD) es débil por regiones y por comunas, y solo alcanza valores moderados entre comunas con volúmenes suficientes en ambas fuentes, lo que subraya que cada fuente describe una parte distinta del contacto con el sistema.
 
 ## Reproducibilidad
 

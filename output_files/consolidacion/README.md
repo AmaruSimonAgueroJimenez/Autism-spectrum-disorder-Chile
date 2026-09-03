@@ -85,6 +85,7 @@ Denominadores: personas-año INE. `unit` distingue `records` (episodios) y `pers
 | `rem_rates_age_specific.csv` | Serie/año/sexo/grupo de edad: tasa de ingreso específica e IC |
 | `rem_rates_regional.csv` | Serie/período/región del establecimiento/sexo: ingresos, población, tasa cruda y TEE con IC |
 | `rem_grd_ecological.csv` | Región/año 2021–2024: tasas REM de ingresos y tasas GRD de registros y de personas |
+| `rem_grd_ecological_comunal.csv` | Comuna/período (anual 2021–2024 y agrupado 2021–2024): personas-año; ingresos REM del código de autismo por comuna del establecimiento con marca de comuna informante, filas y establecimientos, tasa cruda e IC, esperados y razón de ingresos estandarizada (RIE) con IC; registros y personas GRD por comuna de residencia con tasa cruda e IC, esperados y RHE con IC. Los esperados usan las tasas nacionales por sexo y edad de la misma fuente y período; las personas agrupadas usan la población media anual. Las comunas sin fila REM conservan el ingreso vacío, no cero |
 
 ## REM
 

@@ -6,10 +6,19 @@ Repositorio de análisis reproducibles en Python y Quarto sobre el trastorno del
 |---|---|---|
 | [index.qmd](docs/index.qmd) | Índice, alcance y resultados principales | [Inicio](docs/index.html) |
 | [metodologia.qmd](docs/metodologia.qmd) | Diseño, contexto epidemiológico, fuentes, definiciones, unidades, denominadores, estandarización, intervalos, tendencias, análisis espacial, reglas de lectura REM, calidad, sesgos, reproducibilidad y referencias | [Metodología](docs/metodologia.html) |
-| [rem.qmd](docs/rem.qmd) | REM: ingresos y egresos de salud mental, tasas de ingreso por población, edad y sexo, subcategorías, regiones, comunas, panel de establecimientos, tamizaje por etapa, rehabilitación y comparación ecológica con GRD | [Informe REM](docs/rem.html) |
+| [rem.qmd](docs/rem.qmd) | REM: ingresos y egresos de salud mental, tasas de ingreso por población, edad y sexo, subcategorías, regiones, comunas, panel de establecimientos, tamizaje por etapa, rehabilitación y comparación ecológica regional y comunal con GRD | [Informe REM](docs/rem.html) |
 | [grd.qmd](docs/grd.qmd) | GRD, parte A: epidemiología descriptiva (tasas crudas y estandarizadas con intervalos, tendencias, estacionalidad, sexo y edad, subcategorías, posición del código, características del episodio, letalidad, estancia, hospitales, codiagnósticos, rehospitalización, regiones, comunas, Moran y LISA); parte B: trayectorias diagnósticas | [Informe GRD](docs/grd.html) |
 
 Los cuatro QMD ejecutan bloques Python para calcular tablas y figuras desde los agregados. Comparten configuración en `docs/_quarto.yml`, bibliografía en `docs/references.bib`, utilidades de presentación en `scripts/report_helpers.py` y funciones epidemiológicas en `scripts/epi_helpers.py`.
+
+## Manuscrito (preprint)
+
+La carpeta `paper/` contiene [manuscript.qmd](paper/manuscript.qmd), un manuscrito en formato de artículo (resumen, métodos, resultados con figuras de panel y tablas, discusión, conclusiones y referencias en estilo Vancouver) que se renderiza a Word como [manuscript.docx](paper/manuscript.docx). Todas sus cifras, tablas y figuras se recalculan desde `output_files/consolidacion/` en cada renderización; el texto no contiene valores pegados a mano. Usa la bibliografía compartida `docs/references.bib` y el estilo `paper/vancouver.csl`.
+
+```sh
+python scripts/render_reports.py --paper   # renderiza los cuatro QMD y el manuscrito
+cd paper && quarto render manuscript.qmd   # solo el manuscrito
+```
 
 ## Preguntas e interpretación
 
@@ -68,7 +77,7 @@ El análisis abarca GRD 2019–2024 y REM 2017–2024. Los archivos REM 2025–2
 - `scripts/grd_trajectories.py`: recuperación de todos los egresos y reconstrucción temporal.
 - `scripts/grd_epidemiology.py`: agregados descriptivos de los registros F84.
 - `scripts/epi_helpers.py`: tasas, estandarización directa (OMS) e indirecta, intervalos exactos y gamma, razones, cambio porcentual anual, suavizado empírico bayesiano.
-- `scripts/epi_rates.py`: aplica lo anterior a los agregados y calcula Moran global y LISA con PySAL.
+- `scripts/epi_rates.py`: aplica lo anterior a los agregados, construye los paneles ecológicos REM–GRD por región y por comuna, y calcula Moran global y LISA con PySAL.
 - `tests/`: pruebas con datos sintéticos.
 
 Las auditorías aceptan `--years`; las trayectorias aceptan `--eras`; los scripts de extracción aceptan `--output`. Los QMD activos esperan las salidas completas en `output_files/consolidacion/`. Las ejecuciones parciales deben usar una carpeta de salida distinta para conservar esa entrada completa.

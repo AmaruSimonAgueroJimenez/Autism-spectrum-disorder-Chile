@@ -1,4 +1,5 @@
-"""Render index, metodología, REM and GRD; optionally refresh aggregates from canonical data.
+"""Render index, metodología, REM and GRD; optionally refresh aggregates from canonical data
+and render the manuscript in `paper/` (DOCX preprint) with `--paper`.
 
 Refresh order: identifier audit, REM extraction, GRD trajectories, GRD descriptive
 epidemiology and, finally, rates and spatial statistics (which need the INE
@@ -21,6 +22,7 @@ def main():
     parser.add_argument("--refresh", action="store_true", help="Regenerar agregados desde las fuentes antes de renderizar")
     parser.add_argument("--rates-only", action="store_true", help="Recalcular solo tasas y estadísticos espaciales (epi_rates.py) antes de renderizar")
     parser.add_argument("--skip-spatial", action="store_true", help="Omitir Moran y LISA al recalcular tasas")
+    parser.add_argument("--paper", action="store_true", help="Renderizar además el manuscrito paper/manuscript.qmd a DOCX")
     args = parser.parse_args()
     quarto = shutil.which("quarto")
     if not quarto:
@@ -39,6 +41,8 @@ def main():
     env = os.environ.copy()
     env["QUARTO_PYTHON"] = sys.executable
     subprocess.run([quarto, "render", str(ROOT / "docs")], cwd=ROOT, env=env, check=True)
+    if args.paper:
+        subprocess.run([quarto, "render", "manuscript.qmd"], cwd=ROOT / "paper", env=env, check=True)
 
 
 if __name__ == "__main__":

@@ -196,6 +196,26 @@ def show_table(frame: pd.DataFrame, caption: str, decimals=None):
     display(HTML(f'<div class="analysis-table" role="region" aria-label="{escape(caption)}" tabindex="0">{table}</div>'))
 
 
+def markdown_table(frame: pd.DataFrame, caption: str, label: str, decimals=None):
+    """Pipe table with a Quarto caption and cross-reference label, for DOCX and PDF outputs.
+
+    Use inside a cell with `#| output: asis`; reference it as @tbl-<label>. Numbers are
+    formatted with `number()` (decimal comma) so pandoc does not reinterpret them.
+    """
+    decimals = decimals or {}
+    frame = frame.copy()
+    frame.columns = [str(c) for c in frame.columns]
+    for column in frame.columns:
+        if column in ["Año", "Año inicial", "Año final", "Mes", "Código de región", "CUT"]:
+            frame[column] = frame[column].map(lambda v: "—" if pd.isna(v) else (str(int(v)) if isinstance(v, numbers.Number) else str(v)))
+        else:
+            frame[column] = frame[column].map(lambda v, d=decimals.get(column, 0): number(v, d))
+    print(frame.to_markdown(index=False, disable_numparse=True))
+    print()
+    print(f": {caption} {{#tbl-{label}}}")
+    print()
+
+
 def kpis(items):
     cards = "".join(f'<div class="metric"><strong>{escape(str(value))}</strong><span>{escape(label)}</span></div>'
                     for value, label in items)
