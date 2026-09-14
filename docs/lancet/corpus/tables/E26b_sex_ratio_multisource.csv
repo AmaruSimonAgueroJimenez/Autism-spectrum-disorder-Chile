@@ -1,0 +1,73 @@
+﻿Source,Year,Unit,Males,Females,Male-to-female ratio (95% CI),Interval method,Basis
+REM A05 · autism entries (standardised rates),2021,entries,"1,624",461,3.49 (3.14–3.87),log-normal on the ratio of standardised rates,age-standardised rates
+REM A05 · autism entries (standardised rates),2022,entries,"3,466","1,175",2.88 (2.69–3.08),log-normal on the ratio of standardised rates,age-standardised rates
+REM A05 · autism entries (standardised rates),2023,entries,"5,734","2,315",2.44 (2.33–2.56),log-normal on the ratio of standardised rates,age-standardised rates
+REM A05 · autism entries (standardised rates),2024,entries,"8,164","3,679",2.20 (2.11–2.29),log-normal on the ratio of standardised rates,age-standardised rates
+REM A05 · autism entries (standardised rates),2025,entries,"8,867","4,289",2.04 (1.97–2.12),log-normal on the ratio of standardised rates,age-standardised rates
+REM A05 · autism entries (counts),2021,entries,"1,624",461,3.52 (3.17–3.92),exact binomial on p = M/(M+F),counts
+REM A05 · autism entries (counts),2022,entries,"3,465","1,175",2.95 (2.76–3.15),exact binomial on p = M/(M+F),counts
+REM A05 · autism entries (counts),2023,entries,"5,734","2,315",2.48 (2.36–2.60),exact binomial on p = M/(M+F),counts
+REM A05 · autism entries (counts),2024,entries,"8,164","3,678",2.22 (2.13–2.31),exact binomial on p = M/(M+F),counts
+REM A05 · autism entries (counts),2025,entries,"8,867","4,289",2.07 (1.99–2.14),exact binomial on p = M/(M+F),counts
+DEIS · discharges with principal F84,2019,discharges,237,59,4.02 (3.01–5.44),exact binomial on p = M/(M+F),counts
+DEIS · discharges with principal F84,2020,discharges,175,74,2.36 (1.79–3.15),exact binomial on p = M/(M+F),counts
+DEIS · discharges with principal F84,2021,discharges,225,69,3.26 (2.48–4.34),exact binomial on p = M/(M+F),counts
+DEIS · discharges with principal F84,2022,discharges,310,147,2.11 (1.73–2.58),exact binomial on p = M/(M+F),counts
+DEIS · discharges with principal F84,2023,discharges,393,173,2.27 (1.89–2.73),exact binomial on p = M/(M+F),counts
+DEIS · discharges with principal F84,2024,discharges,423,247,1.71 (1.46–2.01),exact binomial on p = M/(M+F),counts
+ENCAVI 2023–24 · persons 15+,2024,respondents,35,45,2.09 (1.10–3.97),"delta on log, complex-design standard errors",proportions
+ENDIDE 2022 · adults 18+,2022,respondents,48,24,2.95 (1.67–5.21),"delta on log, complex-design standard errors",proportions
+ENDIDE 2022 · children 2–17,2022,respondents,129,34,4.13 (2.66–6.42),"delta on log, complex-design standard errors",proportions
+GRD · episodes with documented F84 (counts),2019,episodes,"1,786",547,3.27 (2.97–3.60),exact binomial on p = M/(M+F),counts
+GRD · episodes with documented F84 (counts),2020,episodes,"1,206",403,2.99 (2.67–3.36),exact binomial on p = M/(M+F),counts
+GRD · episodes with documented F84 (counts),2021,episodes,"1,806",560,3.23 (2.93–3.55),exact binomial on p = M/(M+F),counts
+GRD · episodes with documented F84 (counts),2022,episodes,"2,886",972,2.97 (2.76–3.20),exact binomial on p = M/(M+F),counts
+GRD · episodes with documented F84 (counts),2023,episodes,"4,497","1,924",2.34 (2.22–2.47),exact binomial on p = M/(M+F),counts
+GRD · episodes with documented F84 (counts),2024,episodes,"5,849","2,878",2.03 (1.94–2.13),exact binomial on p = M/(M+F),counts
+GRD · episodes with F84 (standardised rates),2019,episodes,"1,786",547,3.13 (2.84–3.45),log-normal on the ratio of standardised rates,age-standardised rates
+GRD · episodes with F84 (standardised rates),2020,episodes,"1,206",403,2.89 (2.58–3.24),log-normal on the ratio of standardised rates,age-standardised rates
+GRD · episodes with F84 (standardised rates),2021,episodes,"1,806",560,3.11 (2.82–3.42),log-normal on the ratio of standardised rates,age-standardised rates
+GRD · episodes with F84 (standardised rates),2022,episodes,"2,886",972,2.89 (2.68–3.11),log-normal on the ratio of standardised rates,age-standardised rates
+GRD · episodes with F84 (standardised rates),2023,episodes,"4,497","1,924",2.30 (2.18–2.43),log-normal on the ratio of standardised rates,age-standardised rates
+GRD · episodes with F84 (standardised rates),2024,episodes,"5,849","2,878",2.03 (1.94–2.12),log-normal on the ratio of standardised rates,age-standardised rates
+GRD · unique persons within year,2019,persons,n/e,n/e,n/e,not estimable: the source does not publish sex for this series,persons
+GRD · unique persons within year,2020,persons,n/e,n/e,n/e,not estimable: the source does not publish sex for this series,persons
+GRD · unique persons within year,2021,persons,n/e,n/e,n/e,not estimable: the source does not publish sex for this series,persons
+GRD · unique persons within year,2022,persons,n/e,n/e,n/e,not estimable: the source does not publish sex for this series,persons
+GRD · unique persons within year,2023,persons,n/e,n/e,n/e,not estimable: the source does not publish sex for this series,persons
+GRD · unique persons within year,2024,persons,n/e,n/e,n/e,not estimable: the source does not publish sex for this series,persons
+GRD · episodes with principal F84,2019,episodes,189,39,4.85 (3.42–7.03),exact binomial on p = M/(M+F),counts
+GRD · episodes with principal F84,2020,episodes,124,33,3.76 (2.54–5.70),exact binomial on p = M/(M+F),counts
+GRD · episodes with principal F84,2021,episodes,150,36,4.17 (2.88–6.17),exact binomial on p = M/(M+F),counts
+GRD · episodes with principal F84,2022,episodes,225,70,3.21 (2.45–4.27),exact binomial on p = M/(M+F),counts
+GRD · episodes with principal F84,2023,episodes,259,102,2.54 (2.01–3.23),exact binomial on p = M/(M+F),counts
+GRD · episodes with principal F84,2024,episodes,263,127,2.07 (1.67–2.58),exact binomial on p = M/(M+F),counts
+JUNAEB · grade 1,2023,respondents,"5,236","1,424",3.44 (3.24–3.64),"delta on log, binomial standard errors (no published weight)",proportions
+JUNAEB · grade 1,2024,respondents,"7,956","2,289",3.21 (3.07–3.36),"delta on log, complex-design standard errors",proportions
+JUNAEB · grade 1,2025,respondents,"9,452","3,084",2.90 (2.78–3.01),"delta on log, complex-design standard errors",proportions
+JUNAEB · grade 5,2023,respondents,"3,728","1,094",3.18 (2.97–3.40),"delta on log, binomial standard errors (no published weight)",proportions
+JUNAEB · grade 5,2024,respondents,"5,725","1,743",2.97 (2.82–3.14),"delta on log, complex-design standard errors",proportions
+JUNAEB · grade 5,2025,respondents,"7,439","2,448",2.83 (2.71–2.96),"delta on log, complex-design standard errors",proportions
+JUNAEB · grade 9,2023,respondents,"3,332","1,286",2.40 (2.25–2.55),"delta on log, binomial standard errors (no published weight)",proportions
+JUNAEB · grade 9,2025,respondents,"6,225","2,938",1.95 (1.87–2.04),"delta on log, complex-design standard errors",proportions
+JUNAEB · pre-school,2023,respondents,"8,828","2,560",3.28 (3.14–3.43),"delta on log, binomial standard errors (no published weight)",proportions
+JUNAEB · pre-school,2024,respondents,"13,220","4,421",2.82 (2.73–2.92),"delta on log, complex-design standard errors",proportions
+JUNAEB · pre-school,2025,respondents,"13,826","4,959",2.64 (2.56–2.73),"delta on log, complex-design standard errors",proportions
+"REM P2 · population under control, December",2019,persons under control,"1,529",325,4.70 (4.17–5.32),exact binomial on p = M/(M+F),counts
+"REM P2 · population under control, December",2020,persons under control,"1,552",367,4.23 (3.77–4.75),exact binomial on p = M/(M+F),counts
+"REM P2 · population under control, December",2021,persons under control,"2,976",877,3.39 (3.15–3.66),exact binomial on p = M/(M+F),counts
+"REM P2 · population under control, December",2022,persons under control,"6,083","1,840",3.31 (3.14–3.48),exact binomial on p = M/(M+F),counts
+"REM P2 · population under control, December",2023,persons under control,"9,945","3,245",3.06 (2.95–3.19),exact binomial on p = M/(M+F),counts
+"REM P2 · population under control, December",2024,persons under control,"16,235","5,502",2.95 (2.86–3.04),exact binomial on p = M/(M+F),counts
+"REM P2 · population under control, December",2025,persons under control,"22,059","7,915",2.79 (2.72–2.86),exact binomial on p = M/(M+F),counts
+"REM P6 · under control in primary care, December",2021,persons under control,"4,303","1,934",2.22 (2.11–2.35),exact binomial on p = M/(M+F),counts
+"REM P6 · under control in primary care, December",2022,persons under control,"6,952","3,346",2.08 (1.99–2.17),exact binomial on p = M/(M+F),counts
+"REM P6 · under control in primary care, December",2023,persons under control,"10,198","4,697",2.17 (2.10–2.25),exact binomial on p = M/(M+F),counts
+"REM P6 · under control in primary care, December",2024,persons under control,"14,017","6,894",2.03 (1.98–2.09),exact binomial on p = M/(M+F),counts
+"REM P6 · under control in primary care, December",2025,persons under control,"17,819","9,500",1.88 (1.83–1.92),exact binomial on p = M/(M+F),counts
+"REM P6 · under control in specialty care, December",2021,persons under control,"7,321","1,842",3.97 (3.78–4.19),exact binomial on p = M/(M+F),counts
+"REM P6 · under control in specialty care, December",2022,persons under control,"8,064","2,655",3.04 (2.91–3.17),exact binomial on p = M/(M+F),counts
+"REM P6 · under control in specialty care, December",2023,persons under control,"10,068","3,585",2.81 (2.70–2.92),exact binomial on p = M/(M+F),counts
+"REM P6 · under control in specialty care, December",2024,persons under control,"10,621","4,683",2.27 (2.19–2.35),exact binomial on p = M/(M+F),counts
+"REM P6 · under control in specialty care, December",2025,persons under control,"13,488","6,877",1.96 (1.91–2.02),exact binomial on p = M/(M+F),counts
+"PIE · strict autism (2023, only published year)",2023,students,"38,090","9,461",4.03 (3.94–4.12),exact binomial on p = M/(M+F),counts

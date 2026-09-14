@@ -1,0 +1,63 @@
+Question,Source,The row counts,Count,Unit,Value,On the schematic,Source table,Column or key
+1 · What one row is,GRD,people,F84 identifiers of 2020 that also appear in 2019,identifiers,160,no,lancet_americas/outputs/tidy/grd_identifier_audit.csv,n_f84_ids_shared_with_previous_year (2020)
+1 · What one row is,GRD,people,F84 identifiers of 2021 that also appear in 2020,identifiers,0,no,lancet_americas/outputs/tidy/grd_identifier_audit.csv,n_f84_ids_shared_with_previous_year (2021)
+1 · What one row is,GRD,records,Diagnosis positions screened in every GRD episode,positions,35,no,lancet_americas/outputs/values_sin_rett.json,grd_diagnosis_positions
+2 · At entry,APS,people,People enrolled in municipal primary care in December 2025,people,"15,791,862",no,lancet_americas/outputs/tidy/coverage_layers_year.csv,aps_enrolled_dec (2025)
+2 · At entry,Cartography,comunas,Comunas in the national cartography,comunas,346,yes,lancet_americas/outputs/tidy/comuna_crosswalk.csv,cut_comuna (distinct)
+2 · At entry,DEIS,records,DEIS discharges at entry,discharges,"9,341,453",yes,lancet_americas/outputs/tidy/deis_year_summary.csv,discharges_total (source_layout=canonical)
+2 · At entry,ENCAVI,people,ENCAVI respondents aged 15 or more,respondents,"16,484",yes,lancet_americas/outputs/tidy/survey_estimates.csv,"n (ENCAVI 2023–2024, 15+, total)"
+2 · At entry,ENDIDE,people,ENDIDE respondents aged 18 or more,respondents,"30,010",yes,lancet_americas/outputs/tidy/survey_estimates.csv,"n (ENDIDE 2022, adults 18+, total)"
+2 · At entry,ENDIDE,people,ENDIDE children aged 2–17 answered for by a caregiver,respondents,"5,526",yes,lancet_americas/outputs/tidy/survey_estimates.csv,"n (ENDIDE 2022, children 2–17, total)"
+2 · At entry,FONASA,people,FONASA beneficiaries in December 2025,people,"17,132,611",no,lancet_americas/outputs/tidy/coverage_layers_year.csv,fonasa_beneficiaries_dec (2025)
+2 · At entry,GRD,records,GRD episodes at entry,episodes,"5,808,535",yes,lancet_americas/outputs/tidy/grd_year_summary.csv,"n_episodes_total_same_panel_activity (observed, all, any)"
+2 · At entry,INE,people,Residents projected at 30 June 2025,people,"20,206,953",yes,lancet_americas/outputs/tidy/coverage_layers_year.csv,ine_population_base2017_30jun (2025)
+2 · At entry,ISAPRE,people,ISAPRE beneficiaries in December 2025,people,"2,517,305",no,lancet_americas/outputs/tidy/coverage_layers_year.csv,isapre_beneficiaries_dec (2025)
+2 · At entry,JUNAEB,people,"Pre-school students who answered the JUNAEB survey, 2025",students,"239,332",yes,lancet_americas/outputs/tidy/education_summary_year.csv,junaeb_parvularia_n_students (2025)
+2 · At entry,MINEDUC,people,"Students in the published base of the school integration programme, 2025",students,"475,710",yes,lancet_americas/outputs/tidy/pie_series.csv,pie_total_applicants_sinaces (2025)
+2 · At entry,REM Series A,records,REM Series A establishment-month rows at entry,establishment-month rows,"170,249",yes,lancet_americas/outputs/tidy/rem_pathway_annual.csv,"n_rows (series=A, variant=single_code)"
+2 · At entry,REM Series P,records,REM Series P establishment-month rows at entry,establishment-month rows,"41,121",yes,lancet_americas/outputs/tidy/rem_pathway_annual.csv,"n_rows (series=P, variant=single_code)"
+2 · After the autism selection,DEIS,records,DEIS discharges with F84 as the principal diagnosis,discharges,"2,591",yes,lancet_americas/outputs/tidy/deis_year_summary.csv,f84_diag1
+2 · After the autism selection,ENCAVI,people,ENCAVI respondents reporting an autism diagnosis,respondents,80,yes,lancet_americas/outputs/tidy/survey_estimates.csv,"cases (ENCAVI 2023–2024, 15+)"
+2 · After the autism selection,ENDIDE,people,ENDIDE adults reporting autism,respondents,72,yes,lancet_americas/outputs/tidy/survey_estimates.csv,"cases (ENDIDE 2022, adults 18+)"
+2 · After the autism selection,ENDIDE,people,ENDIDE children reported as autistic,respondents,163,yes,lancet_americas/outputs/tidy/survey_estimates.csv,"cases (ENDIDE 2022, children 2–17)"
+2 · After the autism selection,GRD,records,"Of these, episodes with F84 as the principal diagnosis",episodes,"1,617",no,lancet_americas/outputs/tidy/grd_year_summary.csv,n_episodes_f84 (position=principal)
+2 · After the autism selection,GRD,records,GRD episodes with documented F84,episodes,"25,323",yes,lancet_americas/outputs/tidy/grd_year_summary.csv,"n_episodes_f84 (observed, all, any)"
+2 · After the autism selection,JUNAEB,people,"Pre-school students reported as autistic, 2025",students,"18,785",yes,lancet_americas/outputs/tidy/education_summary_year.csv,junaeb_parvularia_tea_n (2025)
+2 · After the autism selection,MINEDUC,people,"Autistic students in the harmonised programme series, 2019",students,"21,012",no,lancet_americas/outputs/tidy/education_summary_year.csv,pie_harmonised_n (2019)
+2 · After the autism selection,MINEDUC,people,"Autistic students in the harmonised programme series, 2025",students,"106,786",yes,lancet_americas/outputs/tidy/education_summary_year.csv,pie_harmonised_n (2025)
+2 · After the autism selection,REM A05,records,"Autism entries into ambulatory care, 2021",entries,"2,085",yes,lancet_americas/outputs/tidy/rem_pathway_annual.csv,"total (code=05990022, 2021)"
+2 · After the autism selection,REM A05,records,"Autism entries into ambulatory care, 2025",entries,"13,155",yes,lancet_americas/outputs/tidy/rem_pathway_annual.csv,"total (code=05990022, 2025)"
+2 · After the autism selection,REM P2,people,People with autism under control in December 2019,people,"1,854",yes,lancet_americas/outputs/tidy/rem_pathway_annual.csv,"total (code=P2500500, december_stock, 2019)"
+2 · After the autism selection,REM P2,people,People with autism under control in December 2025,people,"29,974",yes,lancet_americas/outputs/tidy/rem_pathway_annual.csv,"total (code=P2500500, december_stock, 2025)"
+2 · Excluded or not estimable,DEIS,records,"DEIS discharges in provider-masked rows, kept in the national totals and out of the territorial tables",discharges,"313,102",yes,lancet_americas/outputs/tidy/deis_year_summary.csv,discharges_suppressed
+2 · Excluded or not estimable,DEIS,records,Diagnosis positions published by DEIS,positions,2,no,lancet_americas/outputs/tidy/deis_year_summary.csv,diagnosis_positions
+2 · Excluded or not estimable,GRD,records,"GRD episodes of any diagnosis with invalid or inconsistent dates, excluded from length of stay",episodes,83,no,lancet_americas/outputs/tidy/grd_length_of_stay.csv,"n_invalid_dates (variant=all_episodes, panel=observed, activity=all)"
+2 · Excluded or not estimable,GRD,records,"Of these, episodes with documented F84, excluded from length of stay",episodes,3,no,lancet_americas/outputs/tidy/grd_length_of_stay.csv,"n_invalid_dates (variant=sin_rett, position=any, panel=observed, activity=all)"
+2 · Excluded or not estimable,GRD,records,"F84 episodes without a valid identifier, excluded from the person counts",episodes,10,no,lancet_americas/outputs/tidy/grd_year_summary.csv,n_f84_without_valid_id
+2 · Excluded or not estimable,JUNAEB,people,"Level-years with no autism item at all: not estimable, never zero",level-years,17,no,lancet_americas/outputs/tidy/junaeb_tea_year_level.csv,estimable=no (sex=all)
+2 · Excluded or not estimable,JUNAEB,people,"Level-years with no usable weight, not comparable with the weighted years",level-years,4,no,lancet_americas/outputs/tidy/junaeb_tea_year_level.csv,estimable=unweighted_only (sex=all)
+2 · Excluded or not estimable,MINEDUC,people,Harmonised 2022 series adopted,students,"42,940",no,lancet_americas/outputs/tidy/education_summary_year.csv,pie_harmonised_n (2022)
+2 · Excluded or not estimable,MINEDUC,people,The other published figure for the same 2022 series,students,"42,945",no,lancet_americas/outputs/tidy/education_summary_year.csv,pie_harmonised_sinaces_n (2022)
+2 · Excluded or not estimable,REM,records,REM exactly duplicated rows removed,rows,7,no,lancet_americas/outputs/tidy/rem_pathway_annual.csv,n_rows_exact_duplicate (variant=single_code)
+2 · Excluded or not estimable,REM,records,"REM establishment-month cells reported empty, kept as empty and never read as zero",cells,168,yes,lancet_americas/outputs/tidy/rem_pathway_annual.csv,n_rows_empty (variant=single_code)
+2 · Excluded or not estimable,REM P2,people,"June 2025 stock, a sensitivity never added to December",people,"26,195",yes,lancet_americas/outputs/tidy/rem_pathway_annual.csv,"total (code=P2500500, june_stock, 2025)"
+2 · Excluded or not estimable,Surveys,people,Survey domains flagged imprecise (fewer than 30 cases or a relative standard error above 30%),domains,10,no,lancet_americas/outputs/tidy/survey_estimates.csv,precision_flag=imprecise
+3 · What is finally counted,DEIS,records,"Discharges with principal F84 per 100,000 discharges, 2019","per 100,000 discharges",18.2,yes,lancet_americas/outputs/tidy/deis_year_summary.csv,rate_per_100k_discharges (2019)
+3 · What is finally counted,DEIS,records,"Discharges with principal F84 per 100,000 discharges, 2024","per 100,000 discharges",40.7,yes,lancet_americas/outputs/tidy/deis_year_summary.csv,rate_per_100k_discharges (2024)
+3 · What is finally counted,ENCAVI,people,Design-weighted percentage of people aged 15+ reporting an autism diagnosis,percent,0.71,yes,lancet_americas/outputs/tidy/survey_estimates.csv,proportion × 100 (ENCAVI 15+)
+3 · What is finally counted,ENDIDE,people,Design-weighted percentage of adults 18+ reporting autism,percent,0.29,yes,lancet_americas/outputs/tidy/survey_estimates.csv,proportion × 100 (ENDIDE adults 18+)
+3 · What is finally counted,ENDIDE,people,Design-weighted percentage of children 2–17 reported as autistic,percent,2.87,yes,lancet_americas/outputs/tidy/survey_estimates.csv,proportion × 100 (ENDIDE children 2–17)
+3 · What is finally counted,FONASA,people,"FONASA beneficiaries as a percentage of the projected resident population, 2025",percent,84.79,yes,lancet_americas/outputs/tidy/coverage_layers_year.csv,share_fonasa_ine (2025) × 100
+3 · What is finally counted,GRD,people,Distinct persons with a documented F84 episode inside 2024,people,"7,169",no,lancet_americas/outputs/tidy/grd_year_summary.csv,persons_within_year (2024)
+3 · What is finally counted,GRD,records,"Episodes with documented F84 per 100,000 GRD episodes, 2019","per 100,000 episodes",202.7,yes,lancet_americas/outputs/tidy/grd_year_summary.csv,rate_per_100k_episodes (2019)
+3 · What is finally counted,GRD,records,"Episodes with documented F84 per 100,000 GRD episodes, 2024","per 100,000 episodes",804.1,yes,lancet_americas/outputs/tidy/grd_year_summary.csv,rate_per_100k_episodes (2024)
+3 · What is finally counted,JUNAEB,people,"Design-weighted percentage of pre-school students reported as autistic, 2025",percent,7.69,yes,lancet_americas/outputs/tidy/education_summary_year.csv,junaeb_parvularia_pct_weighted (2025)
+3 · What is finally counted,MINEDUC,people,"Autistic students as a percentage of the programme's published base, 2025",percent,22.45,yes,lancet_americas/outputs/tidy/education_summary_year.csv,pie_harmonised_share_of_applicants_sinaces_pct (2025)
+3 · What is finally counted,REM A05,records,"Establishments reporting autism entries, 2025",establishments,952,no,lancet_americas/outputs/tidy/rem_pathway_annual.csv,n_reporting_establishments
+3 · What is finally counted,REM P2,people,Establishments reporting the December 2025 stock,establishments,"1,325",no,lancet_americas/outputs/tidy/rem_pathway_annual.csv,n_reporting_establishments
+3 · Definition break in the series,GRD,records,Hospitals in the fixed panel,hospitals,65,yes,lancet_americas/outputs/tidy/grd_year_summary.csv,hospitals_n (panel=fixed65)
+3 · Definition break in the series,GRD,records,"Hospitals in the observed panel, last year",hospitals,72,yes,lancet_americas/outputs/tidy/grd_year_summary.csv,hospitals_n (max)
+3 · Definition break in the series,GRD,records,"Hospitals in the observed panel, first year",hospitals,65,yes,lancet_americas/outputs/tidy/grd_year_summary.csv,hospitals_n (min)
+3 · Definition break in the series,MINEDUC,people,First year published by the second source of the programme series,year,"2,024",yes,lancet_americas/outputs/tidy/education_summary_year.csv,pie_harmonised_source (first year that changes)
+3 · Definition break in the series,REM A05,records,First year of the code era of the autism entry indicator,year,"2,021",yes,lancet_americas/outputs/tidy/rem_pathway_annual.csv,era_start (code=05990022)
+3 · Definition break in the series,REM P6,people,First year of the code era of the specialty autism indicator,year,"2,021",yes,lancet_americas/outputs/tidy/rem_pathway_annual.csv,era_start (code=P6241010)

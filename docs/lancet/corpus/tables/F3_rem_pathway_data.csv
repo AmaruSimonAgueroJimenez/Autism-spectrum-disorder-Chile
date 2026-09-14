@@ -1,0 +1,116 @@
+Panel,Series,Code,Definition era,Measure,Year,Value,Unit,Reporting establishments,Stable-panel establishments,Stable-panel total
+a,M-CHAT done*,03500406,2019–2022,annual sum of months (flow),2019,"2,613",screening records,263,108,"1,316"
+a,M-CHAT done*,03500406,2019–2022,annual sum of months (flow),2020,816,screening records,198,108,613
+a,M-CHAT done*,03500406,2019–2022,annual sum of months (flow),2021,"1,833",screening records,273,108,"1,218"
+a,M-CHAT done*,03500406,2019–2022,annual sum of months (flow),2022,"3,455",screening records,399,108,"1,783"
+a,M-CHAT altered*,03500407,2019–2022,annual sum of months (flow),2019,"1,640",screening records,188,61,525
+a,M-CHAT altered*,03500407,2019–2022,annual sum of months (flow),2020,288,screening records,134,61,174
+a,M-CHAT altered*,03500407,2019–2022,annual sum of months (flow),2021,879,screening records,230,61,368
+a,M-CHAT altered*,03500407,2019–2022,annual sum of months (flow),2022,"1,535",screening records,315,61,494
+a,Suspected elsewhere,09600212,2023–2024,annual sum of months (flow),2023,"8,221",children reported,731,602,"7,820"
+a,Suspected elsewhere,09600212,2023–2024,annual sum of months (flow),2024,"12,281",children reported,861,602,"11,169"
+a,Low risk,09600213,2023–2024,annual sum of months (flow),2023,"14,083",screening results,880,752,"13,708"
+a,Low risk,09600213,2023–2024,annual sum of months (flow),2024,"18,142",screening results,"1,082",752,"16,161"
+a,Medium risk,09600214,2023–2024,annual sum of months (flow),2023,"3,642",screening results,627,497,"3,358"
+a,Medium risk,09600214,2023–2024,annual sum of months (flow),2024,"4,698",screening results,734,497,"4,085"
+a,High risk,09600215,2023–2024,annual sum of months (flow),2023,"1,907",screening results,478,346,"1,635"
+a,High risk,09600215,2023–2024,annual sum of months (flow),2024,"2,234",screening results,552,346,"1,765"
+a,High risk referred,09600216,2023–2024,annual sum of months (flow),2023,"1,152",referral records,373,253,951
+a,High risk referred,09600216,2023–2024,annual sum of months (flow),2024,"1,741",referral records,454,253,"1,275"
+a,Part 2: medium risk,09600217,2023–2023,annual sum of months (flow),2023,920,screening records,247,247,920
+a,Part 2: no referral,09600218,2023–2024,annual sum of months (flow),2023,817,screening results,267,168,614
+a,Part 2: no referral,09600218,2023–2024,annual sum of months (flow),2024,"2,341",screening results,528,168,"1,037"
+a,Part 2: referral,09600219,2023–2024,annual sum of months (flow),2023,"1,136",referral records,346,237,963
+a,Part 2: referral,09600219,2023–2024,annual sum of months (flow),2024,"2,283",referral records,516,237,"1,499"
+b,Evaluated,03700104,2024–2024,annual sum of months (flow),2024,"39,466",children reported,694,694,"39,466"
+b,Suspected elsewhere,03700105,2024–2024,annual sum of months (flow),2024,"4,576",children reported,564,564,"4,576"
+b,Alert signs: yes,03700106,2024–2024,annual sum of months (flow),2024,"5,860",screening results,674,674,"5,860"
+b,Alert signs: no,03700107,2024–2024,annual sum of months (flow),2024,"6,327",screening results,495,495,"6,327"
+b,Referral: yes,03700108,2024–2024,annual sum of months (flow),2024,"4,866",referral records,629,629,"4,866"
+b,Referral: no,03700109,2024–2024,annual sum of months (flow),2024,"4,935",referral records,464,464,"4,935"
+b,Motive: EEDP,03710013,2025–2025,annual sum of months (flow),2025,"14,671",screening records,869,869,"14,671"
+b,Motive: risk/alert,03710014,2025–2025,annual sum of months (flow),2025,"5,921",screening records,665,665,"5,921"
+b,Motive: both,03710015,2025–2025,annual sum of months (flow),2025,"2,656",screening records,503,503,"2,656"
+b,Low risk,03710016,2025–2025,annual sum of months (flow),2025,"12,971",screening results,818,818,"12,971"
+b,"Medium, no ref.",03710017,2025–2025,annual sum of months (flow),2025,"1,637",screening results,395,395,"1,637"
+b,"Medium, ref.",03710018,2025–2025,annual sum of months (flow),2025,"2,500",referral records,534,534,"2,500"
+b,"High, ref.",03710019,2025–2025,annual sum of months (flow),2025,"2,181",referral records,505,505,"2,181"
+b,"30–59 mo, no ref.",03710020,2025–2025,annual sum of months (flow),2025,"5,140",screening results,501,501,"5,140"
+b,"30–59 mo, ref.",03710021,2025–2025,annual sum of months (flow),2025,"5,883",referral records,642,642,"5,883"
+c,A27 Counselling,29101566,2023–2025,annual sum of months (flow),2023,"2,380",interventions,150,87,"1,498"
+c,A27 Counselling,29101566,2023–2025,annual sum of months (flow),2024,"3,874",interventions,180,87,"2,317"
+c,A27 Counselling,29101566,2023–2025,annual sum of months (flow),2025,"3,026",interventions,169,87,"1,815"
+c,A27 Assisted referral,29101574,2023–2025,annual sum of months (flow),2023,672,interventions,98,57,451
+c,A27 Assisted referral,29101574,2023–2025,annual sum of months (flow),2024,"1,068",interventions,118,57,642
+c,A27 Assisted referral,29101574,2023–2025,annual sum of months (flow),2025,878,interventions,114,57,514
+c,A28 Primary-level rehabilitation,29101629,2023–2025,annual sum of months (flow),2023,"3,962",entries reported,264,97,"2,220"
+c,A28 Primary-level rehabilitation,29101629,2023–2025,annual sum of months (flow),2024,"7,033",entries reported,313,97,"3,741"
+c,A28 Primary-level rehabilitation,29101629,2023–2025,annual sum of months (flow),2025,"15,859",entries reported,359,97,"7,267"
+c,A28 Hospital-level rehabilitation,29101651,2023–2025,annual sum of months (flow),2023,731,entries reported,39,25,653
+c,A28 Hospital-level rehabilitation,29101651,2023–2025,annual sum of months (flow),2024,"1,045",entries reported,50,25,923
+c,A28 Hospital-level rehabilitation,29101651,2023–2025,annual sum of months (flow),2025,"1,740",entries reported,43,25,"1,485"
+d,A05 Broad PDD entries,06902600,2019–2020,annual sum of months (flow),2019,"4,417",entries reported,651,395,"3,765"
+d,A05 Broad PDD entries,06902600,2019–2020,annual sum of months (flow),2020,"2,560",entries reported,492,395,"2,310"
+d,A05 Broad PDD discharges,05225000,2019–2020,annual sum of months (flow),2019,"1,208",clinical discharges reported,387,181,833
+d,A05 Broad PDD discharges,05225000,2019–2020,annual sum of months (flow),2020,646,clinical discharges reported,260,181,504
+d,A05 Entries: strict autism,05990022,2021–2025,annual sum of months (flow),2021,"2,085",entries reported,449,258,"1,522"
+d,A05 Entries: strict autism,05990022,2021–2025,annual sum of months (flow),2022,"4,640",entries reported,658,258,"2,852"
+d,A05 Entries: strict autism,05990022,2021–2025,annual sum of months (flow),2023,"8,049",entries reported,920,258,"4,187"
+d,A05 Entries: strict autism,05990022,2021–2025,annual sum of months (flow),2024,"11,842",entries reported,"1,070",258,"5,694"
+d,A05 Entries: strict autism,05990022,2021–2025,annual sum of months (flow),2025,"13,155",entries reported,952,258,"6,767"
+d,A05 Clinical discharges: strict autism,05990027,2021–2025,annual sum of months (flow),2021,494,clinical discharges reported,207,85,240
+d,A05 Clinical discharges: strict autism,05990027,2021–2025,annual sum of months (flow),2022,831,clinical discharges reported,307,85,316
+d,A05 Clinical discharges: strict autism,05990027,2021–2025,annual sum of months (flow),2023,"1,814",clinical discharges reported,438,85,689
+d,A05 Clinical discharges: strict autism,05990027,2021–2025,annual sum of months (flow),2024,"3,315",clinical discharges reported,625,85,782
+d,A05 Clinical discharges: strict autism,05990027,2021–2025,annual sum of months (flow),2025,"3,367",clinical discharges reported,624,85,"1,042"
+d,A05 Entries: PDD family,05990022+05990023+05990025+05990026,2021–2025,annual sum of months (flow),2021,"4,948",entries reported,710,432,"3,753"
+d,A05 Entries: PDD family,05990022+05990023+05990025+05990026,2021–2025,annual sum of months (flow),2022,"8,004",entries reported,869,432,"5,750"
+d,A05 Entries: PDD family,05990022+05990023+05990025+05990026,2021–2025,annual sum of months (flow),2023,"12,086",entries reported,"1,040",432,"8,076"
+d,A05 Entries: PDD family,05990022+05990023+05990025+05990026,2021–2025,annual sum of months (flow),2024,"14,873",entries reported,"1,153",432,"9,464"
+d,A05 Entries: PDD family,05990022+05990023+05990025+05990026,2021–2025,annual sum of months (flow),2025,"15,669",entries reported,995,432,"10,928"
+d,A05 Discharges: PDD family,05990027+05990028+05990030+05990031,2021–2025,annual sum of months (flow),2021,"1,485",clinical discharges reported,387,186,953
+d,A05 Discharges: PDD family,05990027+05990028+05990030+05990031,2021–2025,annual sum of months (flow),2022,"1,799",clinical discharges reported,492,186,920
+d,A05 Discharges: PDD family,05990027+05990028+05990030+05990031,2021–2025,annual sum of months (flow),2023,"2,975",clinical discharges reported,587,186,"1,560"
+d,A05 Discharges: PDD family,05990027+05990028+05990030+05990031,2021–2025,annual sum of months (flow),2024,"4,872",clinical discharges reported,725,186,"1,643"
+d,A05 Discharges: PDD family,05990027+05990028+05990030+05990031,2021–2025,annual sum of months (flow),2025,"4,449",clinical discharges reported,675,186,"2,195"
+e,P2 December stock,P2500500,2019–2025,December stock,2019,"1,854",people under control (stock),460,193,"1,040"
+e,P2 December stock,P2500500,2019–2025,December stock,2020,"1,919",people under control (stock),400,193,"1,154"
+e,P2 December stock,P2500500,2019–2025,December stock,2021,"3,853",people under control (stock),640,193,"1,748"
+e,P2 December stock,P2500500,2019–2025,December stock,2022,"7,923",people under control (stock),897,193,"2,997"
+e,P2 December stock,P2500500,2019–2025,December stock,2023,"13,190",people under control (stock),"1,012",193,"4,711"
+e,P2 December stock,P2500500,2019–2025,December stock,2024,"21,737",people under control (stock),"1,218",193,"6,849"
+e,P2 December stock,P2500500,2019–2025,December stock,2025,"29,974",people under control (stock),"1,325",193,"9,128"
+e,P2 June stock (sensitivity),P2500500,2019–2025,June stock (sensitivity),2019,"1,502",people under control (stock),374,13,102
+e,P2 June stock (sensitivity),P2500500,2019–2025,June stock (sensitivity),2020,172,people under control (stock),28,13,122
+e,P2 June stock (sensitivity),P2500500,2019–2025,June stock (sensitivity),2021,"2,434",people under control (stock),475,13,138
+e,P2 June stock (sensitivity),P2500500,2019–2025,June stock (sensitivity),2022,"5,364",people under control (stock),765,13,260
+e,P2 June stock (sensitivity),P2500500,2019–2025,June stock (sensitivity),2023,"10,523",people under control (stock),980,13,487
+e,P2 June stock (sensitivity),P2500500,2019–2025,June stock (sensitivity),2024,"17,743",people under control (stock),"1,168",13,582
+e,P2 June stock (sensitivity),P2500500,2019–2025,June stock (sensitivity),2025,"26,195",people under control (stock),"1,256",13,"1,373"
+e,P2 NANEAS total,P2501878,2023–2025,December stock,2023,"59,907",people under control (stock),"1,187",907,"52,901"
+e,P2 NANEAS total,P2501878,2023–2025,December stock,2024,"77,081",people under control (stock),"1,293",907,"67,127"
+e,P2 NANEAS total,P2501878,2023–2025,December stock,2025,"100,789",people under control (stock),"1,394",907,"84,833"
+f,P6 Primary care: broad PDD,P6223000,2019–2020,December stock,2019,"5,520",people under control (stock),727,594,"4,837"
+f,P6 Primary care: broad PDD,P6223000,2019–2020,December stock,2020,"5,185",people under control (stock),695,594,"4,752"
+f,P6 Specialty: broad PDD,P6223380,2019–2020,December stock,2019,"6,624",people under control (stock),111,104,"6,087"
+f,P6 Specialty: broad PDD,P6223380,2019–2020,December stock,2020,"6,905",people under control (stock),121,104,"6,250"
+f,P6 Primary care: strict autism,P6241010,2021–2025,December stock,2021,"2,257",people under control (stock),482,353,"1,853"
+f,P6 Primary care: strict autism,P6241010,2021–2025,December stock,2022,"5,042",people under control (stock),704,353,"3,629"
+f,P6 Primary care: strict autism,P6241010,2021–2025,December stock,2023,"9,717",people under control (stock),956,353,"6,359"
+f,P6 Primary care: strict autism,P6241010,2021–2025,December stock,2024,"15,934",people under control (stock),"1,160",353,"9,152"
+f,P6 Primary care: strict autism,P6241010,2021–2025,December stock,2025,"21,843",people under control (stock),"1,274",353,"11,783"
+f,P6 Specialty: strict autism,P6241060,2021–2025,December stock,2021,"3,562",people under control (stock),95,68,"3,027"
+f,P6 Specialty: strict autism,P6241060,2021–2025,December stock,2022,"4,684",people under control (stock),113,68,"3,754"
+f,P6 Specialty: strict autism,P6241060,2021–2025,December stock,2023,"7,982",people under control (stock),129,68,"5,913"
+f,P6 Specialty: strict autism,P6241060,2021–2025,December stock,2024,"8,835",people under control (stock),144,68,"5,733"
+f,P6 Specialty: strict autism,P6241060,2021–2025,December stock,2025,"12,645",people under control (stock),153,68,"8,369"
+f,P6 Primary care: PDD family,P6241010+P6241020+P6241040+P6241050,2021–2025,December stock,2021,"6,237",people under control (stock),815,619,"5,532"
+f,P6 Primary care: PDD family,P6241010+P6241020+P6241040+P6241050,2021–2025,December stock,2022,"10,298",people under control (stock),948,619,"8,685"
+f,P6 Primary care: PDD family,P6241010+P6241020+P6241040+P6241050,2021–2025,December stock,2023,"14,895",people under control (stock),"1,103",619,"12,425"
+f,P6 Primary care: PDD family,P6241010+P6241020+P6241040+P6241050,2021–2025,December stock,2024,"20,911",people under control (stock),"1,258",619,"16,515"
+f,P6 Primary care: PDD family,P6241010+P6241020+P6241040+P6241050,2021–2025,December stock,2025,"27,319",people under control (stock),"1,344",619,"21,144"
+f,P6 Specialty: PDD family,P6241060+P6241070+P6241090+P6241100,2021–2025,December stock,2021,"9,163",people under control (stock),132,105,"7,170"
+f,P6 Specialty: PDD family,P6241060+P6241070+P6241090+P6241100,2021–2025,December stock,2022,"10,719",people under control (stock),134,105,"9,113"
+f,P6 Specialty: PDD family,P6241060+P6241070+P6241090+P6241100,2021–2025,December stock,2023,"13,653",people under control (stock),148,105,"11,100"
+f,P6 Specialty: PDD family,P6241060+P6241070+P6241090+P6241100,2021–2025,December stock,2024,"15,304",people under control (stock),158,105,"11,161"
+f,P6 Specialty: PDD family,P6241060+P6241070+P6241090+P6241100,2021–2025,December stock,2025,"20,365",people under control (stock),169,105,"14,951"

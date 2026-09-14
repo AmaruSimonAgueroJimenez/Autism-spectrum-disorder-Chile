@@ -1,34 +1,43 @@
-# Autismo en Chile: REM y GRD
+# Autism in Chile: REM and GRD
 
-Repositorio de análisis reproducibles en Python y Quarto sobre el trastorno del espectro autista (TEA) en las fuentes administrativas del sistema público de salud chileno. La documentación activa contiene **cuatro QMD**:
+Repository of reproducible Python and Quarto analyses of autism spectrum disorder (ASD) in the administrative sources of the Chilean public health system, and of the manuscript "Rising administrative recognition of autism in Chile's health and education systems, 2019–2025: a national multi-source surveillance study" for The Lancet Regional Health – Americas. The active documentation contains **seven QMD documents**, all in English: four reports and three pages of the manuscript (see below):
 
-| Documento | Contenido | Versión para leer |
+| Document | Content | Rendered version |
 |---|---|---|
-| [index.qmd](docs/index.qmd) | Índice, alcance y resultados principales | [Inicio](docs/index.html) |
-| [metodologia.qmd](docs/metodologia.qmd) | Diseño, contexto epidemiológico, fuentes, definiciones, unidades, denominadores, estandarización, intervalos, tendencias, análisis espacial, reglas de lectura REM, calidad, sesgos, reproducibilidad y referencias | [Metodología](docs/metodologia.html) |
-| [rem.qmd](docs/rem.qmd) | REM: ingresos y egresos de salud mental, tasas de ingreso por población, edad y sexo, subcategorías, regiones, comunas, panel de establecimientos, tamizaje por etapa, rehabilitación y comparación ecológica regional y comunal con GRD | [Informe REM](docs/rem.html) |
-| [grd.qmd](docs/grd.qmd) | GRD, parte A: epidemiología descriptiva (tasas crudas y estandarizadas con intervalos, tendencias, estacionalidad, sexo y edad, subcategorías, posición del código, características del episodio, letalidad, estancia, hospitales, codiagnósticos, rehospitalización, regiones, comunas, Moran y LISA); parte B: trayectorias diagnósticas | [Informe GRD](docs/grd.html) |
+| [index.qmd](docs/index.qmd) | Home page, scope and main results | [Home](docs/index.html) |
+| [methods.qmd](docs/methods.qmd) | Design, epidemiological context, sources, definitions, units, denominators, standardisation, intervals, trends, spatial analysis, REM reading rules, quality, biases, reproducibility and references | [Methods](docs/methods.html) |
+| [rem.qmd](docs/rem.qmd) | REM: mental-health programme entries and discharges, population entry rates, age and sex, subcategories, regions, communes, facility panel, screening by stage, rehabilitation and the regional and commune-level ecological comparison with GRD | [REM report](docs/rem.html) |
+| [grd.qmd](docs/grd.qmd) | GRD, part A: descriptive epidemiology (crude and standardised rates with intervals, trends, seasonality, sex and age, subcategories, code position, episode characteristics, case fatality, length of stay, hospitals, co-diagnoses, readmission, regions, communes, Moran and LISA); part B: diagnostic trajectories | [GRD report](docs/grd.html) |
 
-Los cuatro QMD ejecutan bloques Python para calcular tablas y figuras desde los agregados. Comparten configuración en `docs/_quarto.yml`, bibliografía en `docs/references.bib`, utilidades de presentación en `scripts/report_helpers.py` y funciones epidemiológicas en `scripts/epi_helpers.py`.
+The four reports run Python blocks that compute tables and figures from the aggregates. They share the configuration in `docs/_quarto.yml`, the bibliography in `docs/references.bib`, the presentation helpers in `scripts/report_helpers.py` and the epidemiological functions in `scripts/epi_helpers.py`.
 
-## Manuscrito (preprint)
+## Manuscript for The Lancet Regional Health – Americas
 
-La carpeta `paper/` contiene [manuscript.qmd](paper/manuscript.qmd), un manuscrito en formato de artículo (resumen, métodos, resultados con figuras de panel y tablas, discusión, conclusiones y referencias en estilo Vancouver) que se renderiza a Word como [manuscript.docx](paper/manuscript.docx). Todas sus cifras, tablas y figuras se recalculan desde `output_files/consolidacion/` en cada renderización; el texto no contiene valores pegados a mano. Usa la bibliografía compartida `docs/references.bib` y el estilo `paper/vancouver.csl`.
+The manuscript is built in `lancet_americas/` with its own pipeline (`pipeline/00_provenance.py` to `17_extended_material.py`, documented in [lancet_americas/README.md](lancet_americas/README.md)) that reads the microdata of the data volume and writes tidy tables, plates and documents. Its ten versions (`lancet_americas/manuscript/01_paper` to `10_revision_2026-09-14_paneles`; index in `lancet_americas/manuscript/LEEME.md`), with their DOCX, PDF and 600 dpi plates, **stay out of git**, as does `lancet_americas/outputs/`; the pipeline code is versioned.
+
+So that the results are reproducible from the repository, `docs/` includes three more pages, fed by the folder [docs/lancet](docs/lancet/README.md):
+
+| Document | Content | Rendered version |
+|---|---|---|
+| [lancet.qmd](docs/lancet.qmd) | The article of version 10: text with citations, tables 1 and 2 and panel figures 1 to 4, regenerated from `docs/lancet/data/` by `docs/lancet/figuras_principales.py` (English and Spanish plates) | [Lancet](docs/lancet.html) |
+| [lancet_supplement.qmd](docs/lancet_supplement.qmd) | Supplementary material: extended methods A1–A11 with 23 equations, complementary results B1–B4, tables S1–S9 and figures S1–S9 (`docs/lancet/figuras_suplementarias.py`) | [Supplement](docs/lancet_supplement.html) |
+| [lancet_corpus.qmd](docs/lancet_corpus.qmd) | Extended corpus of the earlier versions: 59 plates and 132 tables of the pipeline (variant without Rett syndrome) | [Corpus](docs/lancet_corpus.html) |
+
+`docs/lancet/data/` contains public copies of the tables the plates need (tidy and verified), a commune extract without identifiers with small cells masked, the STIX equations and `contenido_v10.json`, exported from the document builder with every figure already resolved, in English and Spanish. The plates generated this way coincide with those of the submitted version.
 
 ```sh
-python scripts/render_reports.py --paper   # renderiza los cuatro QMD y el manuscrito
-cd paper && quarto render manuscript.qmd   # solo el manuscrito
+python scripts/render_reports.py --lancet-figures  # regenerates the plates of docs/lancet and renders the seven QMD documents
 ```
 
-## Preguntas e interpretación
+## Questions and interpretation
 
-GRD describe hospitalizaciones en las que se consignó un código F84 y reconstruye qué diagnósticos hospitalarios preceden al primer registro observado de autismo y si aparece como principal o secundario. **Las tasas son de hospitalizaciones o de personas hospitalizadas, no de incidencia ni prevalencia; el primer registro no equivale al primer diagnóstico clínico y los antecedentes no demuestran diferenciales descartados.** Los identificadores se analizan separadamente en 2019–2020 y 2021–2024, sin enlaces entre ambos períodos.
+GRD describes hospitalisations in which an F84 code was documented and reconstructs which hospital diagnoses precede the first observed autism record and whether it appears as principal or secondary. **The rates are of hospitalisations or of hospitalised persons, not of incidence or prevalence; the first record is not the first clinical diagnosis, and prior diagnoses do not demonstrate ruled-out differentials.** Identifiers are analysed separately in 2019–2020 and 2021–2024, with no linkage between the two periods.
 
-REM describe actividad asistencial agregada. A05 distingue total, sexo y edad; A03 requiere sumar ambos sexos para obtener el total de una fila completa; los códigos A28 se mantienen por sección. Las tasas de ingreso por población son indicadores de acceso y registro, no de casos nuevos. Los informes no presentan esos registros como incidencia o personas únicas nacionales.
+REM describes aggregate care activity. A05 distinguishes total, sex and age; A03 requires adding both sexes to obtain the total of a complete row; the A28 codes are kept by section. Population entry rates are indicators of access and recording, not of new cases. The reports do not present those records as incidence or as national unique persons.
 
-## Renderizar los documentos
+## Rendering the documents
 
-Requiere Quarto y Python con Jupyter, más la pila científica y geoespacial fijada en `requirements-analysis.txt` (pandas, scipy, statsmodels, pyarrow, geopandas, libpysal, esda).
+Requires Quarto and Python with Jupyter, plus the scientific and geospatial stack pinned in `requirements-analysis.txt` (pandas, scipy, statsmodels, pyarrow, geopandas, libpysal, esda).
 
 ```sh
 python3 -m venv .venv
@@ -37,53 +46,53 @@ python -m pip install -r requirements-analysis.txt
 python scripts/render_reports.py
 ```
 
-El comando ejecuta los cuatro QMD y actualiza `docs/index.html`, `docs/metodologia.html`, `docs/rem.html` y `docs/grd.html`. Usa los agregados existentes en `output_files/consolidacion/`, por lo que no requiere montar el disco externo. Los mapas leen `data/comunas.shp` y `data/Regional.shp`; las tasas leen `data/censo_proyecciones_ano_edad_genero.parquet`.
+The command runs the seven QMD documents and updates `docs/index.html`, `docs/methods.html`, `docs/rem.html`, `docs/grd.html`, `docs/lancet.html`, `docs/lancet_supplement.html` and `docs/lancet_corpus.html`. It uses the aggregates already in `output_files/consolidacion/`, so it does not require mounting the external disk. The maps read `data/comunas.shp` and `data/Regional.shp`; the rates read `data/censo_proyecciones_ano_edad_genero.parquet`.
 
-Para volver a extraer las fuentes, recalcular tasas y estadísticos espaciales y después renderizar:
+To extract the sources again, recompute rates and spatial statistics and then render:
 
 ```sh
 python scripts/render_reports.py --refresh
 ```
 
-Para recalcular solo tasas, razones, tendencias, Moran y LISA a partir de los agregados ya extraídos:
+To recompute only rates, ratios, trends, Moran and LISA from the aggregates already extracted:
 
 ```sh
 python scripts/render_reports.py --rates-only
 ```
 
-La extracción completa tarda algunos minutos (GRD alrededor de un minuto; REM unos cuatro minutos). Los scripts también se pueden ejecutar por separado, en este orden:
+The full extraction takes a few minutes (GRD about one minute; REM about four minutes). The scripts can also be run separately, in this order:
 
 ```sh
-python scripts/audit_grd_linkage.py      # inventario y continuidad del identificador
-python scripts/audit_rem.py              # catálogo, validación y agregados REM (región, comuna, edad/sexo, panel)
-python scripts/grd_trajectories.py       # historias hospitalarias, cohortes y trayectorias
-python scripts/grd_epidemiology.py       # registros F84 por año, edad, sexo, comuna, posición, características y codiagnósticos
-python scripts/epi_rates.py              # tasas, estandarización, intervalos, tendencias, estandarización indirecta, Moran y LISA
-python -m unittest discover -s tests -v  # pruebas sintéticas de trayectorias y de las funciones epidemiológicas
+python scripts/audit_grd_linkage.py      # inventory and identifier continuity
+python scripts/audit_rem.py              # catalogue, validation and REM aggregates (region, commune, age/sex, panel)
+python scripts/grd_trajectories.py       # hospital histories, cohorts and trajectories
+python scripts/grd_epidemiology.py       # F84 records by year, age, sex, commune, position, characteristics and co-diagnoses
+python scripts/epi_rates.py              # rates, standardisation, intervals, trends, indirect standardisation, Moran and LISA
+python -m unittest discover -s tests -v  # synthetic tests of the trajectories and of the epidemiological functions
 python scripts/render_reports.py
 ```
 
-`grd_epidemiology.py`, `audit_rem.py`, `grd_trajectories.py` y `audit_grd_linkage.py` solo necesitan pandas y openpyxl, por lo que pueden ejecutarse en un entorno mínimo junto al disco de datos; `epi_rates.py` y los QMD necesitan la pila completa. La entrada anterior `scripts/build_consolidation_report.py` se conserva como compatibilidad: llama al renderizador de los documentos actuales.
+`grd_epidemiology.py`, `audit_rem.py`, `grd_trajectories.py` and `audit_grd_linkage.py` only need pandas and openpyxl, so they can run in a minimal environment next to the data disk; `epi_rates.py` and the QMD documents need the full stack. The earlier entry point `scripts/build_consolidation_report.py` is kept for compatibility: it calls the renderer of the current documents.
 
-## Datos y resultados
+## Data and results
 
-La raíz de entrada es `ASESORIAS_DATA_ROOT`, por defecto `/Volumes/Datos/Asesorias_Data`. Debe estar montada al ejecutar la extracción. Se leen los CSV canónicos de `GRD/` y `REM/SerieA/`, junto con los diccionarios de `REM/SerieA/metadata/diccionarios/` y el catálogo de hospitales de `GRD/metadata/`. No se modifican ni copian las fuentes al repositorio.
+The input root is `ASESORIAS_DATA_ROOT`, by default `/Volumes/Datos/Asesorias_Data`. It must be mounted when running the extraction. The canonical CSV files of `GRD/` and `REM/SerieA/` are read, together with the dictionaries of `REM/SerieA/metadata/diccionarios/` and the hospital catalogue of `GRD/metadata/`. The sources are neither modified nor copied into the repository.
 
-El análisis abarca GRD 2019–2024 y REM 2017–2024. Los archivos REM 2025–2026 requieren validar integridad y cobertura antes de incorporarlos. Los denominadores son las proyecciones INE base Censo 2017 por comuna, edad simple y sexo.
+The analysis covers GRD 2019–2024 and REM 2017–2024. The REM 2025–2026 files require validating integrity and coverage before they are incorporated. The denominators are the INE projections based on the 2017 Census by commune, single year of age and sex.
 
-- [Resultados agregados y diccionario de salidas](output_files/consolidacion/README.md): tablas sin identificadores de pacientes.
-- `scripts/audit_grd_linkage.py`: continuidad y calidad del identificador.
-- `scripts/audit_rem.py`: catálogo por año, validación de columnas y agregación por región, comuna, edad y sexo, y panel de establecimientos.
-- `scripts/grd_trajectories.py`: recuperación de todos los egresos y reconstrucción temporal.
-- `scripts/grd_epidemiology.py`: agregados descriptivos de los registros F84.
-- `scripts/epi_helpers.py`: tasas, estandarización directa (OMS) e indirecta, intervalos exactos y gamma, razones, cambio porcentual anual, suavizado empírico bayesiano.
-- `scripts/epi_rates.py`: aplica lo anterior a los agregados, construye los paneles ecológicos REM–GRD por región y por comuna, y calcula Moran global y LISA con PySAL.
-- `tests/`: pruebas con datos sintéticos.
+- [Aggregate results and output dictionary](output_files/consolidacion/README.md): tables without patient identifiers.
+- `scripts/audit_grd_linkage.py`: identifier continuity and quality.
+- `scripts/audit_rem.py`: catalogue by year, column validation and aggregation by region, commune, age and sex, and facility panel.
+- `scripts/grd_trajectories.py`: recovery of all discharges and temporal reconstruction.
+- `scripts/grd_epidemiology.py`: descriptive aggregates of the F84 records.
+- `scripts/epi_helpers.py`: rates, direct (WHO) and indirect standardisation, exact and gamma intervals, ratios, annual percent change, empirical Bayes smoothing.
+- `scripts/epi_rates.py`: applies the above to the aggregates, builds the REM–GRD ecological panels by region and by commune, and computes global Moran and LISA with PySAL.
+- `tests/`: tests with synthetic data.
 
-Las auditorías aceptan `--years`; las trayectorias aceptan `--eras`; los scripts de extracción aceptan `--output`. Los QMD activos esperan las salidas completas en `output_files/consolidacion/`. Las ejecuciones parciales deben usar una carpeta de salida distinta para conservar esa entrada completa.
+The audits accept `--years`; the trajectories accept `--eras`; the extraction scripts accept `--output`. The active QMD documents expect the complete outputs in `output_files/consolidacion/`. Partial runs should use a different output folder to preserve that complete input.
 
-## Archivo histórico
+## Historical archive
 
-Todo el contenido previo de `docs/` se trasladó a [others scripts](<others scripts/README.md>), incluyendo QMD, HTML y recursos. [El manifiesto del traslado](<others scripts/archive_manifest.csv>) permite verificar las rutas y hashes de los archivos originales. Allí se conserva también la [propuesta metodológica inicial](<others scripts/propuesta-rem-grd.md>). Los análisis de esos informes (tasas estandarizadas, mapas, Moran y LISA) fueron reimplementados sobre la extracción validada en los documentos actuales.
+All the earlier content of `docs/` was moved to [others scripts](<others scripts/README.md>), including QMD, HTML and resources. [The transfer manifest](<others scripts/archive_manifest.csv>) allows verifying the paths and hashes of the original files. The [initial methodological proposal](<others scripts/propuesta-rem-grd.md>) is also kept there. The analyses of those reports (standardised rates, maps, Moran and LISA) were re-implemented on the validated extraction in the current documents.
 
-Los resultados anteriores fuera de `output_files/consolidacion/` se mantienen para trazabilidad. Los informes vigentes se renderizan localmente; estos comandos no publican cambios en el sitio remoto.
+Earlier results outside `output_files/consolidacion/` are kept for traceability. The current reports are rendered locally; these commands do not publish changes to the remote site.

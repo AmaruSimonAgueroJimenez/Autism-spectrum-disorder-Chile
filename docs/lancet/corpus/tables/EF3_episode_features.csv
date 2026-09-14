@@ -1,0 +1,67 @@
+﻿Variable,Category,"Documented F84 2019–2024, n (%)","All GRD episodes, n (%)",Difference (pp),% F84 in 2019,% F84 in 2024
+TIPO_INGRESO,Emergency,"16,705 (66.0%)","2,977,270 (51.3%)",14.7,55.9%,66.9%
+TIPO_INGRESO,Scheduled,"8,440 (33.3%)","1,904,181 (32.8%)",0.5,43.9%,32.2%
+TIPO_INGRESO,Obstetric,163 (0.6%),"926,596 (16.0%)",−15.3,0.2%,0.9%
+TIPO_INGRESO,Not reported,14 (0.1%),145 (0.0%),0.1,0.0%,0.1%
+TIPO_INGRESO,Not identified,1 (0.0%),318 (0.0%),−0.0,0.0%,0.0%
+TIPO_ACTIVIDAD,Hospitalisation,"22,544 (89.0%)","4,800,767 (82.7%)",6.4,81.9%,87.3%
+TIPO_ACTIVIDAD,Major ambulatory surgery (CMA),"2,524 (10.0%)","889,868 (15.3%)",−5.4,7.2%,12.7%
+TIPO_ACTIVIDAD,Day hospitalisation,163 (0.6%),"55,328 (1.0%)",−0.3,7.0%,0.0%
+TIPO_ACTIVIDAD,Emergency-room hospitalisation,92 (0.4%),"62,551 (1.1%)",−0.7,3.9%,0.0%
+TIPO_PROCEDENCIA,Emergency department (from home),"12,202 (48.2%)","2,729,075 (47.0%)",1.2,39.0%,49.5%
+TIPO_PROCEDENCIA,"Specialty centre (CDT, CRS)","7,512 (29.7%)","1,841,244 (31.7%)",−2.0,41.2%,28.6%
+TIPO_PROCEDENCIA,Other hospitals of the service network,"1,860 (7.3%)","411,096 (7.1%)",0.3,6.6%,7.1%
+TIPO_PROCEDENCIA,"Primary-care emergency (SAPU, SUR, SUC)","1,132 (4.5%)","271,210 (4.7%)",−0.2,2.7%,4.9%
+TIPO_PROCEDENCIA,Major ambulatory surgery (CMA),533 (2.1%),"33,772 (0.6%)",1.5,1.4%,2.4%
+TIPO_PROCEDENCIA,Other hospitals of the national network,508 (2.0%),"70,107 (1.2%)",0.8,2.9%,1.4%
+TIPO_PROCEDENCIA,Primary-care centre (CESFAM),374 (1.5%),"91,964 (1.6%)",−0.1,1.9%,1.5%
+TIPO_PROCEDENCIA,"Other health institutions (private, rehabilitation)",372 (1.5%),"73,282 (1.3%)",0.2,1.5%,1.1%
+TIPO_PROCEDENCIA,Private consultation,314 (1.2%),"139,137 (2.4%)",−1.2,1.2%,1.3%
+TIPO_PROCEDENCIA,"Other institutions (prison, care homes, SENAME)",182 (0.7%),"28,499 (0.5%)",0.2,0.6%,0.7%
+TIPO_PROCEDENCIA,CRR strategy,128 (0.5%),"36,485 (0.6%)",−0.1,0.0%,1.1%
+TIPO_PROCEDENCIA,Waiting-list resolution plan,114 (0.5%),"48,739 (0.8%)",−0.4,0.0%,0.0%
+TIPO_PROCEDENCIA,Home hospitalisation,29 (0.1%),"13,029 (0.2%)",−0.1,0.1%,0.1%
+TIPO_PROCEDENCIA,Day hospitalisation,25 (0.1%),"2,590 (0.0%)",0.1,0.8%,0.0%
+TIPO_PROCEDENCIA,Rural post,16 (0.1%),"7,119 (0.1%)",−0.1,0.0%,0.1%
+TIPO_PROCEDENCIA,"Cardiac surgery, GRD payment",15 (0.1%),"7,751 (0.1%)",−0.1,0.0%,0.1%
+TIPO_PROCEDENCIA,Not reported,7 (0.0%),"3,111 (0.1%)",−0.0,0.0%,0.0%
+TIPOALTA,Home,"23,762 (93.8%)","5,205,550 (89.6%)",4.2,94.4%,93.9%
+TIPOALTA,Referral to another hospital of the service,358 (1.4%),"123,285 (2.1%)",−0.7,1.3%,1.6%
+TIPOALTA,Home hospitalisation,302 (1.2%),"138,900 (2.4%)",−1.2,0.5%,1.3%
+TIPOALTA,Discharge against medical advice,272 (1.1%),"58,281 (1.0%)",0.1,1.0%,1.2%
+TIPOALTA,Referral to another hospital of the national network,233 (0.9%),"44,429 (0.8%)",0.2,1.0%,0.8%
+TIPOALTA,"Referral to other centres (prison, care home)",159 (0.6%),"22,041 (0.4%)",0.2,0.6%,0.4%
+TIPOALTA,Died,103 (0.4%),"170,691 (2.9%)",−2.5,0.7%,0.3%
+TIPOALTA,Patient absconded,54 (0.2%),"19,160 (0.3%)",−0.1,0.2%,0.2%
+TIPOALTA,Referral to a private institution (purchased care),45 (0.2%),"18,653 (0.3%)",−0.1,0.0%,0.2%
+TIPOALTA,Referral to a private institution (voluntary),35 (0.1%),"7,443 (0.1%)",0.0,0.2%,0.1%
+PREVISION_grouped,FONASA MAI B,"8,799 (34.7%)","2,677,795 (46.1%)",−11.4,35.0%,35.4%
+PREVISION_grouped,FONASA MAI A,"8,733 (34.5%)","1,376,556 (23.7%)",10.8,35.0%,33.4%
+PREVISION_grouped,FONASA MAI D,"3,927 (15.5%)","826,370 (14.2%)",1.3,14.4%,16.1%
+PREVISION_grouped,FONASA MAI C,"3,086 (12.2%)","698,238 (12.0%)",0.2,11.2%,12.5%
+PREVISION_grouped,ISAPRE,373 (1.5%),"46,495 (0.8%)",0.7,2.2%,1.1%
+PREVISION_grouped,Armed forces and police,166 (0.7%),"21,791 (0.4%)",0.3,0.6%,0.6%
+PREVISION_grouped,FONASA free choice,138 (0.5%),"112,127 (1.9%)",−1.4,0.9%,0.6%
+PREVISION_grouped,Out of pocket,90 (0.4%),"43,995 (0.8%)",−0.4,0.4%,0.2%
+PREVISION_grouped,Not identified,11 (0.0%),"4,547 (0.1%)",−0.0,0.3%,0.0%
+ESPECIALIDAD_MEDICA,Paediatrics,"9,176 (36.2%)","353,135 (6.1%)",30.2,35.9%,35.0%
+ESPECIALIDAD_MEDICA,Paediatric surgery,"3,820 (15.1%)","188,010 (3.2%)",11.8,13.1%,15.1%
+ESPECIALIDAD_MEDICA,Child and adolescent psychiatry,"2,652 (10.5%)","25,090 (0.4%)",10.0,5.1%,13.3%
+ESPECIALIDAD_MEDICA,Adult psychiatry,"1,635 (6.5%)","69,865 (1.2%)",5.3,5.8%,6.7%
+ESPECIALIDAD_MEDICA,Other specialty (outside the top 20),"1,239 (4.9%)","830,436 (14.3%)",−9.4,12.8%,3.8%
+ESPECIALIDAD_MEDICA,Orthopaedics and traumatology,"1,115 (4.4%)","462,960 (8.0%)",−3.6,4.6%,4.1%
+ESPECIALIDAD_MEDICA,Internal medicine,813 (3.2%),"853,850 (14.7%)",−11.5,2.7%,3.2%
+ESPECIALIDAD_MEDICA,Otorhinolaryngology,809 (3.2%),"85,881 (1.5%)",1.7,3.1%,3.7%
+ESPECIALIDAD_MEDICA,Paediatric neurology,768 (3.0%),"8,590 (0.1%)",2.9,8.1%,2.0%
+ESPECIALIDAD_MEDICA,General surgery,667 (2.6%),"879,151 (15.1%)",−12.5,3.2%,2.8%
+ESPECIALIDAD_MEDICA,Paediatric haemato-oncology,480 (1.9%),"20,555 (0.4%)",1.5,0.0%,1.6%
+ESPECIALIDAD_MEDICA,Paediatric dentistry,298 (1.2%),"1,182 (0.0%)",1.2,2.5%,1.0%
+ESPECIALIDAD_MEDICA,Neurosurgery,284 (1.1%),"99,905 (1.7%)",−0.6,0.2%,0.9%
+ESPECIALIDAD_MEDICA,Obstetrics and gynaecology,257 (1.0%),"1,204,539 (20.7%)",−19.7,0.3%,1.4%
+ESPECIALIDAD_MEDICA,Ophthalmology,231 (0.9%),"328,639 (5.7%)",−4.7,1.2%,1.0%
+ESPECIALIDAD_MEDICA,Urology,198 (0.8%),"180,350 (3.1%)",−2.3,0.7%,0.8%
+ESPECIALIDAD_MEDICA,Paediatric intensive care,195 (0.8%),"6,003 (0.1%)",0.7,0.0%,0.9%
+ESPECIALIDAD_MEDICA,Paediatric respiratory medicine,195 (0.8%),"8,296 (0.1%)",0.6,0.0%,0.8%
+ESPECIALIDAD_MEDICA,Oral and maxillofacial surgery,186 (0.7%),"20,440 (0.4%)",0.4,0.0%,1.0%
+ESPECIALIDAD_MEDICA,Adult neurology,179 (0.7%),"119,442 (2.1%)",−1.3,0.4%,0.7%
+ESPECIALIDAD_MEDICA,Medical oncology,126 (0.5%),"62,216 (1.1%)",−0.6,0.4%,0.3%

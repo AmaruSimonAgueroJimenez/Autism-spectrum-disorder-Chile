@@ -1,0 +1,18 @@
+﻿Series,Code,Measure,2019,2020,2021,2022,2023,2024,2025
+P2 ASD,P2500500,December,"1,854 (460)","1,919 (400)","3,853 (640)","7,923 (897)","13,190 (1,012)","21,737 (1,218)","29,974 (1,325)"
+P2 ASD,P2500500,June,"1,502 (374)",172 (28),"2,434 (475)","5,364 (765)","10,523 (980)","17,743 (1,168)","26,195 (1,256)"
+P6 primary care — Broad PDD (pre-2021),P6223000,December,"5,520 (727)","5,185 (695)",outside the era,outside the era,outside the era,outside the era,outside the era
+P6 primary care — Broad PDD (pre-2021),P6223000,June,"4,864 (707)",725 (53),outside the era,outside the era,outside the era,outside the era,outside the era
+P6 specialty — Broad PDD (pre-2021),P6223380,December,"6,624 (111)","6,905 (121)",outside the era,outside the era,outside the era,outside the era,outside the era
+P6 specialty — Broad PDD (pre-2021),P6223380,June,"6,221 (109)","5,543 (105)",outside the era,outside the era,outside the era,outside the era,outside the era
+P6 primary care — Strict autism,P6241010,December,outside the era,outside the era,"2,257 (482)","5,042 (704)","9,717 (956)","15,934 (1,160)","21,843 (1,274)"
+P6 primary care — Strict autism,P6241010,June,outside the era,outside the era,"1,448 (359)","3,264 (592)","7,199 (835)","13,996 (1,061)","18,013 (1,204)"
+P6 specialty — Strict autism,P6241060,December,outside the era,outside the era,"3,562 (95)","4,684 (113)","7,982 (129)","8,835 (144)","12,645 (153)"
+P6 specialty — Strict autism,P6241060,June,outside the era,outside the era,"3,204 (90)","4,427 (102)","6,624 (123)","9,262 (139)","9,940 (142)"
+P6 primary care — PDD family (variant),P6241010+P6241020+P6241040+P6241050,December,outside the era,outside the era,"6,237 (815)","10,298 (948)","14,895 (1,103)","20,911 (1,258)","27,319 (1,344)"
+P6 primary care — PDD family (variant),P6241010+P6241020+P6241040+P6241050,June,outside the era,outside the era,"5,623 (734)","7,523 (864)","12,010 (1,018)","19,618 (1,182)","23,138 (1,279)"
+P6 specialty — PDD family (variant),P6241060+P6241070+P6241090+P6241100,December,outside the era,outside the era,"9,163 (132)","10,719 (134)","13,653 (148)","15,304 (158)","20,365 (169)"
+P6 specialty — PDD family (variant),P6241060+P6241070+P6241090+P6241100,June,outside the era,outside the era,"8,933 (126)","9,606 (126)","12,694 (144)","15,766 (157)","16,120 (159)"
+NANEAS (P2501878),P2501878,December,outside the era,outside the era,outside the era,outside the era,"59,907 (1,187)","77,081 (1,293)","100,789 (1,394)"
+NANEAS (P2501878),P2501878,June,outside the era,outside the era,outside the era,outside the era,not reported,"64,833 (1,261)","84,281 (1,342)"
+P2 ASD as a share of total NANEAS under control (December),P2500500 / P2501878,ASD per 100 NANEAS under control (Wilson 95% CI),outside the era,outside the era,outside the era,outside the era,22.0% (21.7–22.4),28.2% (27.9–28.5),29.7% (29.5–30.0)

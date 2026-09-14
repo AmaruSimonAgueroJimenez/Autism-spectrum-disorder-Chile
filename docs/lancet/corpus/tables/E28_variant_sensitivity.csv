@@ -1,0 +1,41 @@
+﻿Series,Year,with Rett (full F84),without Rett (F84 except F84.2),Absolute difference (cases),Relative difference (%)
+REM A05 · PDD-family entries,2021,"5,302","4,948",354,7.15%
+REM A05 · PDD-family entries,2022,"8,080","8,004",76,0.95%
+REM A05 · PDD-family entries,2023,"12,142","12,086",56,0.46%
+REM A05 · PDD-family entries,2024,"14,888","14,873",15,0.10%
+REM A05 · PDD-family entries,2025,"15,685","15,669",16,0.10%
+DEIS · principal F84,2019,336,304,32,10.53%
+DEIS · principal F84,2020,267,255,12,4.71%
+DEIS · principal F84,2021,309,299,10,3.34%
+DEIS · principal F84,2022,480,470,10,2.13%
+DEIS · principal F84,2023,600,585,15,2.56%
+DEIS · principal F84,2024,690,678,12,1.77%
+GRD · documented F84 (any position),2019,"2,385","2,334",51,2.19%
+GRD · documented F84 (any position),2020,"1,633","1,609",24,1.49%
+GRD · documented F84 (any position),2021,"2,399","2,367",32,1.35%
+GRD · documented F84 (any position),2022,"3,912","3,859",53,1.37%
+GRD · documented F84 (any position),2023,"6,473","6,423",50,0.78%
+GRD · documented F84 (any position),2024,"8,818","8,731",87,1.00%
+GRD · principal F84,2019,241,228,13,5.70%
+GRD · principal F84,2020,163,157,6,3.82%
+GRD · principal F84,2021,189,186,3,1.61%
+GRD · principal F84,2022,304,295,9,3.05%
+GRD · principal F84,2023,366,361,5,1.39%
+GRD · principal F84,2024,401,390,11,2.82%
+"REM P6 · primary care, December",2021,"6,745","6,237",508,8.14%
+"REM P6 · primary care, December",2022,"10,723","10,298",425,4.13%
+"REM P6 · primary care, December",2023,"15,129","14,895",234,1.57%
+"REM P6 · primary care, December",2024,"21,163","20,911",252,1.21%
+"REM P6 · primary care, December",2025,"27,469","27,319",150,0.55%
+"REM P6 · specialty care, December",2021,"9,169","9,163",6,0.07%
+"REM P6 · specialty care, December",2022,"10,731","10,719",12,0.11%
+"REM P6 · specialty care, December",2023,"13,660","13,653",7,0.05%
+"REM P6 · specialty care, December",2024,"15,311","15,304",7,0.05%
+"REM P6 · specialty care, December",2025,"20,371","20,365",6,0.03%
+Education · harmonised PIE (identical),2019,"21,012","21,012",0,0.00%
+Education · harmonised PIE (identical),2020,"23,590","23,590",0,0.00%
+Education · harmonised PIE (identical),2021,"30,882","30,882",0,0.00%
+Education · harmonised PIE (identical),2022,"42,940","42,940",0,0.00%
+Education · harmonised PIE (identical),2023,"63,642","63,642",0,0.00%
+Education · harmonised PIE (identical),2024,"86,475","86,475",0,0.00%
+Education · harmonised PIE (identical),2025,"106,786","106,786",0,0.00%

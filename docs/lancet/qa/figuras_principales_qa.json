@@ -1,0 +1,172 @@
+[
+ {
+  "figure": "Figure_1",
+  "language": "en",
+  "width_mm": 175.0,
+  "height_mm": 215.0,
+  "font_sizes_pt": [
+   6.4,
+   6.6,
+   6.8,
+   6.9,
+   7.0,
+   7.3,
+   7.5,
+   8.0,
+   11.0
+  ],
+  "out_of_canvas": [],
+  "overlaps": [],
+  "internal_titles": false,
+  "panel_letters": "lowercase"
+ },
+ {
+  "figure": "Figure_2",
+  "language": "en",
+  "width_mm": 175.0,
+  "height_mm": 215.0,
+  "font_sizes_pt": [
+   5.6,
+   5.8,
+   6.0,
+   6.2,
+   6.4,
+   6.5,
+   6.6,
+   6.8,
+   7.2,
+   7.5,
+   8.0,
+   11.0
+  ],
+  "out_of_canvas": [],
+  "overlaps": [],
+  "internal_titles": false,
+  "panel_letters": "lowercase"
+ },
+ {
+  "figure": "Figure_3",
+  "language": "en",
+  "width_mm": 175.0,
+  "height_mm": 172.0,
+  "font_sizes_pt": [
+   5.8,
+   6.2,
+   6.4,
+   6.6,
+   7.0,
+   7.4,
+   7.5,
+   8.0,
+   11.0
+  ],
+  "out_of_canvas": [],
+  "overlaps": [],
+  "internal_titles": false,
+  "panel_letters": "lowercase"
+ },
+ {
+  "figure": "Figure_4",
+  "language": "en",
+  "width_mm": 175.0,
+  "height_mm": 172.0,
+  "font_sizes_pt": [
+   6.2,
+   6.4,
+   6.6,
+   6.8,
+   7.5,
+   8.0,
+   11.0
+  ],
+  "out_of_canvas": [],
+  "overlaps": [],
+  "internal_titles": false,
+  "panel_letters": "lowercase"
+ },
+ {
+  "figure": "Figure_1",
+  "language": "es",
+  "width_mm": 175.0,
+  "height_mm": 215.0,
+  "font_sizes_pt": [
+   6.4,
+   6.6,
+   6.8,
+   6.9,
+   7.0,
+   7.3,
+   7.5,
+   8.0,
+   11.0
+  ],
+  "out_of_canvas": [],
+  "overlaps": [],
+  "internal_titles": false,
+  "panel_letters": "lowercase"
+ },
+ {
+  "figure": "Figure_2",
+  "language": "es",
+  "width_mm": 175.0,
+  "height_mm": 215.0,
+  "font_sizes_pt": [
+   5.6,
+   5.8,
+   6.0,
+   6.2,
+   6.4,
+   6.5,
+   6.6,
+   6.8,
+   7.2,
+   7.5,
+   8.0,
+   11.0
+  ],
+  "out_of_canvas": [],
+  "overlaps": [],
+  "internal_titles": false,
+  "panel_letters": "lowercase"
+ },
+ {
+  "figure": "Figure_3",
+  "language": "es",
+  "width_mm": 175.0,
+  "height_mm": 172.0,
+  "font_sizes_pt": [
+   5.8,
+   6.2,
+   6.4,
+   6.6,
+   7.0,
+   7.4,
+   7.5,
+   8.0,
+   11.0
+  ],
+  "out_of_canvas": [],
+  "overlaps": [],
+  "internal_titles": false,
+  "panel_letters": "lowercase"
+ },
+ {
+  "figure": "Figure_4",
+  "language": "es",
+  "width_mm": 175.0,
+  "height_mm": 172.0,
+  "font_sizes_pt": [
+   6.2,
+   6.4,
+   6.6,
+   6.8,
+   7.5,
+   8.0,
+   11.0
+  ],
+  "out_of_canvas": [],
+  "overlaps": [],
+  "internal_titles": false,
+  "panel_letters": "lowercase"
+ }
+]

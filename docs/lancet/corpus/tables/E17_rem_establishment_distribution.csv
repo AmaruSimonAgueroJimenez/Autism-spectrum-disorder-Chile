@@ -1,0 +1,51 @@
+﻿Series,Value,2019,2020,2021,2022,2023,2024,2025
+A05 strict autism (entries),Reporting establishments,outside the era,outside the era,449,658,920,"1,070",952
+A05 strict autism (entries),Gini,outside the era,outside the era,0.59,0.60,0.61,0.60,0.61
+A05 strict autism (entries),% contributed by the top decile,outside the era,outside the era,48.9,46.4,46.3,43.1,44.4
+A05 strict autism (entries),Value per establishment,outside the era,outside the era,2.0,3.0,4.0,5.0,6.0
+A05 strict autism (entries),Establishments with value ≥ threshold (n): ≥ 1,outside the era,outside the era,449,658,920,"1,070",952
+A05 strict autism (entries),Establishments with value ≥ threshold (n): ≥ 5,outside the era,outside the era,115,264,426,574,553
+A05 strict autism (entries),Establishments with value ≥ threshold (n): ≥ 10,outside the era,outside the era,44,139,242,376,376
+A05 strict autism (entries),Establishments with value ≥ threshold (n): ≥ 25,outside the era,outside the era,12,32,71,124,163
+A05 strict autism (entries),Establishments with value ≥ threshold (n): ≥ 50,outside the era,outside the era,3,7,18,32,51
+A05 strict autism (entries),Establishments with value ≥ threshold (n): ≥ 100,outside the era,outside the era,2,1,3,3,6
+A05 PDD family (entries),Reporting establishments,outside the era,outside the era,710,869,"1,040","1,153",995
+A05 PDD family (entries),Gini,outside the era,outside the era,0.61,0.60,0.61,0.61,0.62
+A05 PDD family (entries),% contributed by the top decile,outside the era,outside the era,48.7,45.0,45.0,43.5,44.4
+A05 PDD family (entries),Value per establishment,outside the era,outside the era,3.0,4.0,5.0,6.0,7.0
+A05 PDD family (entries),Establishments with value ≥ threshold (n): ≥ 1,outside the era,outside the era,709,869,"1,040","1,153",995
+A05 PDD family (entries),Establishments with value ≥ threshold (n): ≥ 5,outside the era,outside the era,283,426,559,659,600
+A05 PDD family (entries),Establishments with value ≥ threshold (n): ≥ 10,outside the era,outside the era,129,250,359,451,432
+A05 PDD family (entries),Establishments with value ≥ threshold (n): ≥ 25,outside the era,outside the era,40,73,135,179,211
+A05 PDD family (entries),Establishments with value ≥ threshold (n): ≥ 50,outside the era,outside the era,10,18,37,49,67
+A05 PDD family (entries),Establishments with value ≥ threshold (n): ≥ 100,outside the era,outside the era,2,1,6,5,13
+P2 ASD (December),Reporting establishments,460,400,640,897,"1,012","1,218","1,325"
+P2 ASD (December),Gini,0.52,0.53,0.59,0.59,0.60,0.63,0.64
+P2 ASD (December),% contributed by the top decile,38.0,39.9,45.7,43.6,42.9,45.5,45.4
+P2 ASD (December),Value per establishment,2.0,3.0,3.0,4.0,6.0,7.5,9.0
+P2 ASD (December),Establishments with value ≥ threshold (n): ≥ 1,460,400,640,897,"1,012","1,218","1,325"
+P2 ASD (December),Establishments with value ≥ threshold (n): ≥ 5,122,125,221,437,594,760,876
+P2 ASD (December),Establishments with value ≥ threshold (n): ≥ 10,55,52,109,254,387,548,649
+P2 ASD (December),Establishments with value ≥ threshold (n): ≥ 25,3,8,18,62,159,276,371
+P2 ASD (December),Establishments with value ≥ threshold (n): ≥ 50,0,0,5,14,47,118,184
+P2 ASD (December),Establishments with value ≥ threshold (n): ≥ 100,0,0,1,2,7,26,46
+P6 primary care (December),Reporting establishments,outside the era,outside the era,482,704,956,"1,160","1,273"
+P6 primary care (December),Gini,outside the era,outside the era,0.56,0.62,0.62,0.63,0.64
+P6 primary care (December),% contributed by the top decile,outside the era,outside the era,43.6,48.6,46.5,45.6,46.1
+P6 primary care (December),Value per establishment,outside the era,outside the era,2.0,3.0,4.0,6.0,7.0
+P6 primary care (December),Establishments with value ≥ threshold (n): ≥ 1,outside the era,outside the era,475,702,956,"1,159","1,273"
+P6 primary care (December),Establishments with value ≥ threshold (n): ≥ 5,outside the era,outside the era,142,271,466,661,756
+P6 primary care (December),Establishments with value ≥ threshold (n): ≥ 10,outside the era,outside the era,59,147,293,445,537
+P6 primary care (December),Establishments with value ≥ threshold (n): ≥ 25,outside the era,outside the era,10,43,101,196,290
+P6 primary care (December),Establishments with value ≥ threshold (n): ≥ 50,outside the era,outside the era,0,10,31,59,110
+P6 primary care (December),Establishments with value ≥ threshold (n): ≥ 100,outside the era,outside the era,0,2,3,12,25
+P6 specialty (December),Reporting establishments,outside the era,outside the era,95,113,129,144,153
+P6 specialty (December),Gini,outside the era,outside the era,0.63,0.66,0.64,0.54,0.56
+P6 specialty (December),% contributed by the top decile,outside the era,outside the era,50.7,54.2,47.5,35.4,39.2
+P6 specialty (December),Value per establishment,outside the era,outside the era,20.5,19.0,29.0,34.5,51.0
+P6 specialty (December),Establishments with value ≥ threshold (n): ≥ 1,outside the era,outside the era,94,113,129,144,153
+P6 specialty (December),Establishments with value ≥ threshold (n): ≥ 5,outside the era,outside the era,79,90,111,128,142
+P6 specialty (December),Establishments with value ≥ threshold (n): ≥ 10,outside the era,outside the era,60,74,98,119,130
+P6 specialty (December),Establishments with value ≥ threshold (n): ≥ 25,outside the era,outside the era,39,46,69,84,102
+P6 specialty (December),Establishments with value ≥ threshold (n): ≥ 50,outside the era,outside the era,19,25,49,62,77
+P6 specialty (December),Establishments with value ≥ threshold (n): ≥ 100,outside the era,outside the era,6,6,21,30,51

@@ -1,10 +1,10 @@
 ---
-title: "Autismo en Chile"
-subtitle: "Epidemiología hospitalaria (GRD), actividad ambulatoria y tamizaje (REM) y trayectorias diagnósticas"
+title: "Autism in Chile"
+subtitle: "Hospital epidemiology (GRD), outpatient activity and screening (REM), diagnostic trajectories, and the manuscript for The Lancet Regional Health – Americas"
 ---
 
 ::: {.report-nav}
-[Inicio](index.html) [Metodología](metodologia.html) [REM](rem.html) [GRD](grd.html)
+[Home](index.html) [Methods](methods.html) [REM](rem.html) [GRD](grd.html) [Lancet](lancet.html) [Supplement](lancet_supplement.html) [Corpus](lancet_corpus.html)
 :::
 
 ```{python}
@@ -38,67 +38,75 @@ rem_ingresos = rem_annual.loc[rem_annual.code == "05990022"].set_index("year").C
 moran_main = moran.query("unit == 'records' and variable == 'sir_eb'").iloc[0]
 
 kpis([
-    (number(grd_sources.records.sum()), "Registros GRD leídos · 2019–2024"),
-    (number(epi_quality.records_kept.sum()), "Registros con código F84"),
-    (number(rem_quality.records.sum()), "Filas REM Serie A · 2017–2024"),
-    (number(cohort.patients), "Identificadores en la cohorte de trayectorias · 2021–2024"),
+    (number(grd_sources.records.sum()), "GRD records read · 2019–2024"),
+    (number(epi_quality.records_kept.sum()), "Records with an F84 code"),
+    (number(rem_quality.records.sum()), "REM Series A rows · 2017–2024"),
+    (number(cohort.patients), "Identifiers in the trajectory cohort · 2021–2024"),
 ])
 ```
 
-## Tres preguntas, dos fuentes
+## Three questions, two sources
 
-**[GRD: epidemiología hospitalaria y trayectorias](grd.html).** Describe las hospitalizaciones con código de trastorno del espectro autista (TEA) en el sistema público: magnitud y tendencia, tasas por población estandarizadas por edad, sexo y edad, subcategorías, posición del código, características del episodio, codiagnósticos, rehospitalización, regiones, comunas y autocorrelación espacial. Reconstruye además qué diagnósticos hospitalarios preceden al primer registro observado de autismo y en qué posición se registra.
+**[GRD: hospital epidemiology and trajectories](grd.html).** Describes hospitalisations with an autism spectrum disorder (ASD) code in the public system: magnitude and trend, age-standardised population rates, sex and age, subcategories, code position, episode characteristics, co-diagnoses, readmission, regions, communes and spatial autocorrelation. It also reconstructs which hospital diagnoses precede the first observed autism record and in which position it is recorded.
 
-**[REM: actividad ambulatoria, tamizaje y rehabilitación](rem.html).** Describe los ingresos y egresos de los programas de salud mental con código de autismo, sus tasas por población, edad, sexo, regiones, comunas y establecimientos, el tamizaje en controles de salud infantil (MCHAT y M-CHAT R/F) y los ingresos a rehabilitación, y compara ecológicamente ambas fuentes.
+**[REM: outpatient activity, screening and rehabilitation](rem.html).** Describes entries to and discharges from mental-health programmes with an autism code, their population rates, age, sex, regions, communes and facilities, screening in well-child check-ups (MCHAT and M-CHAT R/F) and rehabilitation entries, and compares both sources ecologically.
 
-**[Metodología](metodologia.html).** Fuentes, definiciones de caso, unidades, denominadores, estandarización, intervalos, tendencias, análisis espacial, reglas de lectura de REM, controles de calidad, sesgos, limitaciones y reproducibilidad. Es la referencia común de los dos informes.
+**[Methods](methods.html).** Sources, case definitions, units, denominators, standardisation, intervals, trends, spatial analysis, REM reading rules, quality controls, biases, limitations and reproducibility. It is the common reference of the two reports.
 
-## Resultados principales
+## The manuscript for The Lancet Regional Health – Americas
+
+**[Article (version 10)](lancet.html).** Administrative recognition of autism in Chile's public health and education systems, 2019–2025: a national multi-source study. Reproduces the text with its citations, the two tables and the four panel figures of the manuscript; the plates are regenerated from `docs/lancet/` with the same scripts as the submitted version, in English and Spanish.
+
+**[Supplementary material](lancet_supplement.html).** Extended methods (A1–A11, 23 equations), complementary results, tables S1–S9 and figures S1–S9.
+
+**[Extended corpus](lancet_corpus.html).** The 59 plates and 132 tables of the earlier versions of the study (`lancet_americas/` pipeline, variant without Rett syndrome), so that no result is left out of the site.
+
+## Main results
 
 ```{python}
 #| label: hallazgos-principales
 kpis([
-    (number(records.loc[last_year, "asr"], 1), f"Hospitalizaciones con código TEA por 100.000 personas-año, estandarizadas · {last_year} (era {number(records.asr.iloc[0], 1)} en {int(records.index.min())})"),
-    (number(persons.loc[last_year, "asr"], 1), f"Personas hospitalizadas con código TEA por 100.000 habitantes · {last_year}"),
-    (number(apc.apc, 1) + "%", f"Cambio porcentual anual promedio · 2021–2024 (IC 95%: {ci(apc.apc_lo, apc.apc_hi)})"),
-    (number(ratio.loc[last_year, "asr_ratio"], 2), f"Razón hombre:mujer de tasas · {last_year} (era {number(ratio.asr_ratio.iloc[0], 2)} en {int(ratio.index.min())})"),
-    (number(rem_last.loc[last_year, "asr"], 1), f"Ingresos REM A05 con código de autismo por 100.000 habitantes, estandarizados · {last_year} ({number(rem_ingresos.loc[last_year])} ingresos)"),
-    (number(moran_main.moran_i, 2), "I de Moran de la razón de hospitalización comunal suavizada (p de permutación " + number(moran_main.p_sim, 3) + ")"),
-    (number(share(cohort.prior_hospitalization, cohort.patients), 1) + "%", "Cohorte 2021–2024 con hospitalizaciones anteriores observables"),
+    (number(records.loc[last_year, "asr"], 1), f"Hospitalisations with an ASD code per 100 000 person-years, age-standardised · {last_year} (was {number(records.asr.iloc[0], 1)} in {int(records.index.min())})"),
+    (number(persons.loc[last_year, "asr"], 1), f"Hospitalised persons with an ASD code per 100 000 population · {last_year}"),
+    (number(apc.apc, 1) + "%", f"Average annual percent change · 2021–2024 (95% CI: {ci(apc.apc_lo, apc.apc_hi)})"),
+    (number(ratio.loc[last_year, "asr_ratio"], 2), f"Male:female rate ratio · {last_year} (was {number(ratio.asr_ratio.iloc[0], 2)} in {int(ratio.index.min())})"),
+    (number(rem_last.loc[last_year, "asr"], 1), f"REM A05 entries with an autism code per 100 000 population, age-standardised · {last_year} ({number(rem_ingresos.loc[last_year])} entries)"),
+    (number(moran_main.moran_i, 2), "Moran's I of the smoothed commune hospitalisation ratio (permutation p " + number(moran_main.p_sim, 3) + ")"),
+    (number(share(cohort.prior_hospitalization, cohort.patients), 1) + "%", "2021–2024 cohort with observable prior hospitalisations"),
 ])
 ```
 
-Las hospitalizaciones y los ingresos ambulatorios con código de autismo crecen con rapidez desde 2021, más en mujeres que en hombres, con la mayor intensidad entre 5 y 14 años y con fuerte heterogeneidad territorial. Estos aumentos son coherentes con mayor detección, mayor demanda y cambios de codificación en el período de la Ley 21.545; **no demuestran un aumento de la ocurrencia del autismo**. Ninguna cifra de estos informes es incidencia ni prevalencia: son tasas de hospitalizaciones, de personas hospitalizadas y de ingresos registrados.
+Hospitalisations and outpatient programme entries with an autism code have grown rapidly since 2021, more in females than in males, with the greatest intensity between 5 and 14 years of age and with strong territorial heterogeneity. These increases are consistent with greater detection, greater demand and coding changes in the period of Law 21.545; **they do not demonstrate an increase in the occurrence of autism**. No figure in these reports is incidence or prevalence: they are rates of hospitalisations, of hospitalised persons and of recorded programme entries.
 
-En las trayectorias hospitalarias 2021–2024, el primer registro de autismo ocurre casi siempre con el código en posición secundaria y solo una minoría tiene hospitalizaciones anteriores observables. Los códigos anteriores no demuestran que se hayan descartado como diagnósticos diferenciales: pueden ser comorbilidades, síntomas o motivos de ingreso independientes.
+In the 2021–2024 hospital trajectories, the first autism record almost always occurs with the code in a secondary position, and only a minority has observable prior hospitalisations. The earlier codes do not show that they were ruled out as differential diagnoses: they may be comorbidities, symptoms or independent reasons for admission.
 
-## Cómo están organizados los análisis
+## How the analyses are organised
 
 ```{python}
 #| label: tabla-organizacion
 import pandas as pd
 organisation = pd.DataFrame([
-    ("GRD · A1", "Universo, unidades y calidad", "grd_epi_quality, grd_annual_positions"),
-    ("GRD · A2", "Tendencia anual, tasas crudas y estandarizadas, CPA, estacionalidad, sensibilidad", "grd_rates_national, grd_trends_apc, grd_epi_monthly"),
-    ("GRD · A3", "Razón de sexos, edad simple, tasas específicas por edad", "grd_sex_ratio, grd_epi_age_single, grd_rates_age_specific"),
-    ("GRD · A4", "Subcategorías F84 y posición del código", "grd_rates_subcodes, grd_epi_subcodes"),
-    ("GRD · A5", "Ingreso, actividad, especialidad, previsión, alta, letalidad, estancia, severidad, hospitales", "grd_epi_features, grd_epi_los_*, grd_epi_grd_weight, grd_epi_hospitals"),
-    ("GRD · A6", "Rehospitalización y multiplicidad", "grd_epi_readmissions, grd_epi_multiplicity"),
-    ("GRD · A7", "Codiagnósticos y diagnóstico principal", "grd_epi_codiagnoses"),
-    ("GRD · A8", "Regiones, comunas, estandarización indirecta, Moran, LISA", "grd_rates_regional, grd_rates_comunal, grd_spatial_*"),
-    ("GRD · B", "Trayectorias: enlace, posición, antecedentes, secuencias, transiciones", "grd_cohort_*, grd_first_*, grd_previous_*, grd_sequences, grd_principal_transitions"),
-    ("REM", "Ingresos, tasas, edad y sexo, subcategorías, regiones, comunas, panel, tamizaje, rehabilitación, comparación ecológica", "rem_*"),
-], columns=["Sección", "Contenido", "Tablas en output_files/consolidacion"])
-show_table(organisation, "Secciones de los informes y tablas agregadas que las alimentan")
+    ("GRD · A1", "Universe, units and quality", "grd_epi_quality, grd_annual_positions"),
+    ("GRD · A2", "Annual trend, crude and standardised rates, AAPC, seasonality, sensitivity", "grd_rates_national, grd_trends_apc, grd_epi_monthly"),
+    ("GRD · A3", "Sex ratio, single year of age, age-specific rates", "grd_sex_ratio, grd_epi_age_single, grd_rates_age_specific"),
+    ("GRD · A4", "F84 subcategories and code position", "grd_rates_subcodes, grd_epi_subcodes"),
+    ("GRD · A5", "Admission, activity, specialty, insurance, discharge, case fatality, length of stay, severity, hospitals", "grd_epi_features, grd_epi_los_*, grd_epi_grd_weight, grd_epi_hospitals"),
+    ("GRD · A6", "Readmission and multiplicity", "grd_epi_readmissions, grd_epi_multiplicity"),
+    ("GRD · A7", "Co-diagnoses and principal diagnosis", "grd_epi_codiagnoses"),
+    ("GRD · A8", "Regions, communes, indirect standardisation, Moran, LISA", "grd_rates_regional, grd_rates_comunal, grd_spatial_*"),
+    ("GRD · B", "Trajectories: linkage, position, prior diagnoses, sequences, transitions", "grd_cohort_*, grd_first_*, grd_previous_*, grd_sequences, grd_principal_transitions"),
+    ("REM", "Entries, rates, age and sex, subcategories, regions, communes, panel, screening, rehabilitation, ecological comparison", "rem_*"),
+], columns=["Section", "Content", "Tables in output_files/consolidacion"])
+show_table(organisation, "Report sections and the aggregate tables that feed them")
 ```
 
-Los cuatro documentos ejecutan **Python** y leen las tablas agregadas de `output_files/consolidacion/`. Las tablas y figuras se recalculan al renderizar; no contienen cifras pegadas manualmente. La extracción de los archivos originales se ejecuta por separado, mediante los scripts documentados en el [README del repositorio](../README.md). Los informes previos, sus HTML y sus recursos se conservaron en `others scripts/`, fuera de `docs`, solo para trazabilidad.
+The seven documents run **Python** and read the aggregate tables of `output_files/consolidacion/`. Tables and figures are recalculated at render time; they contain no hand-pasted figures. The extraction from the original files runs separately, through the scripts documented in the [repository README](../README.md). The earlier reports, their HTML and their resources were kept in `others scripts/`, outside `docs`, for traceability only.
 
-## Prioridades de interpretación
+## Interpretation priorities
 
-| Fuente | Ya disponible | Siguiente extensión |
+| Source | Already available | Next extension |
 |---|---|---|
-| GRD | Tasas crudas y estandarizadas con intervalos, tendencias, sexo y edad, subcategorías, posición, características del episodio, codiagnósticos, rehospitalización, regiones, comunas, Moran y LISA, cohortes y trayectorias | Confirmar el enlace con el productor, modelos ajustados por edad, sexo, año, contactos y hospital, incorporar defunciones y urgencias, validar fichas clínicas |
-| REM | Series 2017–2024, tasas de ingreso estandarizadas, edad y sexo, subcategorías, regiones, comunas, panel de establecimientos, indicadores de tamizaje por etapa, rehabilitación, comparación ecológica | Validar denominadores de tamizaje con los manuales, incorporar Serie P (población en control), revisar 2025–2026 |
+| GRD | Crude and standardised rates with intervals, trends, sex and age, subcategories, position, episode characteristics, co-diagnoses, readmission, regions, communes, Moran and LISA, cohorts and trajectories | Confirm the linkage with the producer, models adjusted for age, sex, year, contacts and hospital, incorporate deaths and emergency care, validate clinical records |
+| REM | 2017–2024 series, standardised entry rates, age and sex, subcategories, regions, communes, facility panel, screening indicators by stage, rehabilitation, ecological comparison | Validate screening denominators with the manuals, incorporate Series P (population under control), review 2025–2026 |
 
-Los datos originales permanecen en la raíz externa configurada mediante `ASESORIAS_DATA_ROOT`. La extracción utilizada no incorpora REM 2025–2026: esos archivos requieren revisar integridad, cobertura y comparabilidad antes de ampliar las series.
+The original data remain in the external root configured through `ASESORIAS_DATA_ROOT`. The extraction used does not incorporate REM 2025–2026: those files require reviewing integrity, coverage and comparability before extending the series.

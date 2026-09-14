@@ -1,0 +1,34 @@
+Panel,Series,Code,Definition era,Measure,Year,Value,Reporting establishments,Stable-panel establishments,Stable-panel total,% volume retained,% establishments retained
+a,A05 entries: strict autism · Broad PDD 2019–20,06902600,2019–2020,annual sum of months (flow),2019,"4,417",651,395,"3,765",85.2,60.7
+a,A05 entries: strict autism · Broad PDD 2019–20,06902600,2019–2020,annual sum of months (flow),2020,"2,560",492,395,"2,310",90.2,80.3
+a,A05 entries: strict autism,05990022,2021–2025,annual sum of months (flow),2021,"2,085",449,258,"1,522",73.0,57.5
+a,A05 entries: strict autism,05990022,2021–2025,annual sum of months (flow),2022,"4,640",658,258,"2,852",61.5,39.2
+a,A05 entries: strict autism,05990022,2021–2025,annual sum of months (flow),2023,"8,049",920,258,"4,187",52.0,28.0
+a,A05 entries: strict autism,05990022,2021–2025,annual sum of months (flow),2024,"11,842","1,070",258,"5,694",48.1,24.1
+a,A05 entries: strict autism,05990022,2021–2025,annual sum of months (flow),2025,"13,155",952,258,"6,767",51.4,27.1
+b,A05 entries: variant PDD family,05990022+05990023+05990025+05990026,2021–2025,annual sum of months (flow),2021,"4,948",710,432,"3,753",75.8,60.8
+b,A05 entries: variant PDD family,05990022+05990023+05990025+05990026,2021–2025,annual sum of months (flow),2022,"8,004",869,432,"5,750",71.8,49.7
+b,A05 entries: variant PDD family,05990022+05990023+05990025+05990026,2021–2025,annual sum of months (flow),2023,"12,086","1,040",432,"8,076",66.8,41.5
+b,A05 entries: variant PDD family,05990022+05990023+05990025+05990026,2021–2025,annual sum of months (flow),2024,"14,873","1,153",432,"9,464",63.6,37.5
+b,A05 entries: variant PDD family,05990022+05990023+05990025+05990026,2021–2025,annual sum of months (flow),2025,"15,669",995,432,"10,928",69.7,43.4
+c,"P2 ASD, December",P2500500,2019–2025,December stock,2019,"1,854",460,193,"1,040",56.1,42.0
+c,"P2 ASD, December",P2500500,2019–2025,December stock,2020,"1,919",400,193,"1,154",60.1,48.2
+c,"P2 ASD, December",P2500500,2019–2025,December stock,2021,"3,853",640,193,"1,748",45.4,30.2
+c,"P2 ASD, December",P2500500,2019–2025,December stock,2022,"7,923",897,193,"2,997",37.8,21.5
+c,"P2 ASD, December",P2500500,2019–2025,December stock,2023,"13,190","1,012",193,"4,711",35.7,19.1
+c,"P2 ASD, December",P2500500,2019–2025,December stock,2024,"21,737","1,218",193,"6,849",31.5,15.8
+c,"P2 ASD, December",P2500500,2019–2025,December stock,2025,"29,974","1,325",193,"9,128",30.5,14.6
+d,"P6 primary care, December · Broad PDD 2019–20",P6223000,2019–2020,December stock,2019,"5,520",727,594,"4,837",87.6,81.7
+d,"P6 primary care, December · Broad PDD 2019–20",P6223000,2019–2020,December stock,2020,"5,185",695,594,"4,752",91.6,85.5
+d,"P6 primary care, December",P6241010,2021–2025,December stock,2021,"2,257",482,353,"1,853",82.1,73.2
+d,"P6 primary care, December",P6241010,2021–2025,December stock,2022,"5,042",704,353,"3,629",72.0,50.1
+d,"P6 primary care, December",P6241010,2021–2025,December stock,2023,"9,717",956,353,"6,359",65.4,36.9
+d,"P6 primary care, December",P6241010,2021–2025,December stock,2024,"15,934","1,160",353,"9,152",57.4,30.4
+d,"P6 primary care, December",P6241010,2021–2025,December stock,2025,"21,843","1,274",353,"11,783",53.9,27.7
+e,"P6 specialty, December · Broad PDD 2019–20",P6223380,2019–2020,December stock,2019,"6,624",111,104,"6,087",91.9,93.7
+e,"P6 specialty, December · Broad PDD 2019–20",P6223380,2019–2020,December stock,2020,"6,905",121,104,"6,250",90.5,86.0
+e,"P6 specialty, December",P6241060,2021–2025,December stock,2021,"3,562",95,68,"3,027",85.0,71.6
+e,"P6 specialty, December",P6241060,2021–2025,December stock,2022,"4,684",113,68,"3,754",80.1,60.2
+e,"P6 specialty, December",P6241060,2021–2025,December stock,2023,"7,982",129,68,"5,913",74.1,52.7
+e,"P6 specialty, December",P6241060,2021–2025,December stock,2024,"8,835",144,68,"5,733",64.9,47.2
+e,"P6 specialty, December",P6241060,2021–2025,December stock,2025,"12,645",153,68,"8,369",66.2,44.4

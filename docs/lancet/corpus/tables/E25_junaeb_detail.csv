@@ -1,0 +1,29 @@
+﻿Year,Level,Students in domain,Autism cases (unweighted),% Weighted (95% CI),% unweighted,Male-to-female ratio (95% CI),Weight,Estimable
+2019,Grade 1,"217,506",n/e,n/e,n/e,n/e,not estimable,not estimable
+2019,Grade 5,"208,846",n/e,n/e,n/e,n/e,not estimable,not estimable
+2019,Grade 9,"206,665",n/e,n/e,n/e,n/e,not estimable,not estimable
+2019,Pre-school,"364,967",n/e,n/e,n/e,n/e,not estimable,not estimable
+2020,Grade 1,"179,201",n/e,n/e,n/e,n/e,not estimable,not estimable
+2020,Grade 5,"192,349",n/e,n/e,n/e,n/e,not estimable,not estimable
+2020,Grade 9,"185,734",n/e,n/e,n/e,n/e,not estimable,not estimable
+2020,Pre-school,"337,917",n/e,n/e,n/e,n/e,not estimable,not estimable
+2021,Grade 1,"190,518",n/e,n/e,n/e,n/e,not estimable,not estimable
+2021,Grade 5,"196,691",n/e,n/e,n/e,n/e,not estimable,not estimable
+2021,Grade 9,"195,505",n/e,n/e,n/e,n/e,not estimable,not estimable
+2021,Pre-school,"320,233",n/e,n/e,n/e,n/e,not estimable,not estimable
+2022,Grade 1,"191,649",n/e,n/e,n/e,n/e,not estimable,not estimable
+2022,Grade 5,"195,457",n/e,n/e,n/e,n/e,not estimable,not estimable
+2022,Grade 9,"199,027",n/e,n/e,n/e,n/e,not estimable,not estimable
+2022,Pre-school,"313,688",n/e,n/e,n/e,n/e,not estimable,not estimable
+2023,Grade 1,"159,887","6,660",n/e,4.17%,3.44 (3.24–3.64),not estimable,unweighted only
+2023,Grade 5,"166,218","4,822",n/e,2.90%,3.18 (2.97–3.40),not estimable,unweighted only
+2023,Grade 9,"178,466","4,618",n/e,2.59%,2.40 (2.25–2.55),not estimable,unweighted only
+2023,Pre-school,"261,098","11,388",n/e,4.36%,3.28 (3.14–3.43),not estimable,unweighted only
+2024,Grade 1,"154,166","10,245",6.60 (6.48–6.73),6.65%,3.21 (3.07–3.36),EXP_REG,yes (weighted)
+2024,Grade 5,"165,533","7,468",4.49 (4.39–4.59),4.51%,2.97 (2.82–3.14),EXP_REG,yes (weighted)
+2024,Grade 9,"184,963",n/e,n/e,n/e,n/e,EXP_REG,not estimable
+2024,Pre-school,"258,255","17,641",6.74 (6.64–6.84),6.83%,2.82 (2.73–2.92),EXP_REG,yes (weighted)
+2025,Grade 1,"148,970","12,536",8.35 (8.20–8.49),8.42%,2.90 (2.78–3.01),EXP,yes (weighted)
+2025,Grade 5,"171,925","9,887",5.71 (5.60–5.82),5.75%,2.83 (2.71–2.96),EXP,yes (weighted)
+2025,Grade 9,"183,573","9,164",5.03 (4.93–5.14),4.99%,1.95 (1.87–2.04),EXP,yes (weighted)
+2025,Pre-school,"239,332","18,785",7.69 (7.58–7.80),7.85%,2.64 (2.56–2.73),EXP,yes (weighted)

@@ -1,0 +1,10 @@
+Source,Linkage method,Raw names (n),Distinct comunas (n of 346),Years,Detail
+FONASA,exact (normalised name),691,346,2018–2025,
+FONASA,explicit alias,2,1,2019–2025,"CABO DE HORNOS (EX - NAVARINO) → 12201 (2019, 2020, 2021); Cabo De Hornos (Ex - Navarino) → 12201 (2022, 2023, 2024, 2025)"
+FONASA,all methods,693,346,2018–2025,"Unlinked non-geographic placeholders: (missing), UNKNOWN, Unknown"
+APS,exact (normalised name),336,336,2019–2025,
+APS,explicit alias,3,3,2019–2025,"Coihaique → 11101 (2019, 2020, 2021, 2022, 2023, 2024, 2025); Aisén → 11201 (2019, 2020, 2021, 2022, 2023, 2024, 2025); Cabo De Hornos (Ex Navarino) → 12201 (2022, 2023, 2024, 2025)"
+APS,all methods,339,339,2019–2025,Unlinked non-geographic placeholders: 0
+ISAPRE,exact (normalised name),419,344,2019–2025,
+ISAPRE,explicit alias,5,4,2019–2025,"Coihaique → 11101 (2019, 2020, 2021, 2022, 2023, 2024, 2025); Aisen → 11201 (2021, 2022, 2023, 2024, 2025); Aisén → 11201 (2019, 2020); Cabo de Hornos (Ex - Navarino) → 12201 (2019, 2020); La Calera → 5502 (2019, 2020)"
+ISAPRE,all methods,424,346,2019–2025,"Unlinked non-geographic placeholders: Sin Código de Comuna, Sin dato Comuna"

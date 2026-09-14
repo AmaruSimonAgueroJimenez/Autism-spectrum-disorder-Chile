@@ -1,0 +1,30 @@
+﻿Hospital or group,2019,2020,2021,2022,2023,2024
+C.H. Dr. Sótero del Río (Puente Alto),107; 192,69; 186,174; 388,274; 578,476; 959,"515; 1,042"
+H. Dr. Exequiel González Cortés (San Miguel),59; 577,"70; 1,209","154; 2,040","259; 2,953","332; 3,657","518; 5,211"
+H.C.R. Dr. Guillermo Grant Benavente (Concepción),132; 329,94; 381,132; 457,181; 581,313; 917,344; 979
+H. Dr. Leonardo Guzmán (Antofagasta),89; 378,75; 405,124; 616,165; 801,"285; 1,352","334; 1,443"
+H. Niños Dr. Roberto del Río (Independencia),89; 843,"71; 1,274","125; 1,983","196; 2,560","258; 3,001","331; 3,610"
+H.C. San Borja-Arriarán (Santiago),178; 625,91; 504,47; 521,109; 618,"254; 1,282","337; 1,663"
+H.C. Herminda Martín (Chillán),98; 372,55; 315,123; 643,199; 870,245; 978,"281; 1,088"
+H. Dr. Gustavo Fricke (Viña del Mar),67; 216,74; 430,68; 410,137; 708,266; 999,"370; 1,324"
+H. Dr. Hernán Henríquez Aravena (Temuco),72; 205,64; 274,80; 341,114; 441,231; 776,290; 982
+H. Niños Dr. Luis Calvo Mackenna (Providencia),86; 651,45; 739,72; 889,"144; 1,728","179; 2,030","258; 3,513"
+C.A. Dr. Víctor Ríos Ruiz (Los Ángeles),147; 443,83; 374,64; 282,96; 330,182; 582,209; 685
+H. Las Higueras (Talcahuano),69; 270,46; 272,74; 419,138; 640,186; 785,"257; 1,002"
+H. Carlos Van Buren (Valparaíso),80; 190,38; 280,44; 300,89; 509,161; 772,"275; 1,290"
+H. Reg. de Rancagua,32; 104,43; 191,62; 272,91; 355,161; 613,193; 716
+H. Dr. Ernesto Torres Galdames (Iquique),62; 279,33; 191,42; 235,94; 486,128; 621,"212; 1,044"
+H. San Pablo (Coquimbo),50; 260,26; 189,55; 376,71; 440,146; 786,"213; 1,141"
+H. Dr. Juan Noé Crevanni (Arica),38; 193,33; 217,67; 402,95; 529,151; 778,169; 860
+H. San Juan de Dios (La Serena),30; 161,24; 194,54; 378,92; 598,136; 682,206; 975
+H. de Puerto Montt,54; 177,34; 155,49; 214,84; 335,133; 454,183; 601
+H. Dr. César Garavagno Burotto (Talca),51; 160,40; 158,37; 144,88; 291,139; 432,171; 505
+H. Dr. Félix Bulnes Cerda (Quinta Normal),57; 276,38; 241,49; 254,65; 273,119; 475,149; 577
+H. Base San José de Osorno,42; 189,30; 206,50; 338,66; 382,97; 500,152; 754
+H.C.M. La Florida Dra. Eloisa Díaz Inzu…,22; 109,34; 221,44; 258,60; 298,119; 562,158; 786
+H.C. Regional (Valdivia),81; 323,58; 342,39; 229,61; 315,88; 369,102; 433
+H.C. de Magallanes Dr. Lautaro Navarro…,59; 438,39; 441,48; 460,60; 527,81; 614,85; 633
+Fixed panel of 65 hospitals,"2,334; 203","1,609; 206","2,367; 290","3,859; 414","6,371; 622","8,480; 809"
+Hospitals added in 2023–2024,n/e,n/e,n/e,n/e,52; 357,251; 676
+% of episodes with F84,46.6%,46.6%,47.6%,46.8%,44.3%,41.2%
+Hospitals,65,65,65,65,68,72

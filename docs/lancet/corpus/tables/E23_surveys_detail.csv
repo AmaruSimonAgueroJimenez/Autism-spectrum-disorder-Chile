@@ -1,0 +1,36 @@
+﻿Survey,Domain,Subgroup,n,Cases,% (95% CI),Weighted total,DEFF,RSE,df,Precision
+ENDIDE 2022,ENDIDE adults: reported,Domain total,"30,010",72,0.29 (0.22–0.38),"44,594",1.70,14.0%,"8,445",Adequate domain
+ENDIDE 2022,ENDIDE adults: reported,Males,"12,696",48,0.44 (0.32–0.61),"32,927",1.55,16.7%,"8,445",Adequate domain
+ENDIDE 2022,ENDIDE adults: reported,Females,"17,314",24,0.15 (0.09–0.24),"11,667",1.46,23.8%,"8,445",< 30 cases
+ENDIDE 2022,ENDIDE adults: reported,18–29 years,"5,953",36,0.62 (0.42–0.91),"21,620",1.41,19.5%,"8,445",Adequate domain
+ENDIDE 2022,ENDIDE adults: reported,30–44 years,"6,820",22,0.33 (0.20–0.54),"15,188",1.42,24.9%,"8,445",< 30 cases
+ENDIDE 2022,ENDIDE adults: reported,45–59 years,"8,066",9,0.15 (0.07–0.33),"5,659",1.87,39.0%,"8,445",< 30 cases
+ENDIDE 2022,ENDIDE adults: reported,60+ years,"9,171",5,0.06 (0.02–0.15),"2,127",1.29,48.8%,"8,445",< 30 cases
+ENDIDE 2022,ENDIDE children: reported,Domain total,"5,526",163,2.87 (2.37–3.47),"114,497",1.54,9.7%,"8,445",Adequate domain
+ENDIDE 2022,ENDIDE children: reported,Males,"2,880",129,4.57 (3.70–5.63),"92,789",1.58,10.7%,"8,445",Adequate domain
+ENDIDE 2022,ENDIDE children: reported,Females,"2,646",34,1.11 (0.75–1.63),"21,708",1.16,19.8%,"8,445",Adequate domain
+ENDIDE 2022,ENDIDE children: reported,2–5 years,"1,053",45,3.45 (2.34–5.05),"27,405",1.45,19.6%,"8,445",Adequate domain
+ENDIDE 2022,ENDIDE children: reported,6–11 years,"2,131",68,3.33 (2.50–4.41),"51,066",1.54,14.5%,"8,445",Adequate domain
+ENDIDE 2022,ENDIDE children: reported,12–17 years,"2,342",50,2.17 (1.57–2.98),"36,026",1.38,16.3%,"8,445",Adequate domain
+ENDIDE 2022,ENDIDE children: confirmed | reported,Domain total,153,139,90.00 (82.30–94.57),"95,560",1.56,3.4%,"8,445",Adequate domain
+ENDIDE 2022,ENDIDE children: confirmed | reported,Males,120,111,91.01 (81.67–95.83),"76,972",1.72,3.8%,"8,445",Adequate domain
+ENDIDE 2022,ENDIDE children: confirmed | reported,Females,33,28,86.06 (68.41–94.62),"18,588",1.13,7.4%,"8,445",< 30 cases
+ENDIDE 2022,ENDIDE children: confirmed (sens.),Domain total,163,139,83.46 (74.92–89.50),"95,560",1.61,4.4%,"8,445",Adequate domain
+ENDIDE 2022,ENDIDE children: reported & confirmed,Domain total,"5,526",139,2.39 (1.94–2.95),"95,560",1.54,10.7%,"8,445",Adequate domain
+ENDIDE 2022,ENDIDE children: reported & confirmed,Males,"2,880",111,3.79 (3.01–4.77),"76,972",1.57,11.8%,"8,445",Adequate domain
+ENDIDE 2022,ENDIDE children: reported & confirmed,Females,"2,646",28,0.95 (0.62–1.45),"18,588",1.20,21.7%,"8,445",< 30 cases
+ENDIDE 2022,ENDIDE children: reported & confirmed,2–5 years,"1,053",38,2.79 (1.81–4.29),"22,207",1.47,22.0%,"8,445",Adequate domain
+ENDIDE 2022,ENDIDE children: reported & confirmed,6–11 years,"2,131",61,2.95 (2.18–3.99),"45,358",1.54,15.4%,"8,445",Adequate domain
+ENDIDE 2022,ENDIDE children: reported & confirmed,12–17 years,"2,342",40,1.68 (1.18–2.39),"27,995",1.30,18.0%,"8,445",Adequate domain
+ENDIDE 2022,ENDIDE children: medication | reported,Domain total,153,74,52.57 (43.13–61.83),"55,814",1.43,9.2%,"8,445",Adequate domain
+ENDIDE 2022,ENDIDE children: other treatment | reported,Domain total,153,85,56.36 (46.05–66.14),"59,836",1.68,9.2%,"8,445",Adequate domain
+ENCAVI 2023–2024,ENCAVI 15+: diagnosed,Domain total,"16,484",80,0.71 (0.50–1.01),"114,817",3.79,17.9%,254,Adequate domain
+ENCAVI 2023–2024,ENCAVI 15+: diagnosed,Males,"5,225",35,0.97 (0.61–1.54),"76,608",2.84,23.6%,254,Adequate domain
+ENCAVI 2023–2024,ENCAVI 15+: diagnosed,Females,"11,259",45,0.46 (0.30–0.73),"38,209",2.72,22.7%,254,Adequate domain
+ENCAVI 2023–2024,ENCAVI 15+: diagnosed,15–19 years,475,4,1.65 (0.54–4.93),"20,186",2.54,56.5%,254,< 30 cases
+ENCAVI 2023–2024,ENCAVI 15+: diagnosed,20–29 years,"1,743",28,1.60 (0.93–2.74),"46,009",2.12,27.3%,254,< 30 cases
+ENCAVI 2023–2024,ENCAVI 15+: diagnosed,30–49 years,"4,550",30,0.60 (0.32–1.09),"35,220",2.59,30.8%,254,Adequate domain
+ENCAVI 2023–2024,ENCAVI 15+: diagnosed,50–64 years,"4,727",12,0.28 (0.13–0.60),"9,783",1.95,38.0%,254,< 30 cases
+ENCAVI 2023–2024,ENCAVI 15+: diagnosed,65+ years,"4,989",6,0.14 (0.05–0.39),"3,619",1.92,53.1%,254,< 30 cases
+ENCAVI 2023–2024,ENCAVI 15+: diagnosed (sens.),Domain total,"16,590",80,0.71 (0.50–1.01),"114,817",3.78,17.9%,254,Adequate domain
+ENCAVI 2023–2024,ENCAVI: in treatment | diagnosed,Domain total,79,43,53.04 (36.35–69.08),"60,312",2.36,16.3%,254,Adequate domain

@@ -1,0 +1,25 @@
+Source,Years,Stock/flow,Break year,Kind,Break
+GRD,2019–2024,Flow,2021,Panel/coverage/schema change,new ID format; no 2020/21 linkage
+GRD,2019–2024,Flow,2023,Panel/coverage/schema change,68 hospitals
+GRD,2019–2024,Flow,2024,Panel/coverage/schema change,72 hospitals
+DEIS,2019–2024,Flow,2019,Definition/code change,DIAG1 only; DIAG2 never contains F84
+REM-20,2019–2025,Activity/capacity,2019,Panel/coverage/schema change,188-panel with 12 months every year
+REM A03,2019–2025,Flow,2023,Definition/code change,family 09600212–19
+REM A03,2019–2025,Flow,2024,Definition/code change,31–59-month codes
+REM A03,2019–2025,Flow,2025,Definition/code change,redesign 03710013–21
+REM A27,2023–2025,Flow,2023,Series start,M-CHAT-R/F counselling and assisted referral
+REM A05,2019–2025,Flow,2021,Definition/code change,broad PDD → autism + categories
+REM A28,2023–2025,Flow,2023,Series start,ASD entries to rehabilitation
+REM P2,2019–2025,Stock,2023,Definition/code change,NANEAS total (P2501878) from Dec 2023
+REM P6,2019–2025,Stock,2021,Definition/code change,broad PDD → autism
+FONASA,2019–2025,Stock,2021,Panel/coverage/schema change,schema
+FONASA,2019–2025,Stock,2023,Panel/coverage/schema change,schema; 10-year bands
+FONASA,2019–2025,Stock,2024,Panel/coverage/schema change,schema
+FONASA,2019–2025,Stock,2025,Panel/coverage/schema change,schema
+APS,2019–2025,Stock,2024,Panel/coverage/schema change,age bands and variable names
+ISAPRE,2019–2025,Stock,2021,Panel/coverage/schema change,.xlsx; five-year ages
+INE,2019–2025,Stock,2024,Panel/coverage/schema change,Census 2024 / base 2024 (sensitivity)
+ENDIDE,2022,Cross-sectional survey,2022,Series start,"cross-sectional, complex design"
+ENCAVI,2023–2024,Cross-sectional survey,2023,Series start,cross-sectional 2023–24
+PIE/SINACES,2019–2025,School stock,2024,Panel/coverage/schema change,SINACES source (Apuntes 60 to 2023)
+JUNAEB,2019–2025,School stock,2024,Definition/code change,1º medio not estimable

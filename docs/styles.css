@@ -16,3 +16,21 @@ h2 { padding-top: .7rem; }
 .analysis-table td { vertical-align: top; }
 .source-note { color: #5b6d7b; font-size: .92rem; }
 @media (max-width: 650px) { .metrics { grid-template-columns: 1fr; } }
+/* Páginas del manuscrito Lancet (lancet.qmd, lancet_suplemento.qmd, lancet_corpus.qmd) */
+.research-context { border: 1px solid #9fb3bf; background: #f4f8f9; padding: .4rem 1.2rem 1rem; margin: 1.2rem 0 1.6rem; border-radius: 5px; }
+.research-context h3, .research-context h4 { margin-top: .9rem; font-size: 1.02rem; }
+.table-note { color: #465a6d; font-size: .84rem; margin: -.8rem 0 1.4rem; }
+.table-group td { background: #eef2f5; }
+.fig-links { color: #5b6d7b; font-size: .86rem; margin: -.6rem 0 1.6rem; text-align: center; }
+.equation { margin: .9rem 0 1.3rem; }
+.eq-label { font-weight: 600; font-size: .9rem; margin-bottom: .25rem; }
+.eq-row { display: flex; align-items: center; gap: 1rem; }
+.eq-body { flex: 1; text-align: center; }
+.eq-body img { max-width: 100%; height: auto; }
+.eq-num { min-width: 3.2rem; text-align: right; font-size: .9rem; color: #465a6d; }
+.corpus-table { margin: .6rem 0 1rem; }
+.corpus-table summary { cursor: pointer; }
+.muted { color: #6c7d8a; font-weight: 400; font-size: .86rem; }
+figure figcaption, .figure-caption { text-align: left; font-size: .88rem; }
+/* Figures never overflow the text column (Quarto writes explicit pixel widths on matplotlib images) */
+main img, .figure img, figure img { max-width: 100%; height: auto; }

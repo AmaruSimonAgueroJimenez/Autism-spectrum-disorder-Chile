@@ -1,0 +1,27 @@
+﻿Estimator,Equation,Script,Output file,Status
+Crude rate with exact Poisson limits,1,"lancet_americas/pipeline/01_grd_core.py, 01b_deis_egresos.py, 02_rem_pathway.py, 11_grd_episode_detail.py",lancet_americas/outputs/tidy/grd_year_summary.csv,computed
+Age- and sex-specific rates,2,"lancet_americas/pipeline/03_denominators.py, 06_models.py",lancet_americas/outputs/tidy/models_population_rates.csv,computed
+Direct age standardisation with Fay–Feuer limits,"3, 4, 5","lancet_americas/pipeline/06_models.py::_standardise, population_rates",lancet_americas/outputs/tidy/models_population_rates.csv,computed
+Ratio of standardised rates (males/females),6,lancet_americas/pipeline/06_models.py::population_rates,lancet_americas/outputs/tidy/models_population_rates.csv,computed
+Count ratio with exact binomial limits,7,"lancet_americas/pipeline/14_extra_figures_rem.py::prep_e14 (male:female ratio by age group, A05)",lancet_americas/outputs/<variant>/<language>/extra/tables/E14_rem_a05_age_sex_numeric.csv,computed
+Indirect standardisation: expected counts and SIR,"8, 9",lancet_americas/pipeline/15b_spatial_correlation.py::indirect_standardise,lancet_americas/outputs/tidy/spatial_comuna_standardised.csv; spatial_region_summary.csv; spatial_denominator_sensitivity.csv,computed
+Global empirical-Bayes shrinkage of the SIR,"10, 11",lancet_americas/pipeline/15b_spatial_correlation.py::indirect_standardise,lancet_americas/outputs/tidy/spatial_comuna_standardised.csv; spatial_region_summary.csv,computed
+Quasi-Poisson log-linear trend and APC,"12, 13","lancet_americas/pipeline/06_models.py::fit_glm, Store.add_trend",lancet_americas/outputs/tidy/models_summary.csv,computed
+Hospital fixed effects with cluster-robust variance,14,lancet_americas/pipeline/06_models.py::hospital_models,lancet_americas/outputs/tidy/hospital_effects.csv,computed
+Poisson random intercept with conditional dispersion diagnostic,15,lancet_americas/pipeline/06_models.py::fit_random_intercept,lancet_americas/outputs/tidy/hospital_effects.csv,computed
+Durbin–Watson on deviance residuals,16,lancet_americas/pipeline/06_models.py,lancet_americas/outputs/tidy/models_summary.csv,computed
+Wilson interval for proportions,17,lancet_americas/pipeline/11_grd_episode_detail.py,lancet_americas/outputs/tidy/grd_readmission.csv,computed
+Jeffreys interval for small proportions,18,lancet_americas/pipeline/13_extra_figures_hospital.py::ef4 (in-hospital lethality by year and position),lancet_americas/outputs/<variant>/<language>/extra/tables/EF4_severity_weight_numeric.csv,computed
+Monthly seasonal index,19,"lancet_americas/pipeline/11_grd_episode_detail.py, 08b_figures_rem.py",lancet_americas/outputs/tidy/grd_monthly.csv,computed
+Index numbers with a stated base year,20,lancet_americas/pipeline/06_models.py,lancet_americas/outputs/tidy/models_convergence_index.csv,computed
+Spearman's rho with the Fisher z interval,21,lancet_americas/pipeline/06_models.py::figure_hospital; 15b_spatial_correlation.py::spearman_ci,lancet_americas/outputs/tidy/hospital_effects.csv; spatial_correlations.csv; spatial_stability.csv,computed
+Linearly weighted kappa,22,no implementation in this run: territorial agreement between systems is reported with Spearman's rho on the comuna and region ranks (15b_spatial_correlation.py::spearman_ci),—,pre-specified
+Survey proportion with Taylor linearisation,23,lancet_americas/pipeline/04_surveys.py::estimate,lancet_americas/outputs/tidy/survey_estimates.csv,computed
+Design effect and relative standard error,24,lancet_americas/pipeline/04_surveys.py,lancet_americas/outputs/tidy/survey_estimates.csv,computed
+Global Moran's I with row-standardised queen contiguity,25,"lancet_americas/pipeline/15b_spatial_correlation.py::load_geography, moran_global",lancet_americas/outputs/tidy/spatial_moran.csv,computed
+Bivariate Moran's I between sources,26,lancet_americas/pipeline/15b_spatial_correlation.py::moran_bivariate,lancet_americas/outputs/tidy/spatial_bivariate_moran.csv; spatial_bivariate_local.csv,computed
+Local indicators of spatial association,"27, 28","lancet_americas/pipeline/15b_spatial_correlation.py::lisa_local, bh_threshold",lancet_americas/outputs/tidy/spatial_lisa.csv,computed
+Getis–Ord Gi* statistic,"28, 29","lancet_americas/pipeline/15b_spatial_correlation.py::gistar_local, bh_threshold",lancet_americas/outputs/tidy/spatial_lisa.csv,computed
+Territorial Lorenz curve and Gini coefficient,"30, 31","lancet_americas/pipeline/15b_spatial_correlation.py::lorenz_gini, decile_ratio",lancet_americas/outputs/tidy/spatial_inequality.csv,computed
+Theil index with within/between-region decomposition,32,lancet_americas/pipeline/15b_spatial_correlation.py::theil_decomposition,lancet_americas/outputs/tidy/spatial_inequality.csv,computed
+Small-cell suppression rule,33,"lancet_americas/pipeline/11_grd_episode_detail.py, 01b_deis_egresos.py, 15b_spatial_correlation.py",lancet_americas/outputs/tidy/grd_territory.csv; spatial_comuna_indicators.csv,computed

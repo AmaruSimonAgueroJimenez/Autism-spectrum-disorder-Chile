@@ -55,5 +55,16 @@ __pycache__/
 
 # Quarto execution metadata
 docs/.quarto/
-paper/.quarto/
-paper/manuscript_files/
+
+# Manuscript for The Lancet Regional Health – Americas: the versions (DOCX, PDF, 600 dpi plates and
+# revision data) and the heavy pipeline outputs stay out of git; the pipeline code
+# (lancet_americas/*.py, pipeline/, journal/, tests/, tools/) and the public replica in docs/lancet/ are versioned.
+lancet_americas/manuscript/
+lancet_americas/outputs/
+lancet_americas/.pytest_cache/
+lancet_americas/**/__pycache__/
+.pytest_cache/
+docs/lancet/__pycache__/
+
+# Local downloads and session outputs
+Claude outputs/

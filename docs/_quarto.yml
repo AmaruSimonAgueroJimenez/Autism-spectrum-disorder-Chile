@@ -3,11 +3,14 @@ project:
   execute-dir: project
   render:
     - index.qmd
-    - metodologia.qmd
+    - methods.qmd
     - rem.qmd
     - grd.qmd
+    - lancet.qmd
+    - lancet_supplement.qmd
+    - lancet_corpus.qmd
 
-lang: es
+lang: en
 jupyter: python3
 date: today
 format:
@@ -19,7 +22,7 @@ format:
     embed-resources: true
     css: styles.css
     code-fold: true
-    code-summary: "Ver Python"
+    code-summary: "Show Python"
     fig-cap-location: bottom
     number-sections: false
     smooth-scroll: true

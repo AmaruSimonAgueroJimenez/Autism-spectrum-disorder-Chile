@@ -1,0 +1,13 @@
+Year,Series,DEIS discharges (all establishments),SNSS discharges,DEIS principal F84 (all),DEIS principal F84 SNSS,DEIS principal F84 non-SNSS,DEIS principal F84 masked,"Principal F84 per 100,000 discharges (exact 95% CI)",GRD episodes (observed panel),GRD hospitals,GRD principal F84,"GRD principal F84 per 100,000 episodes","GRD principal F84, strict hospitalisation","GRD principal F84, fixed panel of 65",GRD F84 any position (no DEIS equivalent),GRD F84 secondary only,Ratio DEIS discharges / GRD episodes,Ratio principal F84 DEIS / GRD,Ratio principal F84 DEIS SNSS / GRD,Ratio principal F84 DEIS SNSS / GRD strict hospitalisation
+2019,F84 family excluding Rett syndrome,"1,667,180","1,042,595",304,234,62,8,18.2 (16.2 to 20.4),"1,151,475",65,228,19.8,203,228,"2,334","2,106",1.45,1.33,1.03,1.15
+2020,F84 family excluding Rett syndrome,"1,330,477","816,463",255,196,53,6,19.2 (16.9 to 21.7),"781,912",65,157,20.1,155,157,"1,609","1,452",1.70,1.62,1.25,1.26
+2021,F84 family excluding Rett syndrome,"1,467,062","844,546",299,239,55,5,20.4 (18.1 to 22.8),"816,909",65,186,22.8,186,186,"2,367","2,181",1.80,1.61,1.28,1.28
+2022,F84 family excluding Rett syndrome,"1,597,118","909,774",470,383,74,13,29.4 (26.8 to 32.2),"932,839",65,295,31.6,295,295,"3,859","3,564",1.71,1.59,1.30,1.30
+2023,F84 family excluding Rett syndrome,"1,612,267","938,890",585,508,58,19,36.3 (33.4 to 39.3),"1,039,587",68,361,34.7,361,358,"6,423","6,062",1.55,1.62,1.41,1.41
+2024,F84 family excluding Rett syndrome,"1,667,349","993,807",678,581,89,8,40.7 (37.7 to 43.8),"1,085,813",72,390,35.9,390,381,"8,731","8,341",1.54,1.74,1.49,1.49
+2019,F84.0 only (childhood autism; identical in both variants),"1,667,180","1,042,595",160,125,33,2,9.6 (8.2 to 11.2),"1,151,475",65,150,13.0,133,150,"1,400","1,250",1.45,1.07,0.83,0.94
+2020,F84.0 only (childhood autism; identical in both variants),"1,330,477","816,463",163,124,36,3,12.3 (10.4 to 14.3),"781,912",65,114,14.6,112,114,"1,084",970,1.70,1.43,1.09,1.11
+2021,F84.0 only (childhood autism; identical in both variants),"1,467,062","844,546",192,154,36,2,13.1 (11.3 to 15.1),"816,909",65,139,17.0,139,139,"1,848","1,709",1.80,1.38,1.11,1.11
+2022,F84.0 only (childhood autism; identical in both variants),"1,597,118","909,774",306,247,47,12,19.2 (17.1 to 21.4),"932,839",65,202,21.7,202,202,"3,061","2,859",1.71,1.51,1.22,1.22
+2023,F84.0 only (childhood autism; identical in both variants),"1,612,267","938,890",344,297,36,11,21.3 (19.1 to 23.7),"1,039,587",68,253,24.3,253,251,"5,325","5,072",1.55,1.36,1.17,1.17
+2024,F84.0 only (childhood autism; identical in both variants),"1,667,349","993,807",406,352,51,3,24.4 (22.0 to 26.8),"1,085,813",72,280,25.8,280,272,"7,230","6,950",1.54,1.45,1.26,1.26

@@ -1,0 +1,32 @@
+﻿Layer,Indicator,Geography / unit,2019,2020,2021,2022,2023,2024,2025
+Population (INE),"INE projection, Census 2017 base (primary denominator)",residence; persons at 30 June,"19,107,216","19,458,310","19,678,363","19,828,563","19,960,889","20,086,377","20,206,953"
+Population (INE),"INE projection, Census 2024 base (sensitivity; never merged)",residence; persons at 30 June,"19,040,037","19,235,540","19,391,613","19,581,575","19,756,365","19,904,328","20,036,669"
+Population (INE),Ratio base 2024 / base 2017,ratio,0.996,0.989,0.985,0.988,0.990,0.991,0.992
+Population (INE),"Census 2024, enumerated population",census enumeration; persons,—,—,—,—,—,"18,480,432",—
+"Insurance (FONASA, ISAPRE)",FONASA beneficiaries (December),mixed (APS-centre comuna for enrolled; domicile for non-enrolled); persons in December,"14,841,577","15,142,528","15,233,814","15,613,584","16,229,898","16,752,189","17,132,611"
+"Insurance (FONASA, ISAPRE)",FONASA beneficiaries enrolled in APS (INSCRITO_APS = SI),mixed (APS-centre comuna for enrolled; domicile for non-enrolled); persons in December,"12,966,079","13,154,134","13,244,989","13,572,688",variable absent,variable absent,variable absent
+"Insurance (FONASA, ISAPRE)",FONASA age-band scheme of the file,file schema,23 bands,23 bands,23 bands,23 bands,10 bands,18 bands,23 bands
+"Insurance (FONASA, ISAPRE)","ISAPRE beneficiaries (contributors + dependants, December)",administrative comuna of the beneficiary; persons in December,"3,431,126","3,339,226","3,330,254","3,151,885","2,788,257","2,630,026","2,517,305"
+"Insurance (FONASA, ISAPRE)",ISAPRE contributors,administrative comuna of the beneficiary; persons in December,"2,020,344","1,971,662","1,988,803","1,901,844","1,699,294","1,610,979","1,557,693"
+"Insurance (FONASA, ISAPRE)",ISAPRE dependants,administrative comuna of the beneficiary; persons in December,"1,410,623","1,367,311","1,341,451","1,250,041","1,088,963","1,019,047","959,612"
+"Insurance (FONASA, ISAPRE)",FONASA + ISAPRE,mixed (APS-centre comuna for enrolled; domicile for non-enrolled); persons in December,"18,272,703","18,481,754","18,564,068","18,765,469","19,018,155","19,382,215","19,649,916"
+"Insurance (FONASA, ISAPRE)",FONASA / INE base 2017 (%),percentage (December stock / 30 June projection),77.7%,77.8%,77.4%,78.7%,81.3%,83.4%,84.8%
+"Insurance (FONASA, ISAPRE)",ISAPRE / INE base 2017 (%),percentage (December stock / 30 June projection),18.0%,17.2%,16.9%,15.9%,14.0%,13.1%,12.5%
+"Insurance (FONASA, ISAPRE)",(FONASA + ISAPRE) / INE base 2017 (%); not an insurance-coverage rate,percentage (December stock / 30 June projection),95.6%,95.0%,94.3%,94.6%,95.3%,96.5%,97.2%
+"Insurance (FONASA, ISAPRE)",(FONASA + ISAPRE) / INE base 2024 (%); sensitivity,percentage (December stock / 30 June projection),96.0%,96.1%,95.7%,95.8%,96.3%,97.4%,98.1%
+Operational coverage (APS enrolment),"APS enrolled persons (December), all tramos",APS-centre comuna (place of care); persons in December,"13,777,051","13,885,509","14,100,841","14,522,464","15,051,673","15,353,689","15,791,862"
+Operational coverage (APS enrolment),"APS enrolled persons, FONASA tramos A–D",APS-centre comuna (place of care); persons in December,"12,975,556","13,179,909","13,244,764","13,575,617","14,133,444","14,627,988","15,117,505"
+Operational coverage (APS enrolment),"APS enrolled persons, tramo X (unclassified)",APS-centre comuna (place of care); persons in December,"606,079","705,600","856,077","946,847","918,229","725,701","674,357"
+Operational coverage (APS enrolment),APS centres with enrolled persons (n),distinct centre codes,"1,890","1,956","1,984","2,026","2,057","2,078","2,091"
+Operational coverage (APS enrolment),"Continuous panel of 1,871 centres: enrolled persons",APS-centre comuna (place of care); persons in December,"13,759,553","13,850,153","14,038,029","14,391,024","14,849,251","15,083,226","15,403,789"
+Operational coverage (APS enrolment),"Continuous panel of 1,871 centres: retention (%)",percentage of the annual total retained by the continuous panel,99.87%,99.75%,99.55%,99.09%,98.66%,98.24%,97.54%
+Operational coverage (APS enrolment),Ratio APS enrolled A–D / FONASA enrolled in APS,ratio,1.0007,1.0020,1.0000,1.0002,variable absent,variable absent,variable absent
+Hospital activity and capacity (REM-20),REM-20 reporting establishments (n),establishment (never residence),192,203,196,194,195,193,193
+Hospital activity and capacity (REM-20),REM-20 establishments with 12 reported months (n),establishment (never residence),192,192,194,193,191,192,192
+Hospital activity and capacity (REM-20),"REM-20 discharges, all establishments","discharges (episodes), annual sum","1,065,092","836,287","861,500","927,210","994,127","1,007,697","1,024,024"
+Hospital activity and capacity (REM-20),"REM-20 discharges, panel of 188 establishments","discharges (episodes), annual sum","1,062,539","830,000","853,304","918,716","982,656","992,253","1,005,212"
+Hospital activity and capacity (REM-20),REM-20 discharge retention of the 188 panel (%),percentage of the annual total retained by the continuous panel,99.76%,99.25%,99.05%,99.08%,98.85%,98.47%,98.16%
+Hospital activity and capacity (REM-20),"REM-20 available bed-days, all","available bed-days, annual sum","9,443,021","9,493,833","9,450,490","9,330,209","9,449,474","9,543,857","9,532,708"
+Hospital activity and capacity (REM-20),"REM-20 available bed-days, 188 panel","available bed-days, annual sum","9,411,995","9,276,885","9,284,844","9,184,090","9,288,285","9,334,384","9,318,738"
+Hospital activity and capacity (REM-20),REM-20 bed-day retention of the 188 panel (%),percentage of the annual total retained by the continuous panel,99.67%,97.71%,98.25%,98.43%,98.29%,97.81%,97.76%
+Hospital activity and capacity (REM-20),"REM-20 discharges per 1,000 INE population (activity intensity, not coverage)","discharges of the year per 1,000 INE base-2017 population (activity, place of care / residence)",55.7,43.0,43.8,46.8,49.8,50.2,50.7

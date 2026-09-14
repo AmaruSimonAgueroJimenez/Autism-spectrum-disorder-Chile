@@ -1,0 +1,27 @@
+﻿Code,Indicator,Definition era,2023,2024,2025
+09600212,Autism suspicion in other controls or consultations,2023–2024,"8,221 (731)","12,281 (861)",outside the era
+09600213,M-CHAT-R/F part 1: low risk,2023–2024,"14,083 (880)","18,142 (1,082)",outside the era
+09600214,M-CHAT-R/F part 1: medium risk,2023–2024,"3,642 (627)","4,698 (734)",outside the era
+09600215,M-CHAT-R/F part 1: high risk,2023–2024,"1,907 (478)","2,234 (552)",outside the era
+09600216,High risk with specialist referral,2023–2024,"1,152 (373)","1,741 (454)",outside the era
+09600217,M-CHAT-R/F part 2: medium risk in part 1,2023–2023,920 (247),outside the era,outside the era
+09600218,M-CHAT-R/F part 2: no referral required,2023–2024,817 (267),"2,341 (528)",outside the era
+09600219,M-CHAT-R/F part 2: referral required,2023–2024,"1,136 (346)","2,283 (516)",outside the era
+03700104,31–59 months evaluated at the integral control,2024–2024,outside the era,"39,466 (694)",outside the era
+03700105,31–59 months suspected elsewhere,2024–2024,outside the era,"4,576 (564)",outside the era
+03700106,Alert-sign guide: yes,2024–2024,outside the era,"5,860 (674)",outside the era
+03700107,Alert-sign guide: no,2024–2024,outside the era,"6,327 (495)",outside the era
+03700108,Referral after alert signs: yes,2024–2024,outside the era,"4,866 (629)",outside the era
+03700109,Referral after alert signs: no,2024–2024,outside the era,"4,935 (464)",outside the era
+03710013,Motive: altered EEDP (16–30 months),2025–2025,outside the era,outside the era,"14,671 (869)"
+03710014,Motive: risk factor or alert sign (16–30 months),2025–2025,outside the era,outside the era,"5,921 (665)"
+03710015,Motive: both (16–30 months),2025–2025,outside the era,outside the era,"2,656 (503)"
+03710016,M-CHAT-R/F: low risk,2025–2025,outside the era,outside the era,"12,971 (818)"
+03710017,M-CHAT-R/F medium risk: no referral,2025–2025,outside the era,outside the era,"1,637 (395)"
+03710018,M-CHAT-R/F medium risk: referral,2025–2025,outside the era,outside the era,"2,500 (534)"
+03710019,M-CHAT-R/F high risk: referral,2025–2025,outside the era,outside the era,"2,181 (505)"
+03710020,Suspected 30–59 months: no referral,2025–2025,outside the era,outside the era,"5,140 (501)"
+03710021,Suspected 30–59 months: referral,2025–2025,outside the era,outside the era,"5,883 (642)"
+09600213+09600214+09600215 / 03710016–03710019,Risk composition by era (never a continuous series),2023–2024 | 2025,Low risk 71.7%; Medium risk 18.6%; High risk 9.7%,Low risk 72.4%; Medium risk 18.7%; High risk 8.9%,Low risk 67.2%; Medium risk 21.4%; High risk 11.3%
+09600216/09600215,"Referral of high risk, 2023–2024",2023–2024,60.4% (58.2–62.6),77.9% (76.2–79.6),outside the era
+09600219 / (09600218+09600219),"Part-2 outcomes, 2023–2024",2023–2024,58.2% (56.0–60.3),49.4% (47.9–50.8),outside the era

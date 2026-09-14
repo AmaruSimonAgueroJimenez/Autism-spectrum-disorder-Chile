@@ -1,0 +1,236 @@
+---
+title: "Methods"
+subtitle: "Design, sources, definitions, measures and controls of the REM and GRD analyses"
+bibliography: references.bib
+link-citations: true
+---
+
+::: {.report-nav}
+[Home](index.html) [Methods](methods.html) [REM](rem.html) [GRD](grd.html) [Lancet](lancet.html) [Supplement](lancet_supplement.html) [Corpus](lancet_corpus.html)
+:::
+
+```{python}
+#| label: load-methods
+from pathlib import Path
+import sys
+import pandas as pd
+
+ROOT = Path.cwd().parent if Path.cwd().name == "docs" else Path.cwd()
+sys.path.insert(0, str(ROOT / "scripts"))
+from report_helpers import read_result, show_table, kpis, number, AGE_GROUPS
+from epi_helpers import WHO_STANDARD
+
+grd_sources = read_result("grd_source_inventory.csv")
+rem_quality = read_result("rem_quality.csv")
+epi_quality = read_result("grd_epi_quality.csv")
+kpis([
+    (number(grd_sources.records.sum()), "GRD records read · 2019–2024"),
+    (number(rem_quality.records.sum()), "REM Series A rows read · 2017–2024"),
+    (number(epi_quality.records_kept.sum()), "GRD records with an F84 code analysed"),
+])
+```
+
+This document describes, in one place, how every result of the [REM](rem.html) and [GRD](grd.html) reports is built. Both reports read aggregate tables produced by reproducible scripts and apply the same definitions, denominators and presentation conventions detailed here. When a result has a specific limitation, the corresponding report repeats it next to the table or figure; this section concentrates the full justification.
+
+## Design and questions
+
+The work is a **descriptive observational study based on administrative health records**, with three complementary components:
+
+1. **Descriptive epidemiology of hospital activity with an autism code** (GRD, 2019–2024): magnitude, temporal trend, distribution by sex and age, diagnostic subcategories, position of the code in the episode, characteristics of the hospitalisation, co-diagnoses, readmission and territorial distribution, with population rates and spatial autocorrelation analysis.
+2. **Hospital coding trajectories** (GRD, identifiers linked within 2019–2020 and 2021–2024): diagnoses recorded before the first observed autism record, principal or secondary position in the index episode and later transitions.
+3. **Outpatient care and screening activity** (REM Series A, 2017–2024): entries to and discharges from mental-health programmes with an autism code, screening in well-child check-ups, rehabilitation and facility coverage, with population entry rates.
+
+The questions are framed in the classical **person, place and time** framework. No source identifies the incidence or prevalence of autism in the population: GRD records hospitalisations in which an F84 code was documented, and REM records aggregate counts of services. Measures are therefore always named by their real unit (records, identifiers, programme entries) and interpreted as indicators of contact with the public health system and of coding practice.
+
+## Epidemiological context
+
+The most recent systematic reviews place the global prevalence of autism at around 1 in 100 people, with a median of 100 per 10,000 and a very wide range between studies, a median male:female ratio of 4.2 and one third of cases with concurrent intellectual disability [@zeidan2022]. Meta-analyses with stricter criteria estimate lower pooled prevalences, of the order of 0.7% [@talantseva2023], while the Global Burden of Disease Study 2021 estimated 61.8 million autistic people, equivalent to 1 in 127, with an age-standardised prevalence of 788 per 100 000 [@santomauro2025]. In the United States, ADDM surveillance reported 32.2 per 1,000 eight-year-old children in 2022, that is 1 in 31, with a prevalence more than three times higher in boys than in girls [@shaw2025].
+
+The male:female ratio is considered overestimated by identification biases: the meta-analysis by Loomes and colleagues estimated a ratio close to 3:1 in studies that screen the general population, against 4.6:1 when only pre-existing diagnoses are counted [@loomes2017]. Recent birth-cohort studies also show that the ratio decreases with age at diagnosis and with calendar period [@fyfe2026]. Comorbidity is frequent and heterogeneous: attention-deficit hyperactivity disorder, anxiety, depression, epilepsy, intellectual disability, sleep disorders and gastrointestinal symptoms appear with very variable prevalences depending on the design [@bougeard2021]. This background justifies presenting the sex ratio with intervals, stratifying by age and describing co-diagnoses without attributing a causal relation to them.
+
+In Chile, population evidence is scarce. A study in two urban communes of Santiago applied M-CHAT screening to children aged 18 to 30 months with clinical confirmation by ADOS-2, estimating a prevalence of 1.95% (95% CI: 0.81 to 4.63) and four boys for every girl diagnosed [@yanez2021]. Law 21.545, published on 10 March 2023, established obligations of early detection, diagnosis and comprehensive care in health and education [@ley21545]. The study period therefore spans a regulatory change and a change in social visibility that must be considered when interpreting trends: an increase in records is compatible with greater detection, greater demand and coding changes, and does not by itself demonstrate an increase in the occurrence of autism.
+
+## Data sources
+
+### Hospital discharges grouped by GRD
+
+The public database of diagnosis-related groups (IR-GRD, Grupos Relacionados por el Diagnóstico) of the Ministry of Health contains one record per episode of hospitalisation or major ambulatory surgery in the public facilities that take part in the GRD system [@minsal_grd]. Each record includes sex, date of birth, commune of residence, health insurance, health service, hospital, admission and activity type, specialty, admission and discharge dates, discharge type, 35 diagnostic positions coded in ICD-10, 30 procedures, and the weight, severity and mortality risk assigned by the grouper. The canonical 2019–2024 files documented in the external data store are used; the files are neither modified nor copied into the repository.
+
+```{python}
+#| label: tabla-fuentes-grd
+inventory = grd_sources.merge(epi_quality[["year", "identifier_column", "records_kept", "records_missing_id"]], on="year")
+show_table(inventory[["year", "records", "identifier_column", "records_kept", "records_missing_id"]].rename(columns={
+    "year": "Year", "records": "Records in the file", "identifier_column": "Identifier field",
+    "records_kept": "Records with an F84 code", "records_missing_id": "F84 records without a valid identifier",
+}), "GRD: canonical files and records with an F84 code after exact deduplication")
+```
+
+The patient identifier is an encrypted field (`CIP_ENCRIPTADO` in 2019–2023, `ID_BENEFICIARIO` in 2024). The linkage audit verified that no identifiers are shared between 2019–2020 and 2021–2024, and that the change of field name in 2024 preserves matches with 2021–2023. All longitudinal analyses therefore work in **two separate identifier periods** and never link across 2020/2021. The stability of the identifier is an empirical check, not a certification by the producer.
+
+### Monthly Statistical Summaries (REM), Series A
+
+REM (Resúmenes Estadísticos Mensuales) is the aggregate activity reporting system of the public network [@minsal_rem]. Each row corresponds to a facility, month and service code, with up to 50 columns whose meaning depends on the form and the year. Three forms are used:
+
+| Form | Section used | Content | Years with autism codes |
+|---|---|---|---|
+| A05 | N: entries to the mental-health programme; O: discharges by clinical discharge | Total, sex and 17 age groups by sex | 2017–2020 (generic PDD code), 2021–2024 (autism, Asperger, Rett, disintegrative disorder, unspecified PDD) |
+| A03 | F: autism spectrum disorder screening; F1: 31 to 59 months (2024) | Check-ups, language/social impairment, screening performed and abnormal (MCHAT 2019–2022); risk categories and referral (M-CHAT R/F 2023–2024) | 2019–2024 |
+| A28 | A.2: entries by health condition; B.1: entries to and discharges from comprehensive rehabilitation | Rehabilitation entries with an ASD condition | 2023–2024 |
+
+The annual dictionaries are read directly from the official files to assign the meaning of each column year by year; the catalogue `rem_code_catalogue.csv` keeps the file, sheet and dictionary row of each code. The 2025 and 2026 files exist but are not incorporated: 2026 is partial and 2025 requires validating integrity and comparability before extending the series.
+
+### Population denominators and cartography
+
+The denominators are the **INE population estimates and projections based on the 2017 Census**, by commune, sex and single year of age, for 2017–2024 [@ine2019]. Ages are grouped into 17 five-year groups with an open group of 80 years and over. The population of a region or of the country is the sum of its communes. Multi-year pooled rates use person-years, that is, the sum of the annual populations of the period.
+
+The commune cartography corresponds to the political-administrative division with 346 communes (unique territorial code, CUT) and the regional cartography to 16 regions, both in the EPSG:3857 projection. GRD records are assigned to the reported commune of **residence**; REM is assigned to the commune and region of the reporting **facility**. Non-continental communes (Easter Island, Juan Fernández, Antarctica and Cabo de Hornos) are kept in the tables but excluded from the contiguity statistics.
+
+## Case definitions
+
+### ICD-10 codes in GRD
+
+Three nested definitions are used, identical in the descriptive epidemiology and in the trajectories:
+
+| Definition | ICD-10 codes | Use |
+|---|---|---|
+| Specific autism | F84.0 | Restrictive sensitivity |
+| **Operational ASD** | F84.0, F84.1, F84.5, F84.8, F84.9 | **Main definition** in all results |
+| Historical F84 | F84 and all its valid subcategories, including F84.2, F84.3 and F84.4 | Comparison with the full category of pervasive developmental disorders |
+
+The operational definition approximates the DSM-5 concept of autism spectrum disorder with the ICD-10 nomenclature [@who_icd10], which still distinguishes childhood autism, atypical autism and Asperger syndrome; it is not an exact clinical equivalence. F84.2 (Rett syndrome), F84.3 (disintegrative disorder) and F84.4 (overactive disorder with mental retardation and stereotyped movements) are described separately as subcategories.
+
+Codes are normalised by removing dots and spaces. A record is a **case** when any of the 35 diagnostic fields contains a code of the definition. The **position** is classified exclusively: *principal* when only `DIAGNOSTICO1` contains the code, *secondary only* when it appears only in `DIAGNOSTICO2` to `DIAGNOSTICO35`, and *principal and secondary* when it appears in both. This semantics is operational and should be confirmed with the producer's dictionary; the reports use it consistently.
+
+### REM codes
+
+The A05 codes of entry to the mental-health programme with an autism code (`05990022`) constitute the main series; Asperger (`05990023`), Rett (`05990024`), disintegrative disorder (`05990025`) and unspecified PDD (`05990026`) are presented as subcategories, and their corresponding discharges (`05990027` to `05990031`) separately. The generic series of pervasive developmental disorders of 2017–2020 (`06902600` entries and `05225000` discharges) is kept without mixing it with the later subcategories. The A03 and A28 codes are listed in the REM report with their dictionary label.
+
+## Units of analysis and measures
+
+| Measure | Unit | Operational definition | Source |
+|---|---|---|---|
+| Records with an ASD code | Episode of hospitalisation or major ambulatory surgery | Rows of the annual file with a code of the definition, after removing exact duplicates | GRD |
+| Hospitalised persons | Distinct valid identifier in the year or in the period | The first record of the year or period defines age, sex and commune | GRD |
+| Hospitalisation rate | Records per 100 000 person-years | Numerator: records with valid sex and age; denominator: INE population | GRD |
+| Rate of hospitalised persons | Identifiers per 100 000 population | Annual, or for the 2021–2024 period against the mean annual population | GRD |
+| Diagnostic position | Record | Principal, secondary only, principal and secondary | GRD |
+| Length of stay | Days between admission and discharge | Calculated only with valid dates; major ambulatory surgery is described separately | GRD |
+| In-hospital case fatality | Proportion of records with discharge type "died" | Exact binomial interval | GRD |
+| Readmission at 30 and 90 days | Records with a new admission with a code of the definition for the same identifier | Only records with at least that horizon before the end of the period | GRD |
+| Co-diagnoses | Three-character ICD-10 category | Codes other than F84 in the same record; a record counts once per category and position | GRD |
+| Programme entries | Sum of observed values of `Col01` | Rows with a reported total; no zeros imputed | REM A05 |
+| Entry rate | Entries per 100 000 population | Numerator: observed age and sex cells; denominator: INE population | REM A05 |
+| Screening indicators | Proportions between codes of the same section | Only when numerator and denominator share instrument, stage and age | REM A03 |
+
+Units are not mixed: records are not added to persons, identifier periods are not linked and nested definitions are not added to one another.
+
+## Rates, standardisation and intervals
+
+### Crude and specific rates
+
+For a set of $d$ events and $n$ person-years, the crude rate is $r = 10^5 \cdot d / n$. The 95% confidence limits come from the exact Poisson interval for $d$ through the chi-squared distribution, $d_L = \chi^2_{2d,\,0.025}/2$ and $d_U = \chi^2_{2d+2,\,0.975}/2$, divided by $n$ [@breslow1987]. Age- and sex-specific rates use the same rule.
+
+### Direct standardisation
+
+Age-standardised rates (ASR) are calculated by the direct method with the **WHO world standard population** [@ahmad2001], collapsed to the group aged 80 and over:
+
+$$\mathrm{ASR} = \sum_{i} w_i \, \frac{d_i}{n_i}, \qquad w_i = \frac{p_i}{\sum_j p_j}$$
+
+where $d_i$, $n_i$ and $p_i$ are the events, person-years and standard weight of age group $i$. Groups without population are excluded and the weights are renormalised; groups without events contribute zero. The 95% intervals use the gamma method of Fay and Feuer [@fay1997], which respects the asymmetry of rates with few events:
+
+$$\mathrm{Var}(\mathrm{ASR}) = \sum_i w_i^2 \frac{d_i}{n_i^2}, \qquad w_M = \max_i \frac{w_i}{n_i}$$
+
+$$L = G^{-1}\!\left(0.025;\ \tfrac{\mathrm{ASR}^2}{\mathrm{Var}},\ \tfrac{\mathrm{Var}}{\mathrm{ASR}}\right), \qquad U = G^{-1}\!\left(0.975;\ \tfrac{(\mathrm{ASR}+w_M)^2}{\mathrm{Var}+w_M^2},\ \tfrac{\mathrm{Var}+w_M^2}{\mathrm{ASR}+w_M}\right)$$
+
+with $G^{-1}(q; a, b)$ the quantile of a gamma distribution with shape $a$ and scale $b$.
+
+```{python}
+#| label: tabla-estandar-oms
+standard = pd.DataFrame({"Age group": list(WHO_STANDARD), "Weight per 100 000": list(WHO_STANDARD.values())})
+standard["Weight (%)"] = 100 * standard["Weight per 100 000"] / standard["Weight per 100 000"].sum()
+show_table(standard, "WHO world standard population used in the direct standardisation", {"Weight (%)": 2})
+```
+
+### Rate ratio between sexes
+
+The ratio between the male and female ASRs is accompanied by a log-normal interval, $\exp\{\ln(\mathrm{RR}) \pm 1.96 \cdot \mathrm{se}\}$ with $\mathrm{se}^2 = \mathrm{Var}_M/\mathrm{ASR}_M^2 + \mathrm{Var}_F/\mathrm{ASR}_F^2$. The male:female count ratio is presented with the exact conditional binomial interval (Clopper–Pearson on the proportion of males among cases). Both ratios describe the composition of the records and not the prevalence ratio of autism.
+
+### Indirect standardisation and empirical Bayes smoothing
+
+For the commune analysis, where counts are small, the **standardised hospitalisation ratio** (SHR) is also calculated: the quotient between observed records and those expected if each commune had the national sex- and age-specific rates of the same period, with exact Poisson intervals [@ulm1990]. The ratios are smoothed with Marshall's global empirical Bayes estimator [@marshall1991]: each SHR is shrunk towards the national ratio with a weight $E_i/(E_i + m/v)$, where $E_i$ are the expected events of the commune, and $m$ and $v$ the prior mean and variance estimated by the method of moments. The tables report the crude ratio, the smoothed ratio and the shrinkage weight; the maps and spatial statistics use the smoothed ratio to reduce the instability of small communes.
+
+### Trends
+
+The temporal trend is summarised with the **average annual percent change** (AAPC) estimated with a log-linear count model with an offset of the logarithm of the population, $\log E[d_t] = \alpha + \beta t + \log n_t$, so that $\mathrm{AAPC} = 100\,(e^{\beta} - 1)$ [@clegg2009]. Overdispersion is corrected with a Pearson scale factor (quasi-Poisson), which widens the intervals when the series departs from an exponential trend, as happens with the 2020 drop. Two periods are estimated: the full 2019–2024 period and 2021–2024, which coincides with the main identifier period and with the specific REM codes. Seasonality is described with monthly indices, the quotient between the mean of each month and the overall monthly mean.
+
+## Territorial and spatial analysis
+
+Regional rates are calculated by region of residence (GRD) or of the facility (REM), annual and pooled, with direct standardisation and gamma intervals. Commune rates are pooled over the whole available period to gain stability: records 2019–2024 against person-years, and hospitalised persons 2021–2024 against the mean annual population of the period.
+
+**Global spatial autocorrelation** is assessed with Moran's I [@moran1950] over the continental communes, with a row-standardised queen contiguity matrix and inference by 999 random permutations, with a fixed seed for reproducibility. Anselin's **local indicators of spatial association** (LISA) [@anselin1995] classify each commune into high-high, low-low, high-low and low-high quadrants; local significance is reported with the pseudo p-value of 999 permutations and, in addition, with a threshold corrected by the false discovery rate [@benjamini1995], which is the recommended reading given the number of communes. The calculations use the PySAL library [@rey2010]. Communes without neighbours (contiguous islands) remain on the map without contributing to the lags.
+
+The spatial analysis is **exploratory and ecological** [@elliott2000]: clusters of high rates may reflect hospital supply, coding practices, access and socioeconomic composition, and not a territorial risk of autism. The commune unit introduces the modifiable areal unit problem, and the commune of residence does not always coincide with the place of care.
+
+## Hospitalisation characteristics and co-diagnoses
+
+Episode variables are described as distributions of records by year and code position: admission type, activity type, medical specialty, referral source, health insurance (grouped into FONASA MAI brackets, free choice, ISAPRE, Armed Forces, private and others), discharge type, severity and mortality risk of the grouper, GRD relative weight, hospital and health service. Length of stay is summarised with median, quartiles and the 90th percentile and stratified by activity type and age group, because major ambulatory surgery has a zero stay by definition.
+
+Co-diagnoses are the codes other than F84 present in any position of the same record, summarised into three-character ICD-10 categories, chapters and mental-health blocks. When the autism code is secondary, the principal diagnosis describes the coded reason for the hospitalisation. These co-occurrences describe joint coding in an episode: they establish neither sequence, causality nor prevalence of comorbidity in the autistic population.
+
+## Hospital coding trajectories
+
+The longitudinal component reconstructs, within each identifier period, all discharges of the identifiers with any F84 code. The **index date** is the first observed discharge with the selected definition; age is that at admission to that episode. A **strict prior episode** must have been discharged before admission to the index episode; overlapping or same-day episodes are quantified separately. The report describes the first observed principal diagnosis, the last prior principal diagnosis, prior codes and groups in 365-day, 730-day and whole-period windows, sequences without ties and the later step from secondary to principal, with proportions calculated only among those with 365 calendar days before the end of the period. Exclusions (identifiers with inconsistent birth date or sex, ambiguous episodes, invalid dates, implausible ages) are documented and not imputed. Observation opportunity is distinguished from clinical follow-up: having calendar time does not certify continuous observation, and the absence of prior hospitalisations does not imply the absence of outpatient diagnoses.
+
+## REM reading rules
+
+- **A05.** `Col01` is the total, `Col02` males and `Col03` females; the 17 age groups occupy `Col04` to `Col37` in male/female pairs. Rates are calculated with the age and sex cells; the total `Col01` may differ slightly when cells are missing.
+- **A03.** In the screening sections `Col01` is males and `Col02` females; from 2023 `Col03` and `Col04` correspond to Indigenous peoples and migrants and are not added to the total. The total of a row requires both sex columns; incomplete rows are counted separately.
+- **A28.** `Col01` gathers both sexes; sections A.2 and B.1 are kept separate and are not added as distinct persons.
+- **Facility panel.** A facility reports a code in a month when a row exists; the absence of a row, the empty cell and the explicit zero are distinguished. A stable panel is defined as the set of facilities with at least one reported entry in each of the years 2021–2024, and serves to check that the trend does not depend solely on the incorporation of new reporters.
+- **Screening indicators.** Quotients are calculated only between codes of the same section, instrument, stage and age group. In the 2019–2022 series, abnormal screening among screenings performed is reported; in 2023–2024, the risk distribution of the first part of the M-CHAT R/F and the referral in the second part. None of these quotients is a population positivity, because the denominator is not all screened children.
+- **Ecological comparison.** Regional rates of REM entries and GRD hospitalisations are compared by region and year with Spearman correlation, as a description of the territorial coherence between sources with different units. At commune scale, where REM only provides totals by commune of the facility and GRD the commune of residence, crude rates per 100 000 person-years and indirect standardised ratios (observed over expected according to the national sex- and age-specific rates of the same source and period) are compared by year and for 2021–2024 pooled. The main analysis uses the continental communes with at least one facility reporting the code; as a sensitivity it is repeated among communes with at least 20 entries and 20 hospitalised persons and among all continental communes with zero imputed to non-reporting communes, since the absence of a REM row is not automatically interpreted as zero.
+
+## Data quality and controls
+
+Each script writes control tables that the reports show next to the results: records read, exact duplicates removed, missing or invalid identifiers, invalid dates, implausible ages (negative or over 110 years), records without sex or age, communes not assigned to the INE catalogue, and in REM the consistency between the total and the sums by sex and age of complete rows. Communes of residence are linked to the unique territorial code by normalised name, with three documented aliases (Coyhaique, Concón and Aysén); only records with an "unknown" commune remain without a region. The analytical code has unit tests with synthetic data for the rules on dates, positions, prior episodes and ties, and for the rate and interval functions.
+
+## Biases and limitations
+
+- **Selection.** GRD covers hospitalisations in public facilities that take part in the GRD system; autistic people without a hospitalisation, cared for in the private system or in hospitals without GRD do not appear. The rates describe hospital activity with the code, not the occurrence of autism.
+- **Detection and coding.** The probability that an F84 code is recorded in a hospitalisation depends on clinical awareness, the availability of a prior diagnosis and coding rules. Law 21.545 and the increase in demand for assessment probably raised recording between 2021 and 2024 independently of changes in occurrence.
+- **Left censoring.** The first observed hospital record is not the first diagnosis; a person may have been diagnosed years earlier in outpatient care.
+- **Denominators.** The INE projections are estimates and do not incorporate the results of the 2024 Census; the commune of residence may be outdated or misreported.
+- **REM comparability.** Changes of codes (2021), screening instruments (2023) and sections (2024) prevent homogeneous series; the number of reporting facilities changes every year.
+- **Ecological fallacy and areal unit.** Territorial associations do not apply to persons and depend on the commune division.
+- **Multiple comparisons.** With more than 300 communes, reading with p < 0.05 produces false positives; the false discovery rate correction is preferred.
+- **No causal inference.** No risk or survival models are estimated; differences between groups are described without multivariable adjustment.
+
+## Ethics and data protection
+
+The GRD and REM databases are public or of authorised use and contain no names. Encrypted identifiers are processed in memory and never exported; all tables in the repository are aggregates without identifiers, without individual dates and without combinations that would allow re-identification. Commune tables with small counts are published with their intervals to avoid over-interpretation.
+
+## Reproducibility and software
+
+```{python}
+#| label: tabla-pipeline
+pipeline = pd.DataFrame([
+    ("scripts/audit_grd_linkage.py", "Full GRD", "Inventory, identifier continuity, concordance between years", "grd_source_inventory, grd_linkage_*"),
+    ("scripts/audit_rem.py", "REM Series A + dictionaries", "Annual catalogue, column validation, aggregates by region, commune, age/sex and facility panel", "rem_*"),
+    ("scripts/grd_trajectories.py", "Full GRD", "Hospital histories, cohorts by period and definition, position, prior diagnoses, transitions", "grd_cohort_*, grd_first_*, grd_previous_*, grd_sequences, grd_principal_transitions"),
+    ("scripts/grd_epidemiology.py", "Full GRD", "F84 records by year, age, sex, commune, position, subcode, characteristics, co-diagnoses, length of stay, readmission", "grd_epi_*"),
+    ("scripts/epi_rates.py", "Aggregates + INE + cartography", "Crude and standardised rates, intervals, ratios, trends, indirect standardisation, smoothing, Moran and LISA", "grd_rates_*, grd_sex_ratio, grd_trends_apc, grd_spatial_*, rem_rates_*, rem_grd_ecological"),
+    ("scripts/render_reports.py", "Aggregate tables", "Renders the seven documents of docs/", "docs/*.html"),
+], columns=["Script", "Input", "Function", "Outputs in output_files/consolidacion"])
+show_table(pipeline, "Processing chain; the order of the table is the order of execution")
+```
+
+The scripts are Python (pandas, numpy, scipy, statsmodels, geopandas, libpysal, esda) with versions pinned in `requirements-analysis.txt`; the documents are rendered with Quarto. Tables and figures are recalculated at every render from the aggregates; no value is pasted by hand. The seed of the spatial permutations is fixed. The historical reports in `others scripts/` are kept only for traceability and do not feed the current documents.
+
+## References
+
+::: {#refs}
+:::
+
+::: {.report-nav}
+[Back to home](index.html) [REM analysis](rem.html) [GRD analysis](grd.html)
+:::

@@ -1,0 +1,25 @@
+﻿REM module,Indicator,2019,2020,2021,2022,2023,2024,2025
+A03,Establishments with at least one row,731,700,788,956,"1,243","1,443","1,043"
+A03,Establishments with at least one value > 0,731,700,788,956,"1,242","1,443","1,041"
+A03,Establishments in the stable panel,489,489,489,489,972,"1,156","1,043"
+A03,Codes in force in the year,4,4,4,4,10,15,9
+A05,Establishments with at least one row,718,556,782,927,"1,075","1,223","1,048"
+A05,Establishments with at least one value > 0,699,542,773,918,"1,068","1,213","1,039"
+A05,Establishments in the stable panel,429,429,324,324,324,324,324
+A05,Codes in force in the year,2,2,14,14,14,14,14
+A27,Establishments with at least one row,not reported,not reported,not reported,not reported,151,183,170
+A27,Establishments with at least one value > 0,not reported,not reported,not reported,not reported,151,183,170
+A27,Establishments in the stable panel,not reported,not reported,not reported,not reported,88,88,88
+A27,Codes in force in the year,not reported,not reported,not reported,not reported,2,2,2
+A28,Establishments with at least one row,not reported,not reported,not reported,not reported,302,358,396
+A28,Establishments with at least one value > 0,not reported,not reported,not reported,not reported,302,358,396
+A28,Establishments in the stable panel,not reported,not reported,not reported,not reported,122,122,122
+A28,Codes in force in the year,not reported,not reported,not reported,not reported,2,2,2
+P2,Establishments with at least one row,543,403,722,971,"1,398","1,587","1,642"
+P2,Establishments with at least one value > 0,543,403,722,971,"1,398","1,587","1,642"
+P2,Establishments in the stable panel,193,193,193,193,932,932,932
+P2,Codes in force in the year,1,1,1,1,2,2,2
+P6,Establishments with at least one row,922,825,"1,030","1,160","1,333","1,482","1,581"
+P6,Establishments with at least one value > 0,922,824,"1,026","1,159","1,333","1,481","1,581"
+P6,Establishments in the stable panel,697,697,557,557,557,557,557
+P6,Codes in force in the year,2,2,14,14,14,14,14

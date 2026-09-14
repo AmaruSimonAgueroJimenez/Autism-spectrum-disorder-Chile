@@ -1,0 +1,64 @@
+REM module,Code,Indicator,Definition era,Cell definition,2019,2020,2021,2022,2023,2024,2025
+A03,,All codes of the module,,Establishments with ≥1 row of any code of the module,731,700,788,956,"1,243","1,443","1,043"
+A03,03500404,Children with the 18-month health check,2019–2024,Establishments with ≥1 month reported (stable panel),701 (478),663 (478),745 (478),908 (478),"1,136 (478)","1,283 (478)",—
+A03,03500405,Language or social-area alteration at the 18-month check,2019–2024,Establishments with ≥1 month reported (stable panel),470 (246),404 (246),518 (246),651 (246),831 (246),955 (246),—
+A03,03500406,M-CHAT performed among children with language/social alteration,2019–2022,Establishments with ≥1 month reported (stable panel),263 (108),198 (108),273 (108),399 (108),—,—,—
+A03,03500407,Altered M-CHAT among children with language/social alteration,2019–2022,Establishments with ≥1 month reported (stable panel),188 (61),134 (61),230 (61),315 (61),—,—,—
+A03,03700104,Children aged 31–59 months evaluated at the integral health check,2024–2024,Establishments with ≥1 month reported (stable panel),—,—,—,—,—,694 (694),—
+A03,03700105,Children aged 31–59 months suspected elsewhere,2024–2024,Establishments with ≥1 month reported (stable panel),—,—,—,—,—,564 (564),—
+A03,03700106,Autism suspicion by alert-sign guide: yes,2024–2024,Establishments with ≥1 month reported (stable panel),—,—,—,—,—,674 (674),—
+A03,03700107,Autism suspicion by alert-sign guide: no,2024–2024,Establishments with ≥1 month reported (stable panel),—,—,—,—,—,495 (495),—
+A03,03700108,Referral after alert-sign evaluation: yes,2024–2024,Establishments with ≥1 month reported (stable panel),—,—,—,—,—,629 (629),—
+A03,03700109,Referral after alert-sign evaluation: no,2024–2024,Establishments with ≥1 month reported (stable panel),—,—,—,—,—,464 (464),—
+A03,03710013,M-CHAT motive: altered EEDP language/social area (16–30 months),2025–2025,Establishments with ≥1 month reported (stable panel),—,—,—,—,—,—,869 (869)
+A03,03710014,M-CHAT motive: autism risk factor or alert sign (16–30 months),2025–2025,Establishments with ≥1 month reported (stable panel),—,—,—,—,—,—,665 (665)
+A03,03710015,M-CHAT motive: both altered EEDP and autism risk/alert (16–30 months),2025–2025,Establishments with ≥1 month reported (stable panel),—,—,—,—,—,—,503 (503)
+A03,03710016,M-CHAT-R/F result: low risk,2025–2025,Establishments with ≥1 month reported (stable panel),—,—,—,—,—,—,818 (818)
+A03,03710017,M-CHAT-R/F medium risk: no diagnostic referral required,2025–2025,Establishments with ≥1 month reported (stable panel),—,—,—,—,—,—,395 (395)
+A03,03710018,M-CHAT-R/F medium risk: diagnostic referral required,2025–2025,Establishments with ≥1 month reported (stable panel),—,—,—,—,—,—,534 (534)
+A03,03710019,M-CHAT-R/F high risk: diagnostic referral required,2025–2025,Establishments with ≥1 month reported (stable panel),—,—,—,—,—,—,505 (505)
+A03,03710020,Suspected autism aged 30–59 months: no diagnostic referral required,2025–2025,Establishments with ≥1 month reported (stable panel),—,—,—,—,—,—,501 (501)
+A03,03710021,Suspected autism aged 30–59 months: diagnostic referral required,2025–2025,Establishments with ≥1 month reported (stable panel),—,—,—,—,—,—,642 (642)
+A03,09600212,Suspected autism in other checks or consultations,2023–2024,Establishments with ≥1 month reported (stable panel),—,—,—,—,731 (602),861 (602),—
+A03,09600213,M-CHAT-R/F first part: low risk,2023–2024,Establishments with ≥1 month reported (stable panel),—,—,—,—,880 (752),"1,082 (752)",—
+A03,09600214,M-CHAT-R/F first part: medium risk,2023–2024,Establishments with ≥1 month reported (stable panel),—,—,—,—,627 (497),734 (497),—
+A03,09600215,M-CHAT-R/F first part: high risk,2023–2024,Establishments with ≥1 month reported (stable panel),—,—,—,—,478 (346),552 (346),—
+A03,09600216,M-CHAT-R/F high risk with specialist referral,2023–2024,Establishments with ≥1 month reported (stable panel),—,—,—,—,373 (253),454 (253),—
+A03,09600217,M-CHAT-R/F second part: medium risk in first part,2023–2023,Establishments with ≥1 month reported (stable panel),—,—,—,—,247 (247),—,—
+A03,09600218,M-CHAT-R/F second part: no referral required,2023–2024,Establishments with ≥1 month reported (stable panel),—,—,—,—,267 (168),528 (168),—
+A03,09600219,M-CHAT-R/F second part: referral required,2023–2024,Establishments with ≥1 month reported (stable panel),—,—,—,—,346 (237),516 (237),—
+A27,,All codes of the module,,Establishments with ≥1 row of any code of the module,—,—,—,—,151,183,170
+A27,29101566,Counselling in the screening context: number of M-CHAT-R/F,2023–2025,Establishments with ≥1 month reported (stable panel),—,—,—,—,150 (87),180 (87),169 (87)
+A27,29101574,Assisted referral in the screening context: number of M-CHAT-R/F,2023–2025,Establishments with ≥1 month reported (stable panel),—,—,—,—,98 (57),118 (57),114 (57)
+A05,,All codes of the module,,Establishments with ≥1 row of any code of the module,718,556,782,927,"1,075","1,223","1,048"
+A05,05225000,Clinical discharge: broad PDD (2019–2020),2019–2020,Establishments with ≥1 month reported (stable panel),387 (181),260 (181),—,—,—,—,—
+A05,05990022,Entry: autism,2021–2025,Establishments with ≥1 month reported (stable panel),—,—,449 (258),658 (258),920 (258),"1,070 (258)",952 (258)
+A05,05990023,Entry: Asperger syndrome,2021–2025,Establishments with ≥1 month reported (stable panel),—,—,329 (41),397 (41),397 (41),312 (41),207 (41)
+A05,05990024,Entry: Rett syndrome,2021–2025,Establishments with ≥1 month reported (stable panel),—,—,58 (0),22 (0),20 (0),13 (0),6 (0)
+A05,05990025,Entry: childhood disintegrative disorder,2021–2025,Establishments with ≥1 month reported (stable panel),—,—,38 (0),24 (0),40 (0),27 (0),21 (0)
+A05,05990026,"Entry: pervasive developmental disorder, unspecified",2021–2025,Establishments with ≥1 month reported (stable panel),—,—,424 (102),460 (102),473 (102),457 (102),368 (102)
+A05,05990027,Clinical discharge: autism,2021–2025,Establishments with ≥1 month reported (stable panel),—,—,207 (85),307 (85),438 (85),625 (85),624 (85)
+A05,05990028,Clinical discharge: Asperger syndrome,2021–2025,Establishments with ≥1 month reported (stable panel),—,—,150 (15),181 (15),195 (15),220 (15),168 (15)
+A05,05990029,Clinical discharge: Rett syndrome,2021–2025,Establishments with ≥1 month reported (stable panel),—,—,29 (0),17 (0),17 (0),9 (0),9 (0)
+A05,05990030,Clinical discharge: childhood disintegrative disorder,2021–2025,Establishments with ≥1 month reported (stable panel),—,—,17 (0),15 (0),10 (0),8 (0),12 (0)
+A05,05990031,"Clinical discharge: pervasive developmental disorder, unspecified",2021–2025,Establishments with ≥1 month reported (stable panel),—,—,226 (33),236 (33),280 (33),269 (33),217 (33)
+A05,06902600,Entry to mental-health programme: broad PDD (2019–2020),2019–2020,Establishments with ≥1 month reported (stable panel),651 (395),492 (395),—,—,—,—,—
+A28,,All codes of the module,,Establishments with ≥1 row of any code of the module,—,—,—,—,302,358,396
+A28,29101629,Entry to primary-level rehabilitation by health condition: autism,2023–2025,Establishments with ≥1 month reported (stable panel),—,—,—,—,264 (97),313 (97),359 (97)
+A28,29101651,Entry to hospital-level rehabilitation by health condition: autism,2023–2025,Establishments with ≥1 month reported (stable panel),—,—,—,—,39 (25),50 (25),43 (25)
+P2,,All codes of the module,,Establishments with ≥1 row of any code of the module,543,403,722,971,"1,398","1,587","1,642"
+P2,P2500500,NANEAS population under control: autism spectrum disorder,2019–2025,Establishments with a December row / a June row (December stable panel),460 / 374 (193),400 / 28 (193),640 / 475 (193),897 / 765 (193),"1,012 / 980 (193)","1,218 / 1,168 (193)","1,325 / 1,256 (193)"
+P2,P2501878,NANEAS population under control: total (from December 2023),2023–2025,Establishments with a December row / a June row (December stable panel),—,—,—,—,"1,187 / 0 (907)","1,293 / 1,261 (907)","1,394 / 1,342 (907)"
+P6,,All codes of the module,,Establishments with ≥1 row of any code of the module,922,825,"1,030","1,160","1,333","1,482","1,581"
+P6,P6223000,Broad PDD under control in primary care (2019–2020),2019–2020,Establishments with a December row / a June row (December stable panel),727 / 707 (594),695 / 53 (594),—,—,—,—,—
+P6,P6223380,Broad PDD under control in specialty care (2019–2020),2019–2020,Establishments with a December row / a June row (December stable panel),111 / 109 (104),121 / 105 (104),—,—,—,—,—
+P6,P6241010,Autism under control in primary care,2021–2025,Establishments with a December row / a June row (December stable panel),—,—,482 / 359 (353),704 / 592 (353),956 / 835 (353),"1,160 / 1,061 (353)","1,274 / 1,204 (353)"
+P6,P6241020,Asperger syndrome under control in primary care,2021–2025,Establishments with a December row / a June row (December stable panel),—,—,385 / 323 (101),425 / 406 (101),434 / 444 (101),408 / 422 (101),323 / 350 (101)
+P6,P6241030,Rett syndrome under control in primary care,2021–2025,Establishments with a December row / a June row (December stable panel),—,—,41 / 45 (4),31 / 33 (4),31 / 31 (4),36 / 35 (4),33 / 34 (4)
+P6,P6241040,Childhood disintegrative disorder under control in primary care,2021–2025,Establishments with a December row / a June row (December stable panel),—,—,28 / 26 (4),36 / 28 (4),39 / 27 (4),46 / 41 (4),41 / 37 (4)
+P6,P6241050,PDD unspecified under control in primary care,2021–2025,Establishments with a December row / a June row (December stable panel),—,—,410 / 374 (152),451 / 428 (152),463 / 459 (152),450 / 451 (152),473 / 439 (152)
+P6,P6241060,Autism under control in specialty care,2021–2025,Establishments with a December row / a June row (December stable panel),—,—,95 / 90 (68),113 / 102 (68),129 / 123 (68),144 / 139 (68),153 / 142 (68)
+P6,P6241070,Asperger syndrome under control in specialty care,2021–2025,Establishments with a December row / a June row (December stable panel),—,—,84 / 69 (44),89 / 81 (44),99 / 96 (44),97 / 104 (44),86 / 94 (44)
+P6,P6241080,Rett syndrome under control in specialty care,2021–2025,Establishments with a December row / a June row (December stable panel),—,—,5 / 6 (0),9 / 6 (0),4 / 3 (0),6 / 8 (0),6 / 3 (0)
+P6,P6241090,Childhood disintegrative disorder under control in specialty care,2021–2025,Establishments with a December row / a June row (December stable panel),—,—,9 / 3 (0),8 / 5 (0),11 / 7 (0),9 / 10 (0),13 / 7 (0)
+P6,P6241100,PDD unspecified under control in specialty care,2021–2025,Establishments with a December row / a June row (December stable panel),—,—,109 / 101 (63),106 / 103 (63),108 / 109 (63),115 / 118 (63),122 / 115 (63)

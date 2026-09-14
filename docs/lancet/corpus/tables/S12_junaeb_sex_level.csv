@@ -1,0 +1,53 @@
+Year,Level,Sex,Students with a response (n),Reported ASD (n),Unweighted % (Wilson 95% CI),Weighted % (95% CI),Estimator,Estimable
+2019,Grade 1 (1º básico),All,"217,506",—,—,—,—,not estimable
+2019,Grade 5 (5º básico),All,"208,846",—,—,—,—,not estimable
+2019,Grade 9 (1º medio),All,"206,665",—,—,—,—,not estimable
+2019,Pre-school (NT1–NT2),All,"364,967",—,—,—,—,not estimable
+2020,Grade 1 (1º básico),All,"179,201",—,—,—,—,not estimable
+2020,Grade 5 (5º básico),All,"192,349",—,—,—,—,not estimable
+2020,Grade 9 (1º medio),All,"185,734",—,—,—,—,not estimable
+2020,Pre-school (NT1–NT2),All,"337,917",—,—,—,—,not estimable
+2021,Grade 1 (1º básico),All,"190,518",—,—,—,—,not estimable
+2021,Grade 5 (5º básico),All,"196,691",—,—,—,—,not estimable
+2021,Grade 9 (1º medio),All,"195,505",—,—,—,—,not estimable
+2021,Pre-school (NT1–NT2),All,"320,233",—,—,—,—,not estimable
+2022,Grade 1 (1º básico),All,"191,649",—,—,—,—,not estimable
+2022,Grade 5 (5º básico),All,"195,457",—,—,—,—,not estimable
+2022,Grade 9 (1º medio),All,"199,027",—,—,—,—,not estimable
+2022,Pre-school (NT1–NT2),All,"313,688",—,—,—,—,not estimable
+2023,Grade 1 (1º básico),All,"159,887","6,660",4.17 (4.07 to 4.26),—,—,unweighted %
+2023,Grade 1 (1º básico),Females,"77,245","1,424",1.84 (1.75 to 1.94),—,—,unweighted %
+2023,Grade 1 (1º básico),Males,"82,642","5,236",6.34 (6.17 to 6.50),—,—,unweighted %
+2023,Grade 5 (5º básico),All,"166,218","4,822",2.90 (2.82 to 2.98),—,—,unweighted %
+2023,Grade 5 (5º básico),Females,"80,225","1,094",1.36 (1.29 to 1.45),—,—,unweighted %
+2023,Grade 5 (5º básico),Males,"85,993","3,728",4.34 (4.20 to 4.47),—,—,unweighted %
+2023,Grade 9 (1º medio),All,"178,466","4,618",2.59 (2.51 to 2.66),—,—,unweighted %
+2023,Grade 9 (1º medio),Females,"85,767","1,286",1.50 (1.42 to 1.58),—,—,unweighted %
+2023,Grade 9 (1º medio),Males,"92,699","3,332",3.59 (3.48 to 3.72),—,—,unweighted %
+2023,Pre-school (NT1–NT2),All,"261,098","11,388",4.36 (4.28 to 4.44),—,—,unweighted %
+2023,Pre-school (NT1–NT2),Females,"127,294","2,560",2.01 (1.94 to 2.09),—,—,unweighted %
+2023,Pre-school (NT1–NT2),Males,"133,804","8,828",6.60 (6.47 to 6.73),—,—,unweighted %
+2024,Grade 1 (1º básico),All,"154,166","10,245",6.65 (6.52 to 6.77),6.60 (6.48 to 6.73),EXP_REG,yes
+2024,Grade 1 (1º básico),Females,"74,075","2,289",3.09 (2.97 to 3.22),3.07 (2.95 to 3.20),EXP_REG,yes
+2024,Grade 1 (1º básico),Males,"80,090","7,956",9.93 (9.73 to 10.14),9.88 (9.67 to 10.09),EXP_REG,yes
+2024,Grade 5 (5º básico),All,"165,533","7,468",4.51 (4.41 to 4.61),4.49 (4.39 to 4.59),EXP_REG,yes
+2024,Grade 5 (5º básico),Females,"78,911","1,743",2.21 (2.11 to 2.31),2.21 (2.11 to 2.32),EXP_REG,yes
+2024,Grade 5 (5º básico),Males,"86,622","5,725",6.61 (6.45 to 6.78),6.58 (6.42 to 6.75),EXP_REG,yes
+2024,Grade 9 (1º medio),All,"184,963",—,—,—,EXP_REG,not estimable
+2024,Grade 9 (1º medio),Females,"88,149",—,—,—,EXP_REG,not estimable
+2024,Grade 9 (1º medio),Males,"96,812",—,—,—,EXP_REG,not estimable
+2024,Pre-school (NT1–NT2),All,"258,255","17,641",6.83 (6.73 to 6.93),6.74 (6.64 to 6.84),EXP_REG,yes
+2024,Pre-school (NT1–NT2),Females,"125,635","4,421",3.52 (3.42 to 3.62),3.48 (3.38 to 3.58),EXP_REG,yes
+2024,Pre-school (NT1–NT2),Males,"132,620","13,220",9.97 (9.81 to 10.13),9.81 (9.65 to 9.97),EXP_REG,yes
+2025,Grade 1 (1º básico),All,"148,970","12,536",8.42 (8.28 to 8.56),8.35 (8.20 to 8.49),EXP,yes
+2025,Grade 1 (1º básico),Females,"72,288","3,084",4.27 (4.12 to 4.42),4.22 (4.08 to 4.37),EXP,yes
+2025,Grade 1 (1º básico),Males,"76,682","9,452",12.33 (12.10 to 12.56),12.23 (12.00 to 12.47),EXP,yes
+2025,Grade 5 (5º básico),All,"171,925","9,887",5.75 (5.64 to 5.86),5.71 (5.60 to 5.82),EXP,yes
+2025,Grade 5 (5º básico),Females,"83,098","2,448",2.95 (2.83 to 3.06),2.93 (2.82 to 3.05),EXP,yes
+2025,Grade 5 (5º básico),Males,"88,827","7,439",8.37 (8.19 to 8.56),8.31 (8.12 to 8.49),EXP,yes
+2025,Grade 9 (1º medio),All,"183,573","9,164",4.99 (4.89 to 5.09),5.03 (4.93 to 5.14),EXP,yes
+2025,Grade 9 (1º medio),Females,"87,948","2,938",3.34 (3.22 to 3.46),3.36 (3.24 to 3.49),EXP,yes
+2025,Grade 9 (1º medio),Males,"95,624","6,225",6.51 (6.36 to 6.67),6.56 (6.40 to 6.72),EXP,yes
+2025,Pre-school (NT1–NT2),All,"239,332","18,785",7.85 (7.74 to 7.96),7.69 (7.58 to 7.80),EXP,yes
+2025,Pre-school (NT1–NT2),Females,"116,700","4,959",4.25 (4.14 to 4.37),4.17 (4.06 to 4.29),EXP,yes
+2025,Pre-school (NT1–NT2),Males,"122,632","13,826",11.27 (11.10 to 11.45),11.02 (10.84 to 11.19),EXP,yes

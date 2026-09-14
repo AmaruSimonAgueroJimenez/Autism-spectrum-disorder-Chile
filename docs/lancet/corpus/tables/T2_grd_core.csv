@@ -1,0 +1,46 @@
+﻿Block,Indicator,Unit,2019,2020,2021,2022,2023,2024
+Panel and episodes,Hospitals observed (n),hospitals,65,65,65,65,68,72
+Panel and episodes,Fixed-panel hospitals (n),hospitals,65,65,65,65,65,65
+Panel and episodes,"GRD episodes, observed panel, all activity (n)",episodes,"1,151,475","781,912","816,909","932,839","1,039,587","1,085,813"
+Panel and episodes,"GRD episodes, fixed panel of 65, all activity (n)",episodes,"1,151,475","781,912","816,909","932,839","1,025,029","1,048,706"
+Panel and episodes,"GRD episodes, strict hospitalisation (n)",episodes,"886,627","702,275","713,978","778,072","846,043","873,772"
+Panel and episodes,"GRD episodes, major ambulatory surgery (n)",episodes,"146,948","79,637","102,931","154,767","193,544","212,041"
+Panel and episodes,"GRD episodes, other activity (emergency, day hospital, unidentified) (n)",episodes,"117,900",category absent,category absent,category absent,category absent,category absent
+Episodes with documented F84,"F84 in any position, observed panel (n)",episodes,"2,334","1,609","2,367","3,859","6,423","8,731"
+Episodes with documented F84,"F84 in any position, observed panel, per 100,000 episodes (95% CI)","per 100,000 GRD episodes",202.7 (194.6–211.1),205.8 (195.8–216.1),289.8 (278.2–301.7),413.7 (400.7–426.9),617.8 (602.8–633.1),804.1 (787.3–821.1)
+Episodes with documented F84,"F84 in any position, fixed panel of 65 (n)",episodes,"2,334","1,609","2,367","3,859","6,371","8,480"
+Episodes with documented F84,"F84 in any position, fixed panel of 65, per 100,000 episodes (95% CI)","per 100,000 GRD episodes",202.7 (194.6–211.1),205.8 (195.8–216.1),289.8 (278.2–301.7),413.7 (400.7–426.9),621.5 (606.4–637.0),808.6 (791.5–826.0)
+Episodes with documented F84,"F84 principal, observed panel (n)",episodes,228,157,186,295,361,390
+Episodes with documented F84,"F84 principal, observed panel, per 100,000 episodes (95% CI)","per 100,000 GRD episodes",19.8 (17.3–22.5),20.1 (17.1–23.5),22.8 (19.6–26.3),31.6 (28.1–35.4),34.7 (31.2–38.5),35.9 (32.4–39.7)
+Episodes with documented F84,"F84 principal, fixed panel of 65 (n)",episodes,228,157,186,295,358,381
+Episodes with documented F84,"F84 principal, fixed panel of 65, per 100,000 episodes (95% CI)","per 100,000 GRD episodes",19.8 (17.3–22.5),20.1 (17.1–23.5),22.8 (19.6–26.3),31.6 (28.1–35.4),34.9 (31.4–38.7),36.3 (32.8–40.2)
+Episodes with documented F84,"F84 as secondary diagnosis only, n (% of episodes with F84)",n (%),"2,106 (90.2%)","1,452 (90.2%)","2,181 (92.1%)","3,564 (92.4%)","6,062 (94.4%)","8,341 (95.5%)"
+Episodes with documented F84,F84 both principal and secondary (n),episodes,6,6,3,8,7,15
+Activity type (observed panel),Strict hospitalisation: F84 any position (n),episodes,"1,911","1,526","2,187","3,509","5,792","7,619"
+Activity type (observed panel),"Strict hospitalisation: F84 any position, per 100,000 episodes (95% CI)","per 100,000 GRD episodes",215.5 (206.0–225.4),217.3 (206.5–228.5),306.3 (293.6–319.4),451.0 (436.2–466.2),684.6 (667.1–702.5),872.0 (852.5–891.8)
+Activity type (observed panel),"Strict hospitalisation, fixed panel of 65: F84 any position (n)",episodes,"1,911","1,526","2,187","3,509","5,747","7,424"
+Activity type (observed panel),"Strict hospitalisation, fixed panel of 65: F84 any position, per 100,000 episodes (95% CI)","per 100,000 GRD episodes",215.5 (206.0–225.4),217.3 (206.5–228.5),306.3 (293.6–319.4),451.0 (436.2–466.2),687.3 (669.6–705.3),876.5 (856.7–896.7)
+Activity type (observed panel),Strict hospitalisation: F84 principal (n),episodes,203,155,186,295,361,390
+Activity type (observed panel),"Strict hospitalisation: F84 principal, per 100,000 episodes (95% CI)","per 100,000 GRD episodes",22.9 (19.9–26.3),22.1 (18.7–25.8),26.1 (22.4–30.1),37.9 (33.7–42.5),42.7 (38.4–47.3),44.6 (40.3–49.3)
+Activity type (observed panel),Major ambulatory surgery: F84 any position (n),episodes,168,83,180,350,631,"1,112"
+Activity type (observed panel),"Major ambulatory surgery: F84 any position, per 100,000 episodes (95% CI)","per 100,000 GRD episodes",114.3 (97.7–133.0),104.2 (83.0–129.2),174.9 (150.3–202.4),226.1 (203.1–251.1),326.0 (301.1–352.5),524.4 (494.1–556.2)
+Activity type (observed panel),Other activity: F84 any position (n),episodes,255,category absent,category absent,category absent,category absent,category absent
+Coding depth,"Coded diagnoses per episode, all episodes: mean (median)",diagnoses per episode,4.39 (4),5.21 (4),5.56 (4),5.38 (4),5.51 (4),5.78 (5)
+Coding depth,"Coded diagnoses per episode, episodes with F84 any position: mean (median)",diagnoses per episode,4.97 (4),5.73 (5),5.57 (5),5.39 (4),5.71 (5),6.00 (5)
+Unique persons (within each year only),"Persons with F84 any position (n, within year)",persons,"1,944","1,319","1,954","3,231","5,232","7,169"
+Unique persons (within each year only),F84 episodes per person (ratio),ratio,1.20,1.22,1.21,1.19,1.23,1.22
+Unique persons (within each year only),"Persons with F84 principal (n, within year)",persons,171,126,146,233,253,313
+Unique persons (within each year only),F84 episodes without a valid identifier (n),episodes,4,0,0,3,2,1
+Unique persons (within each year only),Identifier column,text,CIP_ENCRIPTADO,CIP_ENCRIPTADO,CIP_ENCRIPTADO,CIP_ENCRIPTADO,CIP_ENCRIPTADO,ID_BENEFICIARIO
+"Per 100,000 population (INE base 2017, residence)","Crude rate, both sexes, F84 any position (95% CI)","per 100,000 population",12.22 (11.72–12.72),8.27 (7.87–8.68),12.03 (11.55–12.52),19.46 (18.85–20.09),32.18 (31.40–32.97),43.47 (42.56–44.39)
+"Per 100,000 population (INE base 2017, residence)","WHO age-standardised rate, both sexes, F84 any position (95% CI)","per 100,000 population",15.83 (15.19–16.49),10.82 (10.29–11.36),15.85 (15.21–16.51),26.21 (25.39–27.06),43.80 (42.73–44.89),59.34 (58.09–60.60)
+"Per 100,000 population (INE base 2017, residence)","Crude rate, males, F84 any position (95% CI)","per 100,000 population",18.95 (18.08–19.85),12.56 (11.86–13.29),18.60 (17.75–19.48),29.50 (28.43–30.60),45.66 (44.34–47.02),59.02 (57.52–60.55)
+"Per 100,000 population (INE base 2017, residence)","Crude rate, females, F84 any position (95% CI)","per 100,000 population",5.65 (5.19–6.14),4.09 (3.70–4.51),5.62 (5.16–6.10),9.68 (9.08–10.30),19.03 (18.19–19.90),28.28 (27.26–29.34)
+"Per 100,000 population (INE base 2017, residence)","Crude rate, both sexes, F84 principal (95% CI)","per 100,000 population",1.19 (1.04–1.36),0.81 (0.69–0.94),0.95 (0.81–1.09),1.49 (1.32–1.67),1.81 (1.63–2.01),1.94 (1.75–2.14)
+"Per 100,000 population (INE base 2017, residence)","WHO age-standardised rate, both sexes, F84 principal (95% CI)","per 100,000 population",1.50 (1.31–1.71),1.03 (0.88–1.21),1.20 (1.03–1.39),1.92 (1.71–2.16),2.38 (2.14–2.64),2.55 (2.30–2.82)
+Definition sensitivity,"Alternative variant, Full F84 family (including Rett syndrome): F84 any position, observed panel (n)",episodes,"2,385","1,633","2,399","3,912","6,473","8,818"
+Definition sensitivity,"Alternative variant, Full F84 family (including Rett syndrome): per 100,000 episodes (95% CI)","per 100,000 GRD episodes",207.1 (198.9–215.6),208.8 (198.8–219.2),293.7 (282.0–305.7),419.4 (406.3–432.7),622.7 (607.6–638.0),812.1 (795.2–829.2)
+Definition sensitivity,"F84.0 childhood autism only (identical in both variants): any position, observed panel (n)",episodes,"1,400","1,084","1,848","3,061","5,325","7,230"
+Definition sensitivity,"F84.0 only: per 100,000 episodes (95% CI)","per 100,000 GRD episodes",121.6 (115.3–128.1),138.6 (130.5–147.1),226.2 (216.0–236.8),328.1 (316.6–340.0),512.2 (498.6–526.2),665.9 (650.6–681.4)
+Definition sensitivity,"F84.2 Rett syndrome in any position, with or without another F84 code (n)",episodes,55,27,36,57,58,94
+Definition sensitivity,Difference between variants: episodes whose only F84 code is F84.2 (n),episodes,51,24,32,53,50,87

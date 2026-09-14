@@ -1,0 +1,700 @@
+{
+  "schema_version": 1,
+  "catalog_date": "2026-09-04",
+  "project_subdirectory": "Autism",
+  "profiles": {
+    "hospital": ["hospital"],
+    "context": ["coverage", "population", "surveys", "education", "territory"],
+    "core": ["hospital", "coverage", "population", "surveys", "education", "territory"],
+    "all": ["hospital", "coverage", "population", "surveys", "education", "territory", "restricted"]
+  },
+  "sources": [
+    {
+      "id": "deis_egresos",
+      "label": "Egresos hospitalarios DEIS",
+      "provider": "DEIS, Ministerio de Salud",
+      "groups": ["hospital"],
+      "access": "automatic",
+      "kind": "annual",
+      "large": true,
+      "storage": "shared",
+      "destination": "DEIS/Egresos/sources/official_zips",
+      "year_start": 2001,
+      "year_end": 2024,
+      "url_template": "https://repositoriodeis.minsal.cl/DatosAbiertos/Egresos/Egresos_{year}.zip",
+      "filename_template": "Egresos_{year}.zip",
+      "skip_if_template": "DEIS/Egresos/{year}.csv",
+      "landing_url": "https://deis.minsal.cl/#datosabiertos",
+      "license": "Datos abiertos; confirmar términos de reutilización vigentes del DEIS",
+      "coverage": "2001-2024",
+      "purpose": "Comprobación externa de los episodios hospitalarios y de DIAG1/DIAG2",
+      "notes": "Los canónicos ya existentes se reutilizan. Use --retain-sources para conservar también los ZIP oficiales. No equivale a GRD y no permite enlace longitudinal."
+    },
+    {
+      "id": "deis_rem",
+      "label": "Registro Estadístico Mensual (REM), todas las series anuales",
+      "provider": "DEIS, Ministerio de Salud",
+      "groups": ["hospital"],
+      "access": "automatic",
+      "kind": "annual",
+      "large": true,
+      "storage": "shared",
+      "destination": "REM/SerieA/sources/official_zips",
+      "year_start": 2009,
+      "year_end": 2026,
+      "url_template": "https://repositoriodeis.minsal.cl/DatosAbiertos/REM/SERIE_REM_{year}.zip",
+      "filename_template": "SERIE_REM_{year}.zip",
+      "skip_if_template": "REM/SerieA/SerieA_{year}.csv",
+      "landing_url": "https://deis.minsal.cl/#datosabiertos",
+      "license": "Datos abiertos; confirmar términos de reutilización vigentes del DEIS",
+      "coverage": "2009-2026; 2026 es año abierto",
+      "purpose": "A03, A05, A27, A28, P2 y P6 para cobertura, tamizaje, referencia, ingresos y población bajo control",
+      "notes": "Un ZIP anual contiene los módulos REM; no se crean seis copias. Los canónicos existentes se reutilizan y los años abiertos no entran automáticamente al análisis."
+    },
+    {
+      "id": "grd_publico",
+      "label": "GRD público hospitalario",
+      "provider": "FONASA",
+      "groups": ["hospital"],
+      "access": "automatic",
+      "kind": "direct",
+      "large": true,
+      "storage": "shared",
+      "destination": "GRD/sources/official_downloads",
+      "resources": [
+        {"year": 2019, "url": "https://www.fonasa.cl/assets/datos-abiertos/Financiamiento_y_Gasto_en_Salud/GRD_PUBLICO_2019%20.zip", "filename": "GRD_PUBLICO_2019.zip", "skip_if": "GRD/GRD_PUBLICO_2019.csv"},
+        {"year": 2020, "url": "https://www.fonasa.cl/assets/datos-abiertos/Financiamiento_y_Gasto_en_Salud/GRD_PUBLICO_2020.rar", "filename": "GRD_PUBLICO_2020.rar", "skip_if": "GRD/GRD_PUBLICO_2020.csv"},
+        {"year": 2021, "url": "https://www.fonasa.cl/assets/datos-abiertos/Financiamiento_y_Gasto_en_Salud/GRD_PUBLICO_2021.zip", "filename": "GRD_PUBLICO_2021.zip", "skip_if": "GRD/GRD_PUBLICO_2021.csv"},
+        {"year": 2022, "url": "https://www.fonasa.cl/assets/datos-abiertos/Financiamiento_y_Gasto_en_Salud/GRD_PUBLICO_2022.zip", "filename": "GRD_PUBLICO_2022.zip", "skip_if": "GRD/GRD_PUBLICO_2022.csv"},
+        {"year": 2023, "url": "https://www.fonasa.cl/assets/datos-abiertos/Financiamiento_y_Gasto_en_Salud/GRD_PUBLICO_2023.zip", "filename": "GRD_PUBLICO_2023.zip", "skip_if": "GRD/GRD_PUBLICO_2023.csv"},
+        {"year": 2024, "url": "https://www.fonasa.cl/assets/datos-abiertos/Financiamiento_y_Gasto_en_Salud/GRD_PUBLICO_2024.zip", "filename": "GRD_PUBLICO_2024.zip", "skip_if": "GRD/GRD_PUBLICO_2024.csv"}
+      ],
+      "landing_url": "https://public.tableau.com/views/PropuestaTableroGRD/PropuestaTableroGRD?:showVizHome=no",
+      "license": "Datos abiertos FONASA; toda difusión debe citar datosabiertos.fonasa.cl",
+      "coverage": "2019-2024",
+      "purpose": "Núcleo hospitalario del estudio",
+      "notes": "Enlaces oficiales del Catálogo de Datos del tablero GRD, verificados el 2026-09-04. Los archivos observados cubren 65 hospitales en 2019-2022, 68 en 2023 y 72 en 2024; incluyen hospitalización y cirugía mayor ambulatoria y son fotografías corregibles. Usar un panel fijo de 65 como sensibilidad. Los canónicos existentes se reutilizan; --retain-sources --include-large conserva también los contenedores oficiales sin sobrescribirlos."
+    },
+    {
+      "id": "grd_dictionaries",
+      "label": "Tablas auxiliares y diccionarios GRD",
+      "provider": "FONASA",
+      "groups": ["hospital"],
+      "access": "automatic",
+      "kind": "direct",
+      "large": false,
+      "storage": "shared",
+      "destination": "GRD/metadata/official",
+      "resources": [
+        {"url": "https://www.fonasa.cl/assets/datos-abiertos/Financiamiento_y_Gasto_en_Salud/CIE-10.xlsx", "filename": "CIE-10.xlsx"},
+        {"url": "https://www.fonasa.cl/assets/datos-abiertos/Financiamiento_y_Gasto_en_Salud/CIE-9%20.xlsx", "filename": "CIE-9_MC.xlsx"},
+        {"url": "https://www.fonasa.cl/assets/datos-abiertos/Financiamiento_y_Gasto_en_Salud/Tablas%20maestras%20bases%20GRD%20.xlsx", "filename": "tablas_maestras_bases_GRD.xlsx"}
+      ],
+      "landing_url": "https://public.tableau.com/views/PropuestaTableroGRD/PropuestaTableroGRD?:showVizHome=no",
+      "license": "Datos abiertos FONASA; toda difusión debe citar datosabiertos.fonasa.cl",
+      "coverage": "Versiones publicadas junto a GRD 2019-2024",
+      "purpose": "Interpretación de diagnósticos, procedimientos y categorías maestras",
+      "notes": "Se conservan como metadatos, separados de los microdatos GRD."
+    },
+    {
+      "id": "deis_establishments",
+      "label": "Catálogo publicado de establecimientos de salud",
+      "provider": "DEIS, Ministerio de Salud",
+      "groups": ["hospital"],
+      "access": "automatic",
+      "kind": "ckan",
+      "mutable": true,
+      "large": false,
+      "storage": "project",
+      "destination": "DEIS/Establecimientos",
+      "ckan_id": "establecimientos-de-salud-vigentes",
+      "resource_selectors": [
+        {"name_regex": "^EstablecimientosSalud\\.csv$", "filename": "establecimientos_salud_vigentes.csv"},
+        {"name_regex": "^Diccionario de datos$", "filename": "diccionario_establecimientos.pdf"}
+      ],
+      "landing_url": "https://datos.gob.cl/dataset/establecimientos-de-salud-vigentes",
+      "license": "Creative Commons CCZero",
+      "coverage": "Catálogo vigente; versión fechada por el portal",
+      "purpose": "Enlace de establecimientos, estado actual, tipo y geografía de la oferta",
+      "notes": "La descarga disponible es un catastro vigente mutable, no una serie de catastros anuales. Incluye establecimientos cerrados y fechas incompletas: el panel histórico debe construirse desde el reporte observado en REM/GRD. La comuna es la del establecimiento, no la residencia de pacientes."
+    },
+    {
+      "id": "deis_rem20",
+      "label": "Indicadores del proceso de hospitalización REM-20",
+      "provider": "DEIS, Ministerio de Salud",
+      "groups": ["hospital"],
+      "access": "automatic",
+      "kind": "ckan",
+      "mutable": true,
+      "large": false,
+      "storage": "project",
+      "destination": "DEIS/REM20",
+      "ckan_id": "indicadores-hospitalarios-rem20",
+      "resource_selectors": [
+        {"name_regex": "^Indicadores_REM20\\.csv$", "filename": "indicadores_rem20.csv"},
+        {"name_regex": "^Diccionario de Datos.*REM20$", "filename": "diccionario_rem20.xlsx"}
+      ],
+      "landing_url": "https://datos.gob.cl/dataset/indicadores-hospitalarios-rem20",
+      "license": "Creative Commons CCZero",
+      "coverage": "Actualización continua por establecimiento y período",
+      "purpose": "Actividad hospitalaria, capacidad y panel continuo de reporte",
+      "notes": "Unidad establecimiento × área funcional × mes, sin diagnósticos ni personas. Úsese como covariable de capacidad o denominador de episodios, no como población cubierta; verificar compatibilidad con GRD."
+    },
+    {
+      "id": "fonasa_aggregates",
+      "label": "Beneficiarios FONASA agregados de diciembre",
+      "provider": "Fondo Nacional de Salud",
+      "groups": ["coverage"],
+      "access": "automatic",
+      "kind": "annual",
+      "large": false,
+      "storage": "shared",
+      "destination": "FONASA",
+      "year_start": 2018,
+      "year_end": 2025,
+      "url_template": "https://www.fonasa.cl/assets/datos-abiertos/Beneficiarios/Resultados%20Beneficiarios%20{year}12.{ext}",
+      "filename_template": "Resultados_{year}12.{ext}",
+      "extension_by_year": {
+        "2018": "rar",
+        "2019": "rar",
+        "2020": "rar",
+        "2021": "rar",
+        "2022": "zip",
+        "2023": "zip",
+        "2024": "zip",
+        "2025": "zip"
+      },
+      "landing_url": "https://datosabiertos.fonasa.cl/dimensiones-beneficiarios/",
+      "dashboard_url": "https://public.tableau.com/views/Beneficiarios_16704273822880/Reporte?:showVizHome=no",
+      "license": "Datos abiertos FONASA; confirmar términos del portal",
+      "coverage": "Fotografía de diciembre, 2018-2025",
+      "purpose": "Denominadores alineados con la cobertura pública por comuna, edad y sexo",
+      "notes": "Se usa la tabla agregada, no la base individual. La geografía puede corresponder a inscripción APS y debe verificarse."
+    },
+    {
+      "id": "fonasa_dictionary",
+      "label": "Diccionario de beneficiarios FONASA",
+      "provider": "Fondo Nacional de Salud",
+      "groups": ["coverage"],
+      "access": "automatic",
+      "kind": "direct",
+      "large": false,
+      "storage": "shared",
+      "destination": "FONASA",
+      "resources": [
+        {
+          "url": "https://www.fonasa.cl/assets/datos-abiertos/Beneficiarios/Diccionario%20beneficiarios.xlsx",
+          "filename": "Diccionario_beneficiarios.xlsx"
+        }
+      ],
+      "landing_url": "https://datosabiertos.fonasa.cl/dimensiones-beneficiarios/",
+      "license": "Datos abiertos FONASA; confirmar términos del portal",
+      "coverage": "Diccionario vigente",
+      "purpose": "Interpretación de variables y categorías",
+      "notes": "El archivo se conserva junto a las publicaciones anuales."
+    },
+    {
+      "id": "fonasa_aps_enrollment",
+      "label": "Personas inscritas en centros de atención primaria FONASA",
+      "provider": "FONASA",
+      "groups": ["coverage"],
+      "access": "automatic",
+      "kind": "annual",
+      "large": false,
+      "storage": "shared",
+      "destination": "FONASA/APS",
+      "year_start": 2019,
+      "year_end": 2025,
+      "url_template": "https://www.fonasa.cl/assets/datos-abiertos/Beneficiarios/Inscritos%20APS%20{year}%2012.csv",
+      "filename_template": "Inscritos_APS_{year}12.csv",
+      "landing_url": "https://public.tableau.com/views/ReporteInscritosCentrosAPS/ReporteAPS?:showVizHome=no",
+      "license": "Datos abiertos FONASA; confirmar términos del portal",
+      "coverage": "Fotografía de diciembre, 2019-2025",
+      "purpose": "Denominador de población inscrita y cobertura de APS para interpretar REM",
+      "notes": "Los enlaces provienen del Catálogo de Datos del tablero. Es inscripción en un centro APS, no residencia; verificar unidad, duplicados y vigencia antes de usar como offset."
+    },
+    {
+      "id": "fonasa_microdata",
+      "label": "Base innominada anual de beneficiarios FONASA",
+      "provider": "Fondo Nacional de Salud",
+      "groups": ["coverage"],
+      "access": "automatic",
+      "kind": "annual",
+      "large": true,
+      "storage": "shared",
+      "destination": "FONASA/microdata/sources",
+      "year_start": 2018,
+      "year_end": 2025,
+      "url_template": "https://www.fonasa.cl/assets/datos-abiertos/Beneficiarios/Base%20Beneficiarios%20{year}.zip",
+      "filename_template": "Base_Beneficiarios_{year}.zip",
+      "landing_url": "https://datosabiertos.fonasa.cl/dimensiones-beneficiarios/",
+      "license": "Datos abiertos FONASA; confirmar términos del portal",
+      "coverage": "2018-2025",
+      "purpose": "Sensibilidades que requieran edad simple o una estratificación ausente en los agregados",
+      "notes": "Los ZIP oficiales 2018-2025 suman 1.821.032.983 bytes (aproximadamente 1,82 GB comprimidos), verificados el 2026-09-04. La colección se descarga con --include-large y no debe versionarse. Preferir los agregados si responden la pregunta."
+    },
+    {
+      "id": "isapre_communal",
+      "label": "Beneficiarios ISAPRE por comuna, edad y sexo",
+      "provider": "Superintendencia de Salud",
+      "groups": ["coverage"],
+      "access": "automatic",
+      "kind": "direct",
+      "large": false,
+      "storage": "project",
+      "destination": "Cobertura/ISAPRE",
+      "resources": [
+        {"year": 2019, "url": "https://www.superdesalud.gob.cl/app/uploads/2020/05/articles-19431_recurso_1.xls", "filename": "isapre_beneficiarios_comuna_2019.xls"},
+        {"year": 2020, "url": "https://www.superdesalud.gob.cl/app/uploads/2021/05/articles-20029_recurso_1.xls", "filename": "isapre_beneficiarios_comuna_2020.xls"},
+        {"year": 2021, "url": "https://www.superdesalud.gob.cl/app/uploads/2022/04/articles-20939_recurso_1.xlsx", "filename": "isapre_beneficiarios_comuna_2021.xlsx"},
+        {"year": 2022, "url": "https://www.superdesalud.gob.cl/app/uploads/2023/01/articles-22450_recurso_1.xlsx", "filename": "isapre_beneficiarios_comuna_2022.xlsx"},
+        {"year": 2023, "url": "https://www.superdesalud.gob.cl/app/uploads/2024/03/articles-26610_recurso_1.xlsx", "filename": "isapre_beneficiarios_comuna_2023.xlsx"},
+        {"year": 2024, "url": "https://www.superdesalud.gob.cl/app/uploads/2025/01/estadistica-anual-de-cartera-de-beneficiarios-comunal-2024.xlsx", "filename": "isapre_beneficiarios_comuna_2024.xlsx"},
+        {"year": 2025, "url": "https://www.superdesalud.gob.cl/app/uploads/2026/01/estadistica-anual-de-cartera-de-beneficiarios-comunal-2025.xlsx", "filename": "isapre_beneficiarios_comuna_2025.xlsx"}
+      ],
+      "landing_url": "https://www.superdesalud.gob.cl/tax-biblioteca-digital/estadisticas-3724/estadisticas-por-tema-3741/cartera-de-beneficiarios-3742/",
+      "license": "Estadística oficial; revisar condiciones de reutilización",
+      "coverage": "Diciembre, 2019-2025",
+      "purpose": "Cuantificar cobertura privada y sensibilidad de denominadores",
+      "notes": "Población total menos ISAPRE no equivale exactamente a población usuaria de GRD/REM."
+    },
+    {
+      "id": "ine_population",
+      "label": "Estimaciones y proyecciones INE base Censo 2017",
+      "provider": "Instituto Nacional de Estadísticas",
+      "groups": ["population"],
+      "access": "automatic",
+      "kind": "direct",
+      "large": false,
+      "storage": "project",
+      "destination": "Poblacion/INE",
+      "resources": [
+        {
+          "url": "https://www.ine.gob.cl/docs/default-source/proyecciones-de-poblacion/cuadros-estadisticos/base-2017/ine_estimaciones-y-proyecciones-2002-2035_base-2017_comunas0381d25bc2224f51b9770a705a434b74.csv?sfvrsn=b6e930a7_3&download=true",
+          "filename": "proyecciones_comuna_edad_sexo_2002_2035_base_2017.csv"
+        },
+        {
+          "url": "https://www.ine.gob.cl/docs/default-source/proyecciones-de-poblacion/cuadros-estadisticos/base-2017/estimaciones-y-proyecciones-2002-2035-comuna-y-área-urbana-y-rural.csv?sfvrsn=62ba4af3_4&download=true",
+          "filename": "proyecciones_comuna_area_urbana_rural_2002_2035_base_2017.csv"
+        }
+      ],
+      "landing_url": "https://www.ine.gob.cl/estadisticas-por-tema/demografia-y-poblacion/estimaciones-y-proyecciones-de-poblacion",
+      "license": "Fuente oficial INE; revisar términos de uso",
+      "coverage": "2002-2035, comuna, edad, sexo y área",
+      "purpose": "Denominadores poblacionales, ruralidad y análisis de sensibilidad",
+      "notes": "No mezclar silenciosamente con cifras del Censo 2024; registrar la base censal."
+    },
+    {
+      "id": "ine_censo2024_population",
+      "label": "Censo 2024: población por comuna, sexo y edad quinquenal",
+      "provider": "Instituto Nacional de Estadísticas",
+      "groups": ["population"],
+      "access": "automatic",
+      "kind": "direct",
+      "large": false,
+      "storage": "project",
+      "destination": "Poblacion/INE/Censo_2024",
+      "resources": [
+        {
+          "url": "https://censo2024.ine.gob.cl/wp-content/uploads/2025/03/D1_Poblacion-censada-por-sexo-y-edad-en-grupos-quinquenales.xlsx",
+          "filename": "D1_poblacion_comuna_sexo_edad_quinquenal.xlsx",
+          "size": 505437
+        }
+      ],
+      "landing_url": "https://censo2024.ine.gob.cl/estadisticas/",
+      "license": "Fuente oficial INE; revisar términos de uso",
+      "coverage": "Censo 2024, comuna, sexo y edad quinquenal",
+      "purpose": "Denominador censal observado y sensibilidad territorial",
+      "notes": "No sustituye retrospectivamente las proyecciones base Censo 2017; usar como puente/sensibilidad y documentar el cambio de base."
+    },
+    {
+      "id": "ine_population_base2024_national",
+      "label": "Estimaciones y proyecciones nacionales INE base Censo 2024",
+      "provider": "Instituto Nacional de Estadísticas",
+      "groups": ["population"],
+      "access": "automatic",
+      "kind": "direct",
+      "large": false,
+      "storage": "project",
+      "destination": "Poblacion/INE/Base_2024",
+      "resources": [
+        {
+          "url": "https://www.ine.gob.cl/docs/default-source/proyecciones-de-poblacion/cuadros-estadisticos/proyecci%C3%B3n-base-2024/estimaciones-y-proyecciones-de-poblaci%C3%B3n-1992-2070_base-2024_base-de-datos.xlsx?sfvrsn=8e7df320_6",
+          "filename": "estimaciones_proyecciones_nacionales_1992_2070_base_2024.xlsx",
+          "size": 918408
+        }
+      ],
+      "landing_url": "https://www.ine.gob.cl/estadisticas-por-tema/demografia-y-poblacion/estimaciones-y-proyecciones-de-poblacion",
+      "license": "Fuente oficial INE; revisar términos de uso",
+      "coverage": "1992-2070, nivel nacional, base Censo 2024",
+      "purpose": "Sensibilidad nacional y puente entre bases censales",
+      "notes": "No tiene desagregación comunal equivalente a la serie base 2017. Nunca mezclar ambas bases en una sola tendencia sin indicarlo."
+    },
+    {
+      "id": "censo2024_disability",
+      "label": "Censo 2024, tabulados de discapacidad",
+      "provider": "Instituto Nacional de Estadísticas",
+      "groups": ["population", "surveys"],
+      "access": "automatic",
+      "kind": "direct",
+      "large": false,
+      "storage": "project",
+      "destination": "Poblacion/INE/Censo_2024",
+      "resources": [
+        {
+          "url": "https://censo2024.ine.gob.cl/wp-content/uploads/2025/06/P1-Discapacidad.xlsx",
+          "filename": "P1_Discapacidad.xlsx"
+        }
+      ],
+      "landing_url": "https://censo2024.ine.gob.cl/estadisticas/",
+      "license": "Fuente oficial INE; revisar términos de uso",
+      "coverage": "Censo 2024",
+      "purpose": "Contexto poblacional y comprobación de órdenes de magnitud",
+      "notes": "No es una estimación específica de autismo ni sustituye ENDIDE/ENCAVI."
+    },
+    {
+      "id": "endide_2022",
+      "label": "Encuesta Nacional de Discapacidad y Dependencia 2022",
+      "provider": "Ministerio de Desarrollo Social y Familia",
+      "groups": ["surveys"],
+      "access": "automatic",
+      "kind": "direct",
+      "large": false,
+      "storage": "project",
+      "destination": "Encuestas/ENDIDE_2022",
+      "resources": [
+        {
+          "url": "https://observatorio.ministeriodesarrollosocial.gob.cl/storage/docs/endide/230630_Base_de_datos_ENDIDE_2022_adultos_cuidadores_y_NNA.dta.dta.zip",
+          "filename": "endide_2022_adultos_cuidadores_nna.dta.zip"
+        },
+        {
+          "url": "https://observatorio.ministeriodesarrollosocial.gob.cl/storage/docs/endide/230630_Libro_de_codigos_Base_de_datos_ENDIDE%202022_adultos_cuidadores_y_NNA.pdf",
+          "filename": "libro_codigos_endide_2022.pdf"
+        },
+        {
+          "url": "https://observatorio.ministeriodesarrollosocial.gob.cl/storage/docs/endide/Documento_Metodologico_ENDIDE_Diseno_Muestral_y_Medicion_Discapacidad.pdf",
+          "filename": "metodologia_diseno_muestral_endide_2022.pdf"
+        }
+      ],
+      "landing_url": "https://observatorio.ministeriodesarrollosocial.gob.cl/endide-2022",
+      "license": "Base pública; revisar condiciones del Observatorio Social",
+      "coverage": "Nacional y regional, 2022; personas adultas, cuidadores y NNA",
+      "purpose": "Benchmark poblacional de autismo/discapacidad, funcionamiento, atención y apoyos",
+      "notes": "Analizar con estratos, conglomerados y ponderadores; no sobre-desagregar NNA territorialmente."
+    },
+    {
+      "id": "encavi_2023_2024",
+      "label": "Encuesta Nacional de Calidad de Vida y Salud 2023-2024",
+      "provider": "Ministerio de Salud",
+      "groups": ["surveys"],
+      "access": "automatic",
+      "kind": "ckan",
+      "large": false,
+      "storage": "project",
+      "destination": "Encuestas/ENCAVI_2023_2024",
+      "ckan_id": "encavi-2023-24",
+      "resource_selectors": [
+        {"name_regex": "^20250808_ENCAVI_data\\.dta$", "filename": "ENCAVI_2023_2024.dta"},
+        {"name_regex": "^Cuestionario_ENCAVI_2023_2024\\.pdf$", "filename": "cuestionario_ENCAVI_2023_2024.pdf"},
+        {"name_regex": "^Manual_de_base_de_datos_ENCAVI_2023_2024\\.pdf$", "filename": "manual_base_ENCAVI_2023_2024.pdf"}
+      ],
+      "landing_url": "https://datos.gob.cl/dataset/encavi-2023-24",
+      "license": "Creative Commons Attribution",
+      "coverage": "16.590 personas de 15 años o más, 2023-2024",
+      "purpose": "Benchmark adulto de diagnóstico informado por sexo, edad e ingreso",
+      "notes": "Usar ponderadores y diseño complejo; no es clínicamente equivalente a F84 administrativo."
+    },
+    {
+      "id": "mineduc_pie_reports",
+      "label": "Informes oficiales PIE/TEA y SINACES",
+      "provider": "Ministerio de Educación",
+      "groups": ["education"],
+      "access": "automatic",
+      "kind": "direct",
+      "large": false,
+      "storage": "project",
+      "destination": "Educacion/MINEDUC",
+      "resources": [
+        {
+          "url": "https://bibliotecadigital.mineduc.cl/bitstream/handle/20.500.12365/21105/APUNTES%2060_2024_fd01.pdf?sequence=1&isAllowed=y",
+          "filename": "APUNTES_60_2024_tendencia_PIE_2019_2023.pdf"
+        },
+        {
+          "url": "https://bibliotecadigital.mineduc.cl/bitstream/handle/20.500.12365/21104/APUNTES%2059_2024_fd01.pdf?sequence=1",
+          "filename": "APUNTES_59_2024_PIE_sexo_2023.pdf"
+        },
+        {
+          "url": "https://educacionsuperior.mineduc.cl/wp-content/uploads/sites/49/2026/03/Reporte_LEY21545_SINACES.pdf",
+          "filename": "Reporte_Ley_21545_SINACES_2022_2025.pdf"
+        }
+      ],
+      "landing_url": "https://bibliotecadigital.mineduc.cl/",
+      "license": "Publicaciones oficiales; citar según metadatos del documento",
+      "coverage": "PIE 2019-2025 y contexto SINACES/educación superior 2022-2025",
+      "purpose": "Triangulación escolar y contexto de implementación de la Ley 21.545",
+      "notes": "Son agregados publicados, no microdatos. El informe SINACES de educación superior reproduce una serie contextual PIE de educación general. Apuntes 60 reporta TEA estricto; la prolongación armonizada exige sumar explícitamente TEA + TEA-Asperger."
+    },
+    {
+      "id": "junaeb_eve_metadata",
+      "label": "Encuesta de Vulnerabilidad JUNAEB: cuestionarios y diccionarios",
+      "provider": "Junta Nacional de Auxilio Escolar y Becas",
+      "groups": ["education"],
+      "access": "automatic",
+      "kind": "gcs",
+      "large": false,
+      "storage": "project",
+      "destination": "Educacion/JUNAEB/EVE/metadata",
+      "bucket": "biblioteca-datos",
+      "include_regex": "^Encuesta de Vulnerabilidad/(Cuestionarios|Diccionarios)/(2019|2020|2021|2022|2023|2024|2025)/.+\\.(pdf|xlsx)$",
+      "strip_prefix": "Encuesta de Vulnerabilidad/",
+      "landing_url": "https://bibliotecadatos.sead.junaeb.cl/",
+      "license": "Datos públicos desidentificados; revisar condiciones de JUNAEB",
+      "coverage": "Instrumentos 2019-2025",
+      "purpose": "Verificar variable de autismo, redacción y quiebres de definición antes de usar microdatos",
+      "notes": "El portal es una aplicación JavaScript; los archivos se resuelven desde su bucket público oficial. Hay cuestionarios para 2019-2025, pero diccionarios solo para 2019, 2021, 2024 y 2025."
+    },
+    {
+      "id": "junaeb_eve_microdata",
+      "label": "Encuesta de Vulnerabilidad JUNAEB: microdatos CSV desidentificados",
+      "provider": "Junta Nacional de Auxilio Escolar y Becas",
+      "groups": ["education"],
+      "access": "automatic",
+      "kind": "gcs",
+      "large": true,
+      "storage": "project",
+      "destination": "Educacion/JUNAEB/EVE/microdata",
+      "bucket": "biblioteca-datos",
+      "include_regex": "^Encuesta de Vulnerabilidad/(2019|2020|2021|2022|2023|2024|2025)/.+\\.csv$",
+      "strip_prefix": "Encuesta de Vulnerabilidad/",
+      "landing_url": "https://bibliotecadatos.sead.junaeb.cl/",
+      "license": "Datos públicos desidentificados; revisar condiciones de JUNAEB",
+      "coverage": "Parvularia, 1º y 5º básico y 1º medio, 2019-2025",
+      "purpose": "Triangulación escolar de autismo y vulnerabilidad",
+      "notes": "Alrededor de 9,6 GB en total según el catálogo GCS al 2026-09-04. Solo con --include-large. La cobertura no representa a todo el estudiantado chileno."
+    },
+    {
+      "id": "sae_poverty_2024",
+      "label": "Estimaciones comunales de pobreza SAE 2024",
+      "provider": "Ministerio de Desarrollo Social y Familia",
+      "groups": ["territory"],
+      "access": "automatic",
+      "kind": "direct",
+      "large": false,
+      "storage": "project",
+      "destination": "Territorio/SAE_2024",
+      "resources": [
+        {
+          "url": "https://observatorio.ministeriodesarrollosocial.gob.cl/storage/docs/pobreza-comunal/2024/SAE_ingresos_2024.xlsx",
+          "filename": "SAE_ingresos_2024.xlsx"
+        },
+        {
+          "url": "https://observatorio.ministeriodesarrollosocial.gob.cl/storage/docs/pobreza-comunal/2024/SAE_multidimensional_2024.xlsx",
+          "filename": "SAE_multidimensional_2024.xlsx"
+        },
+        {
+          "url": "https://observatorio.ministeriodesarrollosocial.gob.cl/storage/docs/pobreza-comunal/2024/Estimaciones_SAE_2024.pdf",
+          "filename": "metodologia_estimaciones_SAE_2024.pdf"
+        }
+      ],
+      "landing_url": "https://observatorio.ministeriodesarrollosocial.gob.cl/pobreza-comunal-2024",
+      "license": "Publicación oficial; revisar condiciones del Observatorio Social",
+      "coverage": "345 comunas, estimaciones e intervalos, 2024",
+      "purpose": "Covariable territorial preespecificada de pobreza/deprivación",
+      "notes": "Usar estimaciones e incertidumbre; evitar búsquedas ecológicas con decenas de covariables."
+    },
+    {
+      "id": "casen_2024",
+      "label": "Encuesta CASEN 2024",
+      "provider": "Ministerio de Desarrollo Social y Familia",
+      "groups": ["surveys", "territory"],
+      "access": "automatic",
+      "kind": "direct",
+      "large": true,
+      "storage": "project",
+      "destination": "Encuestas/CASEN_2024",
+      "resources": [
+        {
+          "url": "https://observatorio.ministeriodesarrollosocial.gob.cl/storage/docs/casen/2024/casen_2024.dta",
+          "filename": "casen_2024.dta",
+          "size": 1608073353
+        }
+      ],
+      "landing_url": "https://observatorio.ministeriodesarrollosocial.gob.cl/encuesta-casen-2024",
+      "license": "Base pública; revisar condiciones del Observatorio Social",
+      "coverage": "Encuesta nacional y regional, 2024",
+      "purpose": "Previsión, atención pública y pobreza como contexto poblacional",
+      "notes": "1.608.073.353 bytes verificados por HEAD el 2026-09-04. Solo con --include-large. No tratar como representativa de cada comuna. Documentación y complemento territorial en casen_2024_metadata. La misma página oficial ofrece una alternativa R de 46.840.844 bytes en https://observatorio.ministeriodesarrollosocial.gob.cl/storage/docs/casen/2024/casen_2024.RData; no se descarga por defecto para evitar duplicar la base."
+    },
+    {
+      "id": "casen_2024_metadata",
+      "label": "CASEN 2024: complemento territorial y documentación",
+      "provider": "Ministerio de Desarrollo Social y Familia",
+      "groups": ["surveys", "territory"],
+      "access": "automatic",
+      "kind": "direct",
+      "large": false,
+      "storage": "project",
+      "destination": "Encuestas/CASEN_2024/metadata",
+      "resources": [
+        {
+          "url": "https://observatorio.ministeriodesarrollosocial.gob.cl/storage/docs/casen/2024/casen_2024_provincia_comuna.dta",
+          "filename": "casen_2024_provincia_comuna.dta",
+          "size": 2855219
+        },
+        {
+          "url": "https://observatorio.ministeriodesarrollosocial.gob.cl/storage/docs/casen/2024/Libro_de_codigos_Casen_2024.xlsx",
+          "filename": "Libro_de_codigos_Casen_2024.xlsx",
+          "size": 241945
+        },
+        {
+          "url": "https://observatorio.ministeriodesarrollosocial.gob.cl/storage/docs/casen/2024/Libro_de_codigos_Casen_2024_prov_comuna.xlsx",
+          "filename": "Libro_de_codigos_Casen_2024_prov_comuna.xlsx",
+          "size": 33945
+        },
+        {
+          "url": "https://observatorio.ministeriodesarrollosocial.gob.cl/storage/docs/casen/2024/Nota_uso_bases_de_datos_Casen_2024.pdf",
+          "filename": "Nota_uso_bases_de_datos_Casen_2024.pdf",
+          "size": 232992
+        },
+        {
+          "url": "https://observatorio.ministeriodesarrollosocial.gob.cl/storage/docs/casen/2024/Diseno_Muestral_Casen_2024.pdf",
+          "filename": "Diseno_Muestral_Casen_2024.pdf",
+          "size": 4315989
+        },
+        {
+          "url": "https://observatorio.ministeriodesarrollosocial.gob.cl/storage/docs/casen/2024/Ficha_tecnica_Casen_2024.pdf",
+          "filename": "Ficha_tecnica_Casen_2024.pdf",
+          "size": 224673
+        },
+        {
+          "url": "https://observatorio.ministeriodesarrollosocial.gob.cl/storage/docs/casen/2024/Informe_metodologico_casen_2024.pdf",
+          "filename": "Informe_metodologico_casen_2024.pdf",
+          "size": 1707435
+        },
+        {
+          "url": "https://observatorio.ministeriodesarrollosocial.gob.cl/storage/docs/casen/2024/Cuestionario_Casen_2024.pdf",
+          "filename": "Cuestionario_Casen_2024.pdf",
+          "size": 1301618
+        }
+      ],
+      "landing_url": "https://observatorio.ministeriodesarrollosocial.gob.cl/encuesta-casen-2024",
+      "license": "Base y documentación públicas; revisar la nota de uso del Observatorio Social",
+      "coverage": "Encuesta CASEN 2024",
+      "purpose": "Interpretar variables, ponderación, diseño muestral y enlace territorial de CASEN 2024",
+      "notes": "Ocho recursos y tamaños verificados por HEAD el 2026-09-04 en enlaces de la página oficial. El complemento provincia/comuna debe enlazarse según sus libros de códigos; disponer del identificador comunal no otorga representatividad por comuna. Se conserva la documentación separada de la base principal."
+    },
+    {
+      "id": "ine_geodata",
+      "label": "Cartografía y geodatos abiertos INE",
+      "provider": "Instituto Nacional de Estadísticas",
+      "groups": ["territory"],
+      "access": "manual",
+      "kind": "manual",
+      "large": false,
+      "storage": "project",
+      "destination": "Territorio/INE_Geodatos",
+      "landing_url": "https://www.ine.gob.cl/herramientas/portal-de-mapas/geodatos-abiertos",
+      "license": "Fuente oficial INE; revisar metadatos de cada capa",
+      "coverage": "Capas territoriales vigentes e históricas",
+      "purpose": "Códigos CUT, límites y cartografía no distorsionada",
+      "notes": "El portal exige escoger una capa y versión; no hay un único recurso correcto que automatizar sin esa decisión."
+    },
+    {
+      "id": "sinim",
+      "label": "Sistema Nacional de Información Municipal",
+      "provider": "SUBDERE",
+      "groups": ["territory"],
+      "access": "manual",
+      "kind": "manual",
+      "large": false,
+      "storage": "project",
+      "destination": "Territorio/SINIM",
+      "landing_url": "https://datos.sinim.gov.cl/datos_municipales.php",
+      "license": "Revisar condiciones y metadatos de cada indicador",
+      "coverage": "Indicadores municipales por año",
+      "purpose": "Ruralidad, recursos y capacidad municipal preespecificada",
+      "notes": "La exportación depende de selecciones interactivas; documentar indicador, año y unidad antes de descargar."
+    },
+    {
+      "id": "mineduc_pie_microdata",
+      "label": "Microdatos diagnósticos individuales PIE",
+      "provider": "Ministerio de Educación",
+      "groups": ["education", "restricted"],
+      "access": "restricted",
+      "kind": "restricted",
+      "large": true,
+      "storage": "project",
+      "destination": "Educacion/MINEDUC/restricted",
+      "landing_url": "https://datosabiertos.mineduc.cl/",
+      "license": "Sujeto a Transparencia o convenio institucional",
+      "coverage": "Por solicitar",
+      "purpose": "Registro escolar TEA con detalle no contenido en los informes agregados",
+      "notes": "No hay descarga pública reproducible identificada. Requiere solicitud con variables, años y nivel de agregación exactos."
+    },
+    {
+      "id": "registro_nacional_discapacidad",
+      "label": "Registro Nacional de la Discapacidad",
+      "provider": "Servicio de Registro Civil e Identificación / SENADIS",
+      "groups": ["restricted"],
+      "access": "restricted",
+      "kind": "restricted",
+      "large": true,
+      "storage": "project",
+      "destination": "Registros/restricted/RND",
+      "landing_url": "https://www.senadis.gob.cl/",
+      "license": "Acceso sujeto a autorización y protección de datos",
+      "coverage": "Personas certificadas e inscritas",
+      "purpose": "Mejora futura, no denominador de autismo",
+      "notes": "No cubre a todas las personas autistas y no existe una descarga pública masiva adecuada."
+    },
+    {
+      "id": "registro_prestadores_individuales",
+      "label": "Registro Nacional de Prestadores Individuales",
+      "provider": "Superintendencia de Salud",
+      "groups": ["restricted"],
+      "access": "restricted",
+      "kind": "restricted",
+      "large": false,
+      "storage": "project",
+      "destination": "Registros/restricted/RNPI",
+      "landing_url": "https://rnpi.superdesalud.gob.cl/",
+      "license": "Consulta pública; acceso masivo puede requerir convenio",
+      "coverage": "Prestadores habilitados",
+      "purpose": "Oferta profesional y accesibilidad",
+      "notes": "No automatizar consultas masivas sin una API o autorización explícita."
+    }
+  ],
+  "audit_checks": [
+    {"id": "grd", "source_id": "grd_publico", "label": "GRD canónico", "template": "GRD/GRD_PUBLICO_{year}.csv", "year_start": 2019, "year_end": 2024, "required": true},
+    {"id": "rem", "source_id": "deis_rem", "label": "REM Serie A canónica", "template": "REM/SerieA/SerieA_{year}.csv", "year_start": 2009, "year_end": 2026, "required": true},
+    {"id": "rem_seriep", "source_id": "deis_rem", "label": "REM Serie P extraída", "template": "REM/SerieP/SerieP_{year}.csv", "year_start": 2019, "year_end": 2025, "required": true},
+    {"id": "rem_seriep_manifest", "source_id": "deis_rem", "label": "Manifiesto de extracción REM Serie P", "path": "REM/SerieP/manifest_extract_rem_series_p.csv", "required": true},
+    {"id": "egresos", "source_id": "deis_egresos", "label": "Egresos DEIS canónicos", "template": "DEIS/Egresos/{year}.csv", "year_start": 2001, "year_end": 2024, "required": true},
+    {"id": "deis_establishments", "source_id": "deis_establishments", "storage": "project", "label": "Catastro DEIS publicado", "glob": "DEIS/Establecimientos/*", "min_count": 2, "required": true},
+    {"id": "deis_rem20", "source_id": "deis_rem20", "storage": "project", "label": "REM-20 y diccionario", "glob": "DEIS/REM20/*", "min_count": 2, "required": true},
+    {"id": "fonasa", "source_id": "fonasa_aggregates", "label": "Resultados FONASA", "template": "FONASA/Resultados_{year}12.{ext}", "year_start": 2018, "year_end": 2025, "extension_by_year": {"2018": "rar", "2019": "rar", "2020": "rar", "2021": "rar", "2022": "zip", "2023": "zip", "2024": "zip", "2025": "zip"}, "required": true},
+    {"id": "fonasa_dictionary", "source_id": "fonasa_dictionary", "label": "Diccionario FONASA", "path": "FONASA/Diccionario_beneficiarios.xlsx", "required": true},
+    {"id": "fonasa_microdata", "source_id": "fonasa_microdata", "label": "Bases innominadas FONASA", "template": "FONASA/microdata/sources/Base_Beneficiarios_{year}.zip", "year_start": 2018, "year_end": 2025, "required": true},
+    {"id": "fonasa_aps", "source_id": "fonasa_aps_enrollment", "label": "Inscritos APS FONASA", "template": "FONASA/APS/Inscritos_APS_{year}12.csv", "year_start": 2019, "year_end": 2025, "required": true},
+    {"id": "isapre", "source_id": "isapre_communal", "storage": "project", "label": "Beneficiarios ISAPRE comunales", "template": "Cobertura/ISAPRE/isapre_beneficiarios_comuna_{year}.{ext}", "year_start": 2019, "year_end": 2025, "extension_by_year": {"2019": "xls", "2020": "xls", "2021": "xlsx", "2022": "xlsx", "2023": "xlsx", "2024": "xlsx", "2025": "xlsx"}, "required": true},
+    {"id": "ine_population", "source_id": "ine_population", "storage": "project", "label": "Proyecciones comunales INE base 2017", "glob": "Poblacion/INE/*base_2017.csv", "min_count": 2, "required": true},
+    {"id": "ine_censo2024_population", "source_id": "ine_censo2024_population", "storage": "project", "label": "Población Censo 2024 por comuna/edad/sexo", "path": "Poblacion/INE/Censo_2024/D1_poblacion_comuna_sexo_edad_quinquenal.xlsx", "required": true},
+    {"id": "ine_population_base2024_national", "source_id": "ine_population_base2024_national", "storage": "project", "label": "Proyección nacional INE base 2024", "path": "Poblacion/INE/Base_2024/estimaciones_proyecciones_nacionales_1992_2070_base_2024.xlsx", "required": true},
+    {"id": "censo2024_disability", "source_id": "censo2024_disability", "storage": "project", "label": "Tabulado de discapacidad Censo 2024", "path": "Poblacion/INE/Censo_2024/P1_Discapacidad.xlsx", "required": true},
+    {"id": "endide", "source_id": "endide_2022", "storage": "project", "label": "ENDIDE 2022: base y documentación", "glob": "Encuestas/ENDIDE_2022/*", "min_count": 3, "required": true},
+    {"id": "encavi", "source_id": "encavi_2023_2024", "storage": "project", "label": "ENCAVI 2023-2024: base y documentación", "glob": "Encuestas/ENCAVI_2023_2024/*", "min_count": 3, "required": true},
+    {"id": "mineduc", "source_id": "mineduc_pie_reports", "storage": "project", "label": "Informes PIE/SINACES", "glob": "Educacion/MINEDUC/*.pdf", "min_count": 3, "required": true},
+    {"id": "junaeb_questionnaires", "source_id": "junaeb_eve_metadata", "storage": "project", "label": "Cuestionarios EVE-JUNAEB 2019-2025", "glob": "Educacion/JUNAEB/EVE/metadata/Cuestionarios/*/*.pdf", "min_count": 28, "required": true},
+    {"id": "junaeb_dictionaries", "source_id": "junaeb_eve_metadata", "storage": "project", "label": "Diccionarios EVE-JUNAEB disponibles", "glob": "Educacion/JUNAEB/EVE/metadata/Diccionarios/*/*.xlsx", "min_count": 16, "required": true},
+    {"id": "junaeb_microdata", "source_id": "junaeb_eve_microdata", "storage": "project", "label": "Microdatos EVE-JUNAEB 2019-2025", "glob": "Educacion/JUNAEB/EVE/microdata/*/*.csv", "min_count": 28, "required": true},
+    {"id": "casen_2024", "source_id": "casen_2024", "storage": "project", "label": "CASEN 2024: microdatos Stata", "path": "Encuestas/CASEN_2024/casen_2024.dta", "required": true},
+    {"id": "casen_2024_territorial", "source_id": "casen_2024_metadata", "storage": "project", "label": "CASEN 2024: complemento provincia/comuna", "path": "Encuestas/CASEN_2024/metadata/casen_2024_provincia_comuna.dta", "required": true},
+    {"id": "casen_2024_codebook", "source_id": "casen_2024_metadata", "storage": "project", "label": "CASEN 2024: libro de códigos general", "path": "Encuestas/CASEN_2024/metadata/Libro_de_codigos_Casen_2024.xlsx", "required": true},
+    {"id": "casen_2024_territorial_codebook", "source_id": "casen_2024_metadata", "storage": "project", "label": "CASEN 2024: libro de códigos territorial", "path": "Encuestas/CASEN_2024/metadata/Libro_de_codigos_Casen_2024_prov_comuna.xlsx", "required": true},
+    {"id": "casen_2024_usage", "source_id": "casen_2024_metadata", "storage": "project", "label": "CASEN 2024: nota de uso", "path": "Encuestas/CASEN_2024/metadata/Nota_uso_bases_de_datos_Casen_2024.pdf", "required": true},
+    {"id": "casen_2024_design", "source_id": "casen_2024_metadata", "storage": "project", "label": "CASEN 2024: diseño muestral", "path": "Encuestas/CASEN_2024/metadata/Diseno_Muestral_Casen_2024.pdf", "required": true},
+    {"id": "casen_2024_technical", "source_id": "casen_2024_metadata", "storage": "project", "label": "CASEN 2024: ficha técnica", "path": "Encuestas/CASEN_2024/metadata/Ficha_tecnica_Casen_2024.pdf", "required": true},
+    {"id": "casen_2024_methods", "source_id": "casen_2024_metadata", "storage": "project", "label": "CASEN 2024: metodología del proceso estadístico", "path": "Encuestas/CASEN_2024/metadata/Informe_metodologico_casen_2024.pdf", "required": true},
+    {"id": "casen_2024_questionnaire", "source_id": "casen_2024_metadata", "storage": "project", "label": "CASEN 2024: cuestionario", "path": "Encuestas/CASEN_2024/metadata/Cuestionario_Casen_2024.pdf", "required": true}
+  ]
+}

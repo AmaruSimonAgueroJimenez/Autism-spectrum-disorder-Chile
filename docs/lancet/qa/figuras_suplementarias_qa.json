@@ -1,0 +1,272 @@
+[
+ {
+  "figure": "Figure_S2",
+  "language": "en",
+  "width_mm": 175.0,
+  "height_mm": 172.0,
+  "font_sizes_pt": [
+   5.8,
+   6.0,
+   6.2,
+   6.4,
+   6.6,
+   7.0,
+   7.4,
+   7.5,
+   8.0,
+   11.0
+  ],
+  "out_of_canvas": [],
+  "overlaps": [],
+  "internal_titles": false,
+  "panel_letters": "lowercase"
+ },
+ {
+  "figure": "Figure_S3",
+  "language": "en",
+  "width_mm": 175.0,
+  "height_mm": 165.0,
+  "font_sizes_pt": [
+   6.2,
+   6.6,
+   7.0,
+   7.5,
+   8.0,
+   11.0
+  ],
+  "out_of_canvas": [],
+  "overlaps": [],
+  "internal_titles": false,
+  "panel_letters": "lowercase"
+ },
+ {
+  "figure": "Figure_S4",
+  "language": "en",
+  "width_mm": 175.0,
+  "height_mm": 178.0,
+  "font_sizes_pt": [
+   6.0,
+   6.2,
+   6.4,
+   6.6,
+   6.8,
+   7.0,
+   7.5,
+   8.0,
+   11.0
+  ],
+  "out_of_canvas": [],
+  "overlaps": [],
+  "internal_titles": false,
+  "panel_letters": "lowercase"
+ },
+ {
+  "figure": "Figure_S5",
+  "language": "en",
+  "width_mm": 175.0,
+  "height_mm": 150.0,
+  "font_sizes_pt": [
+   5.8,
+   6.2,
+   6.4,
+   6.6,
+   7.5,
+   8.0,
+   11.0
+  ],
+  "out_of_canvas": [],
+  "overlaps": [],
+  "internal_titles": false,
+  "panel_letters": "lowercase"
+ },
+ {
+  "figure": "Figure_S7",
+  "language": "en",
+  "width_mm": 175.0,
+  "height_mm": 165.0,
+  "font_sizes_pt": [
+   6.4,
+   6.6,
+   6.8,
+   7.2,
+   7.5,
+   8.0,
+   11.0
+  ],
+  "out_of_canvas": [],
+  "overlaps": [],
+  "internal_titles": false,
+  "panel_letters": "lowercase"
+ },
+ {
+  "figure": "Figure_S8",
+  "language": "en",
+  "width_mm": 175.0,
+  "height_mm": 95.0,
+  "font_sizes_pt": [
+   6.0,
+   6.2,
+   6.4,
+   7.5,
+   8.0,
+   11.0
+  ],
+  "out_of_canvas": [],
+  "overlaps": [],
+  "internal_titles": false,
+  "panel_letters": "lowercase"
+ },
+ {
+  "figure": "Figure_S9",
+  "language": "en",
+  "width_mm": 175.0,
+  "height_mm": 95.0,
+  "font_sizes_pt": [
+   6.2,
+   6.4,
+   7.2,
+   7.5,
+   8.0,
+   11.0
+  ],
+  "out_of_canvas": [],
+  "overlaps": [],
+  "internal_titles": false,
+  "panel_letters": "lowercase"
+ },
+ {
+  "figure": "Figure_S2",
+  "language": "es",
+  "width_mm": 175.0,
+  "height_mm": 172.0,
+  "font_sizes_pt": [
+   5.8,
+   6.0,
+   6.2,
+   6.4,
+   6.6,
+   7.0,
+   7.4,
+   7.5,
+   8.0,
+   11.0
+  ],
+  "out_of_canvas": [],
+  "overlaps": [],
+  "internal_titles": false,
+  "panel_letters": "lowercase"
+ },
+ {
+  "figure": "Figure_S3",
+  "language": "es",
+  "width_mm": 175.0,
+  "height_mm": 165.0,
+  "font_sizes_pt": [
+   6.2,
+   6.6,
+   7.0,
+   7.5,
+   8.0,
+   11.0
+  ],
+  "out_of_canvas": [],
+  "overlaps": [],
+  "internal_titles": false,
+  "panel_letters": "lowercase"
+ },
+ {
+  "figure": "Figure_S4",
+  "language": "es",
+  "width_mm": 175.0,
+  "height_mm": 178.0,
+  "font_sizes_pt": [
+   6.0,
+   6.2,
+   6.4,
+   6.6,
+   6.8,
+   7.0,
+   7.5,
+   8.0,
+   11.0
+  ],
+  "out_of_canvas": [],
+  "overlaps": [],
+  "internal_titles": false,
+  "panel_letters": "lowercase"
+ },
+ {
+  "figure": "Figure_S5",
+  "language": "es",
+  "width_mm": 175.0,
+  "height_mm": 150.0,
+  "font_sizes_pt": [
+   5.8,
+   6.2,
+   6.4,
+   6.6,
+   7.5,
+   8.0,
+   11.0
+  ],
+  "out_of_canvas": [],
+  "overlaps": [],
+  "internal_titles": false,
+  "panel_letters": "lowercase"
+ },
+ {
+  "figure": "Figure_S7",
+  "language": "es",
+  "width_mm": 175.0,
+  "height_mm": 165.0,
+  "font_sizes_pt": [
+   6.4,
+   6.6,
+   6.8,
+   7.2,
+   7.5,
+   8.0,
+   11.0
+  ],
+  "out_of_canvas": [],
+  "overlaps": [],
+  "internal_titles": false,
+  "panel_letters": "lowercase"
+ },
+ {
+  "figure": "Figure_S8",
+  "language": "es",
+  "width_mm": 175.0,
+  "height_mm": 95.0,
+  "font_sizes_pt": [
+   6.0,
+   6.2,
+   6.4,
+   7.5,
+   8.0,
+   11.0
+  ],
+  "out_of_canvas": [],
+  "overlaps": [],
+  "internal_titles": false,
+  "panel_letters": "lowercase"
+ },
+ {
+  "figure": "Figure_S9",
+  "language": "es",
+  "width_mm": 175.0,
+  "height_mm": 95.0,
+  "font_sizes_pt": [
+   6.2,
+   6.4,
+   7.2,
+   7.5,
+   8.0,
+   11.0
+  ],
+  "out_of_canvas": [],
+  "overlaps": [],
+  "internal_titles": false,
+  "panel_letters": "lowercase"
+ }
+]

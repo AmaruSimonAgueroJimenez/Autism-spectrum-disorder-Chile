@@ -1,0 +1,10 @@
+﻿Code,ICD-10 description,In the analysed variant,In the other variant,Strict series (F84.0)
+F84,Pervasive developmental disorders (three-character category),yes,yes,no
+F84.0,Childhood autism,yes,yes,yes
+F84.1,Atypical autism,yes,yes,no
+F84.2,Rett syndrome,no,yes,no
+F84.3,Other childhood disintegrative disorder,yes,yes,no
+F84.4,Overactive disorder associated with mental retardation and stereotyped movements,yes,yes,no
+F84.5,Asperger syndrome,yes,yes,no
+F84.8,Other pervasive developmental disorders,yes,yes,no
+F84.9,"Pervasive developmental disorder, unspecified",yes,yes,no

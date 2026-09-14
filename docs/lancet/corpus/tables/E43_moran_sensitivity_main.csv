@@ -1,0 +1,34 @@
+﻿Weight definition,Value type,Period,Subset,n,Moran's I,E[I],z,Analytic p,p (999 permutations)
+queen,"Rate per 100,000 population",full period,all comunas,342,0.2395,−0.0029,6.55,< 0.001,0.001
+knn4,"Rate per 100,000 population",full period,all comunas,342,0.2538,−0.0029,7.23,< 0.001,0.001
+knn8,"Rate per 100,000 population",full period,all comunas,342,0.2247,−0.0029,9.04,< 0.001,0.001
+idw,"Rate per 100,000 population",full period,all comunas,342,0.1296,−0.0029,6.38,< 0.001,0.001
+queen,Crude standardised ratio,full period,all comunas,342,0.2661,−0.0029,7.26,< 0.001,0.001
+knn4,Crude standardised ratio,full period,all comunas,342,0.2713,−0.0029,7.72,< 0.001,0.001
+knn8,Crude standardised ratio,full period,all comunas,342,0.2509,−0.0029,10.08,< 0.001,0.001
+idw,Crude standardised ratio,full period,all comunas,342,0.1507,−0.0029,7.39,< 0.001,0.001
+queen,Empirical-Bayes smoothed standardised ratio,full period,all comunas,342,0.3399,−0.0029,9.26,< 0.001,0.001
+knn4,Empirical-Bayes smoothed standardised ratio,full period,all comunas,342,0.3542,−0.0029,10.05,< 0.001,0.001
+knn8,Empirical-Bayes smoothed standardised ratio,full period,all comunas,342,0.3094,−0.0029,12.40,< 0.001,0.001
+idw,Empirical-Bayes smoothed standardised ratio,full period,all comunas,342,0.2304,−0.0029,11.23,< 0.001,0.001
+queen,Empirical-Bayes smoothed standardised ratio,2019,all comunas,342,0.1846,−0.0029,5.07,< 0.001,0.001
+queen,Empirical-Bayes smoothed standardised ratio,2020,all comunas,342,0.0807,−0.0029,2.26,0.024,0.010
+queen,Empirical-Bayes smoothed standardised ratio,2021,all comunas,342,0.1934,−0.0029,5.30,< 0.001,0.001
+queen,Empirical-Bayes smoothed standardised ratio,2022,all comunas,342,0.2161,−0.0029,5.92,< 0.001,0.001
+queen,Empirical-Bayes smoothed standardised ratio,2023,all comunas,342,0.2769,−0.0029,7.56,< 0.001,0.001
+queen,Empirical-Bayes smoothed standardised ratio,2024,all comunas,342,0.3190,−0.0029,8.69,< 0.001,0.001
+queen,"Rate per 100,000 population",full period,comunas with ≥5 events,287,0.3254,−0.0035,7.86,< 0.001,0.001
+queen,Crude standardised ratio,full period,comunas with ≥5 events,287,0.3400,−0.0035,8.20,< 0.001,0.001
+queen,Empirical-Bayes smoothed standardised ratio,full period,comunas with ≥5 events,287,0.3408,−0.0035,8.22,< 0.001,0.001
+queen,"Rate per 100,000 population",full period,excluding Metropolitan Region (13),290,0.2253,−0.0035,5.49,< 0.001,0.001
+queen,Crude standardised ratio,full period,excluding Metropolitan Region (13),290,0.2538,−0.0035,6.18,< 0.001,0.001
+queen,Empirical-Bayes smoothed standardised ratio,full period,excluding Metropolitan Region (13),290,0.3174,−0.0035,7.70,< 0.001,0.001
+queen,"Rate per 100,000 population",full period,including non-continental comunas present in the cartography,343,0.2345,−0.0029,6.36,< 0.001,0.001
+queen,Crude standardised ratio,full period,including non-continental comunas present in the cartography,343,0.2657,−0.0029,7.20,< 0.001,0.001
+queen,Empirical-Bayes smoothed standardised ratio,full period,including non-continental comunas present in the cartography,343,0.3398,−0.0029,9.18,< 0.001,0.001
+queen,"Rate per 100,000 population",2024,denominator INE base 2017,342,0.1809,−0.0029,4.96,< 0.001,0.001
+queen,Crude standardised ratio,2024,denominator INE base 2017,342,0.1689,−0.0029,4.64,< 0.001,0.001
+queen,Empirical-Bayes smoothed standardised ratio,2024,denominator INE base 2017,342,0.3190,−0.0029,8.69,< 0.001,0.001
+queen,"Rate per 100,000 population",2024,denominator Census 2024,342,0.1256,−0.0029,3.47,< 0.001,0.004
+queen,Crude standardised ratio,2024,denominator Census 2024,342,0.1096,−0.0029,3.04,0.002,0.008
+queen,Empirical-Bayes smoothed standardised ratio,2024,denominator Census 2024,342,0.2962,−0.0029,8.08,< 0.001,0.001

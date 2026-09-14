@@ -1,0 +1,8 @@
+Year,File layout,DEIS discharges (all establishments),SNSS discharges,Non-SNSS discharges,Discharges with masked affiliation,Masked rows (%),F84 in DIAG1 (principal),F84 in DIAG2 (external cause),F84 in either position,F84.2 (Rett) in DIAG1 (excluded from this variant),F84 discharges with death,"Principal F84 per 100,000 discharges (exact 95% CI)",F84 in SNSS,F84 non-SNSS,F84 with masked affiliation,Age scheme,Columns in file,Microdata file
+2019,canonical,"1,667,180","1,042,595","580,740","43,845",2.6%,304,0,304,32,1,18.2 (16.2 to 20.4),234,62,8,decadal,18,2019.csv
+2020,canonical,"1,330,477","816,463","476,472","37,542",2.8%,255,0,255,12,0,19.2 (16.9 to 21.7),196,53,6,decadal,18,2020.csv
+2021,canonical,"1,467,062","844,546","586,860","35,656",2.4%,299,0,299,10,1,20.4 (18.1 to 22.8),239,55,5,decadal,18,2021.csv
+2022,canonical,"1,597,118","909,774","647,775","39,569",2.5%,470,0,470,10,0,29.4 (26.8 to 32.2),383,74,13,decadal,18,2022.csv
+2023,canonical,"1,612,267","938,890","545,269","128,108",7.9%,585,0,585,15,0,36.3 (33.4 to 39.3),508,58,19,decadal,16,2023.csv
+2024,canonical,"1,667,349","993,807","645,160","28,382",1.7%,678,0,678,12,0,40.7 (37.7 to 43.8),581,89,8,five-year,15,2024.csv
+2021,"15-column variant (five-year ages, unmasked)","1,467,062","861,005","606,057",0,0.0%,299,0,299,10,1,20.4 (18.1 to 22.8),241,58,0,five-year,15,variants/detailed_age_15col/2021.csv

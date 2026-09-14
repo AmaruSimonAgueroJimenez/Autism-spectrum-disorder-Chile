@@ -1,0 +1,9 @@
+﻿Data state,Representation in the tidy tables,Published representation,Rule
+Observed zero,0 in the count column with the row present,0,The establishment reported and recorded no events; never converted into missing.
+Empty REM cell,empty string kept as text (columns Col01–Col50 are read as text),—,Empty is not zero: the row exists but the cell was not filled in.
+Establishment with no row,no row at all; counted in 'reporting establishments',not reported,Never imputed or interpolated; the number of reporting establishments accompanies every REM figure.
+Unparsable date or age,"'month = 0' row or 'unknown' age group, with the count reported",unknown (n reported),Reported and excluded from the corresponding statistic; never imputed.
+'Not reported' category,"its own value in the variable (insurance, nationality, ethnicity, sex)",not reported,"A response category, not a missing value, and shown as such."
+Count of 1 to 4,true value plus suppression_flag = 1 and n_display = '<5',<5,"Suppression rule (equation 33) in every territorial table; if a row is left with one suppressed cell, the next smallest is also suppressed."
+Imprecise survey domain,precision_flag = imprecise with DEFF and RSE in the same row,figure flagged as imprecise,"Fewer than 30 unweighted cases or RSE > 30%: shown as an order of magnitude, never as a national estimate."
+Not estimable,"NaN with the reason documented (for example, the empty 1.º medio ASD variable in JUNAEB 2024)",n/e,Never written as zero when the variable was not collected or is not populated.

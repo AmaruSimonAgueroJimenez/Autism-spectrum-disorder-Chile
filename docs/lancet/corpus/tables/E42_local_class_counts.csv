@@ -1,0 +1,5 @@
+﻿Indicator,LISA HH,LISA LL,LISA HL,LISA LH,LISA not significant,LISA BH critical p,Gi* hot,Gi* cold,Gi* BH critical p
+GRD F84 episodes,12,6,0,1,323,0.0020,13,6,0.0020
+GRD persons/year,15,11,0,2,314,0.0040,17,11,0.0040
+REM A05 entries ⚠,10,1,0,3,328,0.0020,13,1,0.0020
+REM P2 December ⚠,3,4,0,0,335,0.0010,3,4,0.0010

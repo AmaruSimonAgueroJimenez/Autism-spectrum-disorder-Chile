@@ -1,0 +1,14 @@
+﻿Source,Period,Unit of observation,Stock or flow,Geography,Identifier,Linkage rule
+GRD público (MINSAL),2019–2024,episode (hospitalisation or major ambulatory surgery),flow,hospital of care; declared comuna of residence,"encrypted identifier, different format in 2019–2020 and 2021–2024",unique persons only within each year; never across 2020 and 2021
+Egresos DEIS,2019–2024,hospital discharge,flow,establishment; comuna of residence,none published,no linkage; principal F84 only (no secondary diagnoses published)
+"REM Serie A (A03, A05, A27, A28)",2019–2025,establishment × month × code cell,flow (activity),establishment (place of care),none,"aggregated; A27 counts interventions, not people"
+"REM Serie P (P2, P6)",2019–2025,establishment × half-year × code cell,stock (June and December),establishment,none,aggregated; half-years are never summed
+REM-20 (DEIS),2019–2025,establishment × area × month,activity/capacity,establishment,none,aggregated; never a covered population
+FONASA (December aggregates),2018–2025,aggregated beneficiary cell,stock,mixes APS enrolment and address,none,aggregated; repeated 2018–2020 rows are additive and are not deduplicated
+Inscritos APS (FONASA),2019–2025,primary-care centre × age group,stock,APS centre,none,"aggregated; operational coverage by centre, not resident population"
+ISAPRE (Superintendencia de Salud),2019–2025,beneficiaries by administrative comuna,stock,administrative geography of the beneficiary,none,aggregated; change from .xls to .xlsx and from single-year to five-year age in 2021
+INE (proyecciones base Censo 2017; Censo 2024),2019–2025,"population by comuna, age and sex",stock,residence,not applicable,population denominator; census bases never combined without a flag
+ENDIDE 2022,2022,surveyed person (complex design),cross-sectional,national and regional,none,independent sample; no comuna-level breakdown
+ENCAVI 2023–2024,2023–2024,person aged 15 or over (complex design),cross-sectional,national,none,independent sample; no comuna-level breakdown
+PIE / SINACES (MINEDUC),2019–2025,aggregated school register,school stock,national,none,published aggregate; categories differ by report and year
+JUNAEB EVE,2019–2025,student in selected school cohorts,school stock,school,none usable,caregiver report with the EXP weight; not a national prevalence
