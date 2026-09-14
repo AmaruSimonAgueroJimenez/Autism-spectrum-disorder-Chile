@@ -222,7 +222,7 @@ Resultados preliminares ponderados en cohortes escolares seleccionadas:
 
 En 2024–2025 la identificación usa diagnóstico médico prolongado y la categoría TEA, con ponderador `EXP`. Son reportes de cuidadores en cohortes escolares específicas, no prevalencia nacional ni una serie directamente comparable con PIE.
 
-## Diseño recomendado para *The Lancet Regional Health – Americas*
+## Diseño recomendado para la revista de destino
 
 ### Pregunta principal
 

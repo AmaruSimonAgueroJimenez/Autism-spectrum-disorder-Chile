@@ -1,0 +1,293 @@
+{
+ "schema": 1,
+ "que_es": "Registro legible por máquina de las lecturas independientes y de los puntos abiertos del estudio. `pipeline/10_manuscript.py` (write_memo) calcula de aquí TODOS los estados y todos los recuentos de la sección 6 de memo_es.md: cuántas comprobaciones pasa cada lectura, cuántos puntos quedan abiertos, cuáles bloquean el envío y cuáles ya están cerrados en la fuente. Ninguna de esas frases se escribe a mano en el memo. `build` es la compilación sobre la que se hicieron las lecturas: si no coincide con la de `manuscript/build_report.json`, el memo lo dice y no presenta las medidas como si fueran de la compilación que describe.",
+ "build": "2026-09-08T14:45:29",
+ "readings": [
+  {
+   "key": "layout",
+   "es": "página y tipografía",
+   "date": "2026-09-08",
+   "instrumentos_es": "`reader.py` (folio, tinta, por ciento y rayas sobre `pdftotext -layout`), `plates_pages.py` (página de la lámina), `docx_typo.py` (celda a celda), `geometry.py` + `ink.py` (las páginas rasterizadas a 40 ppp) y `run_plate_module.py` (los nueve módulos de lámina en un arenero), cada uno con su control positivo",
+   "checks": [
+    {
+     "es": "el folio, siempre último texto de la página y siempre igual al índice",
+     "verdict": "pass"
+    },
+    {
+     "es": "las colas de leyenda, todas rotuladas",
+     "verdict": "pass"
+    },
+    {
+     "es": "la entradilla de cada lámina, impresa en la página de su lámina",
+     "verdict": "pass"
+    },
+    {
+     "es": "una lámina por página, y ninguna leyenda que abra en una página sin lámina",
+     "verdict": "pass"
+    },
+    {
+     "es": "el verificador de composición sobre las construcciones de lámina, con su control positivo",
+     "verdict": "pass"
+    },
+    {
+     "es": "las láminas comprobadas, idénticas a las impresas",
+     "verdict": "pass"
+    },
+    {
+     "es": "el cuerpo mínimo de lámina y el ancho de 180 mm",
+     "verdict": "pass"
+    },
+    {
+     "es": "el porcentaje por idioma, pegado en inglés y con espacio duro en español",
+     "verdict": "pass"
+    },
+    {
+     "es": "ninguna cifra separada de su signo por un corte de renglón",
+     "verdict": "pass"
+    },
+    {
+     "es": "ningún rango de lectura con guion en los rótulos de lámina",
+     "verdict": "pass"
+    },
+    {
+     "es": "la lectura a tamaño de impresión de veinte láminas",
+     "verdict": "pass"
+    }
+   ],
+   "measurements": {
+    "colas_rotuladas": 260,
+    "colas_sin_rotulo": 0,
+    "entradillas_en_su_pagina": 432,
+    "entradillas_totales": 432,
+    "leyendas_localizadas": 472,
+    "construcciones_comprobadas": 244,
+    "construcciones_con_defecto": 0,
+    "control_positivo_defectos": 61,
+    "laminas_identicas_byte": 242,
+    "laminas_identicas_pixel": 244,
+    "cuerpo_minimo_lamina_pt": 6.0,
+    "laminas_distintas": 61,
+    "porciento_pegado_en": 8877,
+    "porciento_espacio_duro_es": 8876,
+    "porciento_al_reves": 0,
+    "cifras_separadas_de_su_signo": 0,
+    "rotulos_de_lamina_medidos": 44113,
+    "rangos_con_guion_en_lamina": 0,
+    "raya_corta_manuscrito_en": 8820,
+    "guion_manuscrito_en": 6530,
+    "raya_larga_manuscrito_en": 2035,
+    "menos_manuscrito_en": 730,
+    "laminas_leidas_a_tamano": 20,
+    "laminas_leidas_legibles": 20
+   }
+  },
+  {
+   "key": "content",
+   "es": "contenido",
+   "date": "2026-09-08",
+   "instrumentos_es": "instrumentos propios sobre `pdftotext -layout` de los doce PDF y sobre `manuscript/build_report.json`, con la batería corrida entera",
+   "checks": [
+    {
+     "es": "las colas de leyenda de la tarea J1, cerradas en el papel",
+     "verdict": "pass"
+    },
+    {
+     "es": "las ventanas de año de las Tablas S68 y S85, sin guion en celda de lectura",
+     "verdict": "pass"
+    },
+    {
+     "es": "el encabezado del Gi*, que promete las ecuaciones que imprime debajo",
+     "verdict": "pass"
+    },
+    {
+     "es": "la glosa del panel fijo de 65, dicha de una sola manera",
+     "verdict": "fail",
+     "point": "panel65"
+    }
+   ],
+   "measurements": {
+    "numeracion_suplementaria_sin_hueco": true,
+    "referencias_cruzadas_colgadas": 0,
+    "ecuaciones": 33,
+    "encabezados_de_ecuacion": 26,
+    "desajustes_encabezado_ecuacion": 0,
+    "referencias_articulo": "1–50",
+    "referencias_manuscrito": "1–67",
+    "referencias_apendice": "1–40",
+    "celdas_comparadas_entre_idiomas": 185879,
+    "diferencias_reales_entre_idiomas": 0,
+    "infracciones_de_las_reglas_del_estudio": 0,
+    "panel65_enunciado_viejo": {
+     "manuscrito_en": 34,
+     "manuscrito_es": 30,
+     "apendice_en": 33,
+     "apendice_es": 29,
+     "articulo": 1
+    },
+    "panel65_enunciado_nuevo": {
+     "manuscrito_en": 12,
+     "manuscrito_es": 12,
+     "apendice_en": 11,
+     "apendice_es": 11,
+     "articulo": 1
+    }
+   }
+  }
+ ],
+ "previous": {
+  "es": "medidas de la compilación anterior a la de `build`, con las que la lectura comparó",
+  "colas_sin_rotulo": 100,
+  "colas_sin_rotulo_documentos": "los ocho documentos largos",
+  "rangos_de_ano_con_guion_en_celda_de_lectura": 48,
+  "encabezados_de_ecuacion_desajustados": 1
+ },
+ "points": [
+  {
+   "key": "panel65",
+   "state": "fixed",
+   "reads_as_defect": true,
+   "blocks_submission": false,
+   "owner_es": "fase 4k, tarea K1",
+   "es": "el corpus imprime dos definiciones del mismo panel de 65 hospitales",
+   "fixed_at": "2026-09-08T16:48:00",
+   "fixed_by_es": "fase 4k, tarea K1",
+   "reaches_page": "rebuild",
+   "fix_es": "la glosa se escribe UNA sola vez en `common.py` (`fixed_panel_gloss`, siete formas) y la piden de ahí los siete módulos que la imprimen (06, 07, 09a, 09b, 11, 13 y 16); el corpus dice «hospitales que reportan en todos los años 2019–2024» y la regla de construcción «intersección de 2019–2022, verificada como subconjunto de 2023 y de 2024» sobrevive sólo donde es exacta; ninguna cifra cambia y `tests/test_fixed_panel_gloss.py` cierra la puerta"
+  },
+  {
+   "key": "caption_tail_pages",
+   "state": "open",
+   "reads_as_defect": false,
+   "blocks_submission": false,
+   "es": "las páginas que llevan sólo la cola rotulada de una leyenda: precio medido de la regla nueva, a ratificar"
+  },
+  {
+   "key": "hyphen_range_count",
+   "state": "open",
+   "reads_as_defect": false,
+   "blocks_submission": false,
+   "es": "la cifra declarada de rangos con guion se queda corta frente a lo que imprime la página"
+  },
+  {
+   "key": "layout_checker_gap",
+   "state": "open",
+   "reads_as_defect": false,
+   "blocks_submission": false,
+   "es": "hueco diagnosticado del verificador de composición, no tapado por riesgo"
+  },
+  {
+   "key": "fige26b",
+   "state": "open",
+   "reads_as_defect": false,
+   "blocks_submission": false,
+   "es": "figE26b no se reproduce byte a byte; nada impreso cambia"
+  },
+  {
+   "key": "rem20_area_names",
+   "state": "open",
+   "reads_as_defect": false,
+   "blocks_submission": false,
+   "es": "el nombre completo de las diez áreas funcionales REM-20 no está en ningún sitio del papel"
+  },
+  {
+   "key": "map_panel_letter",
+   "state": "open",
+   "reads_as_defect": false,
+   "blocks_submission": false,
+   "es": "la letra de panel de los mapas comparte línea con su título con un hueco medido: estilo a ratificar"
+  },
+  {
+   "key": "appendix_reference_numbering",
+   "state": "open",
+   "reads_as_defect": false,
+   "blocks_submission": false,
+   "es": "el apéndice suelto reinicia la numeración de referencias en 1"
+  },
+  {
+   "key": "supp_methods_numbering",
+   "state": "open",
+   "reads_as_defect": false,
+   "blocks_submission": false,
+   "es": "los encabezados de métodos suplementarios S1.–S5. colisionan con las láminas y tablas S1–S5"
+  },
+  {
+   "key": "spanish_verbatim_in_english",
+   "state": "open",
+   "reads_as_defect": false,
+   "blocks_submission": false,
+   "es": "términos de la fuente en español dentro de los documentos ingleses, marcados pero no glosados"
+  },
+  {
+   "key": "white_foot_pages",
+   "state": "open",
+   "reads_as_defect": false,
+   "blocks_submission": false,
+   "es": "páginas que abren un bloque y dejan mucho papel al pie"
+  },
+  {
+   "key": "figure1_weaknesses",
+   "state": "open",
+   "reads_as_defect": false,
+   "blocks_submission": false,
+   "es": "las dos debilidades de la Figura 1 que el autor conoce y decidió no tratar"
+  },
+  {
+   "key": "journal_typography",
+   "state": "open",
+   "reads_as_defect": false,
+   "blocks_submission": false,
+   "es": "requisitos tipográficos de la revista aún no aplicados (pasada de maqueta)"
+  },
+  {
+   "key": "tooling_debt",
+   "state": "open",
+   "reads_as_defect": false,
+   "blocks_submission": false,
+   "es": "deuda de herramienta: el formateador de porcentaje en nueve módulos y los cuatro comandos de tools/"
+  },
+  {
+   "key": "memo_stale",
+   "state": "fixed",
+   "reads_as_defect": true,
+   "blocks_submission": false,
+   "fixed_at": "2026-09-08T16:30:00",
+   "fixed_by_es": "fase 4k, tarea K2",
+   "reaches_page": "memo",
+   "es": "el memo daba por buenas cuatro afirmaciones escritas a mano en una ronda anterior",
+   "fix_es": "las páginas del corpus, el estado del material, el veredicto de cada lectura independiente y la lista de puntos abiertos se calculan ahora en cada corrida de `manuscript/build_report.json` y de `review_status.json`, y el memo declara sobre qué compilación se hizo cada lectura"
+  },
+  {
+   "key": "wedderburn_dash",
+   "state": "fixed",
+   "reads_as_defect": false,
+   "blocks_submission": false,
+   "fixed_at": "2026-09-08T16:30:00",
+   "fixed_by_es": "fase 4k, tarea K2",
+   "reaches_page": "rebuild",
+   "es": "«Gauss—Newton» se imprimía con raya larga y el renglón se cortaba justo detrás",
+   "fix_es": "el título de Wedderburn (1974) lleva en `references.bib` la raya corta de los pares de apellidos y un juntapalabras detrás, de modo que el renglón no puede cortar ahí"
+  },
+  {
+   "key": "getis_ord_dash",
+   "state": "fixed",
+   "reads_as_defect": false,
+   "blocks_submission": false,
+   "fixed_at": "2026-09-08T16:30:00",
+   "fixed_by_es": "fase 4k, tarea K2",
+   "reaches_page": "rebuild",
+   "es": "«Getis-Ord» se escribía con guion en las leyendas de las láminas espaciales y en las notas de tabla, y con raya corta en los encabezados y en la prosa",
+   "fix_es": "el par de apellidos se declara una sola vez en el glosario de impresión de `labels.py` y se aplica en el embudo por el que pasan los tres documentos"
+  },
+  {
+   "key": "crosswalk_es",
+   "state": "fixed",
+   "reads_as_defect": false,
+   "blocks_submission": false,
+   "fixed_at": "2026-09-08T16:30:00",
+   "fixed_by_es": "fase 4k, tarea K2",
+   "reaches_page": "rebuild",
+   "es": "«crosswalk», anglicismo suelto en la prosa española",
+   "fix_es": "la prosa española imprime «cuadro de equivalencias»: corregido en su fuente en `labels.py` y en `prose_es.py`, y garantizado para los demás módulos por el glosario de impresión; los identificadores de máquina (`comuna_crosswalk.csv`) se conservan, y el término inglés se conserva entero en los documentos en inglés"
+  }
+ ]
+}

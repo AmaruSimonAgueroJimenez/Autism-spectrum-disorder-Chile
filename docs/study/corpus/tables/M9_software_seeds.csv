@@ -1,0 +1,18 @@
+﻿Component,Version,Role in the pipeline
+Python,3.14.3,pipeline language
+Darwin,25.6.0,operating system of the run
+numpy,2.4.3,algebra and vectorisation
+pandas,2.3.3,tidy tables and chunked reading
+scipy,1.17.1,"exact distributions (chi-square, gamma, beta, t) and Spearman"
+statsmodels,0.14.6,"quasi-Poisson GLM, fixed effects and random intercept"
+matplotlib,3.10.8,plates and equation rendering (STIX mathtext)
+seaborn,0.13.2,plate style
+geopandas,1.1.3,comuna geometries of the territorial analysis
+libpysal,4.14.1,row-standardised queen contiguity matrix
+esda,2.8.2,"Moran's I, LISA, Gi* and the FDR threshold"
+python-docx,1.2.0,Word document construction
+pillow,12.1.1,dimensions of the inserted images
+SEED = 20260905,—,"seed of the permutations of Moran's I, LISA, Gi* and bivariate Moran (study/pipeline/15b_spatial_correlation.py)"
+999,—,number of permutations in every spatial inference
+UTF-8,—,read/write encoding (errors='replace' in sources with mixed encoding)
+α = 0.05 / q = 0.05,—,level of the confidence intervals and of the false discovery rate

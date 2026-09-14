@@ -1,0 +1,21 @@
+year,variant,position,panel,code_position,code3,n_episodes,n_f84_episodes_cell,icd_label_es,pct_of_f84_episodes,unit,denominator,script
+2019,sin_rett,secondary_only,observed,principal,G40,152,2106,Epilepsia,7.2175,episodios GRD con el co-diagnóstico,n_f84_episodes_cell,lancet_americas/pipeline/11_grd_episode_detail.py
+2019,sin_rett,secondary_only,observed,principal,Z51,99,2106,Otra atención médica,4.7009,episodios GRD con el co-diagnóstico,n_f84_episodes_cell,lancet_americas/pipeline/11_grd_episode_detail.py
+2019,sin_rett,secondary_only,observed,principal,N47,75,2106,"Prepucio redundante, fimosis y parafimosis",3.5613,episodios GRD con el co-diagnóstico,n_f84_episodes_cell,lancet_americas/pipeline/11_grd_episode_detail.py
+2019,sin_rett,secondary_only,observed,principal,K35,74,2106,Apendicitis aguda,3.5138,episodios GRD con el co-diagnóstico,n_f84_episodes_cell,lancet_americas/pipeline/11_grd_episode_detail.py
+2019,sin_rett,secondary_only,observed,principal,J35,56,2106,Enfermedades crónicas de amígdalas y adenoides,2.6591,episodios GRD con el co-diagnóstico,n_f84_episodes_cell,lancet_americas/pipeline/11_grd_episode_detail.py
+2019,sin_rett,secondary_only,observed,principal,J12,52,2106,Neumonía viral,2.4691,episodios GRD con el co-diagnóstico,n_f84_episodes_cell,lancet_americas/pipeline/11_grd_episode_detail.py
+2019,sin_rett,secondary_only,observed,principal,T43,24,2106,Envenenamiento por psicotrópicos,1.1396,episodios GRD con el co-diagnóstico,n_f84_episodes_cell,lancet_americas/pipeline/11_grd_episode_detail.py
+2019,sin_rett,secondary_only,observed,principal,F32,22,2106,Episodio depresivo,1.0446,episodios GRD con el co-diagnóstico,n_f84_episodes_cell,lancet_americas/pipeline/11_grd_episode_detail.py
+2019,sin_rett,secondary_only,observed,principal,J46,18,2106,Estado asmático,0.8547,episodios GRD con el co-diagnóstico,n_f84_episodes_cell,lancet_americas/pipeline/11_grd_episode_detail.py
+2019,sin_rett,secondary_only,observed,principal,F60,8,2106,Trastornos específicos de la personalidad,0.3799,episodios GRD con el co-diagnóstico,n_f84_episodes_cell,lancet_americas/pipeline/11_grd_episode_detail.py
+2024,sin_rett,secondary_only,observed,principal,F32,380,8341,Episodio depresivo,4.5558,episodios GRD con el co-diagnóstico,n_f84_episodes_cell,lancet_americas/pipeline/11_grd_episode_detail.py
+2024,sin_rett,secondary_only,observed,principal,N47,373,8341,"Prepucio redundante, fimosis y parafimosis",4.4719,episodios GRD con el co-diagnóstico,n_f84_episodes_cell,lancet_americas/pipeline/11_grd_episode_detail.py
+2024,sin_rett,secondary_only,observed,principal,G40,358,8341,Epilepsia,4.2921,episodios GRD con el co-diagnóstico,n_f84_episodes_cell,lancet_americas/pipeline/11_grd_episode_detail.py
+2024,sin_rett,secondary_only,observed,principal,K35,324,8341,Apendicitis aguda,3.8844,episodios GRD con el co-diagnóstico,n_f84_episodes_cell,lancet_americas/pipeline/11_grd_episode_detail.py
+2024,sin_rett,secondary_only,observed,principal,J12,301,8341,Neumonía viral,3.6087,episodios GRD con el co-diagnóstico,n_f84_episodes_cell,lancet_americas/pipeline/11_grd_episode_detail.py
+2024,sin_rett,secondary_only,observed,principal,J35,292,8341,Enfermedades crónicas de amígdalas y adenoides,3.5008,episodios GRD con el co-diagnóstico,n_f84_episodes_cell,lancet_americas/pipeline/11_grd_episode_detail.py
+2024,sin_rett,secondary_only,observed,principal,Z51,183,8341,Otra atención médica,2.194,episodios GRD con el co-diagnóstico,n_f84_episodes_cell,lancet_americas/pipeline/11_grd_episode_detail.py
+2024,sin_rett,secondary_only,observed,principal,J46,180,8341,Estado asmático,2.158,episodios GRD con el co-diagnóstico,n_f84_episodes_cell,lancet_americas/pipeline/11_grd_episode_detail.py
+2024,sin_rett,secondary_only,observed,principal,T43,177,8341,Envenenamiento por psicotrópicos,2.122,episodios GRD con el co-diagnóstico,n_f84_episodes_cell,lancet_americas/pipeline/11_grd_episode_detail.py
+2024,sin_rett,secondary_only,observed,principal,F60,152,8341,Trastornos específicos de la personalidad,1.8223,episodios GRD con el co-diagnóstico,n_f84_episodes_cell,lancet_americas/pipeline/11_grd_episode_detail.py

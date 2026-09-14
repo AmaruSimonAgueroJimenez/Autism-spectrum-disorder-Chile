@@ -1,0 +1,21 @@
+year,variant,position,panel,code_position,grouping,group_label,n_episodes,n_f84_episodes_cell,pct_of_f84_episodes,unit,denominator,script
+2019,sin_rett,any,observed,any,chapter,Factores que influyen en el estado de salud,1045,2334,44.7729,episodios GRD con el co-diagnóstico,n_f84_episodes_cell,lancet_americas/pipeline/11_grd_episode_detail.py
+2019,sin_rett,any,observed,any,chapter,Sistema respiratorio,611,2334,26.1782,episodios GRD con el co-diagnóstico,n_f84_episodes_cell,lancet_americas/pipeline/11_grd_episode_detail.py
+2019,sin_rett,any,observed,any,chapter,Sistema nervioso,609,2334,26.0925,episodios GRD con el co-diagnóstico,n_f84_episodes_cell,lancet_americas/pipeline/11_grd_episode_detail.py
+2019,sin_rett,any,observed,any,chapter,Trastornos mentales y del comportamiento,592,2334,25.3642,episodios GRD con el co-diagnóstico,n_f84_episodes_cell,lancet_americas/pipeline/11_grd_episode_detail.py
+2019,sin_rett,any,observed,any,chapter,Sistema digestivo,557,2334,23.8646,episodios GRD con el co-diagnóstico,n_f84_episodes_cell,lancet_americas/pipeline/11_grd_episode_detail.py
+2019,sin_rett,any,observed,any,chapter,"Endocrinas, nutricionales y metabólicas",519,2334,22.2365,episodios GRD con el co-diagnóstico,n_f84_episodes_cell,lancet_americas/pipeline/11_grd_episode_detail.py
+2019,sin_rett,any,observed,any,chapter,Síntomas y signos no clasificados,474,2334,20.3085,episodios GRD con el co-diagnóstico,n_f84_episodes_cell,lancet_americas/pipeline/11_grd_episode_detail.py
+2019,sin_rett,any,observed,any,chapter,Malformaciones congénitas,406,2334,17.395,episodios GRD con el co-diagnóstico,n_f84_episodes_cell,lancet_americas/pipeline/11_grd_episode_detail.py
+2019,sin_rett,any,observed,any,chapter,Causas externas,307,2334,13.1534,episodios GRD con el co-diagnóstico,n_f84_episodes_cell,lancet_americas/pipeline/11_grd_episode_detail.py
+2019,sin_rett,any,observed,any,chapter,Traumatismos y envenenamientos,263,2334,11.2682,episodios GRD con el co-diagnóstico,n_f84_episodes_cell,lancet_americas/pipeline/11_grd_episode_detail.py
+2024,sin_rett,any,observed,any,chapter,Factores que influyen en el estado de salud,4436,8731,50.8075,episodios GRD con el co-diagnóstico,n_f84_episodes_cell,lancet_americas/pipeline/11_grd_episode_detail.py
+2024,sin_rett,any,observed,any,chapter,Trastornos mentales y del comportamiento,3549,8731,40.6483,episodios GRD con el co-diagnóstico,n_f84_episodes_cell,lancet_americas/pipeline/11_grd_episode_detail.py
+2024,sin_rett,any,observed,any,chapter,Sistema respiratorio,3021,8731,34.6008,episodios GRD con el co-diagnóstico,n_f84_episodes_cell,lancet_americas/pipeline/11_grd_episode_detail.py
+2024,sin_rett,any,observed,any,chapter,"Endocrinas, nutricionales y metabólicas",2453,8731,28.0953,episodios GRD con el co-diagnóstico,n_f84_episodes_cell,lancet_americas/pipeline/11_grd_episode_detail.py
+2024,sin_rett,any,observed,any,chapter,Síntomas y signos no clasificados,2078,8731,23.8003,episodios GRD con el co-diagnóstico,n_f84_episodes_cell,lancet_americas/pipeline/11_grd_episode_detail.py
+2024,sin_rett,any,observed,any,chapter,Sistema digestivo,1664,8731,19.0585,episodios GRD con el co-diagnóstico,n_f84_episodes_cell,lancet_americas/pipeline/11_grd_episode_detail.py
+2024,sin_rett,any,observed,any,chapter,Causas externas,1657,8731,18.9784,episodios GRD con el co-diagnóstico,n_f84_episodes_cell,lancet_americas/pipeline/11_grd_episode_detail.py
+2024,sin_rett,any,observed,any,chapter,Traumatismos y envenenamientos,1599,8731,18.3141,episodios GRD con el co-diagnóstico,n_f84_episodes_cell,lancet_americas/pipeline/11_grd_episode_detail.py
+2024,sin_rett,any,observed,any,chapter,Sistema nervioso,1566,8731,17.9361,episodios GRD con el co-diagnóstico,n_f84_episodes_cell,lancet_americas/pipeline/11_grd_episode_detail.py
+2024,sin_rett,any,observed,any,chapter,Malformaciones congénitas,1223,8731,14.0076,episodios GRD con el co-diagnóstico,n_f84_episodes_cell,lancet_americas/pipeline/11_grd_episode_detail.py

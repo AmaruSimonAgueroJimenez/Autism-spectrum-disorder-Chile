@@ -6,9 +6,8 @@ project:
     - methods.qmd
     - rem.qmd
     - grd.qmd
-    - lancet.qmd
-    - lancet_supplement.qmd
-    - lancet_corpus.qmd
+    - version_02_corpus.qmd
+    - version_10_panels.qmd
 
 lang: en
 jupyter: python3

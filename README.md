@@ -1,6 +1,6 @@
 # Autism in Chile: REM and GRD
 
-Repository of reproducible Python and Quarto analyses of the administrative recognition of autism spectrum disorder (ASD) in the routine records of the Chilean public health and education systems, 2019–2025: hospital discharges grouped by diagnosis-related groups (GRD), the monthly statistical summaries of the public network (REM), diagnostic trajectories, and the multi-source study manuscript built on the same data. Nothing in the repository is prevalence or incidence: every figure is a count of episodes, programme entries, follow-up stocks or school enrolments, published with its unit, denominator and coverage. The active documentation contains **seven QMD documents**, all in English: four analytical reports and three pages of the study manuscript.
+Repository of reproducible Python and Quarto analyses of the administrative recognition of autism spectrum disorder (ASD) in the routine records of the Chilean public health and education systems, 2019–2025: hospital discharges grouped by diagnosis-related groups (GRD), the monthly statistical summaries of the public network (REM), diagnostic trajectories, and the results of the multi-source study built on the same data. Nothing in the repository is prevalence or incidence: every figure is a count of episodes, programme entries, follow-up stocks or school enrolments, published with its unit, denominator and coverage. The active documentation contains **six QMD documents**, all in English: four analytical reports and two pages of study results, organised by the version that produced them.
 
 | Document | Content | Rendered version |
 |---|---|---|
@@ -11,22 +11,42 @@ Repository of reproducible Python and Quarto analyses of the administrative reco
 
 The four reports run Python blocks that compute tables and figures from the aggregates. They share the configuration in `docs/_quarto.yml`, the bibliography in `docs/references.bib`, the presentation helpers in `scripts/report_helpers.py` and the epidemiological functions in `scripts/epi_helpers.py`.
 
-## Study manuscript
+## Results of the study
 
-The manuscript is built in `lancet_americas/` with its own pipeline (`pipeline/00_provenance.py` to `17_extended_material.py`, documented in [lancet_americas/README.md](lancet_americas/README.md)) that reads the microdata of the data volume and writes tidy tables, plates and documents. Its ten versions (`lancet_americas/manuscript/01_paper` to `10_revision_2026-09-14_paneles`; index in `lancet_americas/manuscript/LEEME.md`), with their DOCX, PDF and 600 dpi plates, **stay out of git**, as does `lancet_americas/outputs/`; the pipeline code is versioned.
+The analysis is built in `study/` with its own pipeline (`pipeline/00_provenance.py` to
+`17_extended_material.py`, documented in [study/README.md](study/README.md)) that reads the microdata of
+the data volume and writes tidy tables, plates and documents. The study was written in ten versions
+between 3 and 14 September 2026 (`study/manuscript/`, index in `study/manuscript/LEEME.md`). Those
+version folders, with their DOCX, PDF and 600 dpi plates (~1.5 GB), **stay out of git**, as does
+`study/outputs/`; the pipeline code and the results are versioned.
 
-So that the results are reproducible from the repository, `docs/` includes three more pages, fed by the folder [docs/lancet](docs/lancet/README.md):
+**The text of the manuscript is not part of this repository. Its results are.** They are organised by
+the version that produced them, from the index of [docs/index.qmd](docs/index.qmd):
 
 | Document | Content | Rendered version |
 |---|---|---|
-| [lancet.qmd](docs/lancet.qmd) | The article of version 10: text with citations, tables 1 and 2 and panel figures 1 to 4. The page rebuilds the four figures at every render from `docs/lancet/data/` with `docs/lancet/figuras_principales.py` (English and Spanish plates) and prints their layout check | [Manuscript](docs/lancet.html) |
-| [lancet_supplement.qmd](docs/lancet_supplement.qmd) | Supplementary material: extended methods A1–A11 with 23 equations, complementary results B1–B4, tables S1–S9 and figures S1–S9, rebuilt at every render by `docs/lancet/figuras_suplementarias.py` | [Supplement](docs/lancet_supplement.html) |
-| [lancet_corpus.qmd](docs/lancet_corpus.qmd) | Extended corpus of the earlier versions: 59 plates and 132 tables of the pipeline (variant without Rett syndrome) | [Corpus](docs/lancet_corpus.html) |
+| [index.qmd](docs/index.qmd) | Common index: the analytical reports, the registry of the ten versions and what each one added to the results | [Home](docs/index.html) |
+| [version_02_corpus.qmd](docs/version_02_corpus.qmd) | Version 02, the extended corpus: 59 plates and 132 tables of the pipeline (variant without Rett syndrome), the reference against which later figures are audited | [v02 corpus](docs/version_02_corpus.html) |
+| [version_10_panels.qmd](docs/version_10_panels.qmd) | Version 10, the most recent: the four panel figures and the nine supplementary figures, rebuilt at every render from `docs/study/data/` (English and Spanish plates), with their layout check | [v10 results](docs/version_10_panels.html) |
 
-`docs/lancet/data/` contains public copies of the tables the plates need (tidy and verified), a commune extract without identifiers with small cells masked, the STIX equations, the verified facts file that resolves the article text and `contenido_v10.json`, exported from the document builder with every figure already resolved, in English and Spanish. The plates generated this way coincide with those of the submitted version. The folder and file names keep the historical prefix `lancet`; renaming them is a cosmetic change that only requires updating the paths in `docs/_quarto.yml`, `docs/lancet/render_helpers.py` (`REL`) and `scripts/render_reports.py`.
+What each version added is audited rather than asserted. `scripts/audit_versions.py` hashes every tidy
+result table in each version folder and compares them pairwise; `docs/study/versions.json` records the
+outcome and the pages are rendered from it. The audit finds that **no result table ever changed between
+versions 05 and 10**: versions only ever add tables, and from version 07 onwards what changes is how the
+same numbers are laid out into figures. Run it where the version folders exist:
 
 ```sh
-python scripts/render_reports.py --lancet-figures  # regenerates the plates of docs/lancet and renders the seven QMD documents
+python scripts/audit_versions.py
+```
+
+`docs/study/data/` contains the public tables the plates are built from (tidy and verified), a commune
+extract without commune identifiers and with small cells masked, the STIX equations, the verified facts
+file and `contenido_v10.json` with the figure titles and captions, in English and Spanish. These tables
+are versioned in git, so the plates can be rebuilt from a clone without the source microdata. Commune
+tables that carry cells under five cases are withheld.
+
+```sh
+python scripts/render_reports.py --figures  # rebuilds the plates of docs/study and renders the six QMD documents
 ```
 
 ## Questions and interpretation
@@ -46,7 +66,7 @@ python -m pip install -r requirements-analysis.txt
 python scripts/render_reports.py
 ```
 
-The command runs the seven QMD documents and updates `docs/index.html`, `docs/methods.html`, `docs/rem.html`, `docs/grd.html`, `docs/lancet.html`, `docs/lancet_supplement.html` and `docs/lancet_corpus.html`. It uses the aggregates already in `output_files/consolidacion/`, so it does not require mounting the external disk. The maps read `data/comunas.shp` and `data/Regional.shp`; the rates read `data/censo_proyecciones_ano_edad_genero.parquet`.
+The command runs the six QMD documents and updates `docs/index.html`, `docs/methods.html`, `docs/rem.html`, `docs/grd.html`, `docs/version_02_corpus.html` and `docs/version_10_panels.html`. It uses the aggregates already in `output_files/consolidacion/`, so it does not require mounting the external disk. The maps read `data/comunas.shp` and `data/Regional.shp`; the rates read `data/censo_proyecciones_ano_edad_genero.parquet`.
 
 To extract the sources again, recompute rates and spatial statistics and then render:
 

@@ -1,0 +1,6 @@
+year,hospitals_n,quantile,rate_per_100k,weighting,source
+2024,72,0.0,67.85795068988917,unweighted hospitals; pandas linear quantile,outputs/tidy/grd_hospital_year.csv; variant=sin_rett
+2024,72,0.25,393.3054244175905,unweighted hospitals; pandas linear quantile,outputs/tidy/grd_hospital_year.csv; variant=sin_rett
+2024,72,0.5,637.9844298259668,unweighted hospitals; pandas linear quantile,outputs/tidy/grd_hospital_year.csv; variant=sin_rett
+2024,72,0.75,976.1444637847053,unweighted hospitals; pandas linear quantile,outputs/tidy/grd_hospital_year.csv; variant=sin_rett
+2024,72,1.0,5210.7433859772655,unweighted hospitals; pandas linear quantile,outputs/tidy/grd_hospital_year.csv; variant=sin_rett

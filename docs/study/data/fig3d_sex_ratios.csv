@@ -1,0 +1,12 @@
+year,male,female,unknown,source,male_age_sum,female_age_sum,male_female_count_ratio,ratio_lo,ratio_hi,interval_method
+2019,1786.0,547.0,1.0,GRD,,,3.2650822669104205,2.965184516532552,3.5998515603600416,"conditional exact Clopper-Pearson binomial, no adjustment for repeat records or clusters"
+2020,1206.0,403.0,0.0,GRD,,,2.9925558312655087,2.67118915686903,3.358149010835801,"conditional exact Clopper-Pearson binomial, no adjustment for repeat records or clusters"
+2021,1806.0,560.0,1.0,GRD,,,3.225,2.931674508789541,3.5520234557543224,"conditional exact Clopper-Pearson binomial, no adjustment for repeat records or clusters"
+2022,2886.0,972.0,1.0,GRD,,,2.9691358024691357,2.7600030603667904,3.196259202356109,"conditional exact Clopper-Pearson binomial, no adjustment for repeat records or clusters"
+2023,4497.0,1924.0,2.0,GRD,,,2.337318087318087,2.215291787482191,2.466780323461786,"conditional exact Clopper-Pearson binomial, no adjustment for repeat records or clusters"
+2024,5849.0,2878.0,4.0,GRD,,,2.032314107018763,1.943274414488163,2.12579725006955,"conditional exact Clopper-Pearson binomial, no adjustment for repeat records or clusters"
+2021,1624.0,461.0,,A05,1624.0,461.0,3.522776572668113,3.1746452051260667,3.9151543363448433,"conditional exact Clopper-Pearson binomial, no adjustment for repeat records or clusters"
+2022,3465.0,1175.0,,A05,3466.0,1175.0,2.948936170212766,2.759316387649867,3.153324691715179,"conditional exact Clopper-Pearson binomial, no adjustment for repeat records or clusters"
+2023,5734.0,2315.0,,A05,5734.0,2315.0,2.476889848812095,2.3597651239706994,2.600478432618943,"conditional exact Clopper-Pearson binomial, no adjustment for repeat records or clusters"
+2024,8164.0,3678.0,,A05,8164.0,3679.0,2.21968461120174,2.1346808850123047,2.308406548530703,"conditional exact Clopper-Pearson binomial, no adjustment for repeat records or clusters"
+2025,8867.0,4289.0,,A05,8867.0,4289.0,2.067381674049895,1.9931453711860672,2.144632179888197,"conditional exact Clopper-Pearson binomial, no adjustment for repeat records or clusters"

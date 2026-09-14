@@ -39,8 +39,10 @@ vignettes/*.pdf
 # R Environment Variables
 .Renviron
 
-# pkgdown site
-data/
+# Source microdata at the repository root (168 MB: GRD public CSVs and shapefiles).
+# The leading slash matters: a bare `data/` also excluded docs/study/data/, the aggregated
+# tables the site needs to rebuild every figure, which made the site unreproducible from a clone.
+/data/
 
 # translation temp files
 po/*~
@@ -56,15 +58,16 @@ __pycache__/
 # Quarto execution metadata
 docs/.quarto/
 
-# Manuscript for The Lancet Regional Health – Americas: the versions (DOCX, PDF, 600 dpi plates and
-# revision data) and the heavy pipeline outputs stay out of git; the pipeline code
-# (lancet_americas/*.py, pipeline/, journal/, tests/, tools/) and the public replica in docs/lancet/ are versioned.
-lancet_americas/manuscript/
-lancet_americas/outputs/
-lancet_americas/.pytest_cache/
-lancet_americas/**/__pycache__/
+# Manuscript builds: the version folders (DOCX, PDF, 600 dpi plates and revision data, ~1.5 GB)
+# and the heavy pipeline outputs stay out of git. What IS versioned: the pipeline code
+# (study/*.py, pipeline/, journal/, tests/, tools/), the aggregated tables in docs/study/data/
+# and the public replica of the results in docs/study/.
+study/manuscript/
+study/outputs/
+study/.pytest_cache/
+study/**/__pycache__/
 .pytest_cache/
-docs/lancet/__pycache__/
+docs/study/__pycache__/
 
 # Local downloads and session outputs
 Claude outputs/

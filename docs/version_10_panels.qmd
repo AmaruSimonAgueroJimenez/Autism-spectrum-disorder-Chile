@@ -1,0 +1,103 @@
+---
+title: "Version 10 results: four panel figures"
+subtitle: "Results of the most recent version (14 September 2026), rebuilt from the public tables each time this page is rendered"
+---
+
+::: {.report-nav}
+[Home](index.html) [Methods](methods.html) [REM](rem.html) [GRD](grd.html) [v02 corpus](version_02_corpus.html) [v10 results](version_10_panels.html)
+:::
+
+```{python}
+#| label: generar-figuras
+from pathlib import Path
+import json
+import subprocess
+import sys
+import time
+
+ROOT = Path.cwd().parent if Path.cwd().name == "docs" else Path.cwd()
+sys.path.insert(0, str(ROOT / "docs" / "study"))
+sys.path.insert(0, str(ROOT / "scripts"))
+import render_helpers as rh
+from report_helpers import kpis, number, show_table
+import pandas as pd
+
+# The plates are rebuilt here, at render time, from docs/study/data: nothing on this page is a stored
+# image. Both scripts run so that a fresh clone reproduces the panel and the supplementary plates alike.
+started = time.time()
+for script in ("figuras_principales.py", "figuras_suplementarias.py"):
+    build = subprocess.run([sys.executable, script], cwd=ROOT / "docs" / "study", capture_output=True, text=True)
+    if build.returncode != 0:
+        raise RuntimeError(f"{script}\n{build.stderr[-3000:]}")
+elapsed = time.time() - started
+
+v10 = rh.version("10")
+tables = rh.data_tables()
+kpis([
+    ("4", f"Panel figures rebuilt by this page in {elapsed:.0f} s (English and Spanish plates)"),
+    ("9", "Supplementary figures"),
+    (str(len(tables)), "Public tidy tables the plates are built from"),
+    (f"v{v10['identical_results_to']}", "Version whose results these are, unchanged"),
+])
+```
+
+This page carries the **results** of version 10 of the study: the four panel figures, the nine supplementary figures and the tables they are built from. It does not reproduce the text of the manuscript, which is not part of this repository.
+
+```{python}
+#| label: nota-auditoria
+#| output: asis
+print(f"> **What version 10 changed.** {v10['results']}\n>\n> {rh.audit_note()}\n")
+```
+
+Case definition: GRD episodes with an eligible F84 code, excluding Rett syndrome (F84.2); REM programmes with the strict autism code except where the "F84 family" is indicated. Every count is administrative recognition, **not prevalence or incidence**. The [extended corpus](version_02_corpus.html) holds the plates and tables of the earlier versions, and the [index](index.html) records what each version of the series added.
+
+## Layout check of the plates built in this render
+
+```{python}
+#| label: control-figuras
+qa = pd.DataFrame(json.loads((ROOT / "docs" / "study" / "qa" / "figuras_principales_qa.json").read_text(encoding="utf-8")))
+qa_view = qa.assign(figure=qa.figure.str.replace("_", " ", regex=False),
+                    **{"Off-canvas texts": qa.out_of_canvas.map(len), "Overlaps": qa.overlaps.map(len),
+                       "Font sizes (pt)": qa.font_sizes_pt.map(lambda s: f"{min(s)}–{max(s)}")})
+show_table(qa_view[["figure", "language", "width_mm", "height_mm", "Font sizes (pt)", "Off-canvas texts", "Overlaps"]].rename(
+    columns={"figure": "Figure", "language": "Language", "width_mm": "Width (mm)", "height_mm": "Height (mm)"}),
+    "Text outside the canvas and overlaps between labels must both be zero for every plate",
+    {"Width (mm)": 1, "Height (mm)": 1})
+```
+
+## Panel figures
+
+```{python}
+#| label: laminas-principales
+#| output: asis
+# Titles and captions come from the exported document content, so the plates keep the wording
+# they were given; only the prose of the article is left out of this repository.
+captions = {e["id"]: e for doc in ("manuscript", "supplement")
+            for e in rh.events(doc, "en") if e.get("kind") == "figure"}
+for fid in ("1", "2", "3", "4"):
+    meta = captions.get(fid, {})
+    print(f"### Figure {fid}\n")
+    print(rh.figure_md(fid, "en", meta.get("title", f"Figure {fid}"), meta.get("caption", "")) + "\n")
+```
+
+## Supplementary figures
+
+```{python}
+#| label: laminas-suplementarias
+#| output: asis
+for n in range(1, 10):
+    fid = f"S{n}"
+    meta = captions.get(fid, {})
+    print(f"### Figure {fid}\n")
+    print(rh.figure_md(fid, "en", meta.get("title", f"Figure {fid}"), meta.get("caption", "")) + "\n")
+```
+
+## Tables the plates are built from
+
+Every table below ships with the repository, so the figures above can be rebuilt from a clone without the source microdata. Commune-level tables that carry cells under five cases are withheld: the site publishes the masked commune extract instead, without commune identifiers.
+
+```{python}
+#| label: tablas-publicas
+show_table(pd.DataFrame(tables).rename(columns={"name": "Table", "rows": "Rows", "kb": "Size (KB)"}),
+           f"The {len(tables)} public tidy tables in docs/study/data/", {"Size (KB)": 1})
+```

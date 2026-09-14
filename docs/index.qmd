@@ -1,10 +1,10 @@
 ---
 title: "Autism in Chile"
-subtitle: "Administrative recognition of autism in the public health and education systems, 2019–2025: hospital discharges (GRD), outpatient activity and screening (REM), diagnostic trajectories, and the study manuscript"
+subtitle: "Administrative recognition of autism in the public health and education systems, 2019–2025: hospital discharges (GRD), outpatient activity and screening (REM), diagnostic trajectories, and the results of every version of the study"
 ---
 
 ::: {.report-nav}
-[Home](index.html) [Methods](methods.html) [REM](rem.html) [GRD](grd.html) [Manuscript](lancet.html) [Supplement](lancet_supplement.html) [Corpus](lancet_corpus.html)
+[Home](index.html) [Methods](methods.html) [REM](rem.html) [GRD](grd.html) [v02 corpus](version_02_corpus.html) [v10 results](version_10_panels.html)
 :::
 
 ```{python}
@@ -48,7 +48,7 @@ kpis([
 ])
 ```
 
-This site documents a national study of how autism is recognised in the routine records of Chile's public health and education systems. Nothing here is prevalence or incidence: every number is a count of hospital episodes, programme entries, follow-up stocks or school enrolments, presented with its unit, its denominator and its coverage. Two lines of work share the same data and definitions: the **analytical reports** (GRD, REM and Methods), which describe each source in depth, and the **study manuscript** with its supplement and its corpus of earlier results, which brings the sources together in a multi-source analysis.
+This site documents a national study of how autism is recognised in the routine records of Chile's public health and education systems. Nothing here is prevalence or incidence: every number is a count of hospital episodes, programme entries, follow-up stocks or school enrolments, presented with its unit, its denominator and its coverage. Two lines of work share the same data and definitions: the **analytical reports** (GRD, REM and Methods), which describe each source in depth, and the **results of the study**, organised below by the version that produced them. The text of the manuscript is not part of this repository; its results are.
 
 ## Analytical reports
 
@@ -58,13 +58,41 @@ This site documents a national study of how autism is recognised in the routine 
 
 **[Methods](methods.html).** Sources, case definitions, units, denominators, standardisation, intervals, trends, spatial analysis, REM reading rules, quality controls, biases, limitations and reproducibility. It is the common reference of the two reports.
 
-## Study manuscript
+## Versions of the study {#versions}
 
-**[Manuscript](lancet.html).** The current version of the article (version 10): summary, research in context, introduction, methods, results and discussion with numbered citations, tables 1 and 2 and the four panel figures. The figures are regenerated at render time from the public data in `docs/lancet/data/` by the same scripts that produced the submitted plates, in English and Spanish.
+The study was written in ten versions between 3 and 14 September 2026. Their results are organised
+here so that each one can be found and reproduced on its own. What each version added is not an
+editorial summary: `scripts/audit_versions.py` hashes every tidy result table in each version and
+compares them pairwise, and this table is rendered from the registry that script feeds.
 
-**[Supplementary material](lancet_supplement.html).** Extended methods (A1–A11, 23 equations), complementary results (B1–B4), tables S1–S9 and figures S1–S9, regenerated the same way.
+```{python}
+#| label: indice-versiones
+#| output: asis
+import sys as _sys
+_sys.path.insert(0, str(ROOT / "docs" / "study"))
+import render_helpers as rh
+print(rh.version_rows_html())
+```
 
-**[Extended corpus](lancet_corpus.html).** The 59 plates and 132 tables produced by the full pipeline for the earlier versions of the study (variant without Rett syndrome), so that no result is left out of the site.
+```{python}
+#| label: nota-auditoria
+#| output: asis
+print(f"> **Audit finding.** {rh.audit_note()}\n")
+```
+
+Two versions carry their results on their own page, because the repository ships the public tables
+and plates they need:
+
+**[Version 02 — extended corpus](version_02_corpus.html).** The 59 plates and 132 tables produced by
+the full pipeline (variant without Rett syndrome). This is the corpus against which any figure in the
+later versions is audited.
+
+**[Version 10 — panel results](version_10_panels.html).** The four panel figures and the nine
+supplementary figures of the most recent version, rebuilt at render time from `docs/study/data/` by
+the same scripts that produced the submitted plates, in English and Spanish.
+
+The version folders themselves (DOCX, PDF and 600 dpi plates, about 1.5 GB) are not versioned in git.
+The results that the site reproduces are.
 
 ## Main results
 
@@ -85,11 +113,11 @@ Hospitalisations and outpatient programme entries with an autism code have grown
 
 In the 2021–2024 hospital trajectories, the first autism record almost always occurs with the code in a secondary position, and only a minority has observable prior hospitalisations. The earlier codes do not show that they were ruled out as differential diagnoses: they may be comorbidities, symptoms or independent reasons for admission.
 
-## Headline figures of the manuscript
+## Headline figures of the study
 
 ```{python}
 #| label: manuscrito-cifras
-facts = json.loads((ROOT / "docs" / "lancet" / "data" / "facts_v10.json").read_text(encoding="utf-8"))["facts"]
+facts = json.loads((ROOT / "docs" / "study" / "data" / "facts_v10.json").read_text(encoding="utf-8"))["facts"]
 headline = pd.DataFrame([
     ("Eligible GRD episodes (F84 family without F84.2, any position)", 2019, number(facts["grd19n"]), 2024, number(facts["grd24n"])),
     ("Eligible episodes per 100 000 GRD episodes of the same panel", 2019, number(facts["grd19r"], 1), 2024, number(facts["grd24r"], 1)),
@@ -100,7 +128,7 @@ headline = pd.DataFrame([
     ("Eligible episodes with the code only in a secondary position, 2024 (%)", np.nan, "—", 2024, number(facts["secondary24pct"], 1)),
     ("Average annual percent change of the hospital indicator, 2019–2024 (%)", np.nan, "—", 2024, number(facts["apcmain"], 1)),
 ], columns=["Indicator", "Start year", "Start value", "End year", "End value"])
-show_table(headline, "Headline figures of the manuscript (version 10), read from the verified facts file that resolves the article text")
+show_table(headline, "Headline figures of version 10, read from the verified facts file the study builds its statements from")
 ```
 
 ## How the analyses are organised
@@ -118,12 +146,12 @@ organisation = pd.DataFrame([
     ("GRD · A8", "Regions, communes, indirect standardisation, Moran, LISA", "grd_rates_regional, grd_rates_comunal, grd_spatial_*"),
     ("GRD · B", "Trajectories: linkage, position, prior diagnoses, sequences, transitions", "grd_cohort_*, grd_first_*, grd_previous_*, grd_sequences, grd_principal_transitions"),
     ("REM", "Entries, rates, age and sex, subcategories, regions, communes, panel, screening, rehabilitation, ecological comparison", "rem_*"),
-    ("Manuscript", "Figures 1–4 and S2–S9 from docs/lancet/data (tidy and verified tables); text and tables from the exported document content", "docs/lancet/data/*.csv, contenido_v10.json"),
+    ("Versions", "Figures 1–4 and S1–S9 rebuilt from docs/study/data (tidy and verified tables); the corpus of version 02 from its stored plates and presentation tables", "docs/study/data/*.csv, docs/study/corpus/"),
 ], columns=["Section", "Content", "Inputs"])
 show_table(organisation, "Site sections and the tables that feed them")
 ```
 
-The seven documents run **Python** and read the aggregate tables of `output_files/consolidacion/` and `docs/lancet/data/`. Tables and figures are recalculated at render time; they contain no hand-pasted figures. The extraction from the original microdata runs separately, through the scripts documented in the [repository README](../README.md).
+The site's documents run **Python** and read the aggregate tables of `output_files/consolidacion/` and `docs/study/data/`, both versioned in git. Tables and figures are recalculated at render time; they contain no hand-pasted figures. The extraction from the original microdata runs separately, through the scripts documented in the [repository README](../README.md).
 
 ## Interpretation priorities
 

@@ -1,0 +1,85 @@
+year,category,panel,n_episodes,sex,age_group,n_episodes_total,rate_per_100k_episodes,rate_lo,rate_hi,label_en,label_es
+2019,F80,fixed65,808,,,1151475,70.17086779999566,65.41526932740908,75.18080145744395,Speech and language development disorders,Trastornos del desarrollo del habla y lenguaje
+2020,F80,fixed65,564,,,781912,72.13087917821954,66.30000623924602,78.3371546264464,Speech and language development disorders,Trastornos del desarrollo del habla y lenguaje
+2021,F80,fixed65,731,,,816909,89.48365117779336,83.1135229394454,96.21249225879383,Speech and language development disorders,Trastornos del desarrollo del habla y lenguaje
+2022,F80,fixed65,970,,,932839,103.98364562373571,97.54200580553652,110.7389114322346,Speech and language development disorders,Trastornos del desarrollo del habla y lenguaje
+2023,F80,fixed65,1141,,,1025029,111.31392380118027,104.94797360670323,117.96505560919343,Speech and language development disorders,Trastornos del desarrollo del habla y lenguaje
+2024,F80,fixed65,1318,,,1048706,125.67869355186296,118.98442233405882,132.65151689054215,Speech and language development disorders,Trastornos del desarrollo del habla y lenguaje
+2019,F81,fixed65,124,,,1151475,10.76879654356369,8.956927810944014,12.839559181866136,Scholastic skills development disorders,Trastornos del aprendizaje escolar
+2020,F81,fixed65,93,,,781912,11.893921566621307,9.599929752101175,14.570857465460644,Scholastic skills development disorders,Trastornos del aprendizaje escolar
+2021,F81,fixed65,114,,,816909,13.955042728137405,11.511189393427589,16.764269164133996,Scholastic skills development disorders,Trastornos del aprendizaje escolar
+2022,F81,fixed65,107,,,932839,11.470360909010022,9.40023757551258,13.860757031052986,Scholastic skills development disorders,Trastornos del aprendizaje escolar
+2023,F81,fixed65,168,,,1025029,16.389780191584823,14.005063396681948,19.064150264072378,Scholastic skills development disorders,Trastornos del aprendizaje escolar
+2024,F81,fixed65,205,,,1048706,19.547899983408122,16.963420169569094,22.414826230960745,Scholastic skills development disorders,Trastornos del aprendizaje escolar
+2019,F82,fixed65,472,,,1151475,40.99090297227469,37.37585299784547,44.861200280025926,Motor function development disorder,Trastorno del desarrollo de la función motriz
+2020,F82,fixed65,300,,,781912,38.36748892458486,34.14825136754089,42.964058046502764,Motor function development disorder,Trastorno del desarrollo de la función motriz
+2021,F82,fixed65,291,,,816909,35.622082753403376,31.64642711866179,39.95900917871787,Motor function development disorder,Trastorno del desarrollo de la función motriz
+2022,F82,fixed65,386,,,932839,41.379058980166995,37.353556393462945,45.720137134205004,Motor function development disorder,Trastorno del desarrollo de la función motriz
+2023,F82,fixed65,388,,,1025029,37.85258758532685,34.17941244904309,41.81294339881311,Motor function development disorder,Trastorno del desarrollo de la función motriz
+2024,F82,fixed65,440,,,1048706,41.956468257071094,38.12723879576451,46.06610977071371,Motor function development disorder,Trastorno del desarrollo de la función motriz
+2019,F83,fixed65,358,,,1151475,31.090557762869363,27.952998285527084,34.48393658245813,Mixed specific developmental disorders,Trastornos mixtos del desarrollo
+2020,F83,fixed65,158,,,781912,20.20687750028136,17.178917684420654,23.614845266254,Mixed specific developmental disorders,Trastornos mixtos del desarrollo
+2021,F83,fixed65,328,,,816909,40.15135100727254,35.923215048275004,44.74035635395138,Mixed specific developmental disorders,Trastornos mixtos del desarrollo
+2022,F83,fixed65,652,,,932839,69.89416180069658,64.63146275279047,75.47122019008877,Mixed specific developmental disorders,Trastornos mixtos del desarrollo
+2023,F83,fixed65,826,,,1025029,80.58308594195871,75.18063045968447,86.27121453740726,Mixed specific developmental disorders,Trastornos mixtos del desarrollo
+2024,F83,fixed65,1116,,,1048706,106.41686039748032,100.26418584099622,112.84830846935544,Mixed specific developmental disorders,Trastornos mixtos del desarrollo
+2019,F84,fixed65,2385,,,1151475,207.12564319676937,198.89558514315817,215.6087952400199,Pervasive developmental disorders,Trastornos generalizados del desarrollo
+2020,F84,fixed65,1633,,,781912,208.8470313794903,198.8393128479987,219.22799789979553,Pervasive developmental disorders,Trastornos generalizados del desarrollo
+2021,F84,fixed65,2399,,,816909,293.66796056843543,282.0329323707012,305.6597305482635,Pervasive developmental disorders,Trastornos generalizados del desarrollo
+2022,F84,fixed65,3912,,,932839,419.3649708041795,406.32542277218255,432.7164631910393,Pervasive developmental disorders,Trastornos generalizados del desarrollo
+2023,F84,fixed65,6421,,,1025029,626.421301250989,611.1919891936836,641.9341676357634,Pervasive developmental disorders,Trastornos generalizados del desarrollo
+2024,F84,fixed65,8557,,,1048706,815.9579519903576,798.7600328126211,833.4328681242262,Pervasive developmental disorders,Trastornos generalizados del desarrollo
+2019,F88,fixed65,19,,,1151475,1.650057534900888,0.9934424250953543,2.5767692369860904,Other psychological development disorders,Otros trastornos del desarrollo psicológico
+2020,F88,fixed65,12,,,781912,1.5346995569833946,0.7930016560331875,2.680811273925575,Other psychological development disorders,Otros trastornos del desarrollo psicológico
+2021,F88,fixed65,24,,,816909,2.937903732239454,1.8823703563905483,4.371367874971779,Other psychological development disorders,Otros trastornos del desarrollo psicológico
+2022,F88,fixed65,29,,,932839,3.108789405245707,2.0820050552719103,4.4647401575820265,Other psychological development disorders,Otros trastornos del desarrollo psicológico
+2023,F88,fixed65,30,,,1025029,2.926746462783004,1.9746635481943353,4.178112560211239,Other psychological development disorders,Otros trastornos del desarrollo psicológico
+2024,F88,fixed65,36,,,1048706,3.432801948305817,2.4042922818516557,4.752444869127877,Other psychological development disorders,Otros trastornos del desarrollo psicológico
+2019,F89,fixed65,121,,,1151475,10.508261143316181,8.719476459561987,12.556031164500677,Unspecified psychological development disorder,Trastorno del desarrollo psicológico no especificado
+2020,F89,fixed65,68,,,781912,8.696630822905902,6.753274121975677,11.025051816064922,Unspecified psychological development disorder,Trastorno del desarrollo psicológico no especificado
+2021,F89,fixed65,85,,,816909,10.405075718348066,8.311204920596357,12.866037259829303,Unspecified psychological development disorder,Trastorno del desarrollo psicológico no especificado
+2022,F89,fixed65,110,,,932839,11.791959813000958,9.691556859479043,14.212500445074054,Unspecified psychological development disorder,Trastorno del desarrollo psicológico no especificado
+2023,F89,fixed65,122,,,1025029,11.902102281984217,9.883976586173258,14.211126695114679,Unspecified psychological development disorder,Trastorno del desarrollo psicológico no especificado
+2024,F89,fixed65,117,,,1048706,11.156606331993904,9.226817405371923,13.370899871141818,Unspecified psychological development disorder,Trastorno del desarrollo psicológico no especificado
+2019,F80,observed,808,,,1151475,70.17086779999566,65.41526932740908,75.18080145744395,Speech and language development disorders,Trastornos del desarrollo del habla y lenguaje
+2020,F80,observed,564,,,781912,72.13087917821954,66.30000623924602,78.3371546264464,Speech and language development disorders,Trastornos del desarrollo del habla y lenguaje
+2021,F80,observed,731,,,816909,89.48365117779336,83.1135229394454,96.21249225879383,Speech and language development disorders,Trastornos del desarrollo del habla y lenguaje
+2022,F80,observed,970,,,932839,103.98364562373571,97.54200580553652,110.7389114322346,Speech and language development disorders,Trastornos del desarrollo del habla y lenguaje
+2023,F80,observed,1147,,,1039587,110.33227618275335,104.0387489039806,116.90698424942565,Speech and language development disorders,Trastornos del desarrollo del habla y lenguaje
+2024,F80,observed,1360,,,1085813,125.25176987197611,118.68267047612215,132.08986365884164,Speech and language development disorders,Trastornos del desarrollo del habla y lenguaje
+2019,F81,observed,124,,,1151475,10.76879654356369,8.956927810944014,12.839559181866136,Scholastic skills development disorders,Trastornos del aprendizaje escolar
+2020,F81,observed,93,,,781912,11.893921566621307,9.599929752101175,14.570857465460644,Scholastic skills development disorders,Trastornos del aprendizaje escolar
+2021,F81,observed,114,,,816909,13.955042728137405,11.511189393427589,16.764269164133996,Scholastic skills development disorders,Trastornos del aprendizaje escolar
+2022,F81,observed,107,,,932839,11.470360909010022,9.40023757551258,13.860757031052986,Scholastic skills development disorders,Trastornos del aprendizaje escolar
+2023,F81,observed,171,,,1039587,16.44883977964326,14.075785273188167,19.107428834959983,Scholastic skills development disorders,Trastornos del aprendizaje escolar
+2024,F81,observed,211,,,1085813,19.432443708078647,16.898723385281247,22.23886970754577,Scholastic skills development disorders,Trastornos del aprendizaje escolar
+2019,F82,observed,472,,,1151475,40.99090297227469,37.37585299784547,44.861200280025926,Motor function development disorder,Trastorno del desarrollo de la función motriz
+2020,F82,observed,300,,,781912,38.36748892458486,34.14825136754089,42.964058046502764,Motor function development disorder,Trastorno del desarrollo de la función motriz
+2021,F82,observed,291,,,816909,35.622082753403376,31.64642711866179,39.95900917871787,Motor function development disorder,Trastorno del desarrollo de la función motriz
+2022,F82,observed,386,,,932839,41.379058980166995,37.353556393462945,45.720137134205004,Motor function development disorder,Trastorno del desarrollo de la función motriz
+2023,F82,observed,389,,,1039587,37.41870569755105,33.792184765712776,41.32837967161713,Motor function development disorder,Trastorno del desarrollo de la función motriz
+2024,F82,observed,447,,,1085813,41.167309656450975,37.438936331408996,45.166478782823155,Motor function development disorder,Trastorno del desarrollo de la función motriz
+2019,F83,observed,358,,,1151475,31.090557762869363,27.952998285527084,34.48393658245813,Mixed specific developmental disorders,Trastornos mixtos del desarrollo
+2020,F83,observed,158,,,781912,20.20687750028136,17.178917684420654,23.614845266254,Mixed specific developmental disorders,Trastornos mixtos del desarrollo
+2021,F83,observed,328,,,816909,40.15135100727254,35.923215048275004,44.74035635395138,Mixed specific developmental disorders,Trastornos mixtos del desarrollo
+2022,F83,observed,652,,,932839,69.89416180069658,64.63146275279047,75.47122019008877,Mixed specific developmental disorders,Trastornos mixtos del desarrollo
+2023,F83,observed,826,,,1039587,79.4546295788616,74.12782812738126,85.06310368065783,Mixed specific developmental disorders,Trastornos mixtos del desarrollo
+2024,F83,observed,1130,,,1085813,104.06948526127427,98.08936636711225,110.3188341135792,Mixed specific developmental disorders,Trastornos mixtos del desarrollo
+2019,F84,observed,2385,,,1151475,207.12564319676937,198.89558514315817,215.6087952400199,Pervasive developmental disorders,Trastornos generalizados del desarrollo
+2020,F84,observed,1633,,,781912,208.8470313794903,198.8393128479987,219.22799789979553,Pervasive developmental disorders,Trastornos generalizados del desarrollo
+2021,F84,observed,2399,,,816909,293.66796056843543,282.0329323707012,305.6597305482635,Pervasive developmental disorders,Trastornos generalizados del desarrollo
+2022,F84,observed,3912,,,932839,419.3649708041795,406.32542277218255,432.7164631910393,Pervasive developmental disorders,Trastornos generalizados del desarrollo
+2023,F84,observed,6473,,,1039587,622.6511104890692,607.5740138067275,638.0077859887115,Pervasive developmental disorders,Trastornos generalizados del desarrollo
+2024,F84,observed,8818,,,1085813,812.1103725963864,795.2474425770961,829.2408188655774,Pervasive developmental disorders,Trastornos generalizados del desarrollo
+2019,F88,observed,19,,,1151475,1.650057534900888,0.9934424250953543,2.5767692369860904,Other psychological development disorders,Otros trastornos del desarrollo psicológico
+2020,F88,observed,12,,,781912,1.5346995569833946,0.7930016560331875,2.680811273925575,Other psychological development disorders,Otros trastornos del desarrollo psicológico
+2021,F88,observed,24,,,816909,2.937903732239454,1.8823703563905483,4.371367874971779,Other psychological development disorders,Otros trastornos del desarrollo psicológico
+2022,F88,observed,29,,,932839,3.108789405245707,2.0820050552719103,4.4647401575820265,Other psychological development disorders,Otros trastornos del desarrollo psicológico
+2023,F88,observed,30,,,1039587,2.885761364849695,1.9470110747268785,4.119603784465145,Other psychological development disorders,Otros trastornos del desarrollo psicológico
+2024,F88,observed,37,,,1085813,3.407584915634644,2.3992542516166258,4.696906939033778,Other psychological development disorders,Otros trastornos del desarrollo psicológico
+2019,F89,observed,121,,,1151475,10.508261143316181,8.719476459561987,12.556031164500677,Unspecified psychological development disorder,Trastorno del desarrollo psicológico no especificado
+2020,F89,observed,68,,,781912,8.696630822905902,6.753274121975677,11.025051816064922,Unspecified psychological development disorder,Trastorno del desarrollo psicológico no especificado
+2021,F89,observed,85,,,816909,10.405075718348066,8.311204920596357,12.866037259829303,Unspecified psychological development disorder,Trastorno del desarrollo psicológico no especificado
+2022,F89,observed,110,,,932839,11.791959813000958,9.691556859479043,14.212500445074054,Unspecified psychological development disorder,Trastorno del desarrollo psicológico no especificado
+2023,F89,observed,122,,,1039587,11.73542955038876,9.745564956226453,14.012119221543463,Unspecified psychological development disorder,Trastorno del desarrollo psicológico no especificado
+2024,F89,observed,119,,,1085813,10.95952986379791,9.07906178846931,13.114711453094362,Unspecified psychological development disorder,Trastorno del desarrollo psicológico no especificado

@@ -134,5 +134,4 @@ anuales; el panel histórico debe reconstruirse desde el reporte observado en
 REM/GRD. REM-20 mide establecimiento × área funcional × mes y sirve para
 actividad/capacidad, no como población cubierta.
 
-El prompt listo para ejecutar la revisión editorial y analítica está en
-[PROMPT_CODEX_LANCET_AMERICAS.md](../../PROMPT_CODEX_LANCET_AMERICAS.md).
+El plan analítico del estudio está en [analysis_plan.md](../../study/analysis_plan.md).
