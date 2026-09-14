@@ -1,4 +1,4 @@
-"""Render the home page, methods, REM, GRD and the three Lancet manuscript pages (article, supplement,
+"""Render the home page, methods, REM, GRD and the three manuscript pages (article, supplement,
 corpus); optionally refresh the aggregates from the canonical data, and regenerate the manuscript plates
 of `docs/lancet/` with `--lancet-figures`.
 
@@ -23,7 +23,7 @@ def main():
     parser.add_argument("--refresh", action="store_true", help="Regenerate the aggregates from the sources before rendering")
     parser.add_argument("--rates-only", action="store_true", help="Recompute only rates and spatial statistics (epi_rates.py) before rendering")
     parser.add_argument("--skip-spatial", action="store_true", help="Skip Moran and LISA when recomputing rates")
-    parser.add_argument("--lancet-figures", action="store_true", help="Regenerate the Lancet manuscript plates first (docs/lancet/figuras_*.py) from docs/lancet/data")
+    parser.add_argument("--lancet-figures", action="store_true", help="Regenerate the manuscript plates first (docs/lancet/figuras_*.py) from docs/lancet/data; the article and supplement pages also rebuild them at render time")
     args = parser.parse_args()
     quarto = shutil.which("quarto")
     if not quarto:

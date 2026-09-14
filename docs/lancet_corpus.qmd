@@ -7,7 +7,7 @@ format:
 ---
 
 ::: {.report-nav}
-[Home](index.html) [Methods](methods.html) [REM](rem.html) [GRD](grd.html) [Lancet](lancet.html) [Supplement](lancet_supplement.html) [Corpus](lancet_corpus.html)
+[Home](index.html) [Methods](methods.html) [REM](rem.html) [GRD](grd.html) [Manuscript](lancet.html) [Supplement](lancet_supplement.html) [Corpus](lancet_corpus.html)
 :::
 
 ```{python}
@@ -29,7 +29,7 @@ kpis([
 ])
 ```
 
-Before version 10, the study was built as a **corpus** of twelve documents (two case definitions, two languages, combined manuscript, appendix and article) with 5 plates and 7 tables in the article and 54 plates and 125 supplementary tables, all produced by the modules `00_provenance.py` to `17_extended_material.py` of `lancet_americas/pipeline/`. This page collects them so that no result is left out of the site: every plate is shown as a preview (the 600 dpi originals and the numeric tables are regenerated with the pipeline, which requires the GRD and REM microdata of the data volume) and every table unfolds from its presentation CSV (`docs/lancet/corpus/tables/`), with its title and its methodological note. The order and thematic groups are those of the module-17 index (`extended_material_index.md`). Version 10 of the manuscript, which reorganises the results around four panel figures, is in [Lancet](lancet.html) and its [supplement](lancet_supplement.html); the figures of both come from the same tidy tables.
+Before version 10, the study was built as a **corpus** of twelve documents (two case definitions, two languages, combined manuscript, appendix and article) with 5 plates and 7 tables in the article and 54 plates and 125 supplementary tables, all produced by the modules `00_provenance.py` to `17_extended_material.py` of `lancet_americas/pipeline/`. This page collects them so that no result is left out of the site: every plate is shown as a preview (the 600 dpi originals and the numeric tables are regenerated with the pipeline, which requires the GRD and REM microdata of the data volume) and every table unfolds from its presentation CSV (`docs/lancet/corpus/tables/`), with its title and its methodological note. The order and thematic groups are those of the module-17 index (`extended_material_index.md`). Version 10 of the manuscript, which reorganises the results around four panel figures, is in [Manuscript](lancet.html) and its [supplement](lancet_supplement.html); the figures of both come from the same tidy tables.
 
 The series on this page are those of the variant **without Rett syndrome** (F84 without F84.2), the case definition of the manuscript; the sensitivity with Rett appears in figure S1 of the corpus and in figure S8 of version 10. All counts are administrative recognition, not prevalence or incidence.
 

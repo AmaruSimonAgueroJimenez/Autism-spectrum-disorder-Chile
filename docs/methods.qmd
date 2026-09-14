@@ -6,7 +6,7 @@ link-citations: true
 ---
 
 ::: {.report-nav}
-[Home](index.html) [Methods](methods.html) [REM](rem.html) [GRD](grd.html) [Lancet](lancet.html) [Supplement](lancet_supplement.html) [Corpus](lancet_corpus.html)
+[Home](index.html) [Methods](methods.html) [REM](rem.html) [GRD](grd.html) [Manuscript](lancet.html) [Supplement](lancet_supplement.html) [Corpus](lancet_corpus.html)
 :::
 
 ```{python}

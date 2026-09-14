@@ -1,5 +1,5 @@
-"""Presentation helpers for the docs/ pages that reproduce the manuscript for The Lancet Regional Health –
-Americas (version 10) and the extended corpus of the pipeline.
+"""Presentation helpers for the docs/ pages that reproduce the study manuscript (version 10) and the extended
+corpus of the pipeline.
 
 `contenido_v10.json` is written by `export_docs_content.py` (revision 10), which runs the real document builder
 with its writing methods intercepted: resolved text with numbered citations, tables, legends, equations and

@@ -1,16 +1,19 @@
 ---
 title: "Autism in Chile"
-subtitle: "Hospital epidemiology (GRD), outpatient activity and screening (REM), diagnostic trajectories, and the manuscript for The Lancet Regional Health – Americas"
+subtitle: "Administrative recognition of autism in the public health and education systems, 2019–2025: hospital discharges (GRD), outpatient activity and screening (REM), diagnostic trajectories, and the study manuscript"
 ---
 
 ::: {.report-nav}
-[Home](index.html) [Methods](methods.html) [REM](rem.html) [GRD](grd.html) [Lancet](lancet.html) [Supplement](lancet_supplement.html) [Corpus](lancet_corpus.html)
+[Home](index.html) [Methods](methods.html) [REM](rem.html) [GRD](grd.html) [Manuscript](lancet.html) [Supplement](lancet_supplement.html) [Corpus](lancet_corpus.html)
 :::
 
 ```{python}
 #| label: cargar-resumen
 from pathlib import Path
+import json
 import sys
+import numpy as np
+import pandas as pd
 
 ROOT = Path.cwd().parent if Path.cwd().name == "docs" else Path.cwd()
 sys.path.insert(0, str(ROOT / "scripts"))
@@ -45,7 +48,9 @@ kpis([
 ])
 ```
 
-## Three questions, two sources
+This site documents a national study of how autism is recognised in the routine records of Chile's public health and education systems. Nothing here is prevalence or incidence: every number is a count of hospital episodes, programme entries, follow-up stocks or school enrolments, presented with its unit, its denominator and its coverage. Two lines of work share the same data and definitions: the **analytical reports** (GRD, REM and Methods), which describe each source in depth, and the **study manuscript** with its supplement and its corpus of earlier results, which brings the sources together in a multi-source analysis.
+
+## Analytical reports
 
 **[GRD: hospital epidemiology and trajectories](grd.html).** Describes hospitalisations with an autism spectrum disorder (ASD) code in the public system: magnitude and trend, age-standardised population rates, sex and age, subcategories, code position, episode characteristics, co-diagnoses, readmission, regions, communes and spatial autocorrelation. It also reconstructs which hospital diagnoses precede the first observed autism record and in which position it is recorded.
 
@@ -53,13 +58,13 @@ kpis([
 
 **[Methods](methods.html).** Sources, case definitions, units, denominators, standardisation, intervals, trends, spatial analysis, REM reading rules, quality controls, biases, limitations and reproducibility. It is the common reference of the two reports.
 
-## The manuscript for The Lancet Regional Health – Americas
+## Study manuscript
 
-**[Article (version 10)](lancet.html).** Administrative recognition of autism in Chile's public health and education systems, 2019–2025: a national multi-source study. Reproduces the text with its citations, the two tables and the four panel figures of the manuscript; the plates are regenerated from `docs/lancet/` with the same scripts as the submitted version, in English and Spanish.
+**[Manuscript](lancet.html).** The current version of the article (version 10): summary, research in context, introduction, methods, results and discussion with numbered citations, tables 1 and 2 and the four panel figures. The figures are regenerated at render time from the public data in `docs/lancet/data/` by the same scripts that produced the submitted plates, in English and Spanish.
 
-**[Supplementary material](lancet_supplement.html).** Extended methods (A1–A11, 23 equations), complementary results, tables S1–S9 and figures S1–S9.
+**[Supplementary material](lancet_supplement.html).** Extended methods (A1–A11, 23 equations), complementary results (B1–B4), tables S1–S9 and figures S1–S9, regenerated the same way.
 
-**[Extended corpus](lancet_corpus.html).** The 59 plates and 132 tables of the earlier versions of the study (`lancet_americas/` pipeline, variant without Rett syndrome), so that no result is left out of the site.
+**[Extended corpus](lancet_corpus.html).** The 59 plates and 132 tables produced by the full pipeline for the earlier versions of the study (variant without Rett syndrome), so that no result is left out of the site.
 
 ## Main results
 
@@ -80,11 +85,28 @@ Hospitalisations and outpatient programme entries with an autism code have grown
 
 In the 2021–2024 hospital trajectories, the first autism record almost always occurs with the code in a secondary position, and only a minority has observable prior hospitalisations. The earlier codes do not show that they were ruled out as differential diagnoses: they may be comorbidities, symptoms or independent reasons for admission.
 
+## Headline figures of the manuscript
+
+```{python}
+#| label: manuscrito-cifras
+facts = json.loads((ROOT / "docs" / "lancet" / "data" / "facts_v10.json").read_text(encoding="utf-8"))["facts"]
+headline = pd.DataFrame([
+    ("Eligible GRD episodes (F84 family without F84.2, any position)", 2019, number(facts["grd19n"]), 2024, number(facts["grd24n"])),
+    ("Eligible episodes per 100 000 GRD episodes of the same panel", 2019, number(facts["grd19r"], 1), 2024, number(facts["grd24r"], 1)),
+    ("Male:female ratio of eligible GRD episodes", 2019, number(facts["grdmf19"], 2), 2024, number(facts["grdmf24"], 2)),
+    ("REM A05 programme entries, strict autism code", 2021, number(facts["a0521n"]), 2025, number(facts["a0525n"])),
+    ("REM P2 December follow-up stock, ages 0–19", 2021, number(facts["p221"]), 2025, number(facts["p225"])),
+    ("School integration programme (PIE) enrolments with ASD", 2019, number(facts["pie19"]), 2025, number(facts["pie25"])),
+    ("Eligible episodes with the code only in a secondary position, 2024 (%)", np.nan, "—", 2024, number(facts["secondary24pct"], 1)),
+    ("Average annual percent change of the hospital indicator, 2019–2024 (%)", np.nan, "—", 2024, number(facts["apcmain"], 1)),
+], columns=["Indicator", "Start year", "Start value", "End year", "End value"])
+show_table(headline, "Headline figures of the manuscript (version 10), read from the verified facts file that resolves the article text")
+```
+
 ## How the analyses are organised
 
 ```{python}
 #| label: tabla-organizacion
-import pandas as pd
 organisation = pd.DataFrame([
     ("GRD · A1", "Universe, units and quality", "grd_epi_quality, grd_annual_positions"),
     ("GRD · A2", "Annual trend, crude and standardised rates, AAPC, seasonality, sensitivity", "grd_rates_national, grd_trends_apc, grd_epi_monthly"),
@@ -96,11 +118,12 @@ organisation = pd.DataFrame([
     ("GRD · A8", "Regions, communes, indirect standardisation, Moran, LISA", "grd_rates_regional, grd_rates_comunal, grd_spatial_*"),
     ("GRD · B", "Trajectories: linkage, position, prior diagnoses, sequences, transitions", "grd_cohort_*, grd_first_*, grd_previous_*, grd_sequences, grd_principal_transitions"),
     ("REM", "Entries, rates, age and sex, subcategories, regions, communes, panel, screening, rehabilitation, ecological comparison", "rem_*"),
-], columns=["Section", "Content", "Tables in output_files/consolidacion"])
-show_table(organisation, "Report sections and the aggregate tables that feed them")
+    ("Manuscript", "Figures 1–4 and S2–S9 from docs/lancet/data (tidy and verified tables); text and tables from the exported document content", "docs/lancet/data/*.csv, contenido_v10.json"),
+], columns=["Section", "Content", "Inputs"])
+show_table(organisation, "Site sections and the tables that feed them")
 ```
 
-The seven documents run **Python** and read the aggregate tables of `output_files/consolidacion/`. Tables and figures are recalculated at render time; they contain no hand-pasted figures. The extraction from the original files runs separately, through the scripts documented in the [repository README](../README.md). The earlier reports, their HTML and their resources were kept in `others scripts/`, outside `docs`, for traceability only.
+The seven documents run **Python** and read the aggregate tables of `output_files/consolidacion/` and `docs/lancet/data/`. Tables and figures are recalculated at render time; they contain no hand-pasted figures. The extraction from the original microdata runs separately, through the scripts documented in the [repository README](../README.md).
 
 ## Interpretation priorities
 

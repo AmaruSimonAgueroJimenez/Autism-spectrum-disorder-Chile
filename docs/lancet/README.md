@@ -1,9 +1,11 @@
-# docs/lancet: public replica of the manuscript for The Lancet Regional Health – Americas
+# docs/lancet: public replica of the study manuscript
 
 This folder contains everything needed to reproduce, from the repository and without the microdata, the content
 of **version 10** of the manuscript (14 September 2026) and to show the corpus of results of the earlier
 versions. The site pages that use it are `docs/lancet.qmd` (article), `docs/lancet_supplement.qmd`
 (supplementary material) and `docs/lancet_corpus.qmd` (extended corpus); their HTML files sit next to the QMD.
+The article and supplement pages run `figuras_principales.py` and `figuras_suplementarias.py` at render time, so
+the plates shown are always rebuilt from `data/` (the folder name `lancet` is historical; the pages do not depend on it).
 
 The complete versions of the manuscript (DOCX, PDF, 600 dpi plates, revision data) live in
 `lancet_americas/manuscript/` and, together with `lancet_americas/outputs/`, stay out of git (`.gitignore`).

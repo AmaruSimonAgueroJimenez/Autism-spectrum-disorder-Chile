@@ -1,6 +1,6 @@
 # Autism in Chile: REM and GRD
 
-Repository of reproducible Python and Quarto analyses of autism spectrum disorder (ASD) in the administrative sources of the Chilean public health system, and of the manuscript "Rising administrative recognition of autism in Chile's health and education systems, 2019–2025: a national multi-source surveillance study" for The Lancet Regional Health – Americas. The active documentation contains **seven QMD documents**, all in English: four reports and three pages of the manuscript (see below):
+Repository of reproducible Python and Quarto analyses of the administrative recognition of autism spectrum disorder (ASD) in the routine records of the Chilean public health and education systems, 2019–2025: hospital discharges grouped by diagnosis-related groups (GRD), the monthly statistical summaries of the public network (REM), diagnostic trajectories, and the multi-source study manuscript built on the same data. Nothing in the repository is prevalence or incidence: every figure is a count of episodes, programme entries, follow-up stocks or school enrolments, published with its unit, denominator and coverage. The active documentation contains **seven QMD documents**, all in English: four analytical reports and three pages of the study manuscript.
 
 | Document | Content | Rendered version |
 |---|---|---|
@@ -11,7 +11,7 @@ Repository of reproducible Python and Quarto analyses of autism spectrum disorde
 
 The four reports run Python blocks that compute tables and figures from the aggregates. They share the configuration in `docs/_quarto.yml`, the bibliography in `docs/references.bib`, the presentation helpers in `scripts/report_helpers.py` and the epidemiological functions in `scripts/epi_helpers.py`.
 
-## Manuscript for The Lancet Regional Health – Americas
+## Study manuscript
 
 The manuscript is built in `lancet_americas/` with its own pipeline (`pipeline/00_provenance.py` to `17_extended_material.py`, documented in [lancet_americas/README.md](lancet_americas/README.md)) that reads the microdata of the data volume and writes tidy tables, plates and documents. Its ten versions (`lancet_americas/manuscript/01_paper` to `10_revision_2026-09-14_paneles`; index in `lancet_americas/manuscript/LEEME.md`), with their DOCX, PDF and 600 dpi plates, **stay out of git**, as does `lancet_americas/outputs/`; the pipeline code is versioned.
 
@@ -19,11 +19,11 @@ So that the results are reproducible from the repository, `docs/` includes three
 
 | Document | Content | Rendered version |
 |---|---|---|
-| [lancet.qmd](docs/lancet.qmd) | The article of version 10: text with citations, tables 1 and 2 and panel figures 1 to 4, regenerated from `docs/lancet/data/` by `docs/lancet/figuras_principales.py` (English and Spanish plates) | [Lancet](docs/lancet.html) |
-| [lancet_supplement.qmd](docs/lancet_supplement.qmd) | Supplementary material: extended methods A1–A11 with 23 equations, complementary results B1–B4, tables S1–S9 and figures S1–S9 (`docs/lancet/figuras_suplementarias.py`) | [Supplement](docs/lancet_supplement.html) |
+| [lancet.qmd](docs/lancet.qmd) | The article of version 10: text with citations, tables 1 and 2 and panel figures 1 to 4. The page rebuilds the four figures at every render from `docs/lancet/data/` with `docs/lancet/figuras_principales.py` (English and Spanish plates) and prints their layout check | [Manuscript](docs/lancet.html) |
+| [lancet_supplement.qmd](docs/lancet_supplement.qmd) | Supplementary material: extended methods A1–A11 with 23 equations, complementary results B1–B4, tables S1–S9 and figures S1–S9, rebuilt at every render by `docs/lancet/figuras_suplementarias.py` | [Supplement](docs/lancet_supplement.html) |
 | [lancet_corpus.qmd](docs/lancet_corpus.qmd) | Extended corpus of the earlier versions: 59 plates and 132 tables of the pipeline (variant without Rett syndrome) | [Corpus](docs/lancet_corpus.html) |
 
-`docs/lancet/data/` contains public copies of the tables the plates need (tidy and verified), a commune extract without identifiers with small cells masked, the STIX equations and `contenido_v10.json`, exported from the document builder with every figure already resolved, in English and Spanish. The plates generated this way coincide with those of the submitted version.
+`docs/lancet/data/` contains public copies of the tables the plates need (tidy and verified), a commune extract without identifiers with small cells masked, the STIX equations, the verified facts file that resolves the article text and `contenido_v10.json`, exported from the document builder with every figure already resolved, in English and Spanish. The plates generated this way coincide with those of the submitted version. The folder and file names keep the historical prefix `lancet`; renaming them is a cosmetic change that only requires updating the paths in `docs/_quarto.yml`, `docs/lancet/render_helpers.py` (`REL`) and `scripts/render_reports.py`.
 
 ```sh
 python scripts/render_reports.py --lancet-figures  # regenerates the plates of docs/lancet and renders the seven QMD documents
