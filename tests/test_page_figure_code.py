@@ -83,5 +83,30 @@ class PageCarriesTheDrawingCode(unittest.TestCase):
         self.assertEqual(result.returncode, 0, result.stdout + result.stderr)
 
 
+class GeneratedPagesAreValidPython(unittest.TestCase):
+    """Every generated page must parse before it is rendered.
+
+    A template that loses one level of escaping writes a broken f-string into the page, and Quarto
+    only reports it minutes into a render. Parsing the chunks here turns that into a one-second failure.
+    """
+
+    PAGES = ["version_01_initial.qmd", "version_05_revision.qmd", "version_06_expanded.qmd",
+             "version_07_editorial.qmd", "version_10_panels.qmd"]
+
+    def test_every_chunk_parses(self):
+        for name in self.PAGES:
+            page = ROOT / "docs" / name
+            with self.subTest(page=name):
+                self.assertTrue(page.exists(), f"{name} is missing")
+                blocks = re.findall(r"```\{python\}\n(.*?)```", page.read_text(encoding="utf-8"), re.S)
+                self.assertTrue(blocks, f"{name} has no Python chunks")
+                for i, block in enumerate(blocks, 1):
+                    code = "\n".join(l for l in block.splitlines() if not l.startswith("#|"))
+                    try:
+                        ast.parse(code)
+                    except SyntaxError as exc:
+                        self.fail(f"{name} chunk {i} does not parse: {exc}")
+
+
 if __name__ == "__main__":
     unittest.main()

@@ -17,8 +17,8 @@
       "results": "Own table set (tabla1-tabla5), not comparable line by line with the later series: the observation window is 2017-2024 and the case definition had not yet been split into the two variants.",
       "tidy_tables": null,
       "identical_results_to": null,
-      "public_material": false,
-      "page": null
+      "public_material": true,
+      "page": "version_01_initial.html"
     },
     {
       "id": "02",
@@ -73,8 +73,8 @@
       "results": "Baseline of the modern series: 48 tidy tables.",
       "tidy_tables": 48,
       "identical_results_to": null,
-      "public_material": false,
-      "page": null
+      "public_material": true,
+      "page": "version_05_revision.html"
     },
     {
       "id": "06",
@@ -87,8 +87,8 @@
       "results": "Adds 11 tidy tables to version 05 (clinical chapters, expanded age distribution, assisted referrals, dataflow provenance and expanded regional endpoints). The 48 tables of version 05 are unchanged, byte for byte.",
       "tidy_tables": 59,
       "identical_results_to": null,
-      "public_material": false,
-      "page": null
+      "public_material": true,
+      "page": "version_06_expanded.html"
     },
     {
       "id": "07",
@@ -101,8 +101,8 @@
       "results": "Adds 3 tidy tables to version 06 (the three Figure5 endpoint tables). The 59 earlier tables are unchanged.",
       "tidy_tables": 62,
       "identical_results_to": null,
-      "public_material": false,
-      "page": null
+      "public_material": true,
+      "page": "version_07_editorial.html"
     },
     {
       "id": "08",

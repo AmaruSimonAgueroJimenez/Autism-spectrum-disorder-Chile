@@ -1,0 +1,7 @@
+year,variant,identifier_column,n_f84,n_with_valid_id,n_without_valid_id,n_unique_ids,id_length_mode,id_length_min,id_length_max,invalid_id_values,n_f84_ids_shared_with_previous_year,previous_year,n_f84_with_comuna,n_records_total,n_records_valid_id_all_episodes,n_f84_exact_duplicates_on_read_columns
+2019,sin_rett,CIP_ENCRIPTADO,2334,2330,4,1944,6,3,7,SIN INFORMACIÓN:4,,,2334,1151475,1143168,0
+2020,sin_rett,CIP_ENCRIPTADO,1609,1609,0,1319,6,4,7,,160.0,2019.0,1609,781912,780019,1
+2021,sin_rett,CIP_ENCRIPTADO,2367,2367,0,1954,8,8,8,,0.0,2020.0,2367,816909,814865,0
+2022,sin_rett,CIP_ENCRIPTADO,3859,3856,3,3231,8,8,9,DESCONOCIDO:3,245.0,2021.0,3859,932839,929890,0
+2023,sin_rett,CIP_ENCRIPTADO,6423,6421,2,5232,8,8,9,DESCONOCIDO:2,448.0,2022.0,6423,1039587,1037952,0
+2024,sin_rett,ID_BENEFICIARIO,8731,8730,1,7169,8,8,9,DESCONOCIDO:1,749.0,2023.0,8731,1085813,1084776,0

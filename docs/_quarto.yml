@@ -6,7 +6,11 @@ project:
     - methods.qmd
     - rem.qmd
     - grd.qmd
+    - version_01_initial.qmd
     - version_02_corpus.qmd
+    - version_05_revision.qmd
+    - version_06_expanded.qmd
+    - version_07_editorial.qmd
     - version_10_panels.qmd
 
 lang: en

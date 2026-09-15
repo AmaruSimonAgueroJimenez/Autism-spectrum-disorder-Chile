@@ -1,0 +1,85 @@
+year,category,sex,n_episodes,asr,asr_lo,asr_hi,asr_var,groups_missing,label_en,label_es
+2019,F80,HOMBRE,528,6.935246484287984,6.349694831170461,7.561384204018535,0.09320942066883726,0,Speech and language development disorders,Trastornos del desarrollo del habla y lenguaje
+2020,F80,HOMBRE,379,4.95240055898455,4.460485020134773,5.485092893879445,0.06631265853781777,0,Speech and language development disorders,Trastornos del desarrollo del habla y lenguaje
+2021,F80,HOMBRE,493,6.612609381383895,6.036017675935923,7.230582416703566,0.09051261772078432,0,Speech and language development disorders,Trastornos del desarrollo del habla y lenguaje
+2022,F80,HOMBRE,690,9.408541275971476,8.713784032393242,10.14492636865829,0.13048162505928373,0,Speech and language development disorders,Trastornos del desarrollo del habla y lenguaje
+2023,F80,HOMBRE,778,10.588840599147002,9.851924355486519,11.367228229309436,0.14646870521928676,0,Speech and language development disorders,Trastornos del desarrollo del habla y lenguaje
+2024,F80,HOMBRE,920,12.50710622092772,11.704364209954312,13.351284270696043,0.17331076150503255,0,Speech and language development disorders,Trastornos del desarrollo del habla y lenguaje
+2019,F81,HOMBRE,78,1.0281598882699776,0.8118698067764428,1.2858258266510327,0.013666504263527064,0,Scholastic skills development disorders,Trastornos del aprendizaje escolar
+2020,F81,HOMBRE,46,0.5944311891627109,0.43418565380796487,0.7964477304695896,0.00778818981413618,0,Scholastic skills development disorders,Trastornos del aprendizaje escolar
+2021,F81,HOMBRE,55,0.7141309140322982,0.537293846606923,0.9327094375004357,0.00935065751082967,0,Scholastic skills development disorders,Trastornos del aprendizaje escolar
+2022,F81,HOMBRE,59,0.767094888479528,0.5827466750043672,0.9933006390223837,0.010114770042335417,0,Scholastic skills development disorders,Trastornos del aprendizaje escolar
+2023,F81,HOMBRE,92,1.2049464019816014,0.9702412578060154,1.4811020960967616,0.015941440257460405,0,Scholastic skills development disorders,Trastornos del aprendizaje escolar
+2024,F81,HOMBRE,89,1.166684215319416,0.9361713268628414,1.438580893384045,0.015402925614747416,0,Scholastic skills development disorders,Trastornos del aprendizaje escolar
+2019,F82,HOMBRE,280,3.8814910120640254,3.438879449140556,4.365847247578504,0.054119430213158154,0,Motor function development disorder,Trastorno del desarrollo de la función motriz
+2020,F82,HOMBRE,169,2.3647009089245006,2.0206689455755122,2.7511296082282386,0.03327802456663428,0,Motor function development disorder,Trastorno del desarrollo de la función motriz
+2021,F82,HOMBRE,169,2.3739326684007143,2.0282055361504394,2.762377854181185,0.03360961666561481,0,Motor function development disorder,Trastorno del desarrollo de la función motriz
+2022,F82,HOMBRE,221,3.1232500778784393,2.723383622749386,3.5658882520519137,0.044515568761459776,0,Motor function development disorder,Trastorno del desarrollo de la función motriz
+2023,F82,HOMBRE,237,3.3556119234527024,2.940344339849242,3.8135959446505874,0.04789631731588703,0,Motor function development disorder,Trastorno del desarrollo de la función motriz
+2024,F82,HOMBRE,261,3.691701515556019,3.255901366395271,4.170078547421433,0.05258306127115257,0,Motor function development disorder,Trastorno del desarrollo de la función motriz
+2019,F83,HOMBRE,194,2.7377116624329423,2.365475458424523,3.1522478622726564,0.0387484641517625,0,Mixed specific developmental disorders,Trastornos mixtos del desarrollo
+2020,F83,HOMBRE,96,1.3474462784089583,1.0907016997989012,1.647039831897123,0.01902743574611357,0,Mixed specific developmental disorders,Trastornos mixtos del desarrollo
+2021,F83,HOMBRE,182,2.54856397338363,2.1902708738539207,2.949471350535526,0.03599383285734667,0,Mixed specific developmental disorders,Trastornos mixtos del desarrollo
+2022,F83,HOMBRE,405,5.718328010856158,5.173343169331818,6.305729883257861,0.08121523147738531,0,Mixed specific developmental disorders,Trastornos mixtos del desarrollo
+2023,F83,HOMBRE,469,6.655096955452199,6.0650397885249925,7.287557401187453,0.09486420101241577,0,Mixed specific developmental disorders,Trastornos mixtos del desarrollo
+2024,F83,HOMBRE,665,9.471642267301561,8.76424636194473,10.221356580417243,0.13533245530215873,0,Mixed specific developmental disorders,Trastornos mixtos del desarrollo
+2019,F84,HOMBRE,1788,23.801842503058097,22.706762224537087,24.93716978493559,0.3194952706864324,0,Pervasive developmental disorders,Trastornos generalizados del desarrollo
+2020,F84,HOMBRE,1208,15.968361120559873,15.07640962150574,16.90064054290511,0.21304357185684247,0,Pervasive developmental disorders,Trastornos generalizados del desarrollo
+2021,F84,HOMBRE,1808,23.797181979420056,22.706913471346066,24.92778188770264,0.316662217463991,0,Pervasive developmental disorders,Trastornos generalizados del desarrollo
+2022,F84,HOMBRE,2887,38.61412543507623,37.21183661534806,40.057050578278265,0.5213022381299238,0,Pervasive developmental disorders,Trastornos generalizados del desarrollo
+2023,F84,HOMBRE,4499,60.66737768354976,58.900600700600826,62.47484832356143,0.8244980102028892,0,Pervasive developmental disorders,Trastornos generalizados del desarrollo
+2024,F84,HOMBRE,5858,79.1347992582801,77.11385452492635,81.1964048859378,1.0768308872502554,0,Pervasive developmental disorders,Trastornos generalizados del desarrollo
+2019,F88,HOMBRE,8,0.09799424372901497,0.0418334490103673,0.19799519448621852,0.001227021816344588,0,Other psychological development disorders,Otros trastornos del desarrollo psicológico
+2020,F88,HOMBRE,6,0.08006830041136635,0.029383623989113834,0.17667092604492748,0.0010684905941985975,0,Other psychological development disorders,Otros trastornos del desarrollo psicológico
+2021,F88,HOMBRE,11,0.13185988695259085,0.06501332636245688,0.2420520178526326,0.0016288749323024219,0,Other psychological development disorders,Otros trastornos del desarrollo psicológico
+2022,F88,HOMBRE,9,0.11859162595915278,0.05421955103184474,0.22792255169031378,0.0015631619979571008,0,Other psychological development disorders,Otros trastornos del desarrollo psicológico
+2023,F88,HOMBRE,7,0.0854097750751112,0.0334074979179746,0.182552697883341,0.0010937085286385935,0,Other psychological development disorders,Otros trastornos del desarrollo psicológico
+2024,F88,HOMBRE,10,0.13813278991090142,0.06616310572917779,0.2556365434806437,0.0019131628456773547,0,Other psychological development disorders,Otros trastornos del desarrollo psicológico
+2019,F89,HOMBRE,57,0.7583891389304636,0.5736254324542326,0.9850502874962432,0.010181749421523726,0,Unspecified psychological development disorder,Trastorno del desarrollo psicológico no especificado
+2020,F89,HOMBRE,28,0.36638298810008374,0.24269283003209338,0.5327642435254052,0.004861349193456828,0,Unspecified psychological development disorder,Trastorno del desarrollo psicológico no especificado
+2021,F89,HOMBRE,33,0.430183912452131,0.2950599145604782,0.6079720035854432,0.00570647561197427,0,Unspecified psychological development disorder,Trastorno del desarrollo psicológico no especificado
+2022,F89,HOMBRE,36,0.4801803434477033,0.33533422727548656,0.6680560730890955,0.00650122077177975,0,Unspecified psychological development disorder,Trastorno del desarrollo psicológico no especificado
+2023,F89,HOMBRE,51,0.6578802045538171,0.48812218140151825,0.8695947396051001,0.008674849273752155,0,Unspecified psychological development disorder,Trastorno del desarrollo psicológico no especificado
+2024,F89,HOMBRE,55,0.7344639026576844,0.5523263609290041,0.9589715312658975,0.009921898105467257,0,Unspecified psychological development disorder,Trastorno del desarrollo psicológico no especificado
+2019,F80,MUJER,279,3.6792581806534805,3.250430046695316,4.1502783611881195,0.05087196271762051,0,Speech and language development disorders,Trastornos del desarrollo del habla y lenguaje
+2020,F80,MUJER,185,2.4048953267980915,2.0620769722580334,2.7901058771966047,0.03298853580150004,0,Speech and language development disorders,Trastornos del desarrollo del habla y lenguaje
+2021,F80,MUJER,238,3.16762330477503,2.769636296135912,3.608355606349184,0.044039354066145064,0,Speech and language development disorders,Trastornos del desarrollo del habla y lenguaje
+2022,F80,MUJER,280,3.777783244165612,3.3382229927284155,4.2604722705260745,0.05344426002177701,0,Speech and language development disorders,Trastornos del desarrollo del habla y lenguaje
+2023,F80,MUJER,369,4.989125641568982,4.480082535895471,5.5413105642703195,0.07111518251203487,0,Speech and language development disorders,Trastornos del desarrollo del habla y lenguaje
+2024,F80,MUJER,438,5.958850939339554,5.401900505143162,6.55876942166081,0.08473647010966096,0,Speech and language development disorders,Trastornos del desarrollo del habla y lenguaje
+2019,F81,MUJER,46,0.6216980303916754,0.45395518289653364,0.8328396812892728,0.008535322052019493,0,Scholastic skills development disorders,Trastornos del aprendizaje escolar
+2020,F81,MUJER,47,0.6295937085797765,0.4619891500548982,0.8403759498552835,0.008501183092287081,0,Scholastic skills development disorders,Trastornos del aprendizaje escolar
+2021,F81,MUJER,59,0.7845278908949289,0.5958543811520641,1.0163270773340392,0.010596137904982574,0,Scholastic skills development disorders,Trastornos del aprendizaje escolar
+2022,F81,MUJER,48,0.6389755597407053,0.4693391193492794,0.8522087757396982,0.008704411763604456,0,Scholastic skills development disorders,Trastornos del aprendizaje escolar
+2023,F81,MUJER,79,1.0757603862466292,0.8511797050882602,1.3434245872807618,0.014719872694902634,0,Scholastic skills development disorders,Trastornos del aprendizaje escolar
+2024,F81,MUJER,122,1.6233578772521735,1.3454230967427734,1.943797260746299,0.022044277505297864,0,Scholastic skills development disorders,Trastornos del aprendizaje escolar
+2019,F82,MUJER,192,2.754347215124684,2.3764165313965346,3.1758882829453987,0.03997117454870287,0,Motor function development disorder,Trastorno del desarrollo de la función motriz
+2020,F82,MUJER,131,1.921324250888739,1.6059923161449543,2.281014826916024,0.028258615917759054,0,Motor function development disorder,Trastorno del desarrollo de la función motriz
+2021,F82,MUJER,122,1.7848206710103802,1.4809797532963704,2.1333258608247334,0.02633026086606005,0,Motor function development disorder,Trastorno del desarrollo de la función motriz
+2022,F82,MUJER,165,2.4106204053228586,2.055256094322982,2.810465908621649,0.03554555420170893,0,Motor function development disorder,Trastorno del desarrollo de la función motriz
+2023,F82,MUJER,152,2.2394677885684993,1.8963485863051277,2.627239180517352,0.033248277535084234,0,Motor function development disorder,Trastorno del desarrollo de la función motriz
+2024,F82,MUJER,186,2.71842250038575,2.340343313783782,3.1407862586871946,0.04004483765725609,0,Motor function development disorder,Trastorno del desarrollo de la función motriz
+2019,F83,MUJER,164,2.3879547181125598,2.0357145936961083,2.784095178180571,0.034925115718269145,0,Mixed specific developmental disorders,Trastornos mixtos del desarrollo
+2020,F83,MUJER,62,0.9054135865009032,0.6939057220431356,1.1617588809528534,0.013258419772079404,0,Mixed specific developmental disorders,Trastornos mixtos del desarrollo
+2021,F83,MUJER,146,2.130451683588504,1.7970677804411208,2.5083981774431554,0.031447440329238185,0,Mixed specific developmental disorders,Trastornos mixtos del desarrollo
+2022,F83,MUJER,245,3.598736861446053,3.1607004882297423,4.081122376973172,0.053232309716456386,0,Mixed specific developmental disorders,Trastornos mixtos del desarrollo
+2023,F83,MUJER,356,5.235466912755776,4.703575707541534,5.811545891972045,0.0776239281826548,0,Mixed specific developmental disorders,Trastornos mixtos del desarrollo
+2024,F83,MUJER,463,6.835007062723988,6.225219655984101,7.488844103755819,0.10134447237463581,0,Mixed specific developmental disorders,Trastornos mixtos del desarrollo
+2019,F84,MUJER,596,8.262873928674082,7.609547561214902,8.958397263722677,0.11570373333115708,0,Pervasive developmental disorders,Trastornos generalizados del desarrollo
+2020,F84,MUJER,425,5.812478062015891,5.269648984515749,6.397502228392344,0.08049070330579111,0,Pervasive developmental disorders,Trastornos generalizados del desarrollo
+2021,F84,MUJER,590,8.058347627179943,7.417716958889458,8.741141146035455,0.11127615580951873,0,Pervasive developmental disorders,Trastornos generalizados del desarrollo
+2022,F84,MUJER,1024,14.087872099538279,13.232916180199442,14.985070187860023,0.1962305430699081,0,Pervasive developmental disorders,Trastornos generalizados del desarrollo
+2023,F84,MUJER,1972,26.98793327723717,25.802962989076917,28.21479274154558,0.3736956475596506,0,Pervasive developmental disorders,Trastornos generalizados del desarrollo
+2024,F84,MUJER,2953,39.98848322462131,38.54976692199937,41.46874716968121,0.5486435437646316,0,Pervasive developmental disorders,Trastornos generalizados del desarrollo
+2019,F88,MUJER,11,0.1477558582662993,0.07354100568828226,0.26742198421815705,0.0019991339166361946,0,Other psychological development disorders,Otros trastornos del desarrollo psicológico
+2020,F88,MUJER,6,0.08267578425074149,0.030339946752377594,0.18260369217046427,0.0011392507207200655,0,Other psychological development disorders,Otros trastornos del desarrollo psicológico
+2021,F88,MUJER,13,0.17287598940858126,0.09121692828210226,0.30029611517350496,0.002356356719613669,0,Other psychological development disorders,Otros trastornos del desarrollo psicológico
+2022,F88,MUJER,20,0.2730855231873156,0.16666762922065478,0.4244936865995571,0.003740096601628286,0,Other psychological development disorders,Otros trastornos del desarrollo psicológico
+2023,F88,MUJER,23,0.31269573200653955,0.19796546241462978,0.47204999583390816,0.004272949504141722,0,Other psychological development disorders,Otros trastornos del desarrollo psicológico
+2024,F88,MUJER,27,0.3676835200823841,0.2419671721515592,0.537773108065591,0.005037493620684445,0,Other psychological development disorders,Otros trastornos del desarrollo psicológico
+2019,F89,MUJER,64,0.8930614826176925,0.6871153437531865,1.1425966208522025,0.012546713406940708,0,Unspecified psychological development disorder,Trastorno del desarrollo psicológico no especificado
+2020,F89,MUJER,40,0.5271293499195541,0.3750905216422942,0.7225061666812276,0.007099116438502211,0,Unspecified psychological development disorder,Trastorno del desarrollo psicológico no especificado
+2021,F89,MUJER,52,0.7038723023809845,0.5249753715819717,0.9262792644067397,0.009609946191197902,0,Unspecified psychological development disorder,Trastorno del desarrollo psicológico no especificado
+2022,F89,MUJER,74,1.0062889459504436,0.7887146662363703,1.2672724352827238,0.013878986124734951,0,Unspecified psychological development disorder,Trastorno del desarrollo psicológico no especificado
+2023,F89,MUJER,71,0.9738524820199583,0.7595609210527728,1.2316373034007682,0.01349519603719509,0,Unspecified psychological development disorder,Trastorno del desarrollo psicológico no especificado
+2024,F89,MUJER,64,0.8665782607359301,0.6665030947622324,1.1098754582207668,0.011843584452478339,0,Unspecified psychological development disorder,Trastorno del desarrollo psicológico no especificado

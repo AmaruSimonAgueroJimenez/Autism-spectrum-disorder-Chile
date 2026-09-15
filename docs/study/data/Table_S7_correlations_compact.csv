@@ -1,0 +1,11 @@
+analysis,scope,GRD–A05,GRD–P2,A05–P2
+core,commune,0.341 (157),0.109 (236),0.321 (133)
+core,region,0.224 (16),0.591 (16),0.225 (15)
+stable_establishments,commune,0.296 (144),0.126 (212),0.313 (111)
+exclude_metropolitan,commune,0.239 (116),0.023 (195),0.095 (99)
+all_three_complete,commune,0.314 (133),0.174 (133),0.321 (133)
+raw_sir,commune,0.337 (157),0.114 (236),0.317 (133)
+empirical_bayes,commune,0.355 (157),0.176 (236),0.319 (133)
+counts_no_denominator,commune,0.798 (157),0.818 (236),0.678 (133)
+partial_population_rank,commune,0.419 (157),0.277 (236),0.269 (133)
+age_compatible_p2,commune,—,0.080 (236),0.310 (133)

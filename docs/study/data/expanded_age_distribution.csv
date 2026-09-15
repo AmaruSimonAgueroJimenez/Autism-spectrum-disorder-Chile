@@ -1,0 +1,13 @@
+source,year,age_group,count,known_age_total,source_file,selector,percent
+GRD,2019,0–9,1299,2334,outputs/tidy/grd_age_single_year.csv,sin_rett;observed;any;all sexes incl unknown sex; known age,55.65552699228792
+GRD,2019,10–19,775,2334,outputs/tidy/grd_age_single_year.csv,sin_rett;observed;any;all sexes incl unknown sex; known age,33.204798628963154
+GRD,2019,≥20,260,2334,outputs/tidy/grd_age_single_year.csv,sin_rett;observed;any;all sexes incl unknown sex; known age,11.139674378748929
+GRD,2024,0–9,4167,8728,outputs/tidy/grd_age_single_year.csv,sin_rett;observed;any;all sexes incl unknown sex; known age,47.74289642529789
+GRD,2024,10–19,3557,8728,outputs/tidy/grd_age_single_year.csv,sin_rett;observed;any;all sexes incl unknown sex; known age,40.75389550870761
+GRD,2024,≥20,1004,8728,outputs/tidy/grd_age_single_year.csv,sin_rett;observed;any;all sexes incl unknown sex; known age,11.503208065994501
+A05,2021,0–9,1289,2085,technical/data/rem_a05_age_sex_annual.csv,strict autism;entry;Hombres+Mujeres;exclude total rows,61.82254196642686
+A05,2021,10–19,675,2085,technical/data/rem_a05_age_sex_annual.csv,strict autism;entry;Hombres+Mujeres;exclude total rows,32.37410071942446
+A05,2021,≥20,121,2085,technical/data/rem_a05_age_sex_annual.csv,strict autism;entry;Hombres+Mujeres;exclude total rows,5.803357314148681
+A05,2025,0–9,6143,13156,technical/data/rem_a05_age_sex_annual.csv,strict autism;entry;Hombres+Mujeres;exclude total rows,46.69352386743691
+A05,2025,10–19,5808,13156,technical/data/rem_a05_age_sex_annual.csv,strict autism;entry;Hombres+Mujeres;exclude total rows,44.147157190635454
+A05,2025,≥20,1205,13156,technical/data/rem_a05_age_sex_annual.csv,strict autism;entry;Hombres+Mujeres;exclude total rows,9.159318941927637

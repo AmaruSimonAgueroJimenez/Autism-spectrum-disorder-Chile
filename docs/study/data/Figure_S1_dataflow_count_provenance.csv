@@ -1,0 +1,32 @@
+key,value,source
+all_episodes,5808535,"grd_raw_rett_recount.csv; sum all_episodes, 2019–2024"
+eligible_any,25323,"grd_raw_rett_recount.csv; sum eligible_any, 2019–2024"
+eligible_principal,1617,"grd_raw_rett_recount.csv; sum eligible_principal, 2019–2024"
+eligible_secondary_only,23706,"grd_raw_rett_recount.csv; sum eligible_secondary_only, 2019–2024"
+rett_only_no_eligible,297,"grd_raw_rett_recount.csv; sum rett_only_no_eligible, 2019–2024"
+rett_and_other_eligible,30,"grd_raw_rett_recount.csv; sum rett_and_other_eligible, 2019–2024"
+a05_2021_total,2085,central_reporting_audit.csv; a05; 2021; total
+a05_2021_stable_n,258,central_reporting_audit.csv; a05; 2021; stable_n
+a05_2021_reporting,449,central_reporting_audit.csv; a05; 2021; reporting
+a05_2025_total,13155,central_reporting_audit.csv; a05; 2025; total
+a05_2025_stable_n,258,central_reporting_audit.csv; a05; 2025; stable_n
+a05_2025_reporting,952,central_reporting_audit.csv; a05; 2025; reporting
+p2_2019_total,1854,central_reporting_audit.csv; p2; 2019; total
+p2_2019_stable_n,193,central_reporting_audit.csv; p2; 2019; stable_n
+p2_2019_reporting,460,central_reporting_audit.csv; p2; 2019; reporting
+p2_2021_total,3853,central_reporting_audit.csv; p2; 2021; total
+p2_2021_stable_n,193,central_reporting_audit.csv; p2; 2021; stable_n
+p2_2021_reporting,640,central_reporting_audit.csv; p2; 2021; reporting
+p2_2025_total,29974,central_reporting_audit.csv; p2; 2025; total
+p2_2025_stable_n,193,central_reporting_audit.csv; p2; 2025; stable_n
+p2_2025_reporting,1325,central_reporting_audit.csv; p2; 2025; reporting
+hospitals_fixed,65,"grd_selected_definition.csv; fixed65, all, any; hospitals_n (all years)"
+hospitals_min,65,"grd_selected_definition.csv; observed, all, any; min hospitals_n"
+hospitals_max,72,"grd_selected_definition.csv; observed, all, any; max hospitals_n"
+adult,30010,flow_survey_source_audit.json; ENDIDE.adult_n
+child,5526,flow_survey_source_audit.json; ENDIDE.child_n
+encavi_total,16590,flow_survey_source_audit.json; ENCAVI.total_n
+encavi_valid,16484,flow_survey_source_audit.json; ENCAVI.valid_n
+encavi_excluded,106,flow_survey_source_audit.json; total_n − valid_n
+pie2019,21012,fig3a_pie.csv; 2019; pie_harmonised_n
+pie2025,106786,fig3a_pie.csv; 2025; pie_harmonised_n

@@ -1,0 +1,21 @@
+Unidad y conjunto,Período,n,ρ tasas (IC 95 %),p (tasas),ρ razones indirectas (IC 95 %),p (razones)
+"Regiones (residencia GRD, establecimiento REM)",2021,16,"0,10 (-0,41 a 0,57)","0,704",n/a,
+"Regiones (residencia GRD, establecimiento REM)",2022,16,"0,18 (-0,35 a 0,62)","0,506",n/a,
+"Regiones (residencia GRD, establecimiento REM)",2023,16,"0,20 (-0,33 a 0,63)","0,464",n/a,
+"Regiones (residencia GRD, establecimiento REM)",2024,16,"0,21 (-0,32 a 0,64)","0,438",n/a,
+"Regiones (residencia GRD, establecimiento REM)",2021–2024,16,"0,18 (-0,34 a 0,62)","0,499",n/a,
+Comunas con establecimiento informante,2021,184,"0,09 (-0,05 a 0,23)","0,210","0,09 (-0,05 a 0,23)","0,211"
+Comunas con establecimiento informante,2022,232,"0,21 (0,09 a 0,33)","0,001","0,22 (0,10 a 0,34)","< 0,001"
+Comunas con establecimiento informante,2023,287,"0,21 (0,10 a 0,32)","< 0,001","0,20 (0,09 a 0,31)","< 0,001"
+Comunas con establecimiento informante,2024,300,"0,24 (0,13 a 0,34)","< 0,001","0,22 (0,11 a 0,33)","< 0,001"
+Comunas con establecimiento informante,2021–2024,321,"0,31 (0,21 a 0,41)","< 0,001","0,29 (0,18 a 0,38)","< 0,001"
+Comunas con ≥ 20 ingresos y ≥ 20 personas,2021,15,"0,63 (0,17 a 0,86)","0,012","0,64 (0,19 a 0,87)","0,010"
+Comunas con ≥ 20 ingresos y ≥ 20 personas,2022,37,"0,48 (0,19 a 0,70)","0,002","0,55 (0,27 a 0,74)","< 0,001"
+Comunas con ≥ 20 ingresos y ≥ 20 personas,2023,65,"0,43 (0,20 a 0,61)","< 0,001","0,44 (0,22 a 0,62)","< 0,001"
+Comunas con ≥ 20 ingresos y ≥ 20 personas,2024,83,"0,54 (0,37 a 0,68)","< 0,001","0,54 (0,36 a 0,67)","< 0,001"
+Comunas con ≥ 20 ingresos y ≥ 20 personas,2021–2024,119,"0,62 (0,49 a 0,72)","< 0,001","0,61 (0,49 a 0,71)","< 0,001"
+Todas las comunas (sin fila REM = 0),2021,342,"0,32 (0,22 a 0,41)","< 0,001","0,31 (0,21 a 0,40)","< 0,001"
+Todas las comunas (sin fila REM = 0),2022,342,"0,37 (0,27 a 0,46)","< 0,001","0,36 (0,27 a 0,45)","< 0,001"
+Todas las comunas (sin fila REM = 0),2023,342,"0,32 (0,22 a 0,41)","< 0,001","0,31 (0,21 a 0,40)","< 0,001"
+Todas las comunas (sin fila REM = 0),2024,342,"0,33 (0,23 a 0,42)","< 0,001","0,30 (0,20 a 0,39)","< 0,001"
+Todas las comunas (sin fila REM = 0),2021–2024,342,"0,37 (0,27 a 0,46)","< 0,001","0,34 (0,24 a 0,43)","< 0,001"

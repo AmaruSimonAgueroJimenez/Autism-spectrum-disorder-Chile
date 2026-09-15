@@ -1,0 +1,17 @@
+source,year,original_value,original_unit,reference_year,index_2021_100
+GRD,2021,289.75075559211615,episodes per 100000 hospital episodes,2021,100.0
+GRD,2022,413.68339016700634,episodes per 100000 hospital episodes,2021,142.77215233541995
+GRD,2023,617.8415082143197,episodes per 100000 hospital episodes,2021,213.23206110428882
+GRD,2024,804.0979432001643,episodes per 100000 hospital episodes,2021,277.5136656872425
+A05,2021,2085.0,entry records during year,2021,100.0
+A05,2022,4640.0,entry records during year,2021,222.54196642685852
+A05,2023,8049.0,entry records during year,2021,386.0431654676259
+A05,2024,11842.0,entry records during year,2021,567.9616306954437
+P2,2021,3853.0,December records under follow-up,2021,100.0
+P2,2022,7923.0,December records under follow-up,2021,205.63197508434985
+P2,2023,13190.0,December records under follow-up,2021,342.33065144043604
+P2,2024,21737.0,December records under follow-up,2021,564.1577991175707
+PIE,2021,30882.0,annual educational records,2021,100.0
+PIE,2022,42940.0,annual educational records,2021,139.0453986140794
+PIE,2023,63642.0,annual educational records,2021,206.08121235671265
+PIE,2024,86475.0,annual educational records,2021,280.01748591412473

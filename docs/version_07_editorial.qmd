@@ -1,0 +1,88 @@
+---
+title: "Version 07 results: the editorial restructure"
+subtitle: "Bilingual editorial revision (2026-09-10) - 62 result tables, none of them changed from the previous version"
+---
+
+::: {.report-nav}
+[Home](index.html) [Methods](methods.html) [REM](rem.html) [GRD](grd.html) [v01](version_01_initial.html) [v02 corpus](version_02_corpus.html) [v05](version_05_revision.html) [v06](version_06_expanded.html) [v07](version_07_editorial.html) [v10 results](version_10_panels.html)
+:::
+
+```{python}
+#| label: preparacion
+import sys
+from pathlib import Path
+
+ROOT = Path.cwd().parent if Path.cwd().name == "docs" else Path.cwd()
+sys.path.insert(0, str(ROOT / "docs" / "study"))
+sys.path.insert(0, str(ROOT / "scripts"))
+import json
+import pandas as pd
+import render_helpers as rh
+from report_helpers import kpis, show_table
+
+VID = "07"
+PREV = '06'
+DATA = ROOT / "docs" / "study" / "data"
+manifest = json.loads((ROOT / "docs" / "study" / "version_tables.json").read_text(encoding="utf-8"))
+meta = rh.version(VID)
+mine = manifest[VID]
+added = sorted(set(mine["tables"]) - set(manifest[PREV]["tables"])) if PREV else sorted(mine["tables"])
+kpis([
+    (str(len(mine["tables"])), "Result tables in this version"),
+    (str(len(added)), "Added by this version" if PREV else "Tables of the baseline"),
+    ("0", "Tables changed from the previous version"),
+    (str(len(mine["withheld"])), "Withheld from publication"),
+])
+```
+
+```{python}
+#| label: que-cambio
+#| output: asis
+print(f"> **What version {VID} is.** {meta['what']}\n>\n> **Its results.** {meta['results']}\n")
+```
+
+This page is the result set of version 07 of the study. The tables below ship with the repository, so
+every number here can be read from a clone. What this version added is not an editorial claim:
+`scripts/audit_versions.py` hashes every table in every version folder and compares them pairwise, and
+this page is rendered from the manifest that script feeds. The audit's finding for the whole series:
+
+```{python}
+#| label: nota-auditoria
+#| output: asis
+print(f"> {rh.audit_note()}\n")
+```
+
+## The 3 tables version 07 added
+
+```{python}
+#| label: tablas-nuevas
+inventory = []
+for name in added:
+    path = DATA / name
+    if not path.exists():
+        inventory.append({"Table": name, "Rows": "withheld", "Columns": "withheld", "Size (KB)": None})
+        continue
+    frame = pd.read_csv(path)
+    inventory.append({"Table": name, "Rows": len(frame), "Columns": len(frame.columns),
+                      "Size (KB)": round(path.stat().st_size / 1024, 1)})
+show_table(pd.DataFrame(inventory), "Tables added by version 07 to the 59 of version 06", {"Size (KB)": 1})
+```
+
+## Every result table of version 07
+
+Tables marked as withheld carry commune identifiers with cells under five cases and are not published;
+the site ships the masked commune extract instead, without commune identifiers.
+
+```{python}
+#| label: inventario-completo
+rows = [{"Table": n, "Published": "yes" if n in mine["public"] else "withheld",
+         "New in this version": "yes" if n in added else ""} for n in sorted(mine["tables"])]
+show_table(pd.DataFrame(rows), f"The {len(mine['tables'])} result tables of version {VID}")
+```
+
+## Where the rest of the series is
+
+The [index](index.html#versions) lists all ten versions and what each one added. The plates of this
+version's results are drawn on the [version 10 page](version_10_panels.html), which carries the same
+numbers laid out as panel figures, and the [version 02 corpus](version_02_corpus.html) holds the
+earlier plates and tables.

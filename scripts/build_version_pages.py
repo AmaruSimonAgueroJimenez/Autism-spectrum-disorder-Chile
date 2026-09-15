@@ -107,7 +107,7 @@ subtitle: "Results of the most recent version (14 September 2026). Every figure 
 ---
 
 ::: {.report-nav}
-[Home](index.html) [Methods](methods.html) [REM](rem.html) [GRD](grd.html) [v02 corpus](version_02_corpus.html) [v10 results](version_10_panels.html)
+[Home](index.html) [Methods](methods.html) [REM](rem.html) [GRD](grd.html) [v01](version_01_initial.html) [v02 corpus](version_02_corpus.html) [v05](version_05_revision.html) [v06](version_06_expanded.html) [v07](version_07_editorial.html) [v10 results](version_10_panels.html)
 :::
 '''
 
@@ -215,6 +215,129 @@ commune extract instead, without commune identifiers.
 '''
 
 
+# ------------------------------------------------------------------ one page per distinct version
+# Versions 05, 06 and 07 each added result tables without changing any that already existed
+# (scripts/audit_versions.py proves this), so each gets a page showing exactly what it added.
+# Version 08 has the same 62 tables as 07 and version 10 the same 71 as 09, so they share a page.
+VERSION_PAGES = [
+    ("05", "version_05_revision.qmd", "Version 05 results: the tidy baseline", None),
+    ("06", "version_06_expanded.qmd", "Version 06 results: the expanded supplement", "05"),
+    ("07", "version_07_editorial.qmd", "Version 07 results: the editorial restructure", "06"),
+]
+
+VERSION_PAGE = """---
+title: "{title}"
+subtitle: "{subtitle}"
+---
+
+::: {{.report-nav}}
+[Home](index.html) [Methods](methods.html) [REM](rem.html) [GRD](grd.html) [v01](version_01_initial.html) [v02 corpus](version_02_corpus.html) [v05](version_05_revision.html) [v06](version_06_expanded.html) [v07](version_07_editorial.html) [v10 results](version_10_panels.html)
+:::
+
+```{{python}}
+#| label: preparacion
+import sys
+from pathlib import Path
+
+ROOT = Path.cwd().parent if Path.cwd().name == "docs" else Path.cwd()
+sys.path.insert(0, str(ROOT / "docs" / "study"))
+sys.path.insert(0, str(ROOT / "scripts"))
+import json
+import pandas as pd
+import render_helpers as rh
+from report_helpers import kpis, show_table
+
+VID = "{vid}"
+PREV = {prev!r}
+DATA = ROOT / "docs" / "study" / "data"
+manifest = json.loads((ROOT / "docs" / "study" / "version_tables.json").read_text(encoding="utf-8"))
+meta = rh.version(VID)
+mine = manifest[VID]
+added = sorted(set(mine["tables"]) - set(manifest[PREV]["tables"])) if PREV else sorted(mine["tables"])
+kpis([
+    (str(len(mine["tables"])), "Result tables in this version"),
+    (str(len(added)), "Added by this version" if PREV else "Tables of the baseline"),
+    ("0", "Tables changed from the previous version"),
+    (str(len(mine["withheld"])), "Withheld from publication"),
+])
+```
+
+```{{python}}
+#| label: que-cambio
+#| output: asis
+print(f"> **What version {{VID}} is.** {{meta['what']}}\\n>\\n> **Its results.** {{meta['results']}}\\n")
+```
+
+This page is the result set of version {vid} of the study. The tables below ship with the repository, so
+every number here can be read from a clone. What this version added is not an editorial claim:
+`scripts/audit_versions.py` hashes every table in every version folder and compares them pairwise, and
+this page is rendered from the manifest that script feeds. The audit's finding for the whole series:
+
+```{{python}}
+#| label: nota-auditoria
+#| output: asis
+print(f"> {{rh.audit_note()}}\\n")
+```
+
+## {heading}
+
+```{{python}}
+#| label: tablas-nuevas
+inventory = []
+for name in added:
+    path = DATA / name
+    if not path.exists():
+        inventory.append({{"Table": name, "Rows": "withheld", "Columns": "withheld", "Size (KB)": None}})
+        continue
+    frame = pd.read_csv(path)
+    inventory.append({{"Table": name, "Rows": len(frame), "Columns": len(frame.columns),
+                      "Size (KB)": round(path.stat().st_size / 1024, 1)}})
+show_table(pd.DataFrame(inventory), "{caption}", {{"Size (KB)": 1}})
+```
+
+## Every result table of version {vid}
+
+Tables marked as withheld carry commune identifiers with cells under five cases and are not published;
+the site ships the masked commune extract instead, without commune identifiers.
+
+```{{python}}
+#| label: inventario-completo
+rows = [{{"Table": n, "Published": "yes" if n in mine["public"] else "withheld",
+         "New in this version": "yes" if n in added else ""}} for n in sorted(mine["tables"])]
+show_table(pd.DataFrame(rows), f"The {{len(mine['tables'])}} result tables of version {{VID}}")
+```
+
+## Where the rest of the series is
+
+The [index](index.html#versions) lists all ten versions and what each one added. The plates of this
+version's results are drawn on the [version 10 page](version_10_panels.html), which carries the same
+numbers laid out as panel figures, and the [version 02 corpus](version_02_corpus.html) holds the
+earlier plates and tables.
+"""
+
+
+def build_version_pages():
+    """Emit one page per version that added result tables."""
+    import json as _json
+    manifest = _json.loads((STUDY / "version_tables.json").read_text(encoding="utf-8"))
+    registry = _json.loads((STUDY / "versions.json").read_text(encoding="utf-8"))
+    titles = {v["id"]: v for v in registry["versions"]}
+    written = []
+    for vid, filename, title, prev in VERSION_PAGES:
+        entry = titles[vid]
+        n_added = len(set(manifest[vid]["tables"]) - set(manifest[prev]["tables"])) if prev else len(manifest[vid]["tables"])
+        heading = f"The {n_added} tables version {vid} added" if prev else f"The {n_added} tables of the baseline"
+        caption = (f"Tables added by version {vid} to the {len(manifest[prev]['tables'])} of version {prev}"
+                   if prev else f"The {n_added} result tables of the baseline")
+        page = VERSION_PAGE.format(
+            title=title, vid=vid, prev=prev, heading=heading, caption=caption,
+            subtitle=f"{entry['title']} ({entry['date']}) - {len(manifest[vid]['tables'])} result tables, "
+                     f"none of them changed from the previous version")
+        (ROOT / "docs" / filename).write_text(page, encoding="utf-8")
+        written.append(filename)
+    return written
+
+
 def main():
     ap = argparse.ArgumentParser(description=__doc__, formatter_class=argparse.RawDescriptionHelpFormatter)
     ap.add_argument("--check", action="store_true", help="exit 1 if the page is not what this script would write")
@@ -229,7 +352,8 @@ def main():
         print("the page matches the figure modules")
         return
     build()
-    print(f"written {PAGE.relative_to(ROOT)}")
+    pages = build_version_pages()
+    print(f"written {PAGE.relative_to(ROOT)} and {len(pages)} version pages: {', '.join(pages)}")
 
 
 if __name__ == "__main__":

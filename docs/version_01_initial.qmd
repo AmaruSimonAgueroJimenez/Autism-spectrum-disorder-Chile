@@ -1,0 +1,84 @@
+---
+title: "Version 01 results: the initial manuscript"
+subtitle: "The first complete manuscript (3 September 2026), in Spanish, over a different observation window — its five tables, published here"
+---
+
+::: {.report-nav}
+[Home](index.html) [Methods](methods.html) [REM](rem.html) [GRD](grd.html) [v01](version_01_initial.html) [v02 corpus](version_02_corpus.html) [v05](version_05_revision.html) [v06](version_06_expanded.html) [v07](version_07_editorial.html) [v10 results](version_10_panels.html)
+:::
+
+```{python}
+#| label: preparacion
+import sys
+from pathlib import Path
+
+ROOT = Path.cwd().parent if Path.cwd().name == "docs" else Path.cwd()
+sys.path.insert(0, str(ROOT / "docs" / "study"))
+sys.path.insert(0, str(ROOT / "scripts"))
+import pandas as pd
+import render_helpers as rh
+from report_helpers import kpis, show_table
+
+V01 = ROOT / "docs" / "study" / "data" / "v01"
+meta = rh.version("01")
+tables = sorted(V01.glob("tabla*.csv"))
+kpis([
+    (str(len(tables)), "Tables of the initial manuscript, published here"),
+    ("2017–2024", "Its observation window"),
+    ("es", "Its language: a single Spanish document"),
+    ("—", "Tidy result tables: this version predates them"),
+])
+```
+
+```{python}
+#| label: que-es
+#| output: asis
+print(f"> **What version 01 is.** {meta['what']}\n>\n> **Its results.** {meta['results']}\n")
+```
+
+This is the earliest version of the study and the one that stands furthest apart from the rest. Its
+observation window is **2017–2024**, not the 2019–2025 of every later version, and it predates the split
+of the case definition into the two variants (with and without Rett syndrome) that the later series
+carries throughout. Its numbers are therefore **not comparable line by line** with the tables of
+versions 05 to 10, and the pairwise audit in `scripts/audit_versions.py` does not attempt to compare
+them: that audit covers the versions that keep tidy result tables, which begin at version 05.
+
+What is published here are the five tables exactly as that manuscript printed them, in Spanish, read
+from `docs/study/data/v01/`. They were built by `make_all.py` against the aggregates of
+`output_files/consolidacion/`, whose paths pointed at the original repository layout, so the script
+itself is a historical record rather than something that still runs.
+
+## The five tables
+
+```{python}
+#| label: tablas-v01
+#| output: asis
+CAPTIONS = {
+    "tabla1": "Table 1. Characteristics of the records, by period.",
+    "tabla2": "Table 2. Annual series of records and persons, with standardised rates and 95% confidence intervals.",
+    "tabla3": "Table 3. Regional distribution, with standardised rates and indirect ratios.",
+    "tabla4": "Table 4. Ecological correlations between sources, by unit and period.",
+    "tabla5": "Table 5. Summary indicators, by period.",
+}
+for path in tables:
+    frame = pd.read_csv(path)
+    print(f"### {path.stem}\n")
+    show_table(frame, CAPTIONS.get(path.stem, path.stem))
+    print()
+```
+
+## How this version relates to the rest
+
+```{python}
+#| label: serie
+rows = []
+for v in rh.versions():
+    rows.append({"Version": f"v{v['id']}", "Date": v["date"], "What it is": v["title"],
+                 "Result tables": v["tidy_tables"] if v["tidy_tables"] else "—",
+                 "Same results as": f"v{v['identical_results_to']}" if v.get("identical_results_to") else ""})
+show_table(pd.DataFrame(rows), "The ten versions of the study, in order")
+```
+
+The [index](index.html#versions) records what each version added. The modern series begins at
+[version 05](version_05_revision.html), and the results as they stand today are on the
+[version 10 page](version_10_panels.html).
