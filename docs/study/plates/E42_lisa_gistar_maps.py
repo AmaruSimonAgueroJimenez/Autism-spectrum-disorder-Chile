@@ -7,7 +7,7 @@ six panels are rebuilt here from tracked tables plus the comuna cartography.
 What the plate shows, unchanged. Every panel is about LOCAL indicators of the empirical-Bayes
 SMOOTHED standardised ratio (`sir_eb`) of the F84 family EXCLUDING Rett syndrome (`sin_rett`), over
 row-standardised QUEEN contiguity of the 342 continental comunas, with significance set by the
-Benjamini–Hochberg threshold at q = 0.05 (critical p 0.0020 for the two GRD series and for A05).
+Benjamini–Hochberg threshold at q = 0.05 (critical p 0.0020 for GRD episodes and for A05, 0.0040 for GRD persons/year).
 Panels (a)–(c) are categorical maps of that classification; panels (d)–(f) are COUNTS OF COMUNAS per
 class, never rates and never events. Nothing here is weighted and nothing is re-standardised.
 
@@ -34,8 +34,9 @@ Sources.
   that every comuna not in the list is drawn 'not significant', never missing data: E51's fourteen
   A05 rows (10 High–High, 1 Low–Low, 3 Low–High) plus that rule reconstruct the map exactly, and the
   10/1/0/3/328 it yields is the A05 row of E42.
-* `catalogo_comunas.csv` supplies the region of each comuna and its `continental` flag, which is what
-  reduces its 346 comunas to the 342 of the analysis (5104, 5201, 12201 and 12202 are the four left
+* `catalogo_comunas.csv` supplies the region of each comuna. Its `continental` flag is NOT read:
+  the 342 comunas come from S3's own row set, and the islands drop out of the maps through the
+  continental-box clip below.
   out of the graph and kept in the tables).
 
 Cartography. Panels (a)–(c) are choropleths and cannot be drawn from a table: they need the comuna
@@ -71,7 +72,7 @@ NOTE = ("Redraws the six panels of plate E42 — the LISA and Getis–Ord Gi* ma
         "significant class of the four local indicators, the region of the LISA-significant comunas and "
         "the class key with the per-map counts — from the per-comuna S3 LISA file (sin_rett, sir_eb, "
         "queen, 342 continental comunas), the E42 class-count table and the E51 list of significant "
-        "comunas, with the region and the continental flag taken from catalogo_comunas.csv; the three "
+        "comunas, with the region taken from catalogo_comunas.csv; the three "
         "choropleths additionally read the comuna polygons of data/comunas.shp, which is not tracked in "
         "this repository and is the same cartography the hospital chapter uses.")
 
@@ -322,11 +323,16 @@ def _panel_f(fig, drawn, counts):
         present = drawn[(letter, column)].value_counts()
         parts = ", ".join(f"{CLASS_LABEL[k]} {present[k]:,}" for k in KEY_ORDER if k in present.index)
         rows.append(f"({letter}) {heading.replace(WARN, '')}: {parts}")
-        published = counts.loc[indicator]
-        # The counts printed in the key are the ones the maps actually draw; they are the published
-        # row of E42 as well, and the plate would be lying about its own maps if they ever diverged.
-        assert present.get("ns", 0) == published[f"{PREFIX[column]} not significant"
-                                                 if False else "LISA not significant"] or True
+        # The counts printed in the key are the ones the maps actually draw. For the LISA panel they
+        # are also a published column of E42, so they can be checked; the Gi* panel has no matching
+        # "not significant" column in that table, so there is nothing to check it against.
+        if column == "lisa_class":
+            published_ns = int(counts.loc[indicator, "LISA not significant"])
+            drawn_ns = int(present.get("ns", 0))
+            if drawn_ns != published_ns:
+                raise AssertionError(
+                    f"{indicator}: the map draws {drawn_ns} communes as not significant but E42 "
+                    f"publishes {published_ns}")
     blocks = [("\n".join(_wrap(r) for r in rows), BODY_COLOUR, BLOCK_PT),
               (_wrap(WARNING_TEXT), WARN_COLOUR, BLOCK_PT),
               (_wrap(THRESHOLD_TEXT), FOOT_COLOUR, BLOCK_PT)]

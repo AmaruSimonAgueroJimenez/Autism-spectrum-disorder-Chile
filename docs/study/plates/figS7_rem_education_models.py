@@ -457,7 +457,10 @@ def draw():
     for a, key in zip(ax, "abcdef"):
         pos = a.get_position()
         cell_x0 = a.get_subplotspec().colspan.start / axes.shape[1]
-        a.title.set_x((cell_x0 + margin - pos.x0) / pos.width)
+        # The visible title was set with loc="left", so it lives on _left_title; a.title is the
+        # empty centre one and moving it does nothing. Same pattern as E16, E18 and figS9.
+        artist = a.title if a.title.get_text() else a._left_title
+        artist.set_x((cell_x0 + margin - pos.x0) / pos.width)
 
     # The `n=` labels of panel (e) are placed last, against the frozen composition.
     marks = [tuple(ax[4].transData.transform((yr, v)))

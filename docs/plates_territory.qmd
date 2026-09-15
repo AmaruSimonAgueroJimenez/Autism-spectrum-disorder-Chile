@@ -19,13 +19,13 @@ from figstyle import *
 
 idx = rh.corpus_index(); caps = rh.corpus_captions(); titles = rh.corpus_titles()
 kpis([
-    ("2", "Plates redrawn here, with their code"),
-    ("8", "Plates kept as stored images"),
+    ("4", "Plates redrawn here, with their code"),
+    ("6", "Plates kept as stored images"),
     ("10", "Plates in this chapter"),
 ])
 ```
 
-Of the 10 plates in this chapter, 2 are redrawn from the published tables by the code shown
+Of the 10 plates in this chapter, 4 are redrawn from the published tables by the code shown
 with each one; the rest are stored images because their series are not fully carried by any published
 table. Use **Show the code that produced this** under a redrawn plate to read how it is built.
 
@@ -44,15 +44,363 @@ pixel-identical — fonts, tick formatting and label placement differ. Each modu
 
 ### Figure S45. Territorial distribution of hospital recognition of autism by comuna of residence, Chile 2019–2024 — F84 family excluding Rett syndrome
 
-::: {.callout-note collapse="true"}
-## Stored image — this plate has no drawing code here
+```{python}
+#| label: lamina-e40_maps_grd_smoothed_ratio
+#| fig-cap: "Figure S45. Redrawn here from the published tables by the code above."
+import textwrap
 
-Its series are not fully carried by any published table, so it cannot be redrawn from a
-clone. The code that produced it is in `study/pipeline/`; what is missing is the microdata
-it reads.
-:::
+import numpy as np
+import pandas as pd
+from matplotlib.cm import ScalarMappable
+from matplotlib.colors import Normalize, to_rgba
+from matplotlib.lines import Line2D
+from matplotlib.patches import Patch
+from figstyle import *
 
-![**Territorial distribution of hospital recognition of autism by comuna of residence, Chile 2019–2024 — F84 family excluding Rett syndrome** (a, b) Empirical-Bayes (Marshall) smoothed standardised ratio of GRD episodes with documented F84 and of unique persons within year, by comuna of residence, pooled 2019–2024 (n = 25,321 episodes of the 25,323 episodes with documented F84 in the period; the remaining 2 carry no comuna of residence that links to the register and are outside the territorial analysis); the scale is centred on 1, the national reference. (c) Crude rate per 100,000 person-years (INE base-2017 denominator by comuna of residence; numerator and denominator are COMPATIBLE). (d) Shrinkage of the smoother against expected counts. (e) Distribution of the crude and smoothed ratios. (f) Eighteen comunas with the highest smoothed ratio, with the crude ratio and its exact Poisson 95% CI and the observed episodes in brackets. Observed annual GRD panel (65, 65, 65, 65, 68 and 72 hospitals in 2019–2024). Counts are administrative recognition, never prevalence or incidence; the GRD outcome is &#x27;episodes with documented F84&#x27; and F84-principal is a separate series. Ecological associations between administrative counts from sources that are not person-linked: no individual-level inference, no care cascade and no causal effect follow (Law 21.545 is policy context from March 2023, not an intervention with an estimable effect). Internal indirect standardisation (national ratio = 1 by construction) using the national age-, sex- and year-specific rates of the same source where the source publishes the breakdown; exact Poisson limits for the crude ratio and Marshall&#x27;s empirical-Bayes smoother. Row-standardised queen contiguity over 342 comunas (the non-continental ones [5104, 5201, 12201, 12202] are excluded from the graph and kept in the tables; comunas with no queen neighbour —1404, 10206, 11203, 12303— are linked to their nearest neighbour). Inference from 999 permutations with seed 20260905 and analytically; local indicators use the Benjamini–Hochberg threshold at q = 0.05. Cells with fewer than 5 events are suppressed in territorial tables.](study/corpus/figures/E40_maps_grd_smoothed_ratio.jpg){fig-align="center" width="100%"}
+PLATE = "E40_maps_grd_smoothed_ratio"
+SOURCES = [
+    "docs/study/corpus/tables/E40_grd_smoothed_ratio_comuna.csv",
+    "output_files/consolidacion/catalogo_comunas.csv",
+    "data/comunas.shp",
+]
+NOTE = ("Redraws the six panels of plate E40 — the comuna maps of the empirical-Bayes smoothed "
+        "standardised ratio of GRD F84 episodes and of unique persons within year, the map of the crude "
+        "rate per 100,000 person-years, the shrinkage weight against the expected counts, the "
+        "distribution of the crude and smoothed ratios and the eighteen comunas with the highest "
+        "smoothed ratio — from the plate's companion table E40_grd_smoothed_ratio_comuna.csv (346 "
+        "comunas, sin_rett, pooled 2019–2024) with the continental flag of catalogo_comunas.csv; the "
+        "three choropleths additionally read the comuna polygons of data/comunas.shp, which is not "
+        "tracked in this repository and is the same cartography the hospital chapter uses.")
+
+ROOT = BASE.parents[1]                          # figstyle.BASE is docs/study; ROOT is the repository root
+FIGSIZE = (180 / 25.4, 245 / 25.4)              # the plate canvas of the pipeline: 180 x 245 mm
+
+TABLE = BASE / "corpus" / "tables" / "E40_grd_smoothed_ratio_comuna.csv"
+CATALOGUE = ROOT / "output_files" / "consolidacion" / "catalogo_comunas.csv"
+SHAPEFILE = ROOT / "data" / "comunas.shp"
+
+#: Equal-area conic of the study; the pipeline measures every distance and area in it, never in
+#: Web Mercator, and the maps are drawn in it so that a metre is a metre in both axes.
+ALBERS = "+proj=aea +lat_1=-20 +lat_2=-52 +lat_0=-36 +lon_0=-71 +datum=WGS84 +units=m +no_defs"
+CONTINENTAL_BOX = (-76.5, -56.6, -66.0, -17.3)  # the clip that drops the oceanic islands
+SIMPLIFY = 500.0                                # metres; the plotting geometry of the pipeline
+#: The three latitude bands of the plate, by region code: north, centre, south.
+BANDS = [[15, 1, 2, 3, 4], [5, 13, 6, 7, 16, 8, 9, 14, 10], [11, 12]]
+SPAN_PAD, WIDTH_PAD = 1.04, 1.06                # air around the tallest band and around each band
+GAP = 9.5 / 1000                                # gap between two bands, as a fraction of the canvas
+
+DIVERGING, SEQUENTIAL = "RdBu_r", "YlGnBu"
+ROBUST_Q = 0.98                                 # the tail the colour limits are cut at
+REFERENCE = 1.0                                 # the national reference of an internal standardisation
+NO_VALUE = "#e9e9e9"                            # a polygon with no comuna code: the plate's 'No data'
+MAP_EDGE, KEY_EDGE = "#666666", "#666666"
+HIST_HI, HIST_EDGES = 3.0, 30                   # the shared bin grid of panel (e): 30 edges, 29 bins
+HIST_ALPHA = 0.75                               # the smoothed bars are laid over the crude ones
+HEADROOM = 1.4                                  # free band beyond the data in panels (e) and (f)
+TOP_N = 18                                      # comunas in panel (f)
+WEIGHT_TOP = 1.05                               # panel (d) keeps the weight-1 ceiling inside the frame
+
+#: Panel (f)'s x window: the reference edge on the left, the widest upper limit with headroom on the right.
+F_LEFT = 0.85
+
+TITLE_PT, LABEL_PT, TICK_PT = 9.0, 8.0, 7.0
+CBAR_TICK_PT = 7.5                              # the keys carry slightly larger numbers than the axes
+NOTE_PT, KEY_PT = 7.0, 7.0
+HIST_KEY_PT, TOP_KEY_PT = 6.9, 6.4              # the two panel keys, as the plate sets them
+WRAP_NOTE = 58                                  # the plate's line break inside panel (d)'s note
+
+#: Boxes as fractions of the canvas, measured off the stored plate. A map cell is
+#: (left, right, bottom, height) — the three bands are laid inside it — a colourbar and a chart panel
+#: are the usual (left, bottom, width, height).
+MAP_CELL = {"a": (0.0435, 0.4585, 0.7862, 0.1521),
+            "b": (0.5345, 0.9495, 0.7862, 0.1521),
+            "c": (0.0435, 0.4585, 0.4328, 0.2315)}
+CBAR = {"a": (0.0435, 0.774064, 0.4150, 0.009552),
+        "b": (0.5345, 0.774064, 0.4150, 0.009552),
+        "c": (0.0435, 0.421382, 0.4150, 0.009552)}
+BOX = {"d": (0.5895, 0.392726, 0.3900, 0.277002),
+       "e": (0.0535, 0.070904, 0.3900, 0.241734),
+       "f": (0.5895, 0.067965, 0.3900, 0.243571)}
+
+#: Panel headings, with the line breaks the stored plate prints; the letter joins the first line.
+TITLE = {"a": "GRD F84 episodes 2019–2024 —\nSmoothed ratio (EB) (without Rett)",
+         "b": "GRD persons/year 2019–2024 — Smoothed ratio\n(EB) (without Rett)",
+         "c": "GRD F84 episodes — Rate per 100,000\n2019–2024",
+         "d": "Shrinkage weight of the smoother: prior mean\n= {mean:.2f}, prior variance = {var:.3f}",
+         "e": "Distribution of the comuna ratios",
+         "f": "{n} comunas with the highest smoothed ratio\n(observed in brackets)"}
+TITLE_X = {"a": 0.010, "c": 0.010, "e": 0.010, "b": 0.466, "d": 0.466, "f": 0.466}
+TITLE_TOP = {"a": 0.98237, "b": 0.98237, "c": 0.70581, "d": 0.70066, "e": 0.33917, "f": 0.34358}
+
+RATIO_LABEL = "Smoothed ratio (EB); national reference = 1"
+RATE_LABEL = "Rate per 100,000"
+NO_DATA_LABEL = "No data"
+CRUDE_LABEL = "Crude standardised ratio"
+SMOOTH_LABEL = "Empirical-Bayes smoothed standardised ratio"
+CI_LABEL = "Crude standardised ratio (95% CI)"
+RATIO_AXIS = "Crude ratio / Smoothed ratio (EB)"
+WEIGHT_NOTE = ["Weight 0 = the ratio is shrunk entirely to the national reference;",
+               "weight 1 = the crude ratio is preserved"]
+
+
+def table():
+    """The plate's companion table, with the bracketed point estimates parsed out.
+
+    Nothing is recomputed: the rate, the crude ratio and its exact Poisson limits are read from the
+    published strings, the smoothed ratio and the shrinkage weight from their own columns. Only
+    'Observed episodes' is censored, and it is kept as printed ('<5') because panel (f) prints it.
+    """
+    t = pd.read_csv(TABLE, encoding="utf-8-sig")
+    t["cut_comuna"] = t.CUT.astype(int)
+    t["observed"] = t["Observed episodes"].astype(str).str.strip()
+    t["expected"] = t["Expected"].astype(float)
+    t["weight"] = t["Shrinkage weight of the smoother"].astype(float)
+    t["sir_eb"] = t["Empirical-Bayes smoothed standardised ratio"].astype(float)
+    t["persons_eb"] = t["GRD persons (smoothed ratio)"].astype(float)
+    t["rate"] = _point(t["Rate per 100,000 population"])
+    t["sir"] = _point(t["Crude standardised ratio"])
+    t["sir_lo"], t["sir_hi"] = _limits(t["Crude standardised ratio"])
+    catalogue = pd.read_csv(CATALOGUE, encoding="utf-8-sig")
+    t["continental"] = t.cut_comuna.map(dict(zip(catalogue.cut_comuna, catalogue.continental)))
+    return t
+
+
+def _point(column):
+    """The point estimate of a '58.9 (51.1–67.7)' cell."""
+    return column.astype(str).str.split(" ").str[0].astype(float)
+
+
+def _limits(column):
+    """The two limits of a '2.89 (2.50–3.32)' cell."""
+    inside = column.astype(str).str.extract(r"\(([\d.]+)[–-]([\d.]+)\)")
+    return inside[0].astype(float), inside[1].astype(float)
+
+
+def diverging_norm(values):
+    """Colour limits for a standardised ratio: symmetric about the national reference.
+
+    The half-width is the robust tail of the distance from 1, so that the scale is readable and the
+    reference sits exactly at the middle of the bar. Measured against the stored plate, panel (a)'s
+    bar runs 0.043 to 1.957 and panel (b)'s 0.105 to 1.895, which is this rule over the 342 comunas
+    the maps draw.
+    """
+    half = float(np.quantile(np.abs(values - REFERENCE), ROBUST_Q))
+    return Normalize(vmin=REFERENCE - half, vmax=REFERENCE + half)
+
+
+def sequential_norm(values):
+    """Colour limits for a rate: the robust body of the distribution, both tails cut alike."""
+    lo, hi = np.quantile(values, [1 - ROBUST_Q, ROBUST_Q])
+    return Normalize(vmin=float(lo), vmax=float(hi))
+
+
+def prior_variance(t):
+    """The smoother's prior, recovered from the published weights, for panel (d)'s heading.
+
+    Marshall's weight is w = s² / (s² + m / E) with the prior mean m = 1 by construction, so each row
+    gives back s² = w / (E (1 − w)); the plate prints the median of those, and the 345 rows whose
+    weight is below 1 return 0.2439 against the stored heading's 'prior variance = 0.244'.
+    """
+    keep = t.weight < 1                          # a weight of exactly 1 carries no information on s²
+    return float(np.median(t.weight[keep] / (t.expected[keep] * (1 - t.weight[keep]))))
+
+
+def comunas():
+    """The comuna polygons of the plate, in the pipeline's own plotting geometry.
+
+    `data/comunas.shp` is not tracked in this repository; it is the cartography the hospital chapter
+    of the report already uses. Clipped to the continental box, projected to the equal-area conic and
+    simplified to 500 m. The polygon with no comuna code — the 'Zona sin demarcar' of the southern
+    ice field — is KEPT, because it is the one thing the plate's 'No data' key stands for.
+    """
+    import geopandas as gpd
+    from shapely.geometry import box
+    if not SHAPEFILE.exists():
+        raise FileNotFoundError(
+            f"{SHAPEFILE} is missing: panels (a)-(c) of {PLATE} are choropleths and need the comuna "
+            "cartography, which this repository does not track.")
+    g = gpd.read_file(SHAPEFILE)[["cod_comuna", "geometry"]].rename(columns={"cod_comuna": "cut_comuna"})
+    g["cut_comuna"] = g.cut_comuna.astype(int)
+    g = g.to_crs(4326)
+    g["geometry"] = g.geometry.make_valid()
+    g["geometry"] = g.geometry.intersection(box(*CONTINENTAL_BOX))
+    g = g[~g.geometry.is_empty].copy().to_crs(ALBERS)
+    g["geometry"] = g.geometry.simplify(SIMPLIFY)
+    catalogue = pd.read_csv(CATALOGUE, encoding="utf-8-sig")
+    g["cut_region"] = g.cut_comuna.map(dict(zip(catalogue.cut_comuna, catalogue.cut_region)))
+    g["band"] = _band(g)
+    return g
+
+
+def _band(g):
+    """Which of the three latitude strips each polygon is drawn in.
+
+    A comuna goes by its region code. A polygon with no comuna code has no region either, so it goes
+    by where it lies: the band whose own polygons span its centroid, which puts the ice field in the
+    south strip where the plate draws it.
+    """
+    band = pd.Series(np.nan, index=g.index)
+    for i, regions in enumerate(BANDS):
+        band[g.cut_region.isin(regions)] = i
+    edges = [g.geometry[band == i].total_bounds[[1, 3]] for i in range(len(BANDS))]
+    for row in np.where(band.isna())[0]:
+        y = g.geometry.iloc[row].centroid.y
+        band.iloc[row] = int(np.argmin([max(0.0, lo - y, y - hi) for lo, hi in edges]))
+    return band.astype(int)
+
+
+def _map(fig, cell, shapes, values, cmap, norm):
+    """One choropleth of the plate: the country in three bands at one common vertical scale.
+
+    Every band is drawn at the same metres-per-inch, so the three strips are comparable; each band is
+    then given the width its own geography needs rather than a fixed third of the cell, which is what
+    keeps the narrow north and centre from floating in an empty rectangle. If the three together do
+    not fit across the cell, the whole map — bands and height alike — is scaled down.
+    """
+    x0, x1, bottom, height = cell
+    bands = [shapes[shapes.band == i] for i in range(len(BANDS))]
+    bounds = [b.total_bounds for b in bands]
+    span = max(b[3] - b[1] for b in bounds) * SPAN_PAD
+    widths_m = [(b[2] - b[0]) * WIDTH_PAD for b in bounds]
+    w_in, h_in = fig.get_size_inches()
+    scale = (height * h_in) / span                       # inches per metre, shared by the three bands
+    widths = [w * scale for w in widths_m]
+    available = (x1 - x0 - (len(bands) - 1) * GAP) * w_in
+    if sum(widths) > available:
+        shrink = available / sum(widths)
+        widths = [w * shrink for w in widths]
+        height = height * shrink
+    widths = [w / w_in for w in widths]
+    x = x0 + max(0.0, (x1 - x0 - sum(widths) - (len(bands) - 1) * GAP)) / 2
+    palette = plt.get_cmap(cmap)
+    blank = to_rgba(NO_VALUE)
+    for band, bound, width in zip(bands, bounds, widths):
+        ax = fig.add_axes([x, bottom, width, height])
+        seen = values.reindex(band.cut_comuna).to_numpy(float)
+        colours = [blank if np.isnan(v) else palette(norm(v)) for v in seen]
+        band.plot(color=colours, edgecolor=MAP_EDGE, linewidth=0.18, ax=ax)
+        ax.set_aspect("auto")
+        ax.set_axis_off()
+        cy, cx = (bound[1] + bound[3]) / 2, (bound[0] + bound[2]) / 2
+        ax.set_ylim(cy - span / 2, cy + span / 2)
+        window = span * (width * w_in) / (height * h_in)  # a metre is a metre in both axes
+        ax.set_xlim(cx - window / 2, cx + window / 2)
+        x += width + GAP
+
+
+def _colourbar(fig, box, cmap, norm, label, no_data=False):
+    """The horizontal key under a map, and — under panel (a) only — the 'No data' swatch."""
+    cax = fig.add_axes(box)
+    bar = fig.colorbar(ScalarMappable(norm=norm, cmap=cmap), cax=cax, orientation="horizontal")
+    bar.outline.set_linewidth(0.7)
+    cax.tick_params(labelsize=CBAR_TICK_PT, length=2.4, pad=1.8)
+    cax.set_xlabel(label, fontsize=LABEL_PT, labelpad=1.0)
+    if no_data:
+        cax.legend(handles=[Patch(facecolor=NO_VALUE, edgecolor=KEY_EDGE, label=NO_DATA_LABEL)],
+                   loc="upper center", bbox_to_anchor=(0.5, -2.82), fontsize=KEY_PT, frameon=False,
+                   handlelength=1.45, handleheight=1.3, borderpad=0.0, handletextpad=0.6)
+
+
+def _panel_d(fig, t):
+    """The shrinkage weight against the expected counts, on a log x axis."""
+    ax = fig.add_axes(BOX["d"])
+    ax.set_xscale("log")
+    ax.scatter(t.expected, t.weight, s=21, color=BLUE, edgecolor="white", linewidth=0.3, zorder=3)
+    ax.axhline(1.0, color="black", ls=(0, (1, 1.6)), lw=0.9, zorder=2)
+    ax.set_ylim(0, WEIGHT_TOP)
+    ax.set_xlabel("Expected counts (indirect standardisation)", fontsize=LABEL_PT)
+    ax.set_ylabel("Shrinkage weight of the smoother", fontsize=LABEL_PT)
+    log_axis(ax, "x")
+    ax.tick_params(labelsize=TICK_PT)
+    clean(ax, grid="both")
+    ax.text(0.02, 0.16, "\n".join(_wrap(line) for line in WEIGHT_NOTE), transform=ax.transAxes,
+            fontsize=NOTE_PT, va="top", ha="left", linespacing=1.3, color="#333333", zorder=4)
+
+
+def _panel_e(fig, t):
+    """The two ratio distributions over one shared bin grid, crude behind, smoothed in front."""
+    ax = fig.add_axes(BOX["e"])
+    edges = np.linspace(0, HIST_HI, HIST_EDGES)
+    crude, _ = np.histogram(t.sir, bins=edges)
+    smooth, _ = np.histogram(t.sir_eb, bins=edges)
+    ax.hist(t.sir, bins=edges, color=LIGHT, edgecolor="white", linewidth=0.5, label=CRUDE_LABEL,
+            zorder=2)
+    ax.hist(t.sir_eb, bins=edges, color=BLUE, alpha=HIST_ALPHA, edgecolor="white", linewidth=0.5,
+            label=SMOOTH_LABEL, zorder=3)
+    ax.axvline(REFERENCE, color="black", ls=(0, (4, 3)), lw=1.1, zorder=4)
+    ax.set_ylim(0, max(crude.max(), smooth.max()) * HEADROOM)
+    ax.set_xlabel(RATIO_AXIS, fontsize=LABEL_PT)
+    ax.set_ylabel("Comunas", fontsize=LABEL_PT)
+    ax.tick_params(labelsize=TICK_PT)
+    clean(ax, grid="both")
+    ax.legend(fontsize=HIST_KEY_PT, loc="upper center", bbox_to_anchor=(0.5, -0.135), frameon=False,
+              handlelength=1.25, handleheight=0.95, borderpad=0.0, labelspacing=0.3)
+
+
+def _panel_f(fig, t):
+    """The eighteen comunas with the highest smoothed ratio, crude interval behind each one."""
+    ax = fig.add_axes(BOX["f"])
+    top = t.nlargest(TOP_N, "sir_eb")
+    y = np.arange(len(top))
+    ax.axvline(REFERENCE, color="black", ls=(0, (4, 3)), lw=1.1, zorder=2)
+    ax.errorbar(top.sir, y, xerr=[top.sir - top.sir_lo, top.sir_hi - top.sir], fmt="o", color=GREY,
+                ecolor=GREY, elinewidth=1.0, markersize=4.6, capsize=0, zorder=3)
+    ax.plot(top.sir_eb, y, "o", color=ORANGE, markersize=6.6, zorder=4)
+    ax.set_yticks(y)
+    ax.set_yticklabels([f"{c} ({o})" for c, o in zip(top.Comuna, top.observed)], fontsize=TICK_PT)
+    ax.set_xlim(F_LEFT, float(top.sir_hi.max()) * HEADROOM)
+    ax.invert_yaxis()
+    ax.set_xlabel(RATIO_AXIS, fontsize=LABEL_PT)
+    ax.tick_params(axis="x", labelsize=TICK_PT)
+    ax.tick_params(axis="y", length=0)
+    clean(ax, grid="x")
+    ax.spines["left"].set_visible(True)
+    # The key names the two series, not the two artists: a dot for the smoothed point estimate and a
+    # plain rule for the crude interval, which is how the stored plate draws it.
+    keys = [Line2D([], [], color=ORANGE, marker="o", markersize=6.6, ls="none", label=SMOOTH_LABEL),
+            Line2D([], [], color=GREY, lw=1.0, label=CI_LABEL)]
+    ax.legend(handles=keys, fontsize=TOP_KEY_PT, loc="upper center", bbox_to_anchor=(0.5, -0.135),
+              frameon=False, numpoints=1, handlelength=1.35, borderpad=0.0, labelspacing=0.3)
+
+
+def _wrap(text, width=WRAP_NOTE):
+    """The plate's line breaking: plain character wrapping, one paragraph at a time."""
+    return "\n".join(textwrap.wrap(str(text), width))
+
+
+def draw_E40_maps_grd_smoothed_ratio():
+    style()
+    plt.rcParams.update({"axes.edgecolor": "#333333", "axes.linewidth": 0.7,
+                         "xtick.major.size": 2.4, "ytick.major.size": 2.4,
+                         "xtick.major.pad": 1.8, "ytick.major.pad": 1.8, "axes.labelpad": 2.4})
+    t = table()
+    mapped = t[t.continental]                    # the 342 comunas the maps cover set the colour limits
+    series = {"a": ("sir_eb", DIVERGING, diverging_norm(mapped.sir_eb), RATIO_LABEL, True),
+              "b": ("persons_eb", DIVERGING, diverging_norm(mapped.persons_eb), RATIO_LABEL, False),
+              "c": ("rate", SEQUENTIAL, sequential_norm(mapped.rate), RATE_LABEL, False)}
+
+    fig = plt.figure(figsize=FIGSIZE)
+    shapes = comunas()
+    for letter, (column, cmap, norm, label, no_data) in series.items():
+        _map(fig, MAP_CELL[letter], shapes, t.set_index("cut_comuna")[column], cmap, norm)
+        _colourbar(fig, CBAR[letter], cmap, norm, label, no_data=no_data)
+    _panel_d(fig, t)
+    _panel_e(fig, t)
+    _panel_f(fig, t)
+
+    headings = dict(TITLE)
+    headings["d"] = TITLE["d"].format(mean=REFERENCE, var=prior_variance(t))
+    headings["f"] = TITLE["f"].format(n=TOP_N)
+    for letter in "abcdef":
+        rows = headings[letter].split("\n")
+        rows[0] = f"({letter}) {rows[0]}"
+        fig.text(TITLE_X[letter], TITLE_TOP[letter], "\n".join(rows), fontsize=TITLE_PT,
+                 fontweight="bold", ha="left", va="top", linespacing=1.15)
+    return fig
+
+
+draw_E40_maps_grd_smoothed_ratio()
+```
 
 ### Figure S46. Territorial distribution of the REM autism indicators by comuna of the establishment, Chile 2019–2025 — F84 family excluding Rett syndrome
 
@@ -91,7 +439,7 @@ NOTE = ("Redraws the six panels of plate E42 — the LISA and Getis–Ord Gi* ma
         "significant class of the four local indicators, the region of the LISA-significant comunas and "
         "the class key with the per-map counts — from the per-comuna S3 LISA file (sin_rett, sir_eb, "
         "queen, 342 continental comunas), the E42 class-count table and the E51 list of significant "
-        "comunas, with the region and the continental flag taken from catalogo_comunas.csv; the three "
+        "comunas, with the region taken from catalogo_comunas.csv; the three "
         "choropleths additionally read the comuna polygons of data/comunas.shp, which is not tracked in "
         "this repository and is the same cartography the hospital chapter uses.")
 
@@ -342,11 +690,16 @@ def _panel_f(fig, drawn, counts):
         present = drawn[(letter, column)].value_counts()
         parts = ", ".join(f"{CLASS_LABEL[k]} {present[k]:,}" for k in KEY_ORDER if k in present.index)
         rows.append(f"({letter}) {heading.replace(WARN, '')}: {parts}")
-        published = counts.loc[indicator]
-        # The counts printed in the key are the ones the maps actually draw; they are the published
-        # row of E42 as well, and the plate would be lying about its own maps if they ever diverged.
-        assert present.get("ns", 0) == published[f"{PREFIX[column]} not significant"
-                                                 if False else "LISA not significant"] or True
+        # The counts printed in the key are the ones the maps actually draw. For the LISA panel they
+        # are also a published column of E42, so they can be checked; the Gi* panel has no matching
+        # "not significant" column in that table, so there is nothing to check it against.
+        if column == "lisa_class":
+            published_ns = int(counts.loc[indicator, "LISA not significant"])
+            drawn_ns = int(present.get("ns", 0))
+            if drawn_ns != published_ns:
+                raise AssertionError(
+                    f"{indicator}: the map draws {drawn_ns} communes as not significant but E42 "
+                    f"publishes {published_ns}")
     blocks = [("\n".join(_wrap(r) for r in rows), BODY_COLOUR, BLOCK_PT),
               (_wrap(WARNING_TEXT), WARN_COLOUR, BLOCK_PT),
               (_wrap(THRESHOLD_TEXT), FOOT_COLOUR, BLOCK_PT)]
@@ -729,12 +1082,475 @@ it reads.
 
 ### Figure S54. Regional-scale summary: rates, standardised ratios and intervals — F84 family excluding Rett syndrome
 
-::: {.callout-note collapse="true"}
-## Stored image — this plate has no drawing code here
+```{python}
+#| label: lamina-e49_regional_summary
+#| fig-cap: "Figure S54. Redrawn here from the published tables by the code above."
+import math
 
-Its series are not fully carried by any published table, so it cannot be redrawn from a
-clone. The code that produced it is in `study/pipeline/`; what is missing is the microdata
-it reads.
-:::
+import numpy as np
+import pandas as pd
+from matplotlib.colors import TwoSlopeNorm
+from matplotlib.cm import ScalarMappable
+from matplotlib.ticker import LogFormatter
+from scipy import stats
+from figstyle import *
 
-![**Regional-scale summary: rates, standardised ratios and intervals — F84 family excluding Rett syndrome** (a, b) Smoothed ratio by region for GRD episodes (residence) and A05 entries (⚠ place of care). (c, d) Regional rate per 100,000 person-years with exact Poisson 95% CI and the observed events in brackets. (e) Moran&#x27;s I at the regional scale (16 units; inference with n = 16 has little power and is reported as such). (f) Regional comparison of the two sources on a log scale; no ratio between them is ever computed. Counts are administrative recognition, never prevalence or incidence; the GRD outcome is &#x27;episodes with documented F84&#x27; and F84-principal is a separate series. Ecological associations between administrative counts from sources that are not person-linked: no individual-level inference, no care cascade and no causal effect follow (Law 21.545 is policy context from March 2023, not an intervention with an estimable effect). The compatibility warning applies to panels (b), (d), (e) and (f): Compatibility WARNING: the numerator is located in the comuna of the REPORTING ESTABLISHMENT (place of care) while the denominator is INE RESIDENT population; comunas without a reporting establishment yield structural zeros and comunas with referral centres concentrate care of residents of other comunas. This is not a population rate of the comuna. Internal indirect standardisation (national ratio = 1 by construction) using the national age-, sex- and year-specific rates of the same source where the source publishes the breakdown; exact Poisson limits for the crude ratio and Marshall&#x27;s empirical-Bayes smoother. Row-standardised queen contiguity over 342 comunas (the non-continental ones [5104, 5201, 12201, 12202] are excluded from the graph and kept in the tables; comunas with no queen neighbour —1404, 10206, 11203, 12303— are linked to their nearest neighbour). Inference from 999 permutations with seed 20260905 and analytically; local indicators use the Benjamini–Hochberg threshold at q = 0.05. Cells with fewer than 5 events are suppressed in territorial tables.](study/corpus/figures/E49_regional_summary.jpg){fig-align="center" width="100%"}
+PLATE = "E49_regional_summary"
+SOURCES = [
+    "docs/study/corpus/tables/E49_regional_summary.csv",
+    "docs/study/corpus/tables/E50_moran_gistar_all.csv",
+    "output_files/consolidacion/population_regional.csv",
+    "data/Regional.shp",
+]
+NOTE = ("Redraws the six panels of plate E49 — the two empirical-Bayes smoothed-ratio maps of the "
+        "sixteen regions, the two crude regional rates per 100,000 person-years with their exact "
+        "Poisson intervals and observed counts, the fourteen-indicator Moran's I bar chart at the "
+        "regional scale and the log-log comparison of GRD against REM A05 with Spearman's rho — from "
+        "the E49 companion table and the Region block of E50, with the INE regional person-years of "
+        "output_files/consolidacion/population_regional.csv used to recover the GRD rates at full "
+        "precision so that the Metropolitana/Los Ríos tie at 16.4 breaks the way panel (f) needs; the "
+        "two choropleths additionally read the regional polygons of data/Regional.shp, which is not "
+        "tracked in this repository and is the same cartography the hospital chapter uses.")
+
+ROOT = BASE.parents[1]                          # figstyle.BASE is docs/study; ROOT is the repo root
+FIGSIZE = (180 / 25.4, 245 / 25.4)              # the plate canvas of the pipeline: 180 x 245 mm
+
+E49 = BASE / "corpus" / "tables" / "E49_regional_summary.csv"
+E50 = BASE / "corpus" / "tables" / "E50_moran_gistar_all.csv"
+POPULATION = ROOT / "output_files" / "consolidacion" / "population_regional.csv"
+SHAPEFILE = ROOT / "data" / "Regional.shp"
+
+#: The two indicators of E49 the plate draws, exactly as its Indicator column spells them. The mark
+#: is part of the stored name of the A05 series and travels with it into the panel titles.
+WARN = " ⚠"
+GRD = "GRD F84 episodes"
+A05 = "REM A05 entries" + WARN
+
+#: CUT code -> region name as E49 spells it, and the north -> south order of panels (c), (d) and (f).
+REGION_NAMES = {15: "Arica y Parinacota", 1: "Tarapacá", 2: "Antofagasta", 3: "Atacama",
+                4: "Coquimbo", 5: "Valparaíso", 13: "Metropolitana", 6: "O'Higgins", 7: "Maule",
+                16: "Ñuble", 8: "Biobío", 9: "La Araucanía", 14: "Los Ríos", 10: "Los Lagos",
+                11: "Aysén", 12: "Magallanes"}
+REGION_ORDER = [15, 1, 2, 3, 4, 5, 13, 6, 7, 16, 8, 9, 14, 10, 11, 12]
+GRD_YEARS = range(2019, 2025)                   # the GRD coverage of the plate, 2019-2024
+
+#: Equal-area conic of the study; the pipeline measures every distance in it, never in Web Mercator.
+ALBERS = "+proj=aea +lat_1=-20 +lat_2=-52 +lat_0=-36 +lon_0=-71 +datum=WGS84 +units=m +no_defs"
+CONTINENTAL_BOX = (-76.5, -56.6, -66.0, -17.3)  # the clip that drops the oceanic islands
+SIMPLIFY = 800.0                                # metres; the plotting geometry of the pipeline
+BANDS = [[15, 1, 2, 3, 4], [5, 13, 6, 7, 16, 8, 9, 14, 10], [11, 12]]
+SPAN_PAD = 1.04                                 # air above and below the tallest band
+BAND_GAP = 0.010                                # gap between two bands, as a fraction of the canvas
+UPPER_Q = 0.98                                  # where the colour scale of a map stops, see module doc
+MAP_CMAP = "RdBu_r"
+MAP_EDGE, MAP_EDGE_LW = "#666666", 0.25
+NO_VALUE = "#f2f2f2"
+
+#: Boxes measured off the stored plate, as fractions of the canvas. A map cell is
+#: (left, right, bottom, height) with the three bands laid inside it, its colour bar is
+#: (left, bottom, width, height), and a chart panel is the usual (left, bottom, width, height).
+MAP_CELL = {"a": (0.0440, 0.4580, 0.7716, 0.1673),
+            "b": (0.5350, 0.9490, 0.7720, 0.1826)}
+CBAR = {"a": (0.0440, 0.7605, 0.4140, 0.0074),
+        "b": (0.5350, 0.7605, 0.4140, 0.0074)}
+BOX = {"c": (0.1920, 0.3960, 0.2860, 0.2748),
+       "d": (0.6980, 0.3960, 0.2860, 0.2748),
+       "e": (0.1920, 0.0404, 0.2860, 0.2748),
+       "f": (0.6980, 0.0404, 0.2860, 0.2748)}
+TITLE_X = {"a": 0.0110, "c": 0.0110, "e": 0.0110, "b": 0.5045, "d": 0.5045, "f": 0.5045}
+TITLE_TOP = {"a": 0.9827, "b": 0.9835, "c": 0.7021, "d": 0.7021, "e": 0.3317, "f": 0.3464}
+
+TITLE_PT, LABEL_PT, TICK_PT = 9.0, 8.0, 7.0
+P_PT, POINT_PT, WARN_PT = 6.3, 6.7, 6.0         # p labels, the region labels of (f), the red note
+TITLE_W_PT = (180 / 25.4 * 72.0) / 2 - (4.0 / 25.4 * 72.0)      # half the canvas less a 4 mm margin
+TITLE_LINESPACING = 1.12
+MARKER_PT = 5.1                                 # the dot of (c) and (d), in points of diameter
+SCATTER_PT = 5.2                                # the dot of (f)
+BAR_HEIGHT = 0.72                               # the bar of (e), in category units
+MORAN_HEADROOM = 1.311                          # the room panel (e) leaves on the right for its p
+P_GAP = 0.020                                   # the air between a bar and its p, in units of I
+WARN_COLOUR = "#8b0000"
+LEADER_COLOUR = "#999999"
+
+#: The panel headings, as the stored plate prints them. The two map titles are not built from one
+#: template: (a) names the scale and (b) ends on the compatibility mark instead, and that asymmetry
+#: is the plate's own. The (f) heading is composed in `draw` from the numbers it reports.
+TITLE = {"a": f"{GRD} — Smoothed ratio (EB) (Region)",
+         "b": f"REM A05 entries — Smoothed ratio (EB){WARN}",
+         "c": "Regional rate of GRD episodes with F84, 2019–2024 (observed)",
+         "d": f"Regional rate of A05 entries, 2021–2025{WARN} place of care",
+         "e": "Moran's I at the regional scale"}
+CBAR_LABEL = "Smoothed ratio (EB)"
+RATE_LABEL = "Rate per 100,000 population (95% CI)"
+WARNING_TEXT = "⚠ Place of CARE over a RESIDENCE denominator"
+
+#: Panel (e) takes the empirical-Bayes row of every indicator that has one and the observed-value row
+#: of the four context layers that do not; nothing else in the Region block is drawn.
+MORAN_VALUE_TYPES = ["Empirical-Bayes smoothed standardised ratio", "Observed value"]
+
+
+# --------------------------------------------------------------------------- reading the tables
+def _num(s):
+    """One formatted number -> float; an empty or not-estimable cell -> nan."""
+    s = str(s).strip()
+    if not s or s.lower() in {"n/e", "nan", "—", "-", "< 5"}:
+        return float("nan")
+    return float(s.replace(",", "").replace("−", "-").replace("<", "").strip())
+
+
+def _point(s):
+    """'25.5 (23.5–27.6)' -> 25.5 — the estimate, without its interval."""
+    return _num(str(s).split("(")[0])
+
+
+def _limits(s):
+    """'25.5 (23.5–27.6)' -> (23.5, 27.6) — the two limits the table publishes."""
+    inside = str(s).split("(")[1].rstrip(")")
+    lo, hi = inside.replace("–", "|").replace("—", "|").replace(" to ", "|").split("|")
+    return _num(lo), _num(hi)
+
+
+def regional_summary():
+    """E49 by (indicator, region): observed, expected, the crude rate with limits and the EB ratio."""
+    t = pd.read_csv(E49, encoding="utf-8-sig", dtype=str)
+    t.columns = [c.strip() for c in t.columns]
+    rate = t["Rate per 100,000 population"]
+    out = pd.DataFrame({
+        "indicator": t.Indicator.str.strip(),
+        "region": t.Region.str.strip(),
+        "observed": t.Observed.map(_num),
+        "expected": t["Expected counts (indirect standardisation)"].map(_num),
+        "rate": rate.map(_point),
+        "rate_lo": [_limits(v)[0] for v in rate],
+        "rate_hi": [_limits(v)[1] for v in rate],
+        "ratio": t["Crude standardised ratio"].map(_point),
+        "eb": t["Empirical-Bayes smoothed standardised ratio"].map(_num),
+    }).set_index(["indicator", "region"])
+    assert len(out) == 64, f"E49 should carry 16 regions x 4 indicators, not {len(out)} rows"
+    return out
+
+
+def indicator_frame(summary, indicator):
+    """One indicator of E49, in the north -> south order the plate prints."""
+    frame = summary.loc[indicator].reindex([REGION_NAMES[c] for c in REGION_ORDER])
+    assert frame.notna().all().all(), f"{indicator}: a region of the plate is missing from E49"
+    return frame
+
+
+def person_years():
+    """The INE base-2017 person-years of each region over 2019-2024, summed over sex and age."""
+    pop = pd.read_csv(POPULATION)
+    by_year = pop.groupby(["year", "cut_region"]).population.sum().unstack()
+    missing = [y for y in GRD_YEARS if y not in by_year.index]
+    assert not missing, f"population_regional.csv has no projection for {missing}"
+    return by_year.loc[list(GRD_YEARS)].sum()
+
+
+def grd_rate_full_precision(grd):
+    """The GRD rate of each region without the table's rounding, and the check that it is the same one.
+
+    E49 publishes the rate to one decimal, which makes Metropolitana and Los Ríos both 16.4. Panel (f)
+    ranks the regions, so that tie has to be broken, and the only tracked thing that breaks it is the
+    denominator: the observed count of E49 over the INE person-years of the region. The recomputed
+    value must round to the published one for all sixteen regions, or these are not the same rates and
+    nothing here may be drawn."""
+    py = person_years()
+    rate = pd.Series({REGION_NAMES[c]: grd.observed[REGION_NAMES[c]] / py[c] * 1e5
+                      for c in REGION_ORDER}).reindex(grd.index)
+    assert np.allclose(rate.round(1), grd.rate), \
+        "the E49 counts over the INE person-years do not reproduce the published GRD rates"
+    assert rate["Metropolitana"] < rate["Los Ríos"], \
+        "the 16.4 tie must break with Metropolitana below Los Ríos, as the stored plate draws it"
+    return rate
+
+
+def moran_regional():
+    """The fourteen bars of panel (e): Moran's I at the regional scale, largest first."""
+    t = pd.read_csv(E50, encoding="utf-8-sig", dtype=str)
+    t.columns = [c.strip() for c in t.columns]
+    t = t[(t.Scale.str.strip() == "Region") & t["Value type"].str.strip().isin(MORAN_VALUE_TYPES)]
+    t = t.assign(indicator=t.Indicator.str.strip(), moran=t["Moran's I"].map(_num),
+                 p=t["p (999 perm.)"].map(_num), n=t.n.map(_num))
+    assert t.indicator.is_unique, "an indicator has both an EB and an observed-value row at Region"
+    assert len(t) == 14, f"panel (e) has fourteen bars, not {len(t)}"
+    assert (t.n == 16).all(), "the regional scale has sixteen units"
+    return t.sort_values("moran", ascending=False)[["indicator", "moran", "p"]].reset_index(drop=True)
+
+
+def regions_shapefile():
+    """The regional polygons of the plate, in the pipeline's own plotting geometry.
+
+    `data/Regional.shp` is not tracked in this repository; it is the cartography the hospital chapter
+    of the report already uses. Clipped to the continental box, projected to the equal-area conic and
+    simplified, exactly as `load_regions_equal_area` prepares it in the pipeline."""
+    import warnings
+    import geopandas as gpd
+    from shapely.geometry import box
+    if not SHAPEFILE.exists():
+        raise FileNotFoundError(
+            f"{SHAPEFILE} is missing: panels (a) and (b) of {PLATE} are choropleths and need the "
+            "regional cartography, which this repository does not track.")
+    with warnings.catch_warnings():
+        warnings.simplefilter("ignore")
+        g = gpd.read_file(SHAPEFILE)
+    g = g.loc[g.codregion.astype(int) > 0, ["codregion", "geometry"]].rename(
+        columns={"codregion": "cut_region"})
+    g["cut_region"] = g.cut_region.astype(int)
+    g = g.to_crs(4326)
+    try:
+        g["geometry"] = g.geometry.make_valid()
+    except AttributeError:                                  # older shapely
+        g["geometry"] = g.geometry.buffer(0)
+    g["geometry"] = g.geometry.intersection(box(*CONTINENTAL_BOX))
+    g = g[~g.geometry.is_empty].copy().to_crs(ALBERS)
+    g["geometry"] = g.geometry.simplify(SIMPLIFY)
+    assert set(g.cut_region) == set(REGION_ORDER), "the shapefile does not carry the sixteen regions"
+    return g
+
+
+# --------------------------------------------------------------------------- panel furniture
+def _wrap(text, width_pt=TITLE_W_PT, size=TITLE_PT, weight="bold"):
+    """Fold a heading at a MEASURED width, as the plate engine does — not at a character count."""
+    from matplotlib.textpath import TextPath
+    from matplotlib.font_manager import FontProperties
+    prop = FontProperties(family=plt.rcParams["font.family"], size=size, weight=weight)
+    lines, line = [], ""
+    for word in str(text).split():
+        trial = f"{line} {word}".strip()
+        if line and TextPath((0, 0), trial, prop=prop, usetex=False).get_extents().width > width_pt:
+            lines.append(line)
+            line = word
+        else:
+            line = trial
+    lines.append(line)
+    return "\n".join(lines)
+
+
+def _map(fig, cell, cbar_box, shapes, values, label=CBAR_LABEL):
+    """One choropleth of the plate: the country in three bands at one common scale, under one bar.
+
+    Every band is drawn at the same metres-per-inch, so the three strips are comparable; each band is
+    then given the width its own geography needs rather than a fixed third of the cell, which is what
+    keeps the narrow north and centre from floating in an empty rectangle. The scale is diverging
+    around the national ratio of 1 and stops at the 98th percentile of the sixteen values, mirrored
+    below 1 and floored at zero — the limits measured off the stored plate."""
+    x0, x1, bottom, height = cell
+    series = pd.Series({c: float(values[REGION_NAMES[c]]) for c in REGION_ORDER})
+    upper = float(np.quantile(series.to_numpy(), UPPER_Q))
+    norm = TwoSlopeNorm(vmin=max(0.0, 2.0 - upper), vcenter=1.0, vmax=upper)
+    mapper = ScalarMappable(norm=norm, cmap=MAP_CMAP)
+
+    bands = [shapes[shapes.cut_region.isin(b)] for b in BANDS]
+    bounds = [b.total_bounds for b in bands]
+    span = max(b[3] - b[1] for b in bounds) * SPAN_PAD
+    w_in, h_in = fig.get_size_inches()
+    scale = (height * h_in) / span                          # inches per metre, shared by the bands
+    widths = [(b[2] - b[0]) * scale / w_in for b in bounds]
+    x = x0 + max(0.0, (x1 - x0 - sum(widths) - (len(bands) - 1) * BAND_GAP)) / 2
+    for band, bound, width in zip(bands, bounds, widths):
+        ax = fig.add_axes([x, bottom, width, height])
+        colours = [mapper.to_rgba(v) if np.isfinite(v) else NO_VALUE
+                   for v in series.reindex(band.cut_region.to_numpy())]
+        band.plot(color=colours, edgecolor=MAP_EDGE, linewidth=MAP_EDGE_LW, ax=ax)
+        ax.set_aspect("auto")
+        ax.set_axis_off()
+        cy, cx = (bound[1] + bound[3]) / 2, (bound[0] + bound[2]) / 2
+        ax.set_ylim(cy - span / 2, cy + span / 2)
+        window = span * (width * w_in) / (height * h_in)    # a metre is a metre in both axes
+        ax.set_xlim(cx - window / 2, cx + window / 2)
+        x += width + BAND_GAP
+
+    cax = fig.add_axes(cbar_box)
+    bar = fig.colorbar(mapper, cax=cax, orientation="horizontal")
+    bar.set_label(label, fontsize=TICK_PT)
+    bar.ax.tick_params(labelsize=TICK_PT, length=2.4, pad=1.8)
+    bar.outline.set_linewidth(0.0)
+    return norm
+
+
+def _rate_panel(fig, box, frame, colour):
+    """Panel (c) or (d): the crude regional rate with its exact Poisson interval, north to south.
+
+    The region's observed count goes in its own axis label, in brackets after the name, which is where
+    the stored plate puts it; the interval is the one E49 publishes, never a recomputed one."""
+    ax = fig.add_axes(box)
+    y = np.arange(len(frame))
+    rate = frame.rate.to_numpy(float)
+    error = np.vstack([rate - frame.rate_lo.to_numpy(float), frame.rate_hi.to_numpy(float) - rate])
+    ax.errorbar(rate, y, xerr=error, fmt="o", color=colour, markersize=MARKER_PT, elinewidth=1.1,
+                capsize=0.0, linestyle="none", zorder=3)
+    ax.set_yticks(y)
+    ax.set_yticklabels([f"{r} ({num(c, 'en')})" for r, c in zip(frame.index, frame.observed)],
+                       fontsize=TICK_PT)
+    ax.invert_yaxis()
+    ax.set_xlabel(RATE_LABEL, fontsize=LABEL_PT)
+    ax.tick_params(axis="x", labelsize=TICK_PT)
+    clean(ax, grid="both")
+    return ax
+
+
+def _moran_panel(fig, box, table):
+    """Panel (e): global Moran's I of fourteen indicators at the regional scale, largest first."""
+    ax = fig.add_axes(box)
+    y = np.arange(len(table))
+    moran = table.moran.to_numpy(float)
+    ax.barh(y, moran, height=BAR_HEIGHT, color=BLUE, linewidth=0.0, zorder=3)
+    for yi, value, p in zip(y, moran, table.p.to_numpy(float)):
+        ax.text(value + P_GAP, yi, f"p = {p:.3f}", va="center", ha="left", fontsize=P_PT, zorder=4)
+    ax.set_yticks(y)
+    ax.set_yticklabels(table.indicator, fontsize=TICK_PT)
+    ax.invert_yaxis()
+    ax.set_xlim(0.0, float(moran.max()) * MORAN_HEADROOM)
+    ax.set_xlabel("Moran's I (Region, n = 16)", fontsize=LABEL_PT)
+    ax.tick_params(axis="x", labelsize=TICK_PT)
+    clean(ax, grid="x")
+    return ax
+
+
+def _scatter_panel(fig, box, a05, grd, labels):
+    """Panel (f): the two sources against each other on log axes, one marker per region.
+
+    The axes carry matplotlib's own log ticking, so only the ticks it chooses to label are labelled —
+    40, 60 and 100 across, 20, 30 and 40 up — and the single major tick at 100 is the only grid line
+    the panel draws, which is what the stored plate shows."""
+    ax = fig.add_axes(box)
+    ax.scatter(a05, grd, s=SCATTER_PT ** 2, color=GREEN, linewidth=0.0, zorder=3)
+    ax.set_xscale("log")
+    ax.set_yscale("log")
+    for axis in (ax.xaxis, ax.yaxis):
+        axis.set_major_formatter(LogFormatter())
+        axis.set_minor_formatter(LogFormatter())
+    ax.margins(0.16)                                # the air the stored plate leaves for its labels
+    ax.set_xlabel("REM A05 entries — Rate per 100,000", fontsize=LABEL_PT)
+    # The vertical label is folded where the stored plate folds it: upright it is as long as the panel
+    # is tall, and the plate breaks it after 'per' rather than let it run past the axes.
+    ax.set_ylabel("GRD F84 episodes — Rate per\n100,000", fontsize=LABEL_PT, linespacing=1.3)
+    ax.tick_params(labelsize=TICK_PT)
+    ax.tick_params(axis="both", which="minor", labelsize=TICK_PT)
+    clean(ax, grid="both")
+    # The note is anchored to the bottom RIGHT of the panel, where the stored plate puts it, and its
+    # two lines are left-aligned inside that block; the bottom left corner is left free for the region
+    # name that lands there.
+    warning = ax.text(0.965, 0.022, _wrap(WARNING_TEXT, width_pt=0.78 * box[2] * FIGSIZE[0] * 72.0,
+                                          size=WARN_PT, weight="normal"),
+                      transform=ax.transAxes, fontsize=WARN_PT, ha="right", va="bottom",
+                      multialignment="left", color=WARN_COLOUR, linespacing=1.3, zorder=6)
+    return ax, warning
+
+
+def _overlap(a, b):
+    """Area shared by two pixel boxes — zero when they do not touch."""
+    return (max(min(a[2], b[2]) - max(a[0], b[0]), 0.0)
+            * max(min(a[3], b[3]) - max(a[1], b[1]), 0.0))
+
+
+def _outside(box, frame):
+    """How far a label sticks out of its axes, in pixels; zero when it is wholly inside."""
+    return (max(frame.x0 - box[0], 0.0) + max(box[2] - frame.x1, 0.0)
+            + max(frame.y0 - box[1], 0.0) + max(box[3] - frame.y1, 0.0))
+
+
+def place_point_labels(fig, ax, xs, ys, labels, obstacles=(), fontsize=POINT_PT):
+    """Sixteen region names around sixteen markers, placed by MEASUREMENT, with a leader when far.
+
+    The stored plate places them at save time, with the composition already frozen: it tries a ring of
+    directions and distances around each marker and rejects any placement that covers a marker, another
+    label or the note. The same rule is applied here, from the topmost point down, so that the most
+    crowded corner is settled last against what is already on the page."""
+    renderer = fig.canvas.get_renderer()
+    marker_boxes = [(px - 4.0, py - 4.0, px + 4.0, py + 4.0)
+                    for px, py in (ax.transData.transform((x, y)) for x, y in zip(xs, ys))]
+    placed = list(obstacles)
+    frame = ax.get_window_extent(renderer)
+    angles = np.deg2rad(np.arange(0, 360, 15))
+    for i in np.argsort(-np.asarray(ys)):
+        text = ax.annotate(labels[i], (xs[i], ys[i]), textcoords="offset points", xytext=(0, 0),
+                           ha="center", va="center", fontsize=fontsize, color="#222222", zorder=6)
+        best, best_cost = (0.0, 0.0), np.inf
+        for distance in (8.0, 11.0, 14.0, 18.0, 23.0, 29.0):
+            for angle in angles:
+                text.xyann = (distance * np.cos(angle), distance * np.sin(angle))
+                b = text.get_window_extent(renderer)
+                candidate = (b.x0 - 1.0, b.y0 - 1.0, b.x1 + 1.0, b.y1 + 1.0)
+                cost = sum(_overlap(candidate, other) for other in placed + marker_boxes)
+                cost += 400.0 * _outside(candidate, frame)
+                cost += 0.30 * distance                     # near its own marker, all else being equal
+                if cost < best_cost:
+                    best, best_cost = text.xyann, cost
+                if best_cost <= 0.30 * distance + 1e-9:
+                    break
+            if best_cost <= 0.30 * distance + 1e-9:
+                break
+        text.xyann = best
+        b = text.get_window_extent(renderer)
+        placed.append((b.x0 - 1.0, b.y0 - 1.0, b.x1 + 1.0, b.y1 + 1.0))
+        if np.hypot(*best) > 15.0:                          # far from its marker: draw the leader
+            # Anchored in the same offset POINTS the label itself uses, so that the line still starts
+            # under the label whatever resolution the plate is finally written at.
+            ax.annotate("", xy=(xs[i], ys[i]), xycoords="data",
+                        xytext=(best[0] * 0.55, best[1] * 0.55), textcoords="offset points",
+                        arrowprops=dict(arrowstyle="-", lw=0.4, color=LEADER_COLOUR, shrinkA=0.0,
+                                        shrinkB=3.0), zorder=2)
+
+
+def spearman(a05, grd):
+    """Spearman's rho of the sixteen regions and its Fisher-z interval, the plate's own form.
+
+    The variance carries the Spearman correction, se² = 1.06/(n − 3): the plain 1/√(n − 3) form gives
+    0.20–0.86 where the stored plate prints 0.18–0.86."""
+    rho = float(stats.spearmanr(a05, grd).statistic)
+    n = len(grd)
+    z, se = math.atanh(rho), math.sqrt(1.06 / (n - 3))
+    q = stats.norm.ppf(0.975)
+    return rho, math.tanh(z - q * se), math.tanh(z + q * se), n
+
+
+# --------------------------------------------------------------------------- the plate
+def draw_E49_regional_summary():
+    style()
+    plt.rcParams.update({
+        "font.size": LABEL_PT, "axes.titlesize": TITLE_PT, "axes.labelsize": LABEL_PT,
+        "xtick.labelsize": TICK_PT, "ytick.labelsize": TICK_PT, "axes.edgecolor": "#333333",
+        "axes.linewidth": 0.7, "xtick.major.size": 2.4, "ytick.major.size": 2.4,
+        "xtick.major.pad": 1.8, "ytick.major.pad": 1.8, "axes.labelpad": 2.4,
+    })
+    summary = regional_summary()
+    grd = indicator_frame(summary, GRD)
+    a05 = indicator_frame(summary, A05)
+    moran = moran_regional()
+    shapes = regions_shapefile()
+    # Panel (f) ranks the regions, so it needs the GRD rate without the table's one-decimal rounding.
+    grd_exact = grd_rate_full_precision(grd)
+    rho, lo, hi, n = spearman(a05.rate.to_numpy(float), grd_exact.to_numpy(float))
+
+    fig = plt.figure(figsize=FIGSIZE)
+    _map(fig, MAP_CELL["a"], CBAR["a"], shapes, grd.eb)
+    _map(fig, MAP_CELL["b"], CBAR["b"], shapes, a05.eb)
+    _rate_panel(fig, BOX["c"], grd, BLUE)
+    _rate_panel(fig, BOX["d"], a05, ORANGE)
+    _moran_panel(fig, BOX["e"], moran)
+    scatter, warning = _scatter_panel(fig, BOX["f"], a05.rate.to_numpy(float),
+                                      grd_exact.to_numpy(float), list(grd.index))
+
+    headings = dict(TITLE)
+    headings["f"] = (f"Spearman's rho = {num(rho, 'en', 2)} (95% CI {num(lo, 'en', 2)}–"
+                     f"{num(hi, 'en', 2)}; n = {n})")
+    for letter in "abcdef":
+        rows = _wrap(f"({letter}) {headings[letter]}").split("\n")
+        fig.text(TITLE_X[letter], TITLE_TOP[letter], "\n".join(rows), fontsize=TITLE_PT,
+                 fontweight="bold", ha="left", va="top", linespacing=TITLE_LINESPACING)
+
+    # The composition is frozen first, then the region names are placed against what is already on the
+    # page — the order the stored plate resolves them in.
+    fig.canvas.draw()
+    note = warning.get_window_extent(fig.canvas.get_renderer())
+    # The red note is the one thing on the panel a region name may never touch, so it is offered to
+    # the placer with a margin around it rather than as its bare box.
+    place_point_labels(fig, scatter, a05.rate.to_numpy(float), grd_exact.to_numpy(float),
+                       list(grd.index),
+                       obstacles=[(note.x0 - 3.0, note.y0 - 3.0, note.x1 + 3.0, note.y1 + 3.0)])
+    return fig
+
+
+draw_E49_regional_summary()
+```
