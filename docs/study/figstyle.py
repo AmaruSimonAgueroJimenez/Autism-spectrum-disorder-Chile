@@ -112,7 +112,9 @@ def out_of_canvas(fig):
         if bb.x0 < -1 or bb.y0 < -1 or bb.x1 > W + 1 or bb.y1 > H + 1: bad.append(t.get_text()[:40])
     return bad
 
-def save(fig, name, lang):
+def save(fig, name, lang, close=True):
+    # close=False leaves the figure open so a Quarto chunk can also show it inline;
+    # the scripts keep the default and close it as before.
     out = BASE/'figures'/lang; out.mkdir(parents=True, exist_ok=True); QA.mkdir(exist_ok=True)
     bad = out_of_canvas(fig)
     from overlap_qa import overlaps
@@ -125,7 +127,8 @@ def save(fig, name, lang):
     QA_LOG.append({'figure': name, 'language': lang, 'width_mm': round(fig.get_figwidth()*25.4, 1),
                    'height_mm': round(fig.get_figheight()*25.4, 1), 'font_sizes_pt': sizes, 'out_of_canvas': bad, 'overlaps': ov,
                    'internal_titles': False, 'panel_letters': 'lowercase'})
-    plt.close(fig)
+    if close:
+        plt.close(fig)
     print(f'  {name} [{lang}] {round(fig.get_figwidth()*25.4)}x{round(fig.get_figheight()*25.4)} mm; fonts {sizes[0]}–{sizes[-1]} pt; off-canvas: {len(bad)}; overlaps: {len(ov)}')
 
 def write_qa(name):

@@ -21,12 +21,18 @@ format:
     embed-resources: true
     css: styles.css
     code-fold: true
-    code-summary: "Show Python"
+    code-summary: "Show the code that produced this"
+    code-tools: true
+    code-overflow: wrap
+    code-line-numbers: false
+    highlight-style: github
     fig-cap-location: bottom
     number-sections: false
     smooth-scroll: true
 execute:
-  echo: false
+  # echo: true is what makes the fold usable. With echo: false Quarto strips the code before
+  # code-fold can wrap it, so every chunk rendered as a result with no way to see how it was made.
+  echo: true
   error: false
   warning: false
   cache: false

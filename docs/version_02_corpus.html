@@ -27,6 +27,41 @@ ul.task-list li input[type="checkbox"] {
   margin: 0 0.8em 0.2em -1em; /* quarto-specific, see https://github.com/quarto-dev/quarto-cli/issues/4556 */ 
   vertical-align: middle;
 }
+/* CSS for syntax highlighting */
+html { -webkit-text-size-adjust: 100%; }
+pre > code.sourceCode { white-space: pre; position: relative; }
+pre > code.sourceCode > span { display: inline-block; line-height: 1.25; }
+pre > code.sourceCode > span:empty { height: 1.2em; }
+.sourceCode { overflow: visible; }
+code.sourceCode > span { color: inherit; text-decoration: inherit; }
+div.sourceCode { margin: 1em 0; }
+pre.sourceCode { margin: 0; }
+@media screen {
+div.sourceCode { overflow: auto; }
+}
+@media print {
+pre > code.sourceCode { white-space: pre-wrap; }
+pre > code.sourceCode > span { text-indent: -5em; padding-left: 5em; }
+}
+pre.numberSource code
+  { counter-reset: source-line 0; }
+pre.numberSource code > span
+  { position: relative; left: -4em; counter-increment: source-line; }
+pre.numberSource code > span > a:first-child::before
+  { content: counter(source-line);
+    position: relative; left: -1em; text-align: right; vertical-align: baseline;
+    border: none; display: inline-block;
+    -webkit-touch-callout: none; -webkit-user-select: none;
+    -khtml-user-select: none; -moz-user-select: none;
+    -ms-user-select: none; user-select: none;
+    padding: 0 4px; width: 4em;
+  }
+pre.numberSource { margin-left: 3em;  padding-left: 4px; }
+div.sourceCode
+  {   }
+@media screen {
+pre > code.sourceCode > span > a:first-child::before { text-decoration: underline; }
+}
 </style>
 
 
@@ -37,10 +72,10 @@ ul.task-list li input[type="checkbox"] {
 <script src="version_02_corpus_files/libs/quarto-html/tippy.umd.min.js"></script>
 <script src="version_02_corpus_files/libs/quarto-html/anchor.min.js"></script>
 <link href="version_02_corpus_files/libs/quarto-html/tippy.css" rel="stylesheet">
-<link href="version_02_corpus_files/libs/quarto-html/quarto-syntax-highlighting-64a204ab8560d761af7679ceaba22944.css" rel="stylesheet" id="quarto-text-highlighting-styles">
+<link href="version_02_corpus_files/libs/quarto-html/quarto-syntax-highlighting-bb62276ab45c84d9efd712f51ff97b5a.css" rel="stylesheet" id="quarto-text-highlighting-styles">
 <script src="version_02_corpus_files/libs/bootstrap/bootstrap.min.js"></script>
 <link href="version_02_corpus_files/libs/bootstrap/bootstrap-icons.css" rel="stylesheet">
-<link href="version_02_corpus_files/libs/bootstrap/bootstrap-c2e55264ed47ce3b2e0326a2269f9400.min.css" rel="stylesheet" append-hash="true" id="quarto-bootstrap" data-mode="light">
+<link href="version_02_corpus_files/libs/bootstrap/bootstrap-c5b8249e638a5980cd3bf2a10a2d2d08.min.css" rel="stylesheet" append-hash="true" id="quarto-bootstrap" data-mode="light">
 <style>html{ scroll-behavior: smooth; }</style>
 <script src="https://cdn.jsdelivr.net/npm/requirejs@2.3.6/require.min.js" integrity="sha384-c9c+LnTbwQ3aujuU7ULEPVvgLs+Fn6fJUvIGTsuu1ZcCf11fiEubah0ttpca4ntM sha384-6V1/AdqZRWk1KAlWbKBlGhN7VG4iE/yAZcO6NZPMF8od0vukrvr0tg4qY6NSrItx" crossorigin="anonymous"></script>
 
@@ -69,7 +104,7 @@ ul.task-list li input[type="checkbox"] {
 
 <header id="title-block-header" class="quarto-title-block default">
 <div class="quarto-title">
-<h1 class="title">Extended corpus of the study: plates and tables of the earlier versions</h1>
+<div class="quarto-title-block"><div><h1 class="title">Extended corpus of the study: plates and tables of the earlier versions</h1><button type="button" class="btn code-tools-button dropdown-toggle" id="quarto-code-tools-menu" data-bs-toggle="dropdown" aria-expanded="false"><i class="bi"></i> Code</button><ul class="dropdown-menu dropdown-menu-end" aria-labelelledby="quarto-code-tools-menu"><li><a id="quarto-show-all-code" class="dropdown-item" href="javascript:void(0)" role="button">Show All Code</a></li><li><a id="quarto-hide-all-code" class="dropdown-item" href="javascript:void(0)" role="button">Hide All Code</a></li><li><hr class="dropdown-divider"></li><li><a id="quarto-view-source" class="dropdown-item" href="javascript:void(0)" role="button">View Source</a></li></ul></div></div>
 <p class="subtitle lead">Version 02 of the study — outputs of the <code>study/</code> pipeline (corpus version 02, 9 September 2026; variant without Rett syndrome; English)</p>
 </div>
 
@@ -97,15 +132,53 @@ ul.task-list li input[type="checkbox"] {
 <p><a href="index.html">Home</a> <a href="methods.html">Methods</a> <a href="rem.html">REM</a> <a href="grd.html">GRD</a> <a href="version_02_corpus.html">v02 corpus</a> <a href="version_10_panels.html">v10 results</a></p>
 </div>
 <div id="cell-cargar-corpus" class="cell" data-execution_count="1">
+<details class="code-fold">
+<summary>Show the code that produced this</summary>
+<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb1"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb1-1"><a href="#cb1-1" aria-hidden="true" tabindex="-1"></a><span class="im">from</span> pathlib <span class="im">import</span> Path</span>
+<span id="cb1-2"><a href="#cb1-2" aria-hidden="true" tabindex="-1"></a><span class="im">import</span> sys</span>
+<span id="cb1-3"><a href="#cb1-3" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb1-4"><a href="#cb1-4" aria-hidden="true" tabindex="-1"></a>ROOT <span class="op">=</span> Path.cwd().parent <span class="cf">if</span> Path.cwd().name <span class="op">==</span> <span class="st">"docs"</span> <span class="cf">else</span> Path.cwd()</span>
+<span id="cb1-5"><a href="#cb1-5" aria-hidden="true" tabindex="-1"></a>sys.path.insert(<span class="dv">0</span>, <span class="bu">str</span>(ROOT <span class="op">/</span> <span class="st">"docs"</span> <span class="op">/</span> <span class="st">"study"</span>))</span>
+<span id="cb1-6"><a href="#cb1-6" aria-hidden="true" tabindex="-1"></a>sys.path.insert(<span class="dv">0</span>, <span class="bu">str</span>(ROOT <span class="op">/</span> <span class="st">"scripts"</span>))</span>
+<span id="cb1-7"><a href="#cb1-7" aria-hidden="true" tabindex="-1"></a><span class="im">import</span> render_helpers <span class="im">as</span> rh</span>
+<span id="cb1-8"><a href="#cb1-8" aria-hidden="true" tabindex="-1"></a><span class="im">from</span> report_helpers <span class="im">import</span> kpis</span>
+<span id="cb1-9"><a href="#cb1-9" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb1-10"><a href="#cb1-10" aria-hidden="true" tabindex="-1"></a>idx <span class="op">=</span> rh.corpus_index()<span class="op">;</span> caps <span class="op">=</span> rh.corpus_captions()<span class="op">;</span> titles <span class="op">=</span> rh.corpus_titles()</span>
+<span id="cb1-11"><a href="#cb1-11" aria-hidden="true" tabindex="-1"></a>kpis([</span>
+<span id="cb1-12"><a href="#cb1-12" aria-hidden="true" tabindex="-1"></a>    (<span class="bu">str</span>(<span class="bu">len</span>(idx[<span class="st">"article_figures"</span>]) <span class="op">+</span> <span class="bu">len</span>(idx[<span class="st">"figures"</span>])), <span class="st">"Plates (5 of the corpus article and 54 supplementary), 1000 px JPG previews"</span>),</span>
+<span id="cb1-13"><a href="#cb1-13" aria-hidden="true" tabindex="-1"></a>    (<span class="bu">str</span>(<span class="bu">len</span>(idx[<span class="st">"article_tables"</span>]) <span class="op">+</span> <span class="bu">len</span>(idx[<span class="st">"tables"</span>])), <span class="st">"Tables (7 of the article and 125 supplementary), presentation CSVs"</span>),</span>
+<span id="cb1-14"><a href="#cb1-14" aria-hidden="true" tabindex="-1"></a>    (<span class="st">"18"</span>, <span class="st">"Pipeline modules (00 to 17) that produce these outputs"</span>),</span>
+<span id="cb1-15"><a href="#cb1-15" aria-hidden="true" tabindex="-1"></a>])</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+</details>
 <div id="cargar-corpus" class="cell-output cell-output-display">
 <div class="metrics"><div class="metric"><strong>59</strong><span>Plates (5 of the corpus article and 54 supplementary), 1000 px JPG previews</span></div><div class="metric"><strong>132</strong><span>Tables (7 of the article and 125 supplementary), presentation CSVs</span></div><div class="metric"><strong>18</strong><span>Pipeline modules (00 to 17) that produce these outputs</span></div></div>
 </div>
 </div>
 <p>Before version 10, the study was built as a <strong>corpus</strong> of twelve documents (two case definitions, two languages, combined manuscript, appendix and article) with 5 plates and 7 tables in the article and 54 plates and 125 supplementary tables, all produced by the modules <code>00_provenance.py</code> to <code>17_extended_material.py</code> of <code>study/pipeline/</code>. This page collects them so that no result is left out of the site: every plate is shown as a preview (the 600 dpi originals and the numeric tables are regenerated with the pipeline, which requires the GRD and REM microdata of the data volume) and every table unfolds from its presentation CSV (<code>docs/study/corpus/tables/</code>), with its title and its methodological note. The order and thematic groups are those of the module-17 index (<code>extended_material_index.md</code>). The results of version 10, reorganised around four panel figures, are in <a href="version_10_panels.html">version 10 results</a>; both come from the same tidy tables, and <a href="index.html#versions">the index</a> records what each version of the series added.</p>
 <p>The series on this page are those of the variant <strong>without Rett syndrome</strong> (F84 without F84.2), the case definition of the manuscript; the sensitivity with Rett appears in figure S1 of the corpus and in figure S8 of version 10. All counts are administrative recognition, not prevalence or incidence.</p>
+<div class="callout callout-style-default callout-note callout-titled">
+<div class="callout-header d-flex align-content-center">
+<div class="callout-icon-container">
+<i class="callout-icon"></i>
+</div>
+<div class="callout-title-container flex-fill">
+<span class="screen-reader-only">Note</span>Why this page shows stored images instead of the code that drew them
+</div>
+</div>
+<div class="callout-body-container callout-body">
+<p>Unlike the <a href="version_10_panels.html">version 10 results</a>, where each figure is drawn by the code printed with it, the plates below are stored images. The pipeline that produced them (<code>00_provenance.py</code> to <code>17_extended_material.py</code>) reads the <strong>GRD and REM microdata</strong> of the data volume, which is not part of this repository, so the drawing code cannot run here. What the repository does carry for these is the pipeline code that produced them and the presentation CSV behind every table, which unfolds under each one. The tables on this page are therefore data you can read; the plates are records.</p>
+</div>
+</div>
 <section id="plates-of-the-corpus-article" class="level2">
 <h2 class="anchored" data-anchor-id="plates-of-the-corpus-article">Plates of the corpus article</h2>
 <div id="corpus-laminas-articulo" class="cell" data-execution_count="2">
+<details class="code-fold">
+<summary>Show the code that produced this</summary>
+<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb2"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb2-1"><a href="#cb2-1" aria-hidden="true" tabindex="-1"></a><span class="cf">for</span> it <span class="kw">in</span> idx[<span class="st">"article_figures"</span>]:</span>
+<span id="cb2-2"><a href="#cb2-2" aria-hidden="true" tabindex="-1"></a>    stem <span class="op">=</span> it[<span class="st">"file"</span>].replace(<span class="st">".png"</span>, <span class="st">""</span>)</span>
+<span id="cb2-3"><a href="#cb2-3" aria-hidden="true" tabindex="-1"></a>    meta <span class="op">=</span> rh.corpus_lookup(stem, caps[<span class="st">"main"</span>], caps[<span class="st">"extra"</span>], it[<span class="st">"id"</span>], it[<span class="st">"desc"</span>])</span>
+<span id="cb2-4"><a href="#cb2-4" aria-hidden="true" tabindex="-1"></a>    <span class="bu">print</span>(rh.corpus_figure_md(stem, meta) <span class="op">+</span> <span class="st">"</span><span class="ch">\n</span><span class="st">"</span>)</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+</details>
 <div class="quarto-figure quarto-figure-center">
 <figure class="figure">
 <p><img src="study/corpus/figures/fig1_dataflow.jpg" class="img-fluid figure-img" style="width:100.0%"></p>
@@ -141,6 +214,17 @@ ul.task-list li input[type="checkbox"] {
 <section id="supplementary-plates-of-the-corpus" class="level2">
 <h2 class="anchored" data-anchor-id="supplementary-plates-of-the-corpus">Supplementary plates of the corpus</h2>
 <div id="corpus-laminas-suplementarias" class="cell" data-execution_count="3">
+<details class="code-fold">
+<summary>Show the code that produced this</summary>
+<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb3"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb3-1"><a href="#cb3-1" aria-hidden="true" tabindex="-1"></a>group <span class="op">=</span> <span class="va">None</span></span>
+<span id="cb3-2"><a href="#cb3-2" aria-hidden="true" tabindex="-1"></a><span class="cf">for</span> it <span class="kw">in</span> idx[<span class="st">"figures"</span>]:</span>
+<span id="cb3-3"><a href="#cb3-3" aria-hidden="true" tabindex="-1"></a>    <span class="cf">if</span> it[<span class="st">"group"</span>] <span class="op">!=</span> group:</span>
+<span id="cb3-4"><a href="#cb3-4" aria-hidden="true" tabindex="-1"></a>        group <span class="op">=</span> it[<span class="st">"group"</span>]<span class="op">;</span> <span class="bu">print</span>(<span class="ss">f"</span><span class="ch">\n</span><span class="ss">### </span><span class="sc">{</span>group<span class="sc">}</span><span class="ch">\n</span><span class="ss">"</span>)</span>
+<span id="cb3-5"><a href="#cb3-5" aria-hidden="true" tabindex="-1"></a>    stem <span class="op">=</span> it[<span class="st">"file"</span>].replace(<span class="st">".png"</span>, <span class="st">""</span>)</span>
+<span id="cb3-6"><a href="#cb3-6" aria-hidden="true" tabindex="-1"></a>    meta <span class="op">=</span> rh.corpus_lookup(stem, caps[<span class="st">"main"</span>], caps[<span class="st">"extra"</span>], it[<span class="st">"id"</span>], it[<span class="st">"desc"</span>])</span>
+<span id="cb3-7"><a href="#cb3-7" aria-hidden="true" tabindex="-1"></a>    <span class="bu">print</span>(<span class="ss">f"**</span><span class="sc">{</span>it[<span class="st">'id'</span>]<span class="sc">}</span><span class="ss">** (`</span><span class="sc">{</span>it[<span class="st">'file'</span>]<span class="sc">}</span><span class="ss">`, origin: </span><span class="sc">{</span>it[<span class="st">'origin'</span>]<span class="sc">}</span><span class="ss">)</span><span class="ch">\n</span><span class="ss">"</span>)</span>
+<span id="cb3-8"><a href="#cb3-8" aria-hidden="true" tabindex="-1"></a>    <span class="bu">print</span>(rh.corpus_figure_md(stem, meta) <span class="op">+</span> <span class="st">"</span><span class="ch">\n</span><span class="st">"</span>)</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+</details>
 <section id="core-supplementary-plates-of-the-article" class="level3">
 <h3 class="anchored" data-anchor-id="core-supplementary-plates-of-the-article">Core supplementary plates of the article</h3>
 <p><strong>Figure S1</strong> (<code>figS1_grd_variants.png</code>, origin: 08a_figures_grd.py)</p>
@@ -545,6 +629,13 @@ ul.task-list li input[type="checkbox"] {
 <section id="tables-of-the-corpus-article" class="level2">
 <h2 class="anchored" data-anchor-id="tables-of-the-corpus-article">Tables of the corpus article</h2>
 <div id="corpus-tablas-articulo" class="cell" data-execution_count="4">
+<details class="code-fold">
+<summary>Show the code that produced this</summary>
+<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb4"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb4-1"><a href="#cb4-1" aria-hidden="true" tabindex="-1"></a><span class="cf">for</span> it <span class="kw">in</span> idx[<span class="st">"article_tables"</span>]:</span>
+<span id="cb4-2"><a href="#cb4-2" aria-hidden="true" tabindex="-1"></a>    stem <span class="op">=</span> it[<span class="st">"file"</span>].replace(<span class="st">".csv"</span>, <span class="st">""</span>)</span>
+<span id="cb4-3"><a href="#cb4-3" aria-hidden="true" tabindex="-1"></a>    meta <span class="op">=</span> rh.corpus_lookup(stem, titles[<span class="st">"main"</span>], titles[<span class="st">"extra"</span>], it[<span class="st">"id"</span>], it[<span class="st">"desc"</span>])</span>
+<span id="cb4-4"><a href="#cb4-4" aria-hidden="true" tabindex="-1"></a>    <span class="bu">print</span>(rh.corpus_table_html(stem, meta) <span class="op">+</span> <span class="st">"</span><span class="ch">\n</span><span class="st">"</span>)</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+</details>
 <details class="corpus-table">
 <summary>
 <b>Table 2. GRD hospital core 2019–2024: episodes with documented F84 by code position, panel, activity, coding depth, persons and population, with sensitivities — F84 family excluding Rett syndrome variant</b> <span class="muted">(T2_grd_core.csv; 45 rows)</span>
@@ -10648,6 +10739,17 @@ Rows are of three classes, counted at the end of this note; yearly values are li
 <section id="supplementary-tables-of-the-corpus" class="level2">
 <h2 class="anchored" data-anchor-id="supplementary-tables-of-the-corpus">Supplementary tables of the corpus</h2>
 <div id="corpus-tablas-suplementarias" class="cell" data-execution_count="5">
+<details class="code-fold">
+<summary>Show the code that produced this</summary>
+<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb5"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb5-1"><a href="#cb5-1" aria-hidden="true" tabindex="-1"></a>group <span class="op">=</span> <span class="va">None</span></span>
+<span id="cb5-2"><a href="#cb5-2" aria-hidden="true" tabindex="-1"></a><span class="cf">for</span> it <span class="kw">in</span> idx[<span class="st">"tables"</span>]:</span>
+<span id="cb5-3"><a href="#cb5-3" aria-hidden="true" tabindex="-1"></a>    <span class="cf">if</span> it[<span class="st">"group"</span>] <span class="op">!=</span> group:</span>
+<span id="cb5-4"><a href="#cb5-4" aria-hidden="true" tabindex="-1"></a>        group <span class="op">=</span> it[<span class="st">"group"</span>]<span class="op">;</span> <span class="bu">print</span>(<span class="ss">f"</span><span class="ch">\n</span><span class="ss">### </span><span class="sc">{</span>group<span class="sc">}</span><span class="ch">\n</span><span class="ss">"</span>)</span>
+<span id="cb5-5"><a href="#cb5-5" aria-hidden="true" tabindex="-1"></a>    stem <span class="op">=</span> it[<span class="st">"file"</span>].replace(<span class="st">".csv"</span>, <span class="st">""</span>)</span>
+<span id="cb5-6"><a href="#cb5-6" aria-hidden="true" tabindex="-1"></a>    meta <span class="op">=</span> rh.corpus_lookup(stem, titles[<span class="st">"main"</span>], titles[<span class="st">"extra"</span>], it[<span class="st">"id"</span>], it[<span class="st">"desc"</span>])</span>
+<span id="cb5-7"><a href="#cb5-7" aria-hidden="true" tabindex="-1"></a>    meta <span class="op">=</span> <span class="bu">dict</span>(meta)<span class="op">;</span> meta[<span class="st">"title"</span>] <span class="op">=</span> <span class="ss">f"</span><span class="sc">{</span>it[<span class="st">'id'</span>]<span class="sc">}</span><span class="ss">. "</span> <span class="op">+</span> meta[<span class="st">"title"</span>] <span class="cf">if</span> <span class="kw">not</span> meta[<span class="st">"title"</span>].startswith(it[<span class="st">"id"</span>]) <span class="cf">else</span> meta[<span class="st">"title"</span>]</span>
+<span id="cb5-8"><a href="#cb5-8" aria-hidden="true" tabindex="-1"></a>    <span class="bu">print</span>(rh.corpus_table_html(stem, meta) <span class="op">+</span> <span class="st">"</span><span class="ch">\n</span><span class="st">"</span>)</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+</details>
 <section id="sources-and-data-flow" class="level3">
 <h3 class="anchored" data-anchor-id="sources-and-data-flow">Sources and data flow</h3>
 <details class="corpus-table">
@@ -295610,6 +295712,8 @@ Inventory of every figure, table and equation file present for this variant and 
 </details>
 </section>
 </div>
+<!-- -->
+
 </section>
 
 </main>
@@ -295684,6 +295788,57 @@ Inventory of every figure, table and equation file present for this variant and 
         container: window.document.getElementById('quarto-embedded-source-code-modal')
       });
       clipboardModal.on('success', onCopySuccess);
+    }
+    const viewSource = window.document.getElementById('quarto-view-source') ||
+                       window.document.getElementById('quarto-code-tools-source');
+    if (viewSource) {
+      const sourceUrl = viewSource.getAttribute("data-quarto-source-url");
+      viewSource.addEventListener("click", function(e) {
+        if (sourceUrl) {
+          // rstudio viewer pane
+          if (/\bcapabilities=\b/.test(window.location)) {
+            window.open(sourceUrl);
+          } else {
+            window.location.href = sourceUrl;
+          }
+        } else {
+          const modal = new bootstrap.Modal(document.getElementById('quarto-embedded-source-code-modal'));
+          modal.show();
+        }
+        return false;
+      });
+    }
+    function toggleCodeHandler(show) {
+      return function(e) {
+        const cellDetails = window.document.querySelectorAll(".cell details.code-fold");
+        for (let i=0; i<cellDetails.length; i++) {
+          const details = cellDetails[i];
+          if (show) {
+            details.open = true;
+          } else {
+            details.removeAttribute("open");
+          }
+        }
+        const cellCodeDivs = window.document.querySelectorAll(".cell div.sourceCode.cell-code");
+        const fromCls = show ? "hidden" : "unhidden";
+        const toCls = show ? "unhidden" : "hidden";
+        for (let i=0; i<cellCodeDivs.length; i++) {
+          const codeDiv = cellCodeDivs[i];
+          if (codeDiv.classList.contains(fromCls)) {
+            codeDiv.classList.remove(fromCls);
+            codeDiv.classList.add(toCls);
+          } 
+        }
+        return false;
+      }
+    }
+    const hideAllCode = window.document.getElementById("quarto-hide-all-code");
+    if (hideAllCode) {
+      hideAllCode.addEventListener("click", toggleCodeHandler(false));
+    }
+    const showAllCode = window.document.getElementById("quarto-show-all-code");
+    if (showAllCode) {
+      showAllCode.addEventListener("click", toggleCodeHandler(true));
     }
       var localhostRegex = new RegExp(/^(?:http|https):\/\/localhost\:?[0-9]*\//);
       var mailtoRegex = new RegExp(/^mailto:/);
@@ -296013,7 +296168,106 @@ Inventory of every figure, table and equation file present for this variant and 
       }
     }
   });
-  </script>
+  </script><div class="modal fade" id="quarto-embedded-source-code-modal" tabindex="-1" aria-labelledby="quarto-embedded-source-code-modal-label" aria-hidden="true"><div class="modal-dialog modal-dialog-scrollable"><div class="modal-content"><div class="modal-header"><h5 class="modal-title" id="quarto-embedded-source-code-modal-label">Source Code</h5><button class="btn-close" data-bs-dismiss="modal"></button></div><div class="modal-body"><div class="">
+<div class="code-copy-outer-scaffold"><div class="sourceCode" id="cb6" data-shortcodes="false"><pre class="sourceCode markdown code-with-copy"><code class="sourceCode markdown"><span id="cb6-1"><a href="#cb6-1" aria-hidden="true" tabindex="-1"></a><span class="co">---</span></span>
+<span id="cb6-2"><a href="#cb6-2" aria-hidden="true" tabindex="-1"></a><span class="an">title:</span><span class="co"> "Extended corpus of the study: plates and tables of the earlier versions"</span></span>
+<span id="cb6-3"><a href="#cb6-3" aria-hidden="true" tabindex="-1"></a><span class="an">subtitle:</span><span class="co"> "Version 02 of the study — outputs of the `study/` pipeline (corpus version 02, 9 September 2026; variant without Rett syndrome; English)"</span></span>
+<span id="cb6-4"><a href="#cb6-4" aria-hidden="true" tabindex="-1"></a><span class="an">format:</span></span>
+<span id="cb6-5"><a href="#cb6-5" aria-hidden="true" tabindex="-1"></a><span class="co">  html:</span></span>
+<span id="cb6-6"><a href="#cb6-6" aria-hidden="true" tabindex="-1"></a><span class="co">    embed-resources: false</span></span>
+<span id="cb6-7"><a href="#cb6-7" aria-hidden="true" tabindex="-1"></a><span class="co">---</span></span>
+<span id="cb6-8"><a href="#cb6-8" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb6-9"><a href="#cb6-9" aria-hidden="true" tabindex="-1"></a>::: {.report-nav}</span>
+<span id="cb6-10"><a href="#cb6-10" aria-hidden="true" tabindex="-1"></a><span class="co">[</span><span class="ot">Home</span><span class="co">](index.html)</span> <span class="co">[</span><span class="ot">Methods</span><span class="co">](methods.html)</span> <span class="co">[</span><span class="ot">REM</span><span class="co">](rem.html)</span> <span class="co">[</span><span class="ot">GRD</span><span class="co">](grd.html)</span> <span class="co">[</span><span class="ot">v02 corpus</span><span class="co">](version_02_corpus.html)</span> <span class="co">[</span><span class="ot">v10 results</span><span class="co">](version_10_panels.html)</span></span>
+<span id="cb6-11"><a href="#cb6-11" aria-hidden="true" tabindex="-1"></a>:::</span>
+<span id="cb6-12"><a href="#cb6-12" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb6-15"><a href="#cb6-15" aria-hidden="true" tabindex="-1"></a><span class="in">```{python}</span></span>
+<span id="cb6-16"><a href="#cb6-16" aria-hidden="true" tabindex="-1"></a><span class="co">#| label: cargar-corpus</span></span>
+<span id="cb6-17"><a href="#cb6-17" aria-hidden="true" tabindex="-1"></a><span class="im">from</span> pathlib <span class="im">import</span> Path</span>
+<span id="cb6-18"><a href="#cb6-18" aria-hidden="true" tabindex="-1"></a><span class="im">import</span> sys</span>
+<span id="cb6-19"><a href="#cb6-19" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb6-20"><a href="#cb6-20" aria-hidden="true" tabindex="-1"></a>ROOT <span class="op">=</span> Path.cwd().parent <span class="cf">if</span> Path.cwd().name <span class="op">==</span> <span class="st">"docs"</span> <span class="cf">else</span> Path.cwd()</span>
+<span id="cb6-21"><a href="#cb6-21" aria-hidden="true" tabindex="-1"></a>sys.path.insert(<span class="dv">0</span>, <span class="bu">str</span>(ROOT <span class="op">/</span> <span class="st">"docs"</span> <span class="op">/</span> <span class="st">"study"</span>))</span>
+<span id="cb6-22"><a href="#cb6-22" aria-hidden="true" tabindex="-1"></a>sys.path.insert(<span class="dv">0</span>, <span class="bu">str</span>(ROOT <span class="op">/</span> <span class="st">"scripts"</span>))</span>
+<span id="cb6-23"><a href="#cb6-23" aria-hidden="true" tabindex="-1"></a><span class="im">import</span> render_helpers <span class="im">as</span> rh</span>
+<span id="cb6-24"><a href="#cb6-24" aria-hidden="true" tabindex="-1"></a><span class="im">from</span> report_helpers <span class="im">import</span> kpis</span>
+<span id="cb6-25"><a href="#cb6-25" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb6-26"><a href="#cb6-26" aria-hidden="true" tabindex="-1"></a>idx <span class="op">=</span> rh.corpus_index()<span class="op">;</span> caps <span class="op">=</span> rh.corpus_captions()<span class="op">;</span> titles <span class="op">=</span> rh.corpus_titles()</span>
+<span id="cb6-27"><a href="#cb6-27" aria-hidden="true" tabindex="-1"></a>kpis([</span>
+<span id="cb6-28"><a href="#cb6-28" aria-hidden="true" tabindex="-1"></a>    (<span class="bu">str</span>(<span class="bu">len</span>(idx[<span class="st">"article_figures"</span>]) <span class="op">+</span> <span class="bu">len</span>(idx[<span class="st">"figures"</span>])), <span class="st">"Plates (5 of the corpus article and 54 supplementary), 1000 px JPG previews"</span>),</span>
+<span id="cb6-29"><a href="#cb6-29" aria-hidden="true" tabindex="-1"></a>    (<span class="bu">str</span>(<span class="bu">len</span>(idx[<span class="st">"article_tables"</span>]) <span class="op">+</span> <span class="bu">len</span>(idx[<span class="st">"tables"</span>])), <span class="st">"Tables (7 of the article and 125 supplementary), presentation CSVs"</span>),</span>
+<span id="cb6-30"><a href="#cb6-30" aria-hidden="true" tabindex="-1"></a>    (<span class="st">"18"</span>, <span class="st">"Pipeline modules (00 to 17) that produce these outputs"</span>),</span>
+<span id="cb6-31"><a href="#cb6-31" aria-hidden="true" tabindex="-1"></a>])</span>
+<span id="cb6-32"><a href="#cb6-32" aria-hidden="true" tabindex="-1"></a><span class="in">```</span></span>
+<span id="cb6-33"><a href="#cb6-33" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb6-34"><a href="#cb6-34" aria-hidden="true" tabindex="-1"></a>Before version 10, the study was built as a **corpus** of twelve documents (two case definitions, two languages, combined manuscript, appendix and article) with 5 plates and 7 tables in the article and 54 plates and 125 supplementary tables, all produced by the modules <span class="in">`00_provenance.py`</span> to <span class="in">`17_extended_material.py`</span> of <span class="in">`study/pipeline/`</span>. This page collects them so that no result is left out of the site: every plate is shown as a preview (the 600 dpi originals and the numeric tables are regenerated with the pipeline, which requires the GRD and REM microdata of the data volume) and every table unfolds from its presentation CSV (<span class="in">`docs/study/corpus/tables/`</span>), with its title and its methodological note. The order and thematic groups are those of the module-17 index (<span class="in">`extended_material_index.md`</span>). The results of version 10, reorganised around four panel figures, are in <span class="co">[</span><span class="ot">version 10 results</span><span class="co">](version_10_panels.html)</span>; both come from the same tidy tables, and <span class="co">[</span><span class="ot">the index</span><span class="co">](index.html#versions)</span> records what each version of the series added.</span>
+<span id="cb6-35"><a href="#cb6-35" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb6-36"><a href="#cb6-36" aria-hidden="true" tabindex="-1"></a>The series on this page are those of the variant **without Rett syndrome** (F84 without F84.2), the case definition of the manuscript; the sensitivity with Rett appears in figure S1 of the corpus and in figure S8 of version 10. All counts are administrative recognition, not prevalence or incidence.</span>
+<span id="cb6-37"><a href="#cb6-37" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb6-38"><a href="#cb6-38" aria-hidden="true" tabindex="-1"></a>::: {.callout-note}</span>
+<span id="cb6-39"><a href="#cb6-39" aria-hidden="true" tabindex="-1"></a><span class="fu">## Why this page shows stored images instead of the code that drew them</span></span>
+<span id="cb6-40"><a href="#cb6-40" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb6-41"><a href="#cb6-41" aria-hidden="true" tabindex="-1"></a>Unlike the <span class="co">[</span><span class="ot">version 10 results</span><span class="co">](version_10_panels.html)</span>, where each figure is drawn by the code printed</span>
+<span id="cb6-42"><a href="#cb6-42" aria-hidden="true" tabindex="-1"></a>with it, the plates below are stored images. The pipeline that produced them (<span class="in">`00_provenance.py`</span> to</span>
+<span id="cb6-43"><a href="#cb6-43" aria-hidden="true" tabindex="-1"></a><span class="in">`17_extended_material.py`</span>) reads the **GRD and REM microdata** of the data volume, which is not part of</span>
+<span id="cb6-44"><a href="#cb6-44" aria-hidden="true" tabindex="-1"></a>this repository, so the drawing code cannot run here. What the repository does carry for these is the</span>
+<span id="cb6-45"><a href="#cb6-45" aria-hidden="true" tabindex="-1"></a>pipeline code that produced them and the presentation CSV behind every table, which unfolds under each</span>
+<span id="cb6-46"><a href="#cb6-46" aria-hidden="true" tabindex="-1"></a>one. The tables on this page are therefore data you can read; the plates are records.</span>
+<span id="cb6-47"><a href="#cb6-47" aria-hidden="true" tabindex="-1"></a>:::</span>
+<span id="cb6-48"><a href="#cb6-48" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb6-49"><a href="#cb6-49" aria-hidden="true" tabindex="-1"></a><span class="fu">## Plates of the corpus article</span></span>
+<span id="cb6-50"><a href="#cb6-50" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb6-53"><a href="#cb6-53" aria-hidden="true" tabindex="-1"></a><span class="in">```{python}</span></span>
+<span id="cb6-54"><a href="#cb6-54" aria-hidden="true" tabindex="-1"></a><span class="co">#| label: corpus-laminas-articulo</span></span>
+<span id="cb6-55"><a href="#cb6-55" aria-hidden="true" tabindex="-1"></a><span class="co">#| output: asis</span></span>
+<span id="cb6-56"><a href="#cb6-56" aria-hidden="true" tabindex="-1"></a><span class="cf">for</span> it <span class="kw">in</span> idx[<span class="st">"article_figures"</span>]:</span>
+<span id="cb6-57"><a href="#cb6-57" aria-hidden="true" tabindex="-1"></a>    stem <span class="op">=</span> it[<span class="st">"file"</span>].replace(<span class="st">".png"</span>, <span class="st">""</span>)</span>
+<span id="cb6-58"><a href="#cb6-58" aria-hidden="true" tabindex="-1"></a>    meta <span class="op">=</span> rh.corpus_lookup(stem, caps[<span class="st">"main"</span>], caps[<span class="st">"extra"</span>], it[<span class="st">"id"</span>], it[<span class="st">"desc"</span>])</span>
+<span id="cb6-59"><a href="#cb6-59" aria-hidden="true" tabindex="-1"></a>    <span class="bu">print</span>(rh.corpus_figure_md(stem, meta) <span class="op">+</span> <span class="st">"</span><span class="ch">\n</span><span class="st">"</span>)</span>
+<span id="cb6-60"><a href="#cb6-60" aria-hidden="true" tabindex="-1"></a><span class="in">```</span></span>
+<span id="cb6-61"><a href="#cb6-61" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb6-62"><a href="#cb6-62" aria-hidden="true" tabindex="-1"></a><span class="fu">## Supplementary plates of the corpus</span></span>
+<span id="cb6-63"><a href="#cb6-63" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb6-66"><a href="#cb6-66" aria-hidden="true" tabindex="-1"></a><span class="in">```{python}</span></span>
+<span id="cb6-67"><a href="#cb6-67" aria-hidden="true" tabindex="-1"></a><span class="co">#| label: corpus-laminas-suplementarias</span></span>
+<span id="cb6-68"><a href="#cb6-68" aria-hidden="true" tabindex="-1"></a><span class="co">#| output: asis</span></span>
+<span id="cb6-69"><a href="#cb6-69" aria-hidden="true" tabindex="-1"></a>group <span class="op">=</span> <span class="va">None</span></span>
+<span id="cb6-70"><a href="#cb6-70" aria-hidden="true" tabindex="-1"></a><span class="cf">for</span> it <span class="kw">in</span> idx[<span class="st">"figures"</span>]:</span>
+<span id="cb6-71"><a href="#cb6-71" aria-hidden="true" tabindex="-1"></a>    <span class="cf">if</span> it[<span class="st">"group"</span>] <span class="op">!=</span> group:</span>
+<span id="cb6-72"><a href="#cb6-72" aria-hidden="true" tabindex="-1"></a>        group <span class="op">=</span> it[<span class="st">"group"</span>]<span class="op">;</span> <span class="bu">print</span>(<span class="ss">f"</span><span class="ch">\n</span><span class="ss">### </span><span class="sc">{</span>group<span class="sc">}</span><span class="ch">\n</span><span class="ss">"</span>)</span>
+<span id="cb6-73"><a href="#cb6-73" aria-hidden="true" tabindex="-1"></a>    stem <span class="op">=</span> it[<span class="st">"file"</span>].replace(<span class="st">".png"</span>, <span class="st">""</span>)</span>
+<span id="cb6-74"><a href="#cb6-74" aria-hidden="true" tabindex="-1"></a>    meta <span class="op">=</span> rh.corpus_lookup(stem, caps[<span class="st">"main"</span>], caps[<span class="st">"extra"</span>], it[<span class="st">"id"</span>], it[<span class="st">"desc"</span>])</span>
+<span id="cb6-75"><a href="#cb6-75" aria-hidden="true" tabindex="-1"></a>    <span class="bu">print</span>(<span class="ss">f"**</span><span class="sc">{</span>it[<span class="st">'id'</span>]<span class="sc">}</span><span class="ss">** (`</span><span class="sc">{</span>it[<span class="st">'file'</span>]<span class="sc">}</span><span class="ss">`, origin: </span><span class="sc">{</span>it[<span class="st">'origin'</span>]<span class="sc">}</span><span class="ss">)</span><span class="ch">\n</span><span class="ss">"</span>)</span>
+<span id="cb6-76"><a href="#cb6-76" aria-hidden="true" tabindex="-1"></a>    <span class="bu">print</span>(rh.corpus_figure_md(stem, meta) <span class="op">+</span> <span class="st">"</span><span class="ch">\n</span><span class="st">"</span>)</span>
+<span id="cb6-77"><a href="#cb6-77" aria-hidden="true" tabindex="-1"></a><span class="in">```</span></span>
+<span id="cb6-78"><a href="#cb6-78" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb6-79"><a href="#cb6-79" aria-hidden="true" tabindex="-1"></a><span class="fu">## Tables of the corpus article</span></span>
+<span id="cb6-80"><a href="#cb6-80" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb6-83"><a href="#cb6-83" aria-hidden="true" tabindex="-1"></a><span class="in">```{python}</span></span>
+<span id="cb6-84"><a href="#cb6-84" aria-hidden="true" tabindex="-1"></a><span class="co">#| label: corpus-tablas-articulo</span></span>
+<span id="cb6-85"><a href="#cb6-85" aria-hidden="true" tabindex="-1"></a><span class="co">#| output: asis</span></span>
+<span id="cb6-86"><a href="#cb6-86" aria-hidden="true" tabindex="-1"></a><span class="cf">for</span> it <span class="kw">in</span> idx[<span class="st">"article_tables"</span>]:</span>
+<span id="cb6-87"><a href="#cb6-87" aria-hidden="true" tabindex="-1"></a>    stem <span class="op">=</span> it[<span class="st">"file"</span>].replace(<span class="st">".csv"</span>, <span class="st">""</span>)</span>
+<span id="cb6-88"><a href="#cb6-88" aria-hidden="true" tabindex="-1"></a>    meta <span class="op">=</span> rh.corpus_lookup(stem, titles[<span class="st">"main"</span>], titles[<span class="st">"extra"</span>], it[<span class="st">"id"</span>], it[<span class="st">"desc"</span>])</span>
+<span id="cb6-89"><a href="#cb6-89" aria-hidden="true" tabindex="-1"></a>    <span class="bu">print</span>(rh.corpus_table_html(stem, meta) <span class="op">+</span> <span class="st">"</span><span class="ch">\n</span><span class="st">"</span>)</span>
+<span id="cb6-90"><a href="#cb6-90" aria-hidden="true" tabindex="-1"></a><span class="in">```</span></span>
+<span id="cb6-91"><a href="#cb6-91" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb6-92"><a href="#cb6-92" aria-hidden="true" tabindex="-1"></a><span class="fu">## Supplementary tables of the corpus</span></span>
+<span id="cb6-93"><a href="#cb6-93" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb6-96"><a href="#cb6-96" aria-hidden="true" tabindex="-1"></a><span class="in">```{python}</span></span>
+<span id="cb6-97"><a href="#cb6-97" aria-hidden="true" tabindex="-1"></a><span class="co">#| label: corpus-tablas-suplementarias</span></span>
+<span id="cb6-98"><a href="#cb6-98" aria-hidden="true" tabindex="-1"></a><span class="co">#| output: asis</span></span>
+<span id="cb6-99"><a href="#cb6-99" aria-hidden="true" tabindex="-1"></a>group <span class="op">=</span> <span class="va">None</span></span>
+<span id="cb6-100"><a href="#cb6-100" aria-hidden="true" tabindex="-1"></a><span class="cf">for</span> it <span class="kw">in</span> idx[<span class="st">"tables"</span>]:</span>
+<span id="cb6-101"><a href="#cb6-101" aria-hidden="true" tabindex="-1"></a>    <span class="cf">if</span> it[<span class="st">"group"</span>] <span class="op">!=</span> group:</span>
+<span id="cb6-102"><a href="#cb6-102" aria-hidden="true" tabindex="-1"></a>        group <span class="op">=</span> it[<span class="st">"group"</span>]<span class="op">;</span> <span class="bu">print</span>(<span class="ss">f"</span><span class="ch">\n</span><span class="ss">### </span><span class="sc">{</span>group<span class="sc">}</span><span class="ch">\n</span><span class="ss">"</span>)</span>
+<span id="cb6-103"><a href="#cb6-103" aria-hidden="true" tabindex="-1"></a>    stem <span class="op">=</span> it[<span class="st">"file"</span>].replace(<span class="st">".csv"</span>, <span class="st">""</span>)</span>
+<span id="cb6-104"><a href="#cb6-104" aria-hidden="true" tabindex="-1"></a>    meta <span class="op">=</span> rh.corpus_lookup(stem, titles[<span class="st">"main"</span>], titles[<span class="st">"extra"</span>], it[<span class="st">"id"</span>], it[<span class="st">"desc"</span>])</span>
+<span id="cb6-105"><a href="#cb6-105" aria-hidden="true" tabindex="-1"></a>    meta <span class="op">=</span> <span class="bu">dict</span>(meta)<span class="op">;</span> meta[<span class="st">"title"</span>] <span class="op">=</span> <span class="ss">f"</span><span class="sc">{</span>it[<span class="st">'id'</span>]<span class="sc">}</span><span class="ss">. "</span> <span class="op">+</span> meta[<span class="st">"title"</span>] <span class="cf">if</span> <span class="kw">not</span> meta[<span class="st">"title"</span>].startswith(it[<span class="st">"id"</span>]) <span class="cf">else</span> meta[<span class="st">"title"</span>]</span>
+<span id="cb6-106"><a href="#cb6-106" aria-hidden="true" tabindex="-1"></a>    <span class="bu">print</span>(rh.corpus_table_html(stem, meta) <span class="op">+</span> <span class="st">"</span><span class="ch">\n</span><span class="st">"</span>)</span>
+<span id="cb6-107"><a href="#cb6-107" aria-hidden="true" tabindex="-1"></a><span class="in">```</span></span>
+</code></pre></div><button title="Copy to Clipboard" class="code-copy-button" data-in-quarto-modal=""><i class="bi"></i></button></div>
+</div></div></div></div></div>
 </div> <!-- /content -->
 
 

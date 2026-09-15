@@ -33,6 +33,17 @@ Before version 10, the study was built as a **corpus** of twelve documents (two 
 
 The series on this page are those of the variant **without Rett syndrome** (F84 without F84.2), the case definition of the manuscript; the sensitivity with Rett appears in figure S1 of the corpus and in figure S8 of version 10. All counts are administrative recognition, not prevalence or incidence.
 
+::: {.callout-note}
+## Why this page shows stored images instead of the code that drew them
+
+Unlike the [version 10 results](version_10_panels.html), where each figure is drawn by the code printed
+with it, the plates below are stored images. The pipeline that produced them (`00_provenance.py` to
+`17_extended_material.py`) reads the **GRD and REM microdata** of the data volume, which is not part of
+this repository, so the drawing code cannot run here. What the repository does carry for these is the
+pipeline code that produced them and the presentation CSV behind every table, which unfolds under each
+one. The tables on this page are therefore data you can read; the plates are records.
+:::
+
 ## Plates of the corpus article
 
 ```{python}

@@ -57,6 +57,27 @@ REM describes aggregate care activity. A05 distinguishes total, sex and age; A03
 
 ## Rendering the documents
 
+Every result on the site carries the code that produced it. Each table and figure has a **Show the
+code that produced this** toggle, and the **`</>` Code** button at the top right of a page unfolds or
+hides all of them at once. This needs `echo: true` in `docs/_quarto.yml`: with `echo: false` Quarto
+strips the code before `code-fold` can wrap it, and the toggle never appears.
+
+On [docs/version_10_panels.qmd](docs/version_10_panels.qmd) the figures are not linked from a folder:
+each chunk contains the code that draws its figure, runs it, shows the English plate and exports the
+175 mm PNG, SVG and PDF in both languages. That code is a copy of `docs/study/figuras_principales.py`
+and `figuras_suplementarias.py`, which stay in place for rebuilding the plates outside the site. To stop
+the two copies drifting, the page is generated from those modules and a test compares them:
+
+```sh
+python scripts/build_version_pages.py          # rewrite the page from the figure modules
+python -m pytest tests/test_page_figure_code.py  # fails if the page and the modules differ
+```
+
+Two figures are the exception: S1 and S6 are inherited from earlier revisions by `copy_reused()`, so no
+drawing code for them exists here. The [version 02 corpus](docs/version_02_corpus.qmd) is stored images
+throughout, because the pipeline that drew those plates reads the GRD and REM microdata, which is not
+part of this repository. Both pages say so on the page itself.
+
 Requires Quarto and Python with Jupyter, plus the scientific and geospatial stack pinned in `requirements-analysis.txt` (pandas, scipy, statsmodels, pyarrow, geopandas, libpysal, esda).
 
 ```sh

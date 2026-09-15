@@ -151,7 +151,7 @@ organisation = pd.DataFrame([
 show_table(organisation, "Site sections and the tables that feed them")
 ```
 
-The site's documents run **Python** and read the aggregate tables of `output_files/consolidacion/` and `docs/study/data/`, both versioned in git. Tables and figures are recalculated at render time; they contain no hand-pasted figures. The extraction from the original microdata runs separately, through the scripts documented in the [repository README](../README.md).
+The site's documents run **Python** and read the aggregate tables of `output_files/consolidacion/` and `docs/study/data/`, both versioned in git. Tables and figures are recalculated at render time; they contain no hand-pasted figures. Every result on this site carries the code that produced it: use **Show the code that produced this** under any table or figure, or the **`</>` Code** button at the top right to unfold the whole page at once. The extraction from the original microdata runs separately, through the scripts documented in the [repository README](../README.md).
 
 ## Interpretation priorities
 
