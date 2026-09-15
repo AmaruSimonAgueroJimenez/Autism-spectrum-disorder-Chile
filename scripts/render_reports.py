@@ -15,7 +15,7 @@ import sys
 
 ROOT = Path(__file__).resolve().parents[1]
 EXTRACTION = ["audit_grd_linkage.py", "audit_rem.py", "grd_trajectories.py", "grd_epidemiology.py"]
-DOCUMENTS = {"index.qmd", "methods.qmd", "results.qmd", "hospital.qmd", "community.qmd", "tables.qmd", "plates.qmd", "reproducibility.qmd"}
+DOCUMENTS = {"index.qmd", "methods.qmd", "results.qmd", "hospital.qmd", "community.qmd", "tables.qmd", "plates_core.qmd", "plates_hospital.qmd", "plates_community.qmd", "plates_territory.qmd", "plates_context.qmd", "extended_tables.qmd", "reproducibility.qmd"}
 
 
 def main():

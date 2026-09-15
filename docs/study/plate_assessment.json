@@ -1119,5 +1119,94 @@
    ],
    "estimator_note": "The two sources are located differently and the plate says so in red: GRD is by region of RESIDENCE (comuna recorded in the discharge, linked by normalised name, no fuzzy matching, unknown-residence episodes excluded) while REM A05 is by region of the reporting ESTABLISHMENT, i.e. place of care. Inter-regional referrals are uncorrected, so panel (d) is an ecological comparison and that warning must be carried over verbatim. All rates are crude counts per 100,000 INE population (base-2017 projection, 30 June) - not age-standardised and not smoothed - and the GRD numerator is episodes with F84 in any position, not persons. Panels (a) and (b) differ only by the Rett variant and must keep a shared colour scale."
   }
+ },
+ "corrections": {
+  "_comment": "Errors found in the assessment above by the agents that then drew each plate and checked it against the original. Recorded rather than silently fixed, so the record shows what the first pass got wrong and why the drawing code departs from it.",
+  "items": [
+   {
+    "plate": "EF3_episode_features",
+    "correction": "Not an error, but the assessment's own arithmetic for the pooled specialty bar ('F84 100-80.8 = 19.2%, all GRD 100-47.9 = 52.1%, difference -32.9 against the printed -32.8') is the rounded shortcut its blocker warns against. Doing what the blocker says - summing the 14 residual counts and dividing by the cell denominator - gives 19.243% and 52.082%, difference -32.84, which rounds to the printed -32.8 exactly. There is no residual rounding gap to explain."
+   },
+   {
+    "plate": "EF3_episode_features",
+    "correction": "The assessment lists the plate's category counts as 'TIPO_PROCEDENCIA 17, TIPOALTA 10, PREVISION_grouped 9, ESPECIALIDAD_MEDICA 21' and infers pooling of 17-7, 10-7, 9-7, 21-7. That is right, but it does not say that panels a (5 categories) and b (4) are drawn with every category and no pooled bar at all; the rule I had to infer from the image is 'keep all when there are 8 or fewer, otherwise keep the top 7 and pool the rest'."
+   },
+   {
+    "plate": "EF3_episode_features",
+    "correction": "The assessment does not mention that the six variables have slightly different all-GRD denominators (5,807,914 to 5,808,535, against a constant F84 denominator of 25,323). Using one shared all-GRD total would shift several panels; the within-cell rule it does state is what saves this, but the differing totals are worth naming."
+   },
+   {
+    "plate": "fig1_dataflow",
+    "correction": "The evidence field says 'the 41 rows flagged yes are exactly the numbers on the plate'. Only 38 of them are printed. The three design-weighted survey percentages (0.29 / 2.87 / 0.71) are flagged yes but never drawn, because the survey row has a single step and hence only two arrows; the stored plate shows only the two number stacks 30,010/5,526/16,484 and 72/163/80 for that row. The flag records that a figure was registered for the row, not that it was printed."
+   },
+   {
+    "plate": "fig1_dataflow",
+    "correction": "The estimator_note says to 'keep the labels that say so' for the three survey percentages, which implies they appear on the plate. On the plate the only thing that says so is the yield block 'design-weighted percentage'; the percentages themselves are absent. Kept the yield block, drew no percentages."
+   },
+   {
+    "plate": "EF2_length_of_stay",
+    "correction": "The assessment states that all-GRD age 0-4 in panel (b) 'gives 8.03'. The n-weighted mean of the six per-year means E66 prints is 3,676,177 / 460,144 = 7.989, not 8.03. The stored plate's grey bar for 0-4 measures 7.90, which matches 7.99 after the ~1 px anti-alias bias that every other bar in the panel shows. Everything else in the entry - the six panels, the sin_rett/observed estimator, the n_valid_dates denominator, the n-weighting of (b), the four sources, the 2024-only limit on (e), and the warning against grd_epi_los.csv - held up exactly when I checked it."
+   },
+   {
+    "plate": "E44_correlation_matrix",
+    "correction": "blockers[0] is wrong about the interval formula. It says the CIs 'must be recomputed as tanh(atanh(r) +/- 1.96/sqrt(n-3)) with n = 342' and that endpoints will sit within about +/-0.01 of the stored plate. The plain form misses both printed lower bounds by one unit in the second decimal (panel d 0.57 vs the plate's 0.56, panel e 0.55 vs the plate's 0.54); the Spearman-corrected Fisher-z, se^2 = 1.06/(n-3), reproduces both exactly. Everything else in the entry - the six panels, the three sources, the checked values in (a), (c), (d), (e) and (f), the estimator note and the labels note - held up when I opened the plate and the tables."
+   },
+   {
+    "plate": "fig2_grd_core",
+    "correction": "estimator_note is wrong about panel (f)'s male:female line. It says to use output_files/consolidacion/grd_sex_ratio.csv (definition=TEA_operacional, unit=records, role=cualquiera), giving 3.270 (2.969-3.606) for 2019 and 3.241 (2.946-3.572) for 2021, and warns that docs/study/data/grd_sex_counts.csv's 1,786/547 -> 3.266 pair is 'close enough to look right and not the plotted pair'. The opposite is true. Pixel measurement of the stored plate puts the 2019 upper cap at 3.6036 and the 2021 upper cap at 3.5495 — BELOW the TEA_operacional stored limits of 3.6064 and 3.5715, which is impossible for an outer-edge reading of a drawn cap. The age-sex counts (1,786/547 in 2019; 1,806/560 in 2021) with the pipeline's Wilson ratio interval give 3.2651 (2.9670-3.5931) and 3.2250 (2.9334-3.5456), which sit inside the measured caps by about one cap width, and the 2021 point (3.2250) matches the measured 3.2252 to four decimals. The original code confirms it: `_mf_ratio` in study/pipeline/08a_figures_grd.py sums `D.agesex.n_f84` by sex and passes it to `ratio_ci` (Wilson), and `D.agesex` is docs/study/data/grd_age_sex_year.csv. Using grd_sex_ratio.csv would also have made panel (f) inconsistent with panel (d), which is drawn from those same age-sex counts."
+   },
+   {
+    "plate": "fig2_grd_core",
+    "correction": "Minor: the assessment's source list omits docs/study/data/grd_age_sex_year.csv, which is the tidy table behind both panel (d) and panel (f) and is tracked."
+   },
+   {
+    "plate": "E19_rem_definition_era_sensitivity",
+    "correction": "The panel (e) evidence says 'Every one of the sixteen labels the plate prints matches to 0.1pp'. The plate actually prints 24 labels - three of the four categories on each of the eight bars; the childhood-disintegrative-disorder share (0.2-3.4%) is never labelled. The 32 percentages the assessment lists are all correct to 0.1 pp, so only the count is wrong."
+   },
+   {
+    "plate": "E19_rem_definition_era_sensitivity",
+    "correction": "Not an error but worth recording, since the assessment's phrasing ('strict n = 449/658/920/1,070/952 and family 4,948/8,004/...') could be read as the family carrying an n too: on panels (a)-(d) the pre-2021 grey bar prints count and n, the strict bar prints ONLY n, and the family bar prints ONLY the count. The family's own reporting n (710/869/1,040/1,153/995 for A05 entries) is in the E19 table and is not printed on the plate; my module keeps it that way."
+   },
+   {
+    "plate": "EF8_hospitals",
+    "correction": "estimator_note says 'Do NOT redraw panel (a) from docs/study/corpus/tables/EF8_hospitals.csv: that companion table is from a different run ... and does not match the stored plate'. The premise is wrong. That companion table's first twelve rows are exactly the plate's twelve named hospitals, in the plate's order, and its values match the stored plate cell for cell ('107; 192' ... '518; 5,211'), as do its 'Fixed panel of 65 hospitals' row (2,334; 203 -> 8,480; 809), its 'Hospitals added in 2023-2024' row (n/e ... 52; 357, 251; 676) and its '% of episodes with F84' row (46.6/46.6/47.6/46.8/44.3/41.2) - i.e. panels (c) and (d). It is the same run's companion table printing 25 named hospitals where the plate names only 12; it is not from a different run. The advice to build panel (a) from ST1 is still right (only ST1 can produce the pooled row), but the stated reason is not, and that table is in fact a valid cross-check on (a), (c) and (d). I did not read it in the module."
+   },
+   {
+    "plate": "EF8_hospitals",
+    "correction": "evidence says 'the plate prints 0.81/0.82/0.89/0.89/0.92/0.66' for panel (b). The plate prints no rho values at all - only the 'n=65 / n=68' labels above the bars. Those rho values are the bar heights, which I confirmed by pixel measurement (stored bar tops 168/165/141/141/134/212 px)."
+   },
+   {
+    "plate": "fig1_sources_coverage",
+    "correction": "The assessment's key warning ('n_codes must be the codes actually present in rem_pathway_annual ... the file holds 10') is right in its conclusion but incomplete in its recipe: a plain distinct-code count over rem_pathway_annual returns 14 for A05 2021 and P6 2021, not 10, because the file also carries pooled family rows (variant con_rett / sin_rett / strict_autism / broad_pre2021) whose 'code' is a combination string such as 05990022+05990023+05990025+05990026. The filter that yields 10 - and the right value, zero and row counts - is variant == 'single_code'. Following the assessment literally reproduces the very error it warns against."
+   },
+   {
+    "plate": "fig1_sources_coverage",
+    "correction": "The assessment describes panel (c) as 'maximum across the era's codes', but that rule gives the wrong P2 line. The max across P2's codes from 2023 is the NANEAS total P2501878 (1,187/1,293/1,394); the plate draws the ASD code P2500500 alone (460/400/640/897/1,012/1,218/1,325). The assessment's own number list is the correct one, so only its stated rule is wrong. I confirmed it against the stored plate by reading the top edge of the occluded black markers: 1,009/1,208/1,312. The 2023 P2 break is a code ADDED alongside, not a redefinition of the ASD series."
+   },
+   {
+    "plate": "fig1_sources_coverage",
+    "correction": "The assessment's panel (c) evidence omits the P6 broad PDD December series (727 in 2019, 695 in 2020) and the A03 M-CHAT-R/F 2023-24 values (880, 1,082), both of which are on the plate and are needed to draw all eleven series."
+   },
+   {
+    "plate": "fig3_rem_pathway",
+    "correction": "None. Every number the assessment cites — the twelve (c) values and their n, the (a) n sequences 263/198/273/399 and 188/134/230/315, the 2023–24 family upper ends, all six 2024 31–59-month n and all nine 2025 redesign n, the five A05 strict entries, P2500500 1,854 -> 29,974, the three ASD-per-100-NANEAS ratios, and P6241010 = 21,843 / P6241060 = 12,645 — reproduced exactly, and its estimator note (unweighted counts, four non-comparable A03 eras, the 2021 A05/P6 break, sin_rett family sums, December stock never mixed with June, n = n_reporting_establishments) matches what the plate actually draws."
+   },
+   {
+    "plate": "fig3_rem_pathway",
+    "correction": "Two details the assessment does not state, which I had to establish from the plate and which the module now records: the establishments line in (d) is the n of the ENTRIES code of each era (06902600 then 05990022), not the family n and not a combined count; and panel (e) carries two establishment lines, December solid and June dotted, with the June markers drawn above the December series (at 2019 the two stocks nearly coincide and the plate shows the hollow June ring over the filled December point)."
+   },
+   {
+    "plate": "EF5_codiagnoses",
+    "correction": "The blocker 'Panel (d)'s denominator ... must be taken from E66's Secondary only . All activities n (2,106 / 1,452 / 2,181 / 3,564 / 6,062 / 8,340)' is wrong about the source. E66 counts the episodes whose length of stay could be measured and is short by one episode in 2024 (8,341 in grd_year_summary) and by three for the any-position denominator (8,728 vs 8,731). The published cells settle it: 3,549/8,731 = 40.6% as E7 prints, 3,549/8,728 = 40.7%. Everything the blocker says about the ESTIMATOR — that panel (d) has its own secondary-only denominator, different from panel (a)'s — is correct and is honoured; only the file it names is wrong. Consequently the pooled denominators are 25,323 and 23,706, not the 25,320 and 23,705 the evidence note implies."
+   },
+   {
+    "plate": "EF5_codiagnoses",
+    "correction": "Minor: the evidence note gives EF5's coding_depth_mean_f84 as '4.966 ... 5.997', the grd_year_summary values, and the EF5 row as '4.97 ... 6.00'; both are right, but the sentence reads as if EF5 stores 4.97 as its own series when the row is the published rounding of the same annual-summary column. No consequence for the drawing."
+   },
+   {
+    "plate": "EF5_codiagnoses",
+    "correction": "Everything else in the assessment checked out: 6 panels, the panel (a)/(e) top-ten order and its ten pooled percentages, the six chapters of (b) with Digestive 5,326 above Nervous 5,242, the 13 mental-health blocks of (c) which must come from E7's block rows, E8's first ten rows as panel (d), G40 1,293/23,705 = 5.45% as the longest bar of (d), and the three series of (f)."
+   }
+  ]
  }
 }

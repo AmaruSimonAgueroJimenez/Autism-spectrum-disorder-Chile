@@ -229,14 +229,44 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
 </li>
           <li class="sidebar-item">
   <div class="sidebar-item-container"> 
-  <a href="./plates.html" class="sidebar-item-text sidebar-link">
- <span class="menu-text"><span class="chapter-number">7</span>&nbsp; <span class="chapter-title">Extended plates</span></span></a>
+  <a href="./plates_core.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text"><span class="chapter-number">7</span>&nbsp; <span class="chapter-title">Principal plates</span></span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="./plates_hospital.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text"><span class="chapter-number">8</span>&nbsp; <span class="chapter-title">Hospital episodes in detail</span></span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="./plates_community.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text"><span class="chapter-number">9</span>&nbsp; <span class="chapter-title">Community pathway in detail</span></span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="./plates_territory.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text"><span class="chapter-number">10</span>&nbsp; <span class="chapter-title">Territory and spatial structure</span></span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="./plates_context.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text"><span class="chapter-number">11</span>&nbsp; <span class="chapter-title">Denominators, surveys and education</span></span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="./extended_tables.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text"><span class="chapter-number">12</span>&nbsp; <span class="chapter-title">Extended tables</span></span></a>
   </div>
 </li>
           <li class="sidebar-item">
   <div class="sidebar-item-container"> 
   <a href="./reproducibility.html" class="sidebar-item-text sidebar-link">
- <span class="menu-text"><span class="chapter-number">8</span>&nbsp; <span class="chapter-title">Reproducibility</span></span></a>
+ <span class="menu-text"><span class="chapter-number">13</span>&nbsp; <span class="chapter-title">Reproducibility</span></span></a>
   </div>
 </li>
       </ul>
@@ -2006,7 +2036,7 @@ Figure&nbsp;5.6: Age-standardised rate of A05 entries with an autism code by reg
 <span id="cb16-17"><a href="#cb16-17" aria-hidden="true" tabindex="-1"></a>top10 <span class="op">=</span> share_cum[<span class="bu">int</span>(np.ceil(<span class="bu">len</span>(share_cum) <span class="op">*</span> <span class="fl">.1</span>)) <span class="op">-</span> <span class="dv">1</span>]</span>
 <span id="cb16-18"><a href="#cb16-18" aria-hidden="true" tabindex="-1"></a>note(<span class="ss">f"In </span><span class="sc">{</span>last_year<span class="sc">}</span><span class="ss">, the 10% of facilities with the most entries account for </span><span class="sc">{</span>number(<span class="dv">100</span> <span class="op">*</span> top10, <span class="dv">1</span>)<span class="sc">}</span><span class="ss">% of autism entries; the median number of months with a row per facility is </span><span class="sc">{</span>number(last_pan.months_with_rows.median())<span class="sc">}</span><span class="ss">."</span>)</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
 </details>
-<div id="fig-rem-panel" class="cell quarto-float quarto-figure quarto-figure-center anchored" data-fig-width="13" data-fig-height="4.2" data-execution_count="16">
+<div id="fig-rem-panel" class="cell quarto-float quarto-figure quarto-figure-center anchored" data-fig-height="4.2" data-fig-width="13" data-execution_count="16">
 <figure class="quarto-float quarto-float-fig figure">
 <div aria-describedby="fig-rem-panel-caption-0ceaefa1-69ba-4598-a22c-09a6ac19f8ca">
 <div class="cell-output cell-output-display">
@@ -2832,7 +2862,7 @@ Figure&nbsp;5.8: Screening in 18-month check-ups: check-ups and children with la
 <span id="cb23-12"><a href="#cb23-12" aria-hidden="true" tabindex="-1"></a>plt.show()</span>
 <span id="cb23-13"><a href="#cb23-13" aria-hidden="true" tabindex="-1"></a>show_table(pd.DataFrame(corr_rows), <span class="st">"Spearman correlation between regional REM and GRD rates by year"</span>, {<span class="st">"Spearman ρ"</span>: <span class="dv">2</span>, <span class="st">"p value"</span>: <span class="dv">3</span>})</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
 </details>
-<div id="fig-rem-grd-ecologica" class="cell quarto-float quarto-figure quarto-figure-center anchored" data-fig-width="12" data-fig-height="3.6" data-execution_count="23">
+<div id="fig-rem-grd-ecologica" class="cell quarto-float quarto-figure quarto-figure-center anchored" data-fig-height="3.6" data-fig-width="12" data-execution_count="23">
 <figure class="quarto-float quarto-float-fig figure">
 <div aria-describedby="fig-rem-grd-ecologica-caption-0ceaefa1-69ba-4598-a22c-09a6ac19f8ca">
 <div class="cell-output cell-output-display">

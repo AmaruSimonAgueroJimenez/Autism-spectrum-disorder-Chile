@@ -24,7 +24,12 @@ book:
     - part: "Extended material"
       chapters:
         - tables.qmd
-        - plates.qmd
+        - plates_core.qmd
+        - plates_hospital.qmd
+        - plates_community.qmd
+        - plates_territory.qmd
+        - plates_context.qmd
+        - extended_tables.qmd
         - reproducibility.qmd
   sidebar:
     style: docked

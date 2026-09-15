@@ -1,0 +1,169 @@
+---
+title: "Denominators, surveys and education"
+subtitle: "The plates that place the health records against population, survey and school sources"
+---
+
+```{python}
+#| label: preparacion
+import sys
+from pathlib import Path
+
+ROOT = Path.cwd().parent if Path.cwd().name == "docs" else Path.cwd()
+sys.path.insert(0, str(ROOT / "docs" / "study"))
+sys.path.insert(0, str(ROOT / "scripts"))
+import numpy as np, pandas as pd
+import matplotlib.pyplot as plt
+import render_helpers as rh
+from report_helpers import kpis
+from figstyle import *
+
+idx = rh.corpus_index(); caps = rh.corpus_captions(); titles = rh.corpus_titles()
+kpis([
+    ("0", "Plates redrawn here, with their code"),
+    ("10", "Plates kept as stored images"),
+    ("10", "Plates in this chapter"),
+])
+```
+
+Of the 10 plates in this chapter, 0 are redrawn from the published tables by the code shown
+with each one; the rest are stored images because their series are not fully carried by any published
+table. Use **Show the code that produced this** under a redrawn plate to read how it is built.
+
+::: {.callout-important}
+## Redrawn plates are faithful reconstructions, not the original artwork
+
+The code that produced the stored plates lives in `study/pipeline/` and reads microdata that is not in
+this repository. What is shown here was written from the published aggregates: the panels, the series
+and the numbers are the same, checked value by value against the original, but the artwork is not
+pixel-identical — fonts, tick formatting and label placement differ. Each module in
+`docs/study/plates/` records its own deviations.
+:::
+
+
+## Denominators, surveys and education
+
+### Figure S35. Figure E20. Structure of the reference population (INE), 2019–2025 — F84 family excluding Rett syndrome
+
+::: {.callout-note collapse="true"}
+## Stored image — this plate has no drawing code here
+
+Its series are not fully carried by any published table, so it cannot be redrawn from a
+clone. The code that produced it is in `study/pipeline/`; what is missing is the microdata
+it reads.
+:::
+
+![**Figure E20. Structure of the reference population (INE), 2019–2025 — F84 family excluding Rett syndrome** (a) and (b) National population pyramids in 2019 and 2025 by WHO five-year age group and sex, as a percentage of the total population of the same year (INE Censo 2017-base projections at 30 June; 80+ open-ended). (c) Population aged 0–19 by region in 2019 and 2025, in thousands on a log scale, with the percentage change between the two years beside each bar (16 regions). (d) National total under the Censo 2017 base and the 2024 base, with their ratio on the right axis: census bases are never merged and the 2017 base is the primary denominator throughout the study. (e) The 2024 population by age group under the 2017-base 30 June projection and under the enumerated Censo 2024, with their ratio: Censo 2024 enumerates fewer children than the projection, so rates per 100,000 population depend on the base chosen. (f) National population by year and share aged 0–19. Unit: resident persons; denominator: national population of the same year; coverage: national territory. Counts are administrative recognition, never prevalence or incidence. Sources are not person-linked: no ratio between sources is a cascade or an individual probability. Law 21.545 (March 2023) is policy context, not an intervention with an estimable effect. 2020–2021: pandemic reporting disruption.](study/corpus/figures/figE20_population_structure.jpg){fig-align="center" width="100%"}
+
+### Figure S36. Figure E21. Insurance and operational coverage in detail (December stocks), 2019–2025 — F84 family excluding Rett syndrome
+
+::: {.callout-note collapse="true"}
+## Stored image — this plate has no drawing code here
+
+Its series are not fully carried by any published table, so it cannot be redrawn from a
+clone. The code that produced it is in `study/pipeline/`; what is missing is the microdata
+it reads.
+:::
+
+![**Figure E21. Insurance and operational coverage in detail (December stocks), 2019–2025 — F84 family excluding Rett syndrome** (a) FONASA beneficiaries by tramos A to D and year, in millions, with the total annotated above each bar. (b) FONASA beneficiaries by five-year age group and sex in the latest available year (2025). (c) ISAPRE beneficiaries by five-year age group in the first and last year, with the number of beneficiaries outside the age bands (unborn or age not reported) stated in the panel. (d) APS enrolment by tramo (A–D, X and tramo not reported) and reporting APS centres on the right axis. (e) Regional distribution in 2025: FONASA beneficiaries, ISAPRE beneficiaries and APS enrolment as a percentage of each region&#x27;s INE population; the geographies are NOT homogeneous (FONASA mixes APS-enrolment comuna and domicile, APS locates the centre and ISAPRE uses the beneficiary&#x27;s administrative comuna), so the sum can exceed 100%. (f) Coverage layers by year with (FONASA+ISAPRE)/INE on the right axis. Unit: beneficiaries or enrolled persons, 31 December stock; INE is a 30 June projection, so the ratio is indicative and NOT an uninsured rate. None of these layers is an autism denominator: they answer different questions (insurance coverage, operational coverage and territorial population). Counts are administrative recognition, never prevalence or incidence. Sources are not person-linked: no ratio between sources is a cascade or an individual probability. Law 21.545 (March 2023) is policy context, not an intervention with an estimable effect. 2020–2021: pandemic reporting disruption.](study/corpus/figures/figE21_insurance_coverage.jpg){fig-align="center" width="100%"}
+
+### Figure S37. Figure E22. REM-20 hospital activity and capacity and its ecological relationship with GRD episodes with F84, 2019–2025 — F84 family excluding Rett syndrome
+
+::: {.callout-note collapse="true"}
+## Stored image — this plate has no drawing code here
+
+Its series are not fully carried by any published table, so it cannot be redrawn from a
+clone. The code that produced it is in `study/pipeline/`; what is missing is the microdata
+it reads.
+:::
+
+![**Figure E22. REM-20 hospital activity and capacity and its ecological relationship with GRD episodes with F84, 2019–2025 — F84 family excluding Rett syndrome** (a) REM-20 discharges by year in all establishments and in the fixed panel of 188 establishments with twelve months reported in every year, with the number of reporting establishments on the right axis. (b) Available and occupied bed-days by year and occupancy percentage. (c) Distribution of discharges per establishment and year (box: P25–P75; line: median; whiskers without outliers; the number of establishments appears under each box). (d) Retention of the 188-panel: the share of total discharges and bed-days the panel retains each year. (e) Available bed-days by functional area in 2025 (ten largest areas) with discharges annotated. (f) Ecological relationship in 2024 between an establishment&#x27;s REM-20 discharges and the GRD episodes with documented F84 of the same establishment, linked by DEIS code (n = 72 establishments; Spearman ρ = 0.70; both axes logarithmic). ECOLOGICAL WARNING: the association is between establishments, not persons, and does not describe individual risk. Unit: discharges (episodes) and bed-days; REM-20 measures activity and capacity, never covered population. Counts are administrative recognition, never prevalence or incidence. Sources are not person-linked: no ratio between sources is a cascade or an individual probability. Law 21.545 (March 2023) is policy context, not an intervention with an estimable effect. 2020–2021: pandemic reporting disruption.](study/corpus/figures/figE22_rem20_capacity.jpg){fig-align="center" width="100%"}
+
+### Figure S38. Figure E23. ENDIDE 2022 and ENCAVI 2023–2024 analysed with their complex sampling design: estimates, precision and flagged domains
+
+::: {.callout-note collapse="true"}
+## Stored image — this plate has no drawing code here
+
+Its series are not fully carried by any published table, so it cannot be redrawn from a
+clone. The code that produced it is in `study/pipeline/`; what is missing is the microdata
+it reads.
+:::
+
+![**Figure E23. ENDIDE 2022 and ENCAVI 2023–2024 analysed with their complex sampling design: estimates, precision and flagged domains** (a) ENDIDE 2022, adults aged 18 and over: weighted proportion of reported autism by total, sex and age group, with 95% CI and the number of unweighted cases beside each point. (b) ENDIDE 2022, children and adolescents aged 2–17 reported by the main carer. (c) ENCAVI 2023–2024, persons aged 15 and over with a diagnosis of autism spectrum disorder. (d) Design effect (DEFF) by domain, with the DEFF = 1 reference. (e) Relative standard error by domain with the 30% threshold. (f) Unweighted cases and domain size (log scale) with the 30-case threshold. Panels d-f summarise the DOMAIN (the &#x27;total&#x27; row); the sex and age subgroups are in panels a-c and complete in the companion table. Domains with fewer than 30 cases or a relative standard error above 30% are drawn in grey and are NOT presented as reliable estimates. Regional and comuna domains are not estimated because the effective sample does not support them. Unit: surveyed persons; denominator: persons in the domain with a non-missing item; ratio estimator with Taylor linearisation and a logit CI with t and df = PSU − strata. Counts are administrative recognition, never prevalence or incidence. Sources are not person-linked: no ratio between sources is a cascade or an individual probability. Law 21.545 (March 2023) is policy context, not an intervention with an estimable effect. 2020–2021: pandemic reporting disruption.](study/corpus/figures/figE23_surveys_detail.jpg){fig-align="center" width="100%"}
+
+### Figure S39. Figure E24. Educational recognition of autism: PIE, SINACES and special schools, 2019–2025
+
+::: {.callout-note collapse="true"}
+## Stored image — this plate has no drawing code here
+
+Its series are not fully carried by any published table, so it cannot be redrawn from a
+clone. The code that produced it is in `study/pipeline/`; what is missing is the microdata
+it reads.
+:::
+
+![**Figure E24. Educational recognition of autism: PIE, SINACES and special schools, 2019–2025** (a) PIE series by definition and source: strict autism and autism-Asperger (Apuntes 60, 2019–2023), the Apuntes 60 harmonised series (rule: strict autism + autism-Asperger) and the harmonised total published by SINACES (2022–2025); the two harmonised series are drawn separately because they come from different reports. (b) The 2022 discrepancy: the SINACES total minus special schools gives 42,940, matching Apuntes 60, while the SINACES report writes 42,945; the five-case difference is documented and not corrected. (c) Harmonised PIE and strict autism as a share of PIE enrolment, and harmonised PIE as a share of SINACES applicants. (d) Autistic students in special schools and the SINACES total by year; special schools are not added to PIE. (e) The 2023 sex split, the only published year, with the male-to-female ratio and an exact binomial interval (log scale). (f) Regular and exceptional entry to PIE, with the share of exceptional entries annotated. Unit: students (annual school stock); coverage: schools with special-education funding that take part in PIE. These series are identical in both case-definition variants. Counts are administrative recognition, never prevalence or incidence. Sources are not person-linked: no ratio between sources is a cascade or an individual probability. Law 21.545 (March 2023) is policy context, not an intervention with an estimable effect. 2020–2021: pandemic reporting disruption.](study/corpus/figures/figE24_education_detail.jpg){fig-align="center" width="100%"}
+
+### Figure S40. Figure E25. JUNAEB EVE: caregiver-reported autism in selected school cohorts, 2019–2025
+
+::: {.callout-note collapse="true"}
+## Stored image — this plate has no drawing code here
+
+Its series are not fully carried by any published table, so it cannot be redrawn from a
+clone. The code that produced it is in `study/pipeline/`; what is missing is the microdata
+it reads.
+:::
+
+![**Figure E25. JUNAEB EVE: caregiver-reported autism in selected school cohorts, 2019–2025** (a) Weighted percentage of students with reported autism by level and year, with 95% CI; crosses mark the years that are not estimable as a weighted percentage. (b) Percentage by sex, level and year; the asterisk marks cells without a published weight, where the unweighted percentage is shown. (c) Students in the estimation domain (bars, left axis) and unweighted autism cases (dots and dotted line, right axis). (d) Weighted versus unweighted percentage, with the identity diagonal. (e) Male-to-female ratio by level and year, with the 3:1 and 4:1 clinical-literature references. (f) Availability of the autism item and of the weight by year and level. The questionnaire has no autism category in 2019–2022; the item appears in 2023 with no published weight; the published weight is EXP_REG in 2024 and EXP in 2025; in 2024 the grade-9 variable is completely empty and is reported as &#x27;not estimable&#x27;, never as zero. Unit: surveyed students (caregiver report); denominator: students in the estimation domain. JUNAEB represents selected school cohorts and is NOT national prevalence. Counts are administrative recognition, never prevalence or incidence. Sources are not person-linked: no ratio between sources is a cascade or an individual probability. Law 21.545 (March 2023) is policy context, not an intervention with an estimable effect. 2020–2021: pandemic reporting disruption.](study/corpus/figures/figE25_junaeb_detail.jpg){fig-align="center" width="100%"}
+
+
+## Sex ratio across sources
+
+### Figure S41. Figure E26. Comparison across administrative systems: index, raw value, population rate and value per reporting unit, with their denominators, 2019–2025 — F84 family excluding Rett syndrome
+
+::: {.callout-note collapse="true"}
+## Stored image — this plate has no drawing code here
+
+Its series are not fully carried by any published table, so it cannot be redrawn from a
+clone. The code that produced it is in `study/pipeline/`; what is missing is the microdata
+it reads.
+:::
+
+![**Figure E26. Comparison across administrative systems: index, raw value, population rate and value per reporting unit, with their denominators, 2019–2025 — F84 family excluding Rett syndrome** (a) Annual value of each system indexed to the base year stated on the axis (the first year common to all series, because the REM strict-autism codes start in 2021), on a log scale: indices compare trajectories, never levels; each legend entry carries the value of the last year of that series. (b) Raw annual value of each source in its own unit, on a log scale, before any normalisation. (c) Annual value per 100,000 residents using the INE Censo 2017-base population at 30 June as a common denominator, and (d) that population denominator year by year. (e) Value per reporting unit: GRD episodes per hospital of the observed panel, DEIS discharges per 100,000 discharges, REM A05 entries and REM P2 persons under control per reporting establishment, and PIE students per 1,000 applicants (the number of schools is not published in the sources used); (f) the denominators of that panel: reporting GRD hospitals, reporting REM establishments, total DEIS discharges and PIE applicants. UNITS DIFFER: episodes, discharges, entries, persons under control and students are not interchangeable; the panels have separate axes and the sources are NOT person-linked, so no comparison can be read as a cascade or an individual probability. Counts are administrative recognition, never prevalence or incidence. Sources are not person-linked: no ratio between sources is a cascade or an individual probability. Law 21.545 (March 2023) is policy context, not an intervention with an estimable effect. 2020–2021: pandemic reporting disruption.](study/corpus/figures/figE26_cross_source.jpg){fig-align="center" width="100%"}
+
+### Figure S42. Figure E26b. Male-to-female ratio of administrative autism recognition in every source that reports sex, 2019–2025 — F84 family excluding Rett syndrome
+
+::: {.callout-note collapse="true"}
+## Stored image — this plate has no drawing code here
+
+Its series are not fully carried by any published table, so it cannot be redrawn from a
+clone. The code that produced it is in `study/pipeline/`; what is missing is the microdata
+it reads.
+:::
+
+![**Figure E26b. Male-to-female ratio of administrative autism recognition in every source that reports sex, 2019–2025 — F84 family excluding Rett syndrome** (a) Trend of the male-to-female ratio by source (log scale): GRD episodes with documented F84 and with principal F84, DEIS discharges with principal F84, REM A05 autism entries, the December stock of REM P2 and of REM P6 in primary and specialty care, JUNAEB weighted percentages by level, the 2023 PIE sex split and the ENDIDE 2022 and ENCAVI 2023–2024 estimates; bands show the 95% CI of the three main series. (b) Ratio by five-year age group and source in the latest available year of each; cells with fewer than five events in either sex are suppressed and marked &#x27;&lt;5&#x27;. (c) Ratio of counts versus ratio of age-standardised rates for GRD and REM A05, with the identity diagonal: standardisation removes the age composition, which is why the two measures differ. (d) Forest of the latest available year in each source, with the unit of each point (episodes, persons, discharges, entries, persons under control, students or respondents) and its interval. (e) The same ratio computed in the two case-definition variants. (f) The sex-specific numerators behind each ratio, on a log scale, with the unit of each source next to the bar; the interval method of each source is in the companion table. Intervals: exact Clopper–Pearson binomial for ratios of counts, log-normal for ratios of standardised rates, and the delta method on the log scale with complex-design standard errors (surveys and JUNAEB 2024–2025) or binomial ones (JUNAEB 2023) for ratios of proportions. The 3:1 and 4:1 lines are clinical-literature references, not an expected value for these registries. SOURCES ARE NOT PERSON-LINKED and measure different things, so the ratios are not comparable as if they measured the same thing; GRD unique persons within year are reported as &#x27;not estimable&#x27; because the source does not publish their sex. Counts are administrative recognition, never prevalence or incidence. Sources are not person-linked: no ratio between sources is a cascade or an individual probability. Law 21.545 (March 2023) is policy context, not an intervention with an estimable effect. 2020–2021: pandemic reporting disruption.](study/corpus/figures/figE26b_sex_ratio_multisource.jpg){fig-align="center" width="100%"}
+
+
+## Model diagnostics and case-definition sensitivity
+
+### Figure S43. Figure E27. Quasi-Poisson model diagnostics and sensitivity across specifications — F84 family excluding Rett syndrome
+
+::: {.callout-note collapse="true"}
+## Stored image — this plate has no drawing code here
+
+Its series are not fully carried by any published table, so it cannot be redrawn from a
+clone. The code that produced it is in `study/pipeline/`; what is missing is the microdata
+it reads.
+:::
+
+![**Figure E27. Quasi-Poisson model diagnostics and sensitivity across specifications — F84 family excluding Rett syndrome** (a) Fitted versus observed count of the main specification of each estimand, on a log scale, with the identity diagonal; colour identifies the estimand and the names are labelled in panels c, e and f. (b) Pearson residuals by year, with ±2 references; 2020–2021 are shaded as a reporting disruption. (c) Dispersion (Pearson χ² / df) of every specification by estimand, with the median marked and the dispersion = 1 reference: overdispersion is what motivates quasi-Poisson standard errors. (d) Sensitivity forest with the annual percent change and 95% CI of every specification of the main estimands; the main specifications are drawn at full opacity. (e) Durbin–Watson of every specification; with fewer than eight annual points it is indicative and not conclusive. (f) Annual percent change of the main specification by estimand, with 95% CI and dispersion; the fitted period of each estimand is in the companion table. Unit and denominator: those of the estimand itself (GRD episodes of the same panel, INE 2017-base population, reporting establishments or none). No specification estimates an effect of Law 21.545 and none constitutes a causal interrupted time series. Counts are administrative recognition, never prevalence or incidence. Sources are not person-linked: no ratio between sources is a cascade or an individual probability. Law 21.545 (March 2023) is policy context, not an intervention with an estimable effect. 2020–2021: pandemic reporting disruption.](study/corpus/figures/figE27_model_diagnostics.jpg){fig-align="center" width="100%"}
+
+### Figure S44. Figure E28. Sensitivity of every series to the case-definition variant: full F84 (with Rett syndrome) versus F84 without Rett, 2019–2025
+
+::: {.callout-note collapse="true"}
+## Stored image — this plate has no drawing code here
+
+Its series are not fully carried by any published table, so it cannot be redrawn from a
+clone. The code that produced it is in `study/pipeline/`; what is missing is the microdata
+it reads.
+:::
+
+![**Figure E28. Sensitivity of every series to the case-definition variant: full F84 (with Rett syndrome) versus F84 without Rett, 2019–2025** (a) GRD episodes with documented F84 in any position and with principal F84, observed panel. (b) REM A05 entries for the pervasive developmental disorder family, 2021–2025. (c) REM P6 population under control in December, in primary and specialty care. (d) DEIS discharges with principal F84. In all four panels the annotation above each pair gives the number of cases contributed by Rett syndrome. (e) Absolute difference con_rett − sin_rett by series and year. (f) Relative difference, with the without-Rett value as denominator. The education, survey, A03/A27/A28, P2 and strict-autism series are identical in both variants and appear with a zero difference. Unit: that of each series (episodes, discharges, entries, persons under control or students). Counts are administrative recognition, never prevalence or incidence. Sources are not person-linked: no ratio between sources is a cascade or an individual probability. Law 21.545 (March 2023) is policy context, not an intervention with an estimable effect. 2020–2021: pandemic reporting disruption.](study/corpus/figures/figE28_variant_sensitivity.jpg){fig-align="center" width="100%"}

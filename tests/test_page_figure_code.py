@@ -90,7 +90,8 @@ class GeneratedPagesAreValidPython(unittest.TestCase):
     only reports it minutes into a render. Parsing the chunks here turns that into a one-second failure.
     """
 
-    PAGES = ["results.qmd"]
+    PAGES = ["results.qmd", "plates_core.qmd", "plates_hospital.qmd", "plates_community.qmd",
+             "plates_territory.qmd", "plates_context.qmd", "extended_tables.qmd"]
 
     def test_every_chunk_parses(self):
         for name in self.PAGES:
@@ -105,6 +106,26 @@ class GeneratedPagesAreValidPython(unittest.TestCase):
                         ast.parse(code)
                     except SyntaxError as exc:
                         self.fail(f"{name} chunk {i} does not parse: {exc}")
+
+
+class PlateChaptersMatchTheModules(unittest.TestCase):
+    """The plate chapters inline the drawing code of docs/study/plates/, so they must not drift from it."""
+
+    def test_the_chapters_are_what_the_builder_writes(self):
+        builder = ROOT / "scripts" / "build_plates_chapters.py"
+        result = subprocess.run([sys.executable, str(builder), "--check"], capture_output=True, text=True, cwd=ROOT)
+        self.assertEqual(result.returncode, 0, result.stdout + result.stderr)
+
+    def test_every_module_appears_in_a_chapter(self):
+        modules = sorted(p.stem for p in (ROOT / "docs" / "study" / "plates").glob("*.py") if p.stem != "__init__")
+        chapters = "".join((ROOT / "docs" / name).read_text(encoding="utf-8")
+                           for name in GeneratedPagesAreValidPython.PAGES
+                           if name.startswith("plates_") and (ROOT / "docs" / name).exists())
+        for plate in modules:
+            with self.subTest(plate=plate):
+                self.assertIn(f"def draw_{re.sub(r'\W', '_', plate)}()", chapters,
+                              f"{plate} has a module but its code is in no chapter; "
+                              f"run python scripts/build_plates_chapters.py")
 
 
 if __name__ == "__main__":

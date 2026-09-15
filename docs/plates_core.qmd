@@ -1,0 +1,2527 @@
+---
+title: "Principal plates"
+subtitle: "The plates that carry the main findings, with the core supplementary set that supports them"
+---
+
+```{python}
+#| label: preparacion
+import sys
+from pathlib import Path
+
+ROOT = Path.cwd().parent if Path.cwd().name == "docs" else Path.cwd()
+sys.path.insert(0, str(ROOT / "docs" / "study"))
+sys.path.insert(0, str(ROOT / "scripts"))
+import numpy as np, pandas as pd
+import matplotlib.pyplot as plt
+import render_helpers as rh
+from report_helpers import kpis
+from figstyle import *
+
+idx = rh.corpus_index(); caps = rh.corpus_captions(); titles = rh.corpus_titles()
+kpis([
+    ("4", "Plates redrawn here, with their code"),
+    ("16", "Plates kept as stored images"),
+    ("20", "Plates in this chapter"),
+])
+```
+
+Of the 20 plates in this chapter, 4 are redrawn from the published tables by the code shown
+with each one; the rest are stored images because their series are not fully carried by any published
+table. Use **Show the code that produced this** under a redrawn plate to read how it is built.
+
+::: {.callout-important}
+## Redrawn plates are faithful reconstructions, not the original artwork
+
+The code that produced the stored plates lives in `study/pipeline/` and reads microdata that is not in
+this repository. What is shown here was written from the published aggregates: the panels, the series
+and the numbers are the same, checked value by value against the original, but the artwork is not
+pixel-identical — fonts, tick formatting and label placement differ. Each module in
+`docs/study/plates/` records its own deviations.
+:::
+
+### Figure 1. Figure 1. What was done with each database: the six data families of the multisource study, Chile 2019–2025 — F84 family excluding Rett syndrome
+
+```{python}
+#| label: lamina-fig1_dataflow
+#| fig-cap: "Figure 1. Redrawn here from the published tables by the code above."
+import re
+import sys
+from pathlib import Path
+from types import SimpleNamespace
+
+import pandas as pd
+from matplotlib.patches import (Circle, Ellipse, FancyArrowPatch, FancyBboxPatch, Polygon,
+                                Rectangle, RegularPolygon)
+
+sys.path.insert(0, str(ROOT / "docs" / "study"))   # docs/study, so `figstyle` resolves
+from figstyle import *                                          # noqa: F401,F403  (house style)
+
+PLATE = "fig1_dataflow"
+SOURCES = [
+    "docs/study/corpus/tables/T_dataflow_counts.csv",
+    "docs/study/corpus/tables/M1_sources_units.csv",
+    "docs/study/data/Figure_S1_dataflow_count_provenance.csv",
+]
+COUNTS, UNITS, PROVENANCE = SOURCES
+NOTE = ("Redraws the six-lane data-flow schematic of Figure 1 — cylinder, steps and yield block for "
+        "each data family, with the n at entry, the n after the autism selection and the ends of the "
+        "series on the arrows — from the published companion table of counts, the supplementary "
+        "source table that carries each lane's period, and the count-provenance table used to "
+        "re-check the drawn figures.")
+
+TABLE_COUNTS = BASE / 'corpus' / 'tables' / 'T_dataflow_counts.csv'
+TABLE_UNITS = BASE / 'corpus' / 'tables' / 'M1_sources_units.csv'
+TABLE_PROV = BASE / 'data' / 'Figure_S1_dataflow_count_provenance.csv'
+
+VARIANT_TAG = 'without Rett'       # the case definition the companion table was published for
+
+# ---------------------------------------------------------------------------
+# Geometry of the schematic, in millimetres: one data unit is one millimetre and the plate is drawn 1:1
+# ---------------------------------------------------------------------------
+W_MM, H_MM = 180.0, 245.0
+MM_PER_IN = 25.4
+PT_MM = 0.3528
+
+X0, X1 = 3.5, 176.5                # margins of the content
+LANES_TOP, LANES_BOT = 241.6, 3.2  # the band the six lanes occupy
+SEP_MIN, SEP_MAX = 4.4, 9.0        # gap between lanes: the no-linkage barrier sits in one of them
+
+DB_W = 33.0                        # width of the database cylinder
+YIELD_W = 34.0                     # width of the yield block
+YIELD_TIP = 4.4                    # its point
+STEP_W_MAX, STEP_W_MIN = 40.0, 15.0
+ARROW_MIN = 8.5                    # shortest arrow between two elements
+BREAK_ROOM = 6.2                   # room the definition-break mark needs on its arrow
+DRUM_E = 3.0                       # height of the cylinder's ellipses
+PAD = 1.30                         # inner padding of the boxes
+LINE_FACTOR = 1.18
+CHIP_R = 1.25                      # half-side / radius of the unit badge
+CHIP_GAP = 0.95                    # badge to its word
+TITLE_GAP = 1.6                    # lane title to its first row
+ROW_GAP = 2.0                      # between two rows of the same lane
+TOL_MM = 0.12
+
+# Type sizes in points. Nothing on the plate goes below 6 pt.
+FS_VARIANT, FS_LANE, FS_DB, FS_DB_SUB = 8.0, 8.8, 8.4, 7.2
+FS_CHIP, FS_STEP, FS_YIELD, FS_NUM, FS_NOTE, FS_BARRIER = 6.9, 7.6, 7.8, 8.2, 7.1, 7.9
+FS_FLOOR = 6.6
+
+# One ink per lane; red is always an exclusion or the barrier.
+LANE_INK = ["#0B5FA5", "#0E7C7B", "#1F7A3C", "#8A6100", "#6A4C93", "#44586B"]
+LANE_FILL = ["#e9f1fa", "#e5f4f3", "#e9f4ed", "#f8f0dd", "#efeaf7", "#eceff3"]
+EXCL_COL = "#B02A1A"
+INK, MUTED, CHIP_EDGE = "#1a1a1a", "#4d4d4d", "#2f2f2f"
+
+RECORD, PERSON, PLACE = "record", "person", "comuna"
+BARRIER = "no person-level linkage between systems"
+
+WARNINGS = []                      # composition problems seen while measuring, never silently kept
+
+
+# ===========================================================================
+# The figures: every one of them read out of the published companion table
+# ===========================================================================
+#: plate key -> the exact label the companion table gives that figure in its `Count` column.
+KEYS = {
+    'grd_in': 'GRD episodes at entry',
+    'grd_sel': 'GRD episodes with documented F84',
+    'grd_rate_first': 'Episodes with documented F84 per 100,000 GRD episodes, 2019',
+    'grd_rate_last': 'Episodes with documented F84 per 100,000 GRD episodes, 2024',
+    'grd_hosp_fixed': 'Hospitals in the fixed panel',
+    'grd_hosp_min': 'Hospitals in the observed panel, first year',
+    'grd_hosp_max': 'Hospitals in the observed panel, last year',
+    'deis_in': 'DEIS discharges at entry',
+    'deis_sel': 'DEIS discharges with F84 as the principal diagnosis',
+    'deis_rate_first': 'Discharges with principal F84 per 100,000 discharges, 2019',
+    'deis_rate_last': 'Discharges with principal F84 per 100,000 discharges, 2024',
+    'deis_masked': ('DEIS discharges in provider-masked rows, kept in the national totals and out of '
+                    'the territorial tables'),
+    'rema_in': 'REM Series A establishment-month rows at entry',
+    'a05_first': 'Autism entries into ambulatory care, 2021',
+    'a05_last': 'Autism entries into ambulatory care, 2025',
+    'a05_era_year': 'First year of the code era of the autism entry indicator',
+    'rem_empty': 'REM establishment-month cells reported empty, kept as empty and never read as zero',
+    'remp_in': 'REM Series P establishment-month rows at entry',
+    'p2_first': 'People with autism under control in December 2019',
+    'p2_last': 'People with autism under control in December 2025',
+    'p6_era_year': 'First year of the code era of the specialty autism indicator',
+    'p2_june_last': 'June 2025 stock, a sensitivity never added to December',
+    'cov_ine': 'Residents projected at 30 June 2025',
+    'cov_share_fonasa': ('FONASA beneficiaries as a percentage of the projected resident population, '
+                         '2025'),
+    'endide_adults': 'ENDIDE respondents aged 18 or more',
+    'endide_children': 'ENDIDE children aged 2–17 answered for by a caregiver',
+    'encavi_n': 'ENCAVI respondents aged 15 or more',
+    'endide_adult_cases': 'ENDIDE adults reporting autism',
+    'endide_child_cases': 'ENDIDE children reported as autistic',
+    'encavi_cases': 'ENCAVI respondents reporting an autism diagnosis',
+    'pie_base_last': 'Students in the published base of the school integration programme, 2025',
+    'junaeb_in_last': 'Pre-school students who answered the JUNAEB survey, 2025',
+    'pie_last': 'Autistic students in the harmonised programme series, 2025',
+    'junaeb_sel_last': 'Pre-school students reported as autistic, 2025',
+    'pie_share_last': "Autistic students as a percentage of the programme's published base, 2025",
+    'junaeb_pct_last': 'Design-weighted percentage of pre-school students reported as autistic, 2025',
+    'edu_source_year': 'First year published by the second source of the programme series',
+    'geo_comunas': 'Comunas in the national cartography',
+}
+
+#: plate key -> key of `Figure_S1_dataflow_count_provenance.csv`, which re-derives the figure from its
+#: own source file and column. Only the figures the provenance table also carries are listed.
+CROSSCHECK = {'grd_in': 'all_episodes', 'grd_sel': 'eligible_any', 'a05_first': 'a05_2021_total',
+              'a05_last': 'a05_2025_total', 'p2_first': 'p2_2019_total', 'p2_last': 'p2_2025_total',
+              'grd_hosp_fixed': 'hospitals_fixed', 'grd_hosp_min': 'hospitals_min',
+              'grd_hosp_max': 'hospitals_max', 'endide_adults': 'adult',
+              'endide_children': 'child', 'encavi_n': 'encavi_valid', 'pie_last': 'pie2025'}
+
+
+def _value(cell):
+    """A figure out of the companion table's presentation cell: '5,808,535' or '202.7' or '2,024'."""
+    return float(str(cell).replace(',', '').strip())
+
+
+def values():
+    """Every figure the schematic prints, read out of `T_dataflow_counts.csv` by its published label.
+
+    Only the rows the table flags `On the schematic = yes` are eligible: the other 21 rows are
+    deliberately off-plate and support the figure without appearing on it.
+    """
+    t = pd.read_csv(TABLE_COUNTS, encoding='utf-8-sig')
+    on = t[t['On the schematic'].str.strip().eq('yes')]
+    by_label = dict(zip(on['Count'].str.strip(), on['Value']))
+    missing = [k for k, lab in KEYS.items() if lab not in by_label]
+    if missing:
+        raise KeyError(f'not flagged on the schematic in {TABLE_COUNTS.name}: {missing}')
+    return {k: _value(by_label[lab]) for k, lab in KEYS.items()}
+
+
+def periods():
+    """The two periods printed inside the cylinders, from the `Period` column of the source table."""
+    t = pd.read_csv(TABLE_UNITS, encoding='utf-8-sig')
+    src = t.set_index(t['Source'].str.strip())['Period']
+    grd = next(v for k, v in src.items() if k.startswith('GRD'))
+    rem = next(v for k, v in src.items() if k.startswith('REM Serie A'))
+    return str(grd).strip(), str(rem).strip()
+
+
+def check(vals):
+    """Re-check the drawn figures against the independently derived count-provenance table."""
+    prov = pd.read_csv(TABLE_PROV, encoding='utf-8-sig')
+    prov = dict(zip(prov['key'].str.strip(), prov['value'].astype(float)))
+    bad = [f'{k}: {vals[k]:,.0f} on the plate, {prov[p]:,.0f} in the provenance table'
+           for k, p in CROSSCHECK.items() if p in prov and abs(vals[k] - prov[p]) > 1e-6]
+    if bad:
+        raise ValueError('the schematic disagrees with ' + TABLE_PROV.name + ': ' + '; '.join(bad))
+    return len(CROSSCHECK)
+
+
+def _n(v, dec=0):
+    """A figure as the English plate writes it: thousands separated, `dec` decimals."""
+    return num(v, 'en', dec)
+
+
+def _subst(txt, vals):
+    """Resolve `{key}`, `{key:1}` and `{key:y}` in a break or note template; `:y` is a bare year."""
+    def one(m):
+        key, _, spec = m.group(1).partition(':')
+        return str(int(vals[key])) if spec == 'y' else _n(vals[key], int(spec) if spec else 0)
+    return re.sub(r'\{([^}]+)\}', one, txt)
+
+
+# ===========================================================================
+# Canvas: every string is measured on the real renderer before anything is drawn
+# ===========================================================================
+class Canvas:
+    def __init__(self, fig, ax):
+        self.fig, self.ax = fig, ax
+        self.renderer = fig.canvas.get_renderer()
+        self.rects = []
+        self._cache = {}
+
+    def width_mm(self, s, fs, weight='normal'):
+        key = (s, round(fs, 2), weight)
+        if key not in self._cache:
+            t = self.ax.text(0, 0, s, fontsize=fs, fontweight=weight)
+            bb = t.get_window_extent(renderer=self.renderer)
+            t.remove()
+            self._cache[key] = bb.width / self.fig.dpi * MM_PER_IN
+        return self._cache[key]
+
+    def register(self, x, y, w, h, name):
+        for (x2, y2, w2, h2, n2) in self.rects:
+            if x < x2 + w2 - 0.05 and x2 < x + w - 0.05 and y < y2 + h2 - 0.05 and y2 < y + h - 0.05:
+                WARNINGS.append(f'box overlap: {name} overlaps {n2}')
+        self.rects.append((x, y, w, h, name))
+
+
+def wrap_fit(cv, s, fs, weight, max_w, floor=FS_FLOOR):
+    """Break `s` into lines that fit `max_w`, shrinking the body to the floor before giving up."""
+    s = str(s)
+    while True:
+        lines, cur = [], ''
+        for w in s.split():
+            trial = f'{cur} {w}'.strip()
+            if cur and cv.width_mm(trial, fs, weight) > max_w:
+                lines.append(cur)
+                cur = w
+            else:
+                cur = trial
+        if cur:
+            lines.append(cur)
+        lines = lines or ['']
+        widest = max(cv.width_mm(ln, fs, weight) for ln in lines)
+        if widest <= max_w + 0.05:
+            return lines, fs
+        if fs <= floor + 1e-9:
+            WARNINGS.append(f"'{s}' needs {widest:.1f} mm in {max_w:.1f} mm at the floor")
+            return lines, fs
+        fs = max(floor, fs - 0.1)
+
+
+def fit_fs(cv, s, fs, weight, max_w, floor=FS_FLOOR):
+    """Shrink a line that must not wrap until it fits `max_w`."""
+    while cv.width_mm(s, fs, weight) > max_w and fs > floor + 1e-9:
+        fs = max(floor, fs - 0.1)
+    if cv.width_mm(s, fs, weight) > max_w + 0.05:
+        WARNINGS.append(f"'{s}' does not fit {max_w:.1f} mm at the floor")
+    return fs
+
+
+# ===========================================================================
+# The visual vocabulary: three shapes, one ink per lane, red only for exclusions
+# ===========================================================================
+def put(cv, x, y, s, fs, *, weight='normal', colour=INK, ha='left', va='baseline', zorder=6,
+        bbox=None):
+    return cv.ax.text(x, y, s, fontsize=fs, fontweight=weight, color=colour, ha=ha, va=va,
+                      zorder=zorder, bbox=bbox)
+
+
+def put_block(cv, xc, yc, lines, fs, *, weight='normal', colour=INK, ha='center', zorder=6,
+              bbox=None):
+    """A block of lines centred vertically on `yc`."""
+    lh = fs * PT_MM * LINE_FACTOR
+    top = yc + len(lines) * lh / 2.0
+    for i, ln in enumerate(lines):
+        put(cv, xc, top - (i + 1) * lh + fs * PT_MM * 0.30, ln, fs, weight=weight, colour=colour,
+            ha=ha, va='baseline', zorder=zorder, bbox=bbox)
+
+
+def put_down(cv, x, y_top, lines, fs, *, weight='normal', colour=INK, ha='left', zorder=6):
+    """A block of lines hanging from `y_top`; returns the y it ends at."""
+    lh = fs * PT_MM * LINE_FACTOR
+    yy = y_top
+    for ln in lines:
+        yy -= lh
+        put(cv, x, yy + fs * PT_MM * 0.30, ln, fs, weight=weight, colour=colour, ha=ha,
+            va='baseline', zorder=zorder)
+    return yy
+
+
+def drum(cv, x, y, w, h, edge, name=None):
+    """Cylinder: a DATABASE. The only shape with elliptical caps."""
+    if name:
+        cv.register(x, y, w, h, name)
+    e = min(DRUM_E, h * 0.34)
+    cv.ax.add_patch(Ellipse((x + w / 2, y + e / 2), w, e, fc='white', ec=edge, lw=1.15, zorder=2))
+    cv.ax.add_patch(Rectangle((x, y + e / 2), w, h - e, fc='white', ec='none', zorder=2))
+    cv.ax.plot([x, x], [y + e / 2, y + h - e / 2], color=edge, lw=1.15, zorder=3)
+    cv.ax.plot([x + w, x + w], [y + e / 2, y + h - e / 2], color=edge, lw=1.15, zorder=3)
+    cv.ax.add_patch(Ellipse((x + w / 2, y + h - e / 2), w, e, fc='white', ec=edge, lw=1.15, zorder=3))
+
+
+def step_box(cv, x, y, w, h, edge, name=None):
+    """Rounded box: a STEP really applied to that database."""
+    if name:
+        cv.register(x, y, w, h, name)
+    cv.ax.add_patch(FancyBboxPatch((x + 0.5, y + 0.5), w - 1.0, h - 1.0,
+                                   boxstyle='round,pad=0.5,rounding_size=1.2',
+                                   fc='white', ec=edge, lw=0.85, zorder=2))
+
+
+def yield_block(cv, x, y, w, h, colour, name=None):
+    """Pointed block: what the lane YIELDS."""
+    if name:
+        cv.register(x, y, w, h, name)
+    pts = [(x, y), (x + w - YIELD_TIP, y), (x + w, y + h / 2), (x + w - YIELD_TIP, y + h), (x, y + h)]
+    cv.ax.add_patch(Polygon(pts, closed=True, fc=colour, ec=colour, lw=0.8, zorder=2))
+
+
+def flow_arrow(cv, x0, x1, y, colour, broken_x=None):
+    """The flow arrow. `broken_x` cuts it exactly where the definition of the series changes."""
+    cv.ax.add_patch(FancyArrowPatch((x0, y), (x1, y), arrowstyle='-|>', mutation_scale=7.5, lw=1.15,
+                                    color=colour, shrinkA=0, shrinkB=0, zorder=3))
+    if broken_x is not None:
+        for dx in (-0.85, 0.85):
+            cv.ax.plot([broken_x + dx - 0.7, broken_x + dx + 0.7], [y - 1.55, y + 1.55],
+                       color=colour, lw=1.25, solid_capstyle='round', zorder=5)
+
+
+def unit_chip(cv, x, yc, kind, fs, colour=CHIP_EDGE):
+    """The badge of the unit of analysis: square RECORD, circle PERSON, hexagon COMUNA.
+
+    The word is always beside the shape, so the shape never needs a legend.
+    """
+    if kind == RECORD:
+        cv.ax.add_patch(Rectangle((x, yc - CHIP_R), 2 * CHIP_R, 2 * CHIP_R, fc='white', ec=colour,
+                                  lw=1.0, zorder=5))
+    elif kind == PERSON:
+        cv.ax.add_patch(Circle((x + CHIP_R, yc), CHIP_R, fc='white', ec=colour, lw=1.0, zorder=5))
+    else:
+        cv.ax.add_patch(RegularPolygon((x + CHIP_R, yc), 6, radius=CHIP_R * 1.18, orientation=0.0,
+                                       fc='white', ec=colour, lw=1.0, zorder=5))
+    put(cv, x + 2 * CHIP_R + CHIP_GAP, yc - fs * PT_MM * 0.34, kind, fs, colour=colour, ha='left',
+        va='baseline')
+
+
+def chip_width(cv, word, fs):
+    return 2 * CHIP_R + CHIP_GAP + cv.width_mm(word, fs)
+
+
+# ===========================================================================
+# The content: six lanes, each one `database -> steps -> what it yields`
+# ---------------------------------------------------------------------------
+# `nums` names keys of the companion table and draws them over the arrow given (0 = database to first
+# step, n = last step to the yield block); `brk` is a template resolved the same way and marks, on that
+# same arrow, where the definition of the series changes; `note` hangs under the step given, in red
+# when it is an exclusion.
+# ===========================================================================
+def lanes(grd_span, rem_span):
+    return [
+        dict(key='hospital', title='Hospital care', rows=[
+            dict(name='GRD', sub=[grd_span], unit=RECORD,
+                 steps=['select F84 codes', 'position and activity'],
+                 nums={0: [[('grd_in', 0, '')]], 1: [[('grd_sel', 0, '')]],
+                       2: [[('grd_rate_first', 0, ''), ('grd_rate_last', 0, '')]]},
+                 brk={1: '{grd_hosp_fixed} fixed · {grd_hosp_min}–{grd_hosp_max} observed'},
+                 out='F84 per 100,000 episodes'),
+            dict(name='DEIS', sub=[grd_span], unit=RECORD,
+                 steps=['principal F84', 'by residence'],
+                 nums={0: [[('deis_in', 0, '')]], 1: [[('deis_sel', 0, '')]],
+                       2: [[('deis_rate_first', 0, ''), ('deis_rate_last', 0, '')]]},
+                 note=dict(at=1, kind='excl', n=('deis_masked', 0), text='masked discharges'),
+                 out='F84 per 100,000 discharges'),
+        ]),
+        dict(key='rem_pathway', title='Care pathway · REM Series A (A03, A05, A27, A28)', rows=[
+            dict(name=None, sub=['screening · entries', 'counselling · rehabilitation', rem_span],
+                 unit=RECORD,
+                 steps=['harmonise codes', 'count establishments'],
+                 nums={0: [[('rema_in', 0, '')]],
+                       2: [[('a05_first', 0, ''), ('a05_last', 0, '')]]},
+                 brk={1: 'code changes, {a05_era_year:y}'},
+                 note=dict(at=0, kind='excl', n=('rem_empty', 0), text='empty cells, never zero'),
+                 out='entries per year'),
+        ]),
+        dict(key='under_control', title='People under control · REM Series P', rows=[
+            dict(name=None, sub=['P2 · P6', rem_span], unit=PERSON,
+                 steps=['harmonise codes', 'take December'],
+                 nums={0: [[('remp_in', 0, '')]],
+                       2: [[('p2_first', 0, ''), ('p2_last', 0, '')]]},
+                 brk={1: 'code changes, {p6_era_year:y}'},
+                 note=dict(at=1, kind='excl', n=('p2_june_last', 0), text='June, never added'),
+                 out='December stock'),
+        ]),
+        dict(key='denominators', title='Denominators and coverage', rows=[
+            dict(name=None, sub=['INE · FONASA', 'APS · ISAPRE · REM-20'], unit=PERSON,
+                 steps=['take December', 'age and sex'],
+                 nums={0: [[('cov_ine', 0, '')]], 2: [[('cov_share_fonasa', 1, '%')]]},
+                 note=dict(at=0, kind='plain', n=None, text='no autism code'),
+                 out='residents as denominator'),
+        ]),
+        dict(key='surveys_education', title='Surveys and education', rows=[
+            dict(name=None, sub=['ENDIDE 18+', 'ENDIDE 2–17', 'ENCAVI 15+'], unit=PERSON,
+                 steps=['apply survey design'],
+                 nums={0: [[('endide_adults', 0, '')], [('endide_children', 0, '')],
+                           [('encavi_n', 0, '')]],
+                       1: [[('endide_adult_cases', 0, '')], [('endide_child_cases', 0, '')],
+                           [('encavi_cases', 0, '')]]},
+                 out='design-weighted percentage'),
+            dict(name=None, sub=['MINEDUC · PIE', 'JUNAEB'], unit=PERSON,
+                 steps=['harmonise the series', 'weight the survey'],
+                 nums={0: [[('pie_base_last', 0, '')], [('junaeb_in_last', 0, '')]],
+                       1: [[('pie_last', 0, '')], [('junaeb_sel_last', 0, '')]],
+                       2: [[('pie_share_last', 1, '%')], [('junaeb_pct_last', 1, '%')]]},
+                 brk={0: 'source changes, {edu_source_year:y}'},
+                 out='students per year'),
+        ]),
+        dict(key='territory', title='Territory', rows=[
+            dict(name=None, sub=['SAE · deprivation', 'cartography'], unit=PLACE,
+                 steps=['standardise by age and sex', 'smooth by comuna'],
+                 nums={0: [[('geo_comunas', 0, '')]]},
+                 out='smoothed comuna ratio'),
+        ]),
+    ]
+
+
+# ===========================================================================
+# Measuring one row: everything is measured on the renderer before anything is drawn
+# ===========================================================================
+def plan_row(cv, row, vals, xa, xb, scale):
+    fs = SimpleNamespace(db=FS_DB * scale, sub=FS_DB_SUB * scale, chip=FS_CHIP * scale,
+                         step=FS_STEP * scale, out=FS_YIELD * scale, num=FS_NUM * scale,
+                         note=FS_NOTE * scale)
+    P = dict(fs=fs)
+
+    # --- the figures over the arrows -----------------------------------------------------------
+    n_steps = len(row['steps'])
+    n_arrows = n_steps + 1
+    nums = {}
+    for a, spec_lines in row.get('nums', {}).items():
+        nums[a] = [' → '.join(_n(vals[key], dec) + suffix for key, dec, suffix in spec)
+                   for spec in spec_lines]
+    P['nums'] = nums
+
+    # --- width of each arrow: the figure decides ------------------------------------------------
+    gaps = []
+    for a in range(n_arrows):
+        w = max([cv.width_mm(ln, fs.num, 'bold') for ln in nums.get(a, [])], default=0.0)
+        room = BREAK_ROOM if a in row.get('brk', {}) else 0.0
+        gaps.append(max(ARROW_MIN + room, w + 4.6 + room) if w else max(ARROW_MIN, room + 4.0))
+    span = (xb - xa) - DB_W - YIELD_W
+    step_w = (span - sum(gaps)) / n_steps
+    if step_w > STEP_W_MAX:
+        gaps = [g + (step_w - STEP_W_MAX) * n_steps / n_arrows for g in gaps]
+        step_w = STEP_W_MAX
+    if step_w < STEP_W_MIN:
+        WARNINGS.append(f"step boxes only {step_w:.1f} mm wide in the row yielding '{row['out']}'")
+    P['gaps'], P['step_w'], P['n_steps'], P['n_arrows'] = gaps, step_w, n_steps, n_arrows
+
+    # --- the cylinder ---------------------------------------------------------------------------
+    inner = DB_W - 2 * PAD
+    name = row.get('name')
+    lh_chip = fs.chip * PT_MM * LINE_FACTOR + 0.6
+    fs_name = fit_fs(cv, name, fs.db, 'bold', inner) if name is not None else fs.db
+    lh_db = fs_name * PT_MM * LINE_FACTOR
+    sub_fit = []
+    for k, s in enumerate(row['sub']):
+        head = name is None and k == 0          # with no name, the first line is the lane's head
+        lines, f = wrap_fit(cv, s, fs.sub, 'bold' if head else 'normal', inner)
+        sub_fit.append((lines, f, head))
+    inline = (name is not None
+              and cv.width_mm(name, fs_name, 'bold') + 1.7 + chip_width(cv, row['unit'],
+                                                                       fs.chip) <= inner)
+    drum_h = ((lh_db if name is not None else 0.0)
+              + sum(len(ls) * f * PT_MM * LINE_FACTOR for ls, f, _ in sub_fit)
+              + (0.0 if inline else lh_chip) + 2 * PAD + DRUM_E)
+    P['drum'] = dict(name=name, fs_name=fs_name, sub=sub_fit, inline=inline, h=drum_h,
+                     lh_db=lh_db, lh_chip=lh_chip)
+
+    # --- the steps ------------------------------------------------------------------------------
+    steps = [wrap_fit(cv, s, fs.step, 'normal', step_w - 2 * PAD) for s in row['steps']]
+    step_h = max(max(len(ln) * f * PT_MM * LINE_FACTOR for ln, f in steps) + 2 * PAD, 8.6)
+    P['steps'], P['step_h'] = steps, step_h
+
+    # --- what the lane yields --------------------------------------------------------------------
+    out_lines, fs_out = wrap_fit(cv, row['out'], fs.out, 'bold', YIELD_W - YIELD_TIP - 2 * PAD)
+    out_h = max(len(out_lines) * fs_out * PT_MM * LINE_FACTOR + 2 * PAD, 9.8)
+    P['out'], P['fs_out'], P['out_h'] = out_lines, fs_out, out_h
+
+    # --- height of the core: the tallest box and the longest stack of figures ---------------------
+    num_h = max([len(v) for v in nums.values()], default=0) * fs.num * PT_MM * LINE_FACTOR
+    P['core_h'] = max(drum_h, step_h, out_h, num_h + 1.8)
+
+    # --- definition breaks, at the foot of their arrow --------------------------------------------
+    lh_note = fs.note * PT_MM * LINE_FACTOR
+    brk = {a: wrap_fit(cv, _subst(t, vals), fs.note, 'normal', 46.0)[0]
+           for a, t in row.get('brk', {}).items()}
+    P['brk'] = brk
+    P['brk_h'] = (max([len(v) for v in brk.values()], default=0) * lh_note + 1.5) if brk else 0.0
+
+    # --- the note: an exclusion in red, or a plain remark in grey ----------------------------------
+    note = row.get('note')
+    P['note'], P['note_h'] = None, 0.0
+    if note:
+        head = '' if note['n'] is None else '−' + _n(vals[note['n'][0]], note['n'][1]) + '  '
+        P['note'] = dict(at=note['at'], kind=note['kind'],
+                         lines=wrap_fit(cv, head + note['text'], fs.note, 'normal', 64.0)[0])
+        P['note_h'] = len(P['note']['lines']) * lh_note + 2.4
+
+    P['h'] = P['core_h'] + P['brk_h'] + P['note_h']
+    return P
+
+
+def draw_row(cv, P, row, xa, xb, ytop, ink, tag):
+    fs = P['fs']
+    core_h, step_w, gaps = P['core_h'], P['step_w'], P['gaps']
+    yc = ytop - core_h / 2.0
+
+    # --- the cylinder ---------------------------------------------------------------------------
+    d = P['drum']
+    drum(cv, xa, yc - d['h'] / 2, DB_W, d['h'], ink, f'{tag}-db')
+    xc = xa + DB_W / 2
+    yy = yc + d['h'] / 2 - DRUM_E / 2 - PAD
+    if d['name'] is not None:
+        fn = d['fs_name']
+        if d['inline']:
+            w_name = cv.width_mm(d['name'], fn, 'bold')
+            x_start = xc - (w_name + 1.7 + chip_width(cv, row['unit'], fs.chip)) / 2
+            put(cv, x_start, yy - d['lh_db'] + fn * PT_MM * 0.30, d['name'], fn, weight='bold',
+                colour=ink, ha='left', va='baseline')
+            unit_chip(cv, x_start + w_name + 1.7, yy - d['lh_db'] * 0.52, row['unit'], fs.chip)
+        else:
+            put(cv, xc, yy - d['lh_db'] + fn * PT_MM * 0.30, d['name'], fn, weight='bold',
+                colour=ink, ha='center', va='baseline')
+        yy -= d['lh_db']
+    for lines, f, head in d['sub']:
+        for s in lines:
+            yy -= f * PT_MM * LINE_FACTOR
+            put(cv, xc, yy + f * PT_MM * 0.30, s, f, weight='bold' if head else 'normal',
+                colour=ink if head else MUTED, ha='center', va='baseline')
+    if not d['inline']:
+        w_chip = chip_width(cv, row['unit'], fs.chip)
+        unit_chip(cv, xc - w_chip / 2, yy - d['lh_chip'] * 0.5, row['unit'], fs.chip)
+
+    # --- geometry of the steps and the arrows -----------------------------------------------------
+    xs, x = [], xa + DB_W
+    for i in range(P['n_steps']):
+        x += gaps[i]
+        xs.append(x)
+        x += step_w
+    x_out = xb - YIELD_W
+    spans, prev = [], xa + DB_W
+    for i in range(P['n_steps']):
+        spans.append((prev, xs[i]))
+        prev = xs[i] + step_w
+    spans.append((prev, x_out))
+
+    for i, (lines, f) in enumerate(P['steps']):
+        step_box(cv, xs[i], yc - P['step_h'] / 2, step_w, P['step_h'], ink, f'{tag}-step{i}')
+        put_block(cv, xs[i] + step_w / 2, yc, lines, f, colour=INK)
+
+    yield_block(cv, x_out, yc - P['out_h'] / 2, YIELD_W, P['out_h'], ink, f'{tag}-out')
+    put_block(cv, x_out + (YIELD_W - YIELD_TIP) / 2, yc, P['out'], P['fs_out'], weight='bold',
+              colour='white')
+
+    for a, (x_left, x_right) in enumerate(spans):
+        has_num = a in P['nums']
+        # with a figure on it, the break mark goes in the room reserved to the left of the white
+        # label; without one, in the middle of the arrow.
+        broken = (x_left + BREAK_ROOM * 0.48 if has_num else (x_left + x_right) / 2) \
+            if a in P['brk'] else None
+        flow_arrow(cv, x_left, x_right, yc, ink, broken_x=broken)
+        if has_num:
+            xn = ((x_left + BREAK_ROOM) + x_right) / 2 if a in P['brk'] else (x_left + x_right) / 2
+            put_block(cv, xn, yc, P['nums'][a], fs.num, weight='bold', colour=INK, zorder=7,
+                      bbox=dict(boxstyle='round,pad=0.12', fc='white', ec='none'))
+
+    # --- the definition break, at the foot of its arrow --------------------------------------------
+    y_brk = yc - core_h / 2 - 1.0
+    for a, lines in P['brk'].items():
+        x_left, x_right = spans[a]
+        half = max(cv.width_mm(ln, fs.note) for ln in lines) / 2 + 0.5
+        xm = min(max((x_left + x_right) / 2, xa + half), xb - half)
+        put_down(cv, xm, y_brk, lines, fs.note, colour=ink, ha='center')
+
+    # --- the note: an exclusion in red, with its own arrow, or a plain remark in grey ---------------
+    nt = P['note']
+    if nt:
+        y_top = yc - core_h / 2 - P['brk_h'] - 0.7
+        xm = xs[nt['at']] + step_w / 2
+        if nt['kind'] == 'excl':
+            cv.ax.add_patch(FancyArrowPatch((xm, y_top + 0.5), (xm, y_top - 2.3), arrowstyle='-|>',
+                                            mutation_scale=6.0, lw=1.0, color=EXCL_COL, shrinkA=0,
+                                            shrinkB=0, zorder=4))
+            wmax = max(cv.width_mm(ln, fs.note) for ln in nt['lines'])
+            put_down(cv, min(xm + 1.9, xb - wmax - 0.4), y_top - 0.7, nt['lines'], fs.note,
+                     colour=EXCL_COL, ha='left')
+        else:
+            put_down(cv, xm, y_top - 0.5, nt['lines'], fs.note, colour=MUTED, ha='center')
+
+
+# ===========================================================================
+# The plate
+# ===========================================================================
+def draw_fig1_dataflow():
+    style()
+    del WARNINGS[:]
+    vals = values()
+    check(vals)
+    LN = lanes(*periods())
+
+    fig = plt.figure(figsize=(W_MM / MM_PER_IN, H_MM / MM_PER_IN))
+    ax = fig.add_axes([0, 0, 1, 1])
+    ax.set_xlim(0, W_MM)
+    ax.set_ylim(0, H_MM)
+    ax.set_facecolor('white')
+    ax.axis('off')
+    ax.grid(False)
+    fig.canvas.draw()
+    cv = Canvas(fig, ax)
+
+    # --- measure: the whole plate is planned before anything is drawn, and the body shrinks if the
+    #     six lanes do not fit the 245 mm of the sheet ------------------------------------------
+    xa, xb = X0 + 1.4, X1 - 1.4
+    avail = LANES_TOP - LANES_BOT
+    scale = 1.0
+    while True:
+        plans, lane_h = [], []
+        for L_ in LN:
+            rows = [plan_row(cv, r, vals, xa, xb, scale) for r in L_['rows']]
+            plans.append(rows)
+            lane_h.append(FS_LANE * scale * PT_MM * LINE_FACTOR + TITLE_GAP
+                          + sum(p['h'] for p in rows) + ROW_GAP * (len(rows) - 1) + 1.6)
+        need = sum(lane_h) + SEP_MIN * (len(LN) - 1)
+        if need <= avail + TOL_MM or FS_NOTE * scale <= 6.4:
+            break
+        scale -= 0.01
+    if need > avail + TOL_MM:
+        WARNINGS.append(f'the six lanes need {need:.1f} mm in {avail:.1f} mm (body scale {scale:.2f})')
+
+    slack = max(avail - sum(lane_h) - SEP_MIN * (len(LN) - 1), 0.0)
+    sep = min(SEP_MAX, SEP_MIN + slack * 0.55 / (len(LN) - 1))
+    rest = max(avail - sum(lane_h) - sep * (len(LN) - 1), 0.0)
+    pad = [rest * h / sum(lane_h) for h in lane_h]
+
+    # --- the case definition, top right ----------------------------------------------------------
+    put(cv, X1, H_MM - 1.2, VARIANT_TAG, FS_VARIANT * scale, weight='bold', colour=MUTED,
+        ha='right', va='top')
+
+    # --- the six lanes, and the barrier that separates the record lanes from the rest --------------
+    y = LANES_TOP
+    for i, (L_, rows, h, pad_extra) in enumerate(zip(LN, plans, lane_h, pad)):
+        hh = h + pad_extra
+        ink, fill = LANE_INK[i], LANE_FILL[i]
+        ax.add_patch(FancyBboxPatch((X0 + 0.6, y - hh + 0.6), X1 - X0 - 1.2, hh - 1.2,
+                                    boxstyle='round,pad=0.6,rounding_size=1.8', fc=fill, ec=fill,
+                                    lw=0.0, zorder=1))
+        lh_lane = FS_LANE * scale * PT_MM * LINE_FACTOR
+        put(cv, X0 + 2.4, y - 1.0 - lh_lane + FS_LANE * scale * PT_MM * 0.30, L_['title'],
+            FS_LANE * scale, weight='bold', colour=ink, ha='left', va='baseline')
+        yr = y - 1.0 - lh_lane - TITLE_GAP - pad_extra * 0.5
+        for j, (P, row) in enumerate(zip(rows, L_['rows'])):
+            draw_row(cv, P, row, xa, xb, yr, ink, f"{L_['key']}{j}")
+            yr -= P['h'] + ROW_GAP
+        y -= hh
+        if i < len(LN) - 1:
+            yb = y - sep / 2
+            ax.plot([X0, X1], [yb, yb], color=EXCL_COL, lw=1.0, ls=(0, (3.0, 2.2)), zorder=4)
+            if i == 2:                      # said once, between the care lanes and the denominators
+                put(cv, (X0 + X1) / 2, yb, BARRIER, FS_BARRIER * scale, weight='bold',
+                    colour=EXCL_COL, ha='center', va='center', zorder=7,
+                    bbox=dict(boxstyle='round,pad=0.30', fc='white', ec=EXCL_COL, lw=0.7))
+            y -= sep
+    return fig
+
+
+draw_fig1_dataflow()
+```
+
+### Figure 2. Figure 2. Administrative reporting completeness, coverage layers, panels and definition breaks of the multisource study, Chile 2019–2025
+
+```{python}
+#| label: lamina-fig1_sources_coverage
+#| fig-cap: "Figure 2. Redrawn here from the published tables by the code above."
+import numpy as np
+import pandas as pd
+from matplotlib.patches import Rectangle
+from matplotlib.lines import Line2D
+from matplotlib.ticker import FixedLocator, MultipleLocator
+from figstyle import *
+
+PLATE = "fig1_sources_coverage"
+SOURCES = ["docs/study/data/rem_pathway_annual.csv",
+           "docs/study/corpus/tables/E72_rem_establishments_by_module.csv",
+           "docs/study/corpus/tables/T_dataflow_counts.csv",
+           "docs/study/corpus/tables/E21_insurance_coverage.csv",
+           "docs/study/corpus/tables/ST1_grd_hospital_panel.csv",
+           "docs/study/corpus/tables/E22_rem20_capacity.csv",
+           "docs/study/corpus/tables/S_definition_breaks.csv"]
+NOTE = ("Redraws the six panels of the sources-and-coverage plate from tracked tables only: REM "
+        "cell states per establishment x period x code from rem_pathway_annual and E72, coverage "
+        "layers from E21, establishments by definition era from rem_pathway_annual, the GRD hospital "
+        "panel from ST1, REM-20 capacity from E22 and the source breaks from S_definition_breaks.")
+
+TABLES = BASE / "corpus" / "tables"
+PATHWAY = BASE / "data" / "rem_pathway_annual.csv"
+
+YEARS = list(range(2019, 2026))
+#: 10 March 2023 on an axis whose year tick is the 30 June reference date of the INE projection.
+LAW_X = 2023 - 112 / 365
+BAND_X = (2019.5, 2021.5)      # the 2020–21 reporting disruption, shaded in every panel
+GREY_DARK = '#555555'
+
+
+# ---------------------------------------------------------------------------- parsing helpers
+def count(cell):
+    """Leading count of a presentation cell such as '1,151,475 (2,334)' or '8,221 (731)'."""
+    return int(str(cell).split('(')[0].replace(',', '').replace(' ', '').strip())
+
+
+def pct(cell):
+    """Percentage inside a presentation cell: '1,062,539 (99.8%)' -> 99.8, '95.6%' -> 95.6."""
+    s = str(cell)
+    s = s.split('(')[1] if '(' in s else s
+    return float(s.replace('%', '').replace(')', '').strip())
+
+
+def is_year(v):
+    return str(v).strip().isdigit() and len(str(v).strip()) == 4
+
+
+# ---------------------------------------------------------------------------- panel (a)
+#: module, the plate's row order, and the reporting periods of its REM series (A monthly, P biannual)
+REM_MODULES = [('A03', 12), ('A05', 12), ('A27', 12), ('A28', 12), ('P2', 2), ('P6', 2)]
+ZERO_FLOOR = 3.0        # minimum drawn width of the explicit-zero segment, in % of the cell grid
+
+
+def pathway():
+    """rem_pathway_annual restricted to the module's own single codes.
+
+    The file also carries pooled family rows (con_rett / sin_rett / strict_autism / broad_pre2021)
+    that repeat the same establishment x period x code cells; counting them would double the grid.
+    """
+    d = pd.read_csv(PATHWAY)
+    return d[d.variant == 'single_code']
+
+
+def establishments():
+    """E72's 'Establishments with at least one row', by module and year; 'not reported' -> None."""
+    t = pd.read_csv(TABLES / "E72_rem_establishments_by_module.csv", encoding='utf-8-sig')
+    t = t[t.Indicator == 'Establishments with at least one row'].set_index('REM module')
+    out = {}
+    for module in t.index:
+        for y in YEARS:
+            v = str(t.loc[module, str(y)])
+            out[(module, y)] = count(v) if v.replace(',', '').strip().isdigit() else None
+    return out
+
+
+def cell_states():
+    """Per module and year: % of grid cells with a value, % explicit zero, and the zero count."""
+    d, est, out = pathway(), establishments(), {}
+    for module, periods in REM_MODULES:
+        for y in YEARS:
+            s = d[(d.module == module) & (d.year == y)]
+            n_est = est.get((module, y))
+            if s.empty or not n_est:            # codes not in force: hatched, never zero
+                out[(module, y)] = None
+                continue
+            grid = n_est * periods * s.code.nunique()
+            out[(module, y)] = (100 * s.n_rows_value.sum() / grid,
+                                100 * s.n_rows_zero.sum() / grid,
+                                int(s.n_rows_zero.sum()))
+    return out
+
+
+def masked_deis():
+    """The DEIS discharges kept in the national totals and out of the territorial tables."""
+    t = pd.read_csv(TABLES / "T_dataflow_counts.csv", encoding='utf-8-sig')
+    row = t[t['Count'].astype(str).str.contains('provider-masked', na=False)].iloc[0]
+    return count(row['Value'])
+
+
+def panel_a(ax):
+    states, d = cell_states(), pathway()
+    rows_k = d.groupby('year').n_rows.sum() / 1000
+    ax.set_axis_off()
+    ax.set_xlim(-1.55, 7.05)
+    ax.set_ylim(-8.95, 1.15)
+    for j, y in enumerate(YEARS):                                   # year header
+        ax.text(j + 0.45, 0.72, str(y), ha='center', va='bottom', fontsize=7.2, color=BLACK)
+    for i, (module, _) in enumerate(REM_MODULES):
+        ax.text(-0.12, -i, module, ha='right', va='center', fontsize=8, fontweight='bold')
+        for j, y in enumerate(YEARS):
+            s = states[(module, y)]
+            if s is None:
+                ax.add_patch(Rectangle((j, -i - 0.12), 0.9, 0.24, facecolor='white',
+                                       edgecolor=LIGHT, lw=0.6, hatch='///'))
+                continue
+            value, zero, n_zero = s
+            zero_w = max(zero, ZERO_FLOOR) if n_zero else 0.0
+            left = 0.0
+            for width, colour in ((value, BLUE), (zero_w, ORANGE), (100 - value - zero_w, '#d9d9d9')):
+                ax.add_patch(Rectangle((j + 0.9 * left / 100, -i - 0.12), 0.9 * width / 100, 0.24,
+                                       facecolor=colour, lw=0))
+                left += width
+            ax.text(j + 0.45, -i + 0.20, num(value, 'en', 1), ha='center', va='bottom',
+                    fontsize=7.2, fontweight='bold', color=BLACK)
+    ax.plot([0, 6.9], [-5.72, -5.72], color=GREY, lw=0.7)            # rule above the rows line
+    ax.text(-0.12, -6.03, 'Rows\n(thousands)', ha='right', va='center', fontsize=7,
+            color=BLACK, linespacing=1.15)
+    for j, y in enumerate(YEARS):
+        ax.text(j + 0.45, -6.03, num(rows_k[y], 'en', 1), ha='center', va='center',
+                fontsize=7.2, color=GREY_DARK)
+    for (x, colour, label) in ((0.15, BLUE, 'reported value'), (3.85, ORANGE, 'explicit zero'),
+                               (0.15, '#d9d9d9', 'not reported')):
+        yy = -6.72 if label != 'not reported' else -7.34
+        ax.add_patch(Rectangle((x, yy - 0.12), 0.42, 0.24, facecolor=colour, lw=0))
+        ax.text(x + 0.58, yy, label, ha='left', va='center', fontsize=7.2, color=BLACK)
+    ax.text(0.15, -7.95,
+            'Blank cells {} · duplicate rows {}. A blank is not a zero. DEIS\nmasks {} '
+            'discharges.'.format(num(d.n_rows_empty.sum(), 'en'),
+                                 num(d.n_rows_exact_duplicate.sum(), 'en'),
+                                 num(masked_deis(), 'en')),
+            ha='left', va='top', fontsize=7, color=BLACK, linespacing=1.3)
+
+
+# ---------------------------------------------------------------------------- panel (b)
+#: legend label, column of E21, colour, marker, and the nudge (points) the plate gives the end
+#: label — FONASA and APS end 1.3 million apart, too close for two labels centred on the markers
+COVERAGE = [('INE (30 June)', 'INE (30 Jun)', BLACK, 'o', 0.0),
+            ('FONASA (Dec)', 'FONASA', BLUE, 's', 1.7),
+            ('APS enrolled (Dec)', 'APS enrolled', GREEN, '^', -0.9),
+            ('ISAPRE (Dec)', 'ISAPRE', ORANGE, 'D', 0.0)]
+
+
+def panel_b(ax):
+    t = pd.read_csv(TABLES / "E21_insurance_coverage.csv", encoding='utf-8-sig')
+    t = t[t.Year.map(is_year)].assign(Year=lambda d: d.Year.astype(int))
+    x = t.Year.to_numpy()
+    for label, column, colour, marker, dy in COVERAGE:
+        y = t[column].map(count).to_numpy() / 1e6
+        ax.plot(x, y, color=colour, marker=marker, label=label, clip_on=False)
+        end_label(ax, x[-1], y[-1], num(y[-1], 'en', 1), colour, dx=7, dy=dy, size=7.2)
+    ax2 = ax.twinx()
+    ratio = t['(FONASA+ISAPRE)/INE'].map(pct).to_numpy()
+    ax2.plot(x, ratio, color=GREY, marker='x', ls='--', label='Ratio (right axis)')
+    ax.plot([], [], color=GREY, marker='x', ls='--', label='Ratio (right axis)')
+
+    shade_pandemic(ax)
+    law_line(ax, 'en', label=False, x=LAW_X)
+    ax.set_xlim(2018.7, 2026.8)
+    ax.set_ylim(0, 32.06)
+    ax.set_yticks(range(0, 26, 5))
+    ax2.set_ylim(79.8, 122.0)
+    ax2.set_yticks([80, 85, 90, 95, 100])
+    ax2.set_ylabel('(FONASA + ISAPRE) / INE (%)', fontsize=8, labelpad=1)
+    ax2.grid(False)
+    ax2.spines['top'].set_visible(False)
+    ax2.tick_params(labelsize=7)
+    year_ticks(ax, YEARS)
+    ax.set_xlabel('Year', fontsize=8)
+    ax.set_ylabel('Millions of people', fontsize=8)
+    clean(ax)
+    ax.text(np.mean(BAND_X), 9.6, 'Reporting\ndisruption\n2020–21', ha='center', va='top',
+            fontsize=6.6, color=GREY_DARK, linespacing=1.15,
+            bbox=dict(facecolor='white', edgecolor='none', alpha=0.65, pad=1.2))
+    ax.text(LAW_X + 0.08, 9.6, 'Law 21.545\n(March 2023,\ncontext)', ha='left', va='top',
+            fontsize=6.6, color=GREY_DARK, linespacing=1.15)
+    leg = ax.legend(loc='upper right', fontsize=6.8, handlelength=1.8, handletextpad=0.5,
+                    labelspacing=0.28, borderpad=0.4, frameon=True, framealpha=1,
+                    edgecolor=LIGHT, facecolor='white')
+    leg.get_frame().set_linewidth(0.6)
+    leg.set_zorder(5)
+
+
+# ---------------------------------------------------------------------------- panel (c)
+#: label, module, the era's codes (prefix or explicit tuple), measure, colour, marker, line style
+ERA_SERIES = [
+    ('A03 M-CHAT 2019–22', 'A03', ('03500406', '03500407'), 'annual_sum', BLUE, 'o', '-'),
+    ('A03 M-CHAT-R/F 2023–24', 'A03', '096002', 'annual_sum', BLUE, 's', '-'),
+    ('A03 31–59 months 2024', 'A03', '037001', 'annual_sum', BLUE, '^', '-'),
+    ('A03 redesign 2025', 'A03', '037100', 'annual_sum', BLUE, 'D', '-'),
+    ('A05 broad PDD 2019–20', 'A05', ('05225000', '06902600'), 'annual_sum', ORANGE, 'D', '--'),
+    ('A05 autism 2021–25', 'A05', '059900', 'annual_sum', ORANGE, 'o', '-'),
+    ('A27 counselling 2023–25', 'A27', '291015', 'annual_sum', GREEN, 'o', '-'),
+    ('A28 rehabilitation 2023–25', 'A28', '291016', 'annual_sum', PINK, 'o', '-'),
+    ('P2 ASD NANEAS, Dec', 'P2', ('P2500500',), 'december_stock', BLACK, 'o', '-'),
+    ('P6 broad PDD, Dec 2019–20', 'P6', ('P6223000', 'P6223380'), 'december_stock', SKY, 'o', '--'),
+    ('P6 autism, Dec 2021–25', 'P6', 'P6241', 'december_stock', SKY, 'o', '-')]
+
+C_XLIM = (2018.6, 2025.4)
+
+
+def era_rows(d, module, codes, measure):
+    s = d[(d.module == module) & (d.measure == measure)]
+    return s[s.code.isin(codes)] if isinstance(codes, tuple) else s[s.code.str.startswith(codes)]
+
+
+def panel_c(ax):
+    d, breaks = pathway(), set()
+    for label, module, codes, measure, colour, marker, ls in ERA_SERIES:
+        s = era_rows(d, module, codes, measure)
+        e = s.groupby('year').n_reporting_establishments.max()
+        ax.plot(e.index, e.to_numpy(), color=colour, marker=marker, ls=ls, label=label,
+                markersize=3.6, clip_on=False)
+        breaks.add(s.era_end.max() + 0.5)       # a line stops where its era's last year ends
+    shade_pandemic(ax)
+    for b in sorted(breaks):
+        if C_XLIM[0] < b < C_XLIM[1]:
+            ax.axvline(b, color=GREY, ls=(0, (4, 3)), lw=0.7, zorder=1)
+    law_line(ax, 'en', label=False, x=LAW_X)
+    ax.set_xlim(*C_XLIM)
+    log_axis(ax, 'y')
+    ax.set_ylim(50, 3070)
+    ax.yaxis.set_major_locator(FixedLocator([50, 100, 200, 500, 1000, 2000]))
+    year_ticks(ax, YEARS)
+    ax.set_xlabel('Year', fontsize=8)
+    ax.set_ylabel('Reporting establishments (log)', fontsize=8, labelpad=1)
+    clean(ax)
+    ax.legend(loc='upper center', bbox_to_anchor=(0.52, -0.16), ncol=2, fontsize=6.3,
+              handlelength=1.6, handletextpad=0.5, labelspacing=0.3, columnspacing=1.2)
+
+
+# ---------------------------------------------------------------------------- panel (d)
+def grd_panel():
+    """The four summary rows of ST1: totals of each panel and the hospital counts, by year."""
+    t = pd.read_csv(TABLES / "ST1_grd_hospital_panel.csv", encoding='utf-8-sig')
+    years = [c for c in t.columns if is_year(c)]
+    t = t.set_index('Hospital')
+    take = lambda row: [count(t.loc[row, y]) for y in years]
+    return ([int(y) for y in years],
+            take('Total, observed annual panel'), take('Total, fixed panel of 65 hospitals'),
+            take('Observed hospitals (n)'), take('Fixed-panel hospitals present (n)'))
+
+
+def panel_d(ax):
+    years, obs_ep, fix_ep, obs_h, fix_h = grd_panel()
+    x = np.array(years, dtype=float)
+    shade_pandemic(ax)
+    for off, vals, colour, label in ((-0.21, obs_h, BLUE, 'Hospitals observed'),
+                                     (0.21, fix_h, '#b0b0b0', 'Fixed panel (65)')):
+        ax.bar(x + off, vals, width=0.4, color=colour, label=label, zorder=2)
+        for xi, v in zip(x + off, vals):
+            ax.text(xi, 30, str(v), ha='center', va='center', rotation=90, fontsize=6.8,
+                    fontweight='bold', color='white', zorder=3)
+    ax2 = ax.twinx()
+    ax2.plot(x, np.array(obs_ep) / 1e6, color=BLACK, marker='o',
+             label='GRD episodes, observed panel (millions)', zorder=4)
+    ax2.plot(x, np.array(fix_ep) / 1e6, color=GREY_DARK, marker='s', ls='--',
+             label='GRD episodes, fixed panel (millions)', zorder=4)
+    proxies = [Line2D([], [], color=BLACK, marker='o',
+                      label='GRD episodes, observed panel (millions)'),
+               Line2D([], [], color=GREY_DARK, marker='s', ls='--',
+                      label='GRD episodes, fixed panel (millions)')]
+
+    law_line(ax, 'en', label=False, x=LAW_X)
+    ax.set_xlim(2018.3, 2024.75)
+    ax.set_ylim(0, 165.3)
+    ax.set_yticks(range(0, 161, 20))
+    ax2.set_ylim(0, 1.853)
+    ax2.yaxis.set_major_locator(MultipleLocator(0.25))
+    ax2.yaxis.set_major_formatter(plt.FuncFormatter(lambda v, p: num(v, 'en', 1)))
+    ax2.set_ylabel('GRD episodes (millions)', fontsize=8, labelpad=1)
+    ax2.grid(False)
+    ax2.spines['top'].set_visible(False)
+    ax2.tick_params(labelsize=7)
+    year_ticks(ax, years)
+    ax.set_xlabel('Year', fontsize=8)
+    ax.set_ylabel('GRD hospitals', fontsize=8)
+    clean(ax)
+    leg = ax.legend(handles=ax.get_legend_handles_labels()[0] + proxies,
+                    loc='upper left', fontsize=6.6, handlelength=1.8, handletextpad=0.5,
+                    labelspacing=0.28, borderpad=0.4, frameon=True, framealpha=1,
+                    edgecolor=LIGHT, facecolor='white')
+    leg.get_frame().set_linewidth(0.6)
+    leg.set_zorder(5)
+
+
+# ---------------------------------------------------------------------------- panel (e)
+def panel_e(ax):
+    t = pd.read_csv(TABLES / "E22_rem20_capacity.csv", encoding='utf-8-sig')
+    t = t[t.Year.map(is_year)].assign(Year=lambda d: d.Year.astype(int))
+    x = t.Year.to_numpy().astype(float)
+    allest = t['Discharges (all)'].map(count).to_numpy() / 1000
+    panel = t['Discharges (188-panel)'].map(count).to_numpy() / 1000
+    retention = t['Discharges (188-panel)'].map(pct).to_numpy()
+    reporting = t['Reporting establishments'].map(count).to_numpy()
+
+    shade_pandemic(ax)
+    ax.bar(x - 0.21, allest, width=0.4, color='#a8cfe8', label='All establishments', zorder=2)
+    ax.bar(x + 0.21, panel, width=0.4, color=BLUE, label='188-panel', zorder=2)
+    ax2 = ax.twinx()
+    ax2.plot(x, retention, color=ORANGE, marker='o', zorder=4)
+    retention_proxy = Line2D([], [], color=ORANGE, marker='o', label='Panel retention (%)')
+    for xi, r in zip(x, retention):
+        ax2.annotate(num(r, 'en', 1), (xi, r), xytext=(0, 6), textcoords='offset points',
+                     ha='center', va='bottom', fontsize=7, fontweight='bold', color=ORANGE)
+
+    law_line(ax, 'en', label=False, x=LAW_X)
+    ax.set_xlim(2018.45, 2025.55)
+    ax.set_ylim(0, 2110)
+    ax.set_yticks([0, 500, 1000, 1500, 2000])
+    ax.yaxis.set_major_formatter(thousands('en'))
+    ax2.set_ylim(95, 102.53)
+    ax2.set_yticks([96, 97, 98, 99, 100])
+    ax2.set_ylabel('Panel retention (%)', fontsize=8, labelpad=1)
+    ax2.grid(False)
+    ax2.spines['top'].set_visible(False)
+    ax2.tick_params(labelsize=7)
+    ax.set_xticks(x)
+    ax.set_xticklabels([f'{int(y)}\n{n}' for y, n in zip(x, reporting)], linespacing=1.3)
+    ax.set_xlabel('Year · n reporting', fontsize=8)
+    ax.set_ylabel('Discharges (thousands)', fontsize=8, labelpad=1)
+    clean(ax)
+    leg = ax.legend(handles=ax.get_legend_handles_labels()[0] + [retention_proxy],
+                    loc='upper right', fontsize=6.8, handlelength=1.5, handletextpad=0.5,
+                    labelspacing=0.3, borderpad=0.4, frameon=True, framealpha=1,
+                    edgecolor=LIGHT, facecolor='white',
+                    title='Hospital activity/capacity;\nnot a population denominator')
+    leg.get_frame().set_linewidth(0.6)
+    leg.get_title().set_fontsize(6.6)
+    leg.get_title().set_color(GREY_DARK)
+    leg.get_title().set_linespacing(1.15)
+    leg.set_zorder(5)
+
+
+# ---------------------------------------------------------------------------- panel (f)
+#: colour of a source column by what one row of it is
+NATURE = {'Flow': BLUE, 'Stock': ORANGE, 'Activity/capacity': GREY,
+          'Cross-sectional survey': GREEN, 'School stock': PINK}
+#: marker of a break by its kind, with the plate's sizes
+KIND = {'Definition/code change': ('D', 2.9, BLACK),
+        'Panel/coverage/schema change': ('s', 2.7, GREY_DARK),
+        'Series start': ('^', 2.5, BLACK)}
+BAR_HALF = 0.42     # a source bar spans its first year - 0.42 to its last year + 0.42
+
+
+def panel_f(ax):
+    t = pd.read_csv(TABLES / "S_definition_breaks.csv", encoding='utf-8-sig')
+    order = list(dict.fromkeys(t.Source))            # the plate's column order: first appearance
+    ax.axhspan(*BAND_X, color=BAND, alpha=0.6, lw=0, zorder=0)
+    ax.axhline(LAW_X, color='#444444', ls=(0, (1, 2)), lw=0.9, zorder=1)
+    for i, src in enumerate(order):
+        s = t[t.Source == src]
+        span = s.Years.iloc[0].split('–')          # '2019–2024', or '2022' for a single year
+        lo, hi = int(span[0]), int(span[-1])
+        ax.add_patch(Rectangle((i - 0.3, lo - BAR_HALF), 0.6, hi - lo + 2 * BAR_HALF,
+                               facecolor=NATURE[s['Stock/flow'].iloc[0]], alpha=0.45, lw=0,
+                               zorder=2))
+        for _, b in s.iterrows():
+            marker, size, colour = KIND[b.Kind]
+            ax.plot([i], [int(b['Break year'])], marker=marker, markersize=size, color=colour,
+                    markeredgecolor=BLACK, markeredgewidth=0.5, ls='none', zorder=4)
+    ax.set_xlim(-0.75, len(order) - 0.25)
+    ax.set_ylim(2018.45, 2025.5)
+    ax.set_xticks(range(len(order)))
+    ax.set_xticklabels(order, rotation=90, fontsize=6.8)
+    ax.set_yticks(YEARS)
+    ax.set_yticklabels([str(y) for y in YEARS])
+    ax.set_ylabel('Reporting year', fontsize=8)
+    clean(ax)
+    ax.tick_params(axis='x', length=0)
+    handles = [Line2D([], [], marker=m, markersize=s, color=c, markeredgecolor=BLACK,
+                      markeredgewidth=0.5, ls='none', label=k) for k, (m, s, c) in KIND.items()]
+    leg = ax.legend(handles=handles, loc='upper center', bbox_to_anchor=(0.5, -0.285),
+                    fontsize=6.5, handletextpad=0.6, labelspacing=0.3, borderpad=0.2,
+                    title='Each break, in the definition-breaks table')
+    leg.get_title().set_fontsize(6.5)
+    leg.get_title().set_color(GREY_DARK)
+
+
+# ---------------------------------------------------------------------------- the plate
+#: (a) is a drawn table, so every panel is placed by hand, as the stored plate places them
+BOXES = {'a': (0.0276, 0.7625, 0.4129, 0.2105), 'b': (0.5735, 0.7630, 0.3710, 0.2194),
+         'c': (0.0845, 0.4813, 0.3515, 0.2193), 'd': (0.5735, 0.4813, 0.3710, 0.2193),
+         'e': (0.0780, 0.1179, 0.3580, 0.2197), 'f': (0.5735, 0.1179, 0.3710, 0.2134)}
+HEADINGS = {'a': 'States of a REM cell', 'b': 'Coverage layers, 2019–2025',
+            'c': 'REM establishments by era', 'd': 'GRD hospitals and episodes',
+            'e': 'REM-20: 188-panel and retention', 'f': 'Breaks by source, 2019–2025'}
+#: where the stored plate puts each panel heading (figure coordinates, baseline of the text)
+HEAD_XY = {'a': (0.013, 0.9853), 'b': (0.5115, 0.9853), 'c': (0.010, 0.7032),
+           'd': (0.5115, 0.7032), 'e': (0.010, 0.3410), 'f': (0.5115, 0.3410)}
+
+
+def draw_fig1_sources_coverage():
+    style()
+    plt.rcParams.update({'xtick.labelsize': 7, 'ytick.labelsize': 7})
+    fig = plt.figure(figsize=(6.89, 9.38))
+    axes = {k: fig.add_axes(BOXES[k]) for k in 'abcdef'}
+    for key, panel in zip('abcdef', (panel_a, panel_b, panel_c, panel_d, panel_e, panel_f)):
+        panel(axes[key])
+    for key in 'abcdef':
+        x, y = HEAD_XY[key]
+        fig.text(x, y, f'({key}) {HEADINGS[key]}', fontweight='bold', fontsize=9,
+                 ha='left', va='baseline')
+    return fig
+
+
+draw_fig1_sources_coverage()
+```
+
+### Figure 3. Figure 3. GRD episodes with documented F84 in Chilean public hospitals, 2019–2024: rates per episode, activity, coding depth, age and sex, hospitals and persons — F84 without Rett variant
+
+```{python}
+#| label: lamina-fig2_grd_core
+#| fig-cap: "Figure 3. Redrawn here from the published tables by the code above."
+import re
+import sys
+from pathlib import Path
+
+_STUDY = ROOT / "docs" / "study"          # docs/study, where figstyle lives
+if str(_STUDY) not in sys.path:
+    sys.path.insert(0, str(_STUDY))
+
+import numpy as np
+import pandas as pd
+from matplotlib.lines import Line2D
+from matplotlib.ticker import FuncFormatter, LogLocator, NullFormatter
+from scipy import stats
+
+from figstyle import *   # noqa: F401,F403  — style, clean, num, BLUE, ORANGE, GREEN, PINK, BLACK, …
+
+PLATE = "fig2_grd_core"
+SOURCES = [
+    "docs/study/data/grd_year_summary.csv",
+    "docs/study/data/grd_selected_definition.csv",
+    "docs/study/data/grd_coding_depth_year.csv",
+    "docs/study/data/grd_age_hombre_2019.csv",
+    "docs/study/data/grd_age_hombre_2024.csv",
+    "docs/study/data/grd_age_mujer_2019.csv",
+    "docs/study/data/grd_age_mujer_2024.csv",
+    "docs/study/data/grd_age_sex_year.csv",
+    "docs/study/corpus/tables/S_hospital_rates_2024.csv",
+    "docs/study/corpus/tables/T2_grd_core.csv",
+]
+NOTE = ("Redraws the six panels of the GRD core plate — the F84 rate per 100,000 GRD episodes by "
+        "position and panel, by activity, by coding-depth stratum, the population rate by age and "
+        "sex, the 2024 rate of each of the 72 hospitals and the episodes/persons pair with the male:"
+        "female ratio — from the published GRD aggregates in docs/study/data/ and the hospital and "
+        "core tables in docs/study/corpus/tables/, all filtered to the sin_rett definition.")
+
+ROOT = ROOT            # repository root
+YEARS = [2019, 2020, 2021, 2022, 2023, 2024]
+FIRST, LAST = YEARS[0], YEARS[-1]
+VARIANT = "sin_rett"                                  # F84 without Rett: the plate's own definition
+PER = 100_000.0
+
+# --------------------------------------------------------------------------------------------------
+# The plate's geometry and typography (study/pipeline/08a_figures_grd.py): 180 × 245 mm drawn 1:1,
+# three rows by two columns, 9 pt bold panel heads down to a 6 pt floor, ticks drawn without marks.
+# --------------------------------------------------------------------------------------------------
+PLATE_W_IN, PLATE_H_IN = 180.0 / 25.4, 245.0 / 25.4
+CELL_MARGIN = 2.0 / 180.0                             # left margin of a grid cell, figure fraction
+FS_BASE, FS_TITLE, FS_TICK, FS_MIN = 8.0, 9.0, 7.0, 6.0
+DARK, GREY_TEXT, LEADER = "#333333", "#555555", "#999999"
+LIGHT_BLUE, LIGHT_ORANGE = "#9ecae1", "#f4b183"       # the plate's two 2019 tints
+LAW_X = 2023 - 0.30                                   # `CFG.LAW_YEAR - 0.30`: March 2023 on a
+#                                                       year-centred axis, marked as context
+PANDEMIC = [2020, 2021]
+NOTE_BBOX = dict(facecolor="white", edgecolor="none", alpha=0.80, pad=1.4)
+PLATE_RC = {
+    "font.family": "DejaVu Sans", "font.size": FS_BASE,
+    "axes.titlesize": FS_TITLE, "axes.titleweight": "bold", "axes.labelsize": FS_BASE,
+    "xtick.labelsize": FS_TICK, "ytick.labelsize": FS_TICK,
+    "legend.fontsize": FS_TICK, "legend.title_fontsize": FS_TICK, "legend.frameon": False,
+    "legend.handlelength": 1.5, "legend.handletextpad": 0.5, "legend.labelspacing": 0.30,
+    "legend.columnspacing": 0.9, "legend.borderpad": 0.3,
+    "axes.facecolor": "white", "axes.edgecolor": DARK, "axes.linewidth": 0.7,
+    "axes.spines.top": False, "axes.spines.right": False,
+    "axes.grid": True, "axes.axisbelow": True,
+    "grid.color": "#cccccc", "grid.alpha": 0.35, "grid.linewidth": 0.45,
+    "lines.linewidth": 1.3, "lines.markersize": 3.4, "patch.linewidth": 0.6,
+    # the stored plate draws the grid but no tick marks (seaborn's `whitegrid`); the right-hand axis
+    # of panel (f) is a twin and brings its own marks back.
+    "xtick.bottom": False, "ytick.left": False, "ytick.right": False,
+    "xtick.major.width": 0.7, "ytick.major.width": 0.7,
+    "xtick.major.size": 2.2, "ytick.major.size": 2.2,
+    "xtick.major.pad": 1.5, "ytick.major.pad": 1.5,
+    "axes.labelpad": 2.0, "axes.titlepad": 3.0,
+    "figure.facecolor": "white", "savefig.facecolor": "white",
+}
+
+# Panel heads, axis units and legend keys, in the words the stored plate prints.
+T = ["F84 per 100,000 GRD episodes", "Hospitalisation and CMA", "Coding depth and rate",
+     "Population: age and sex", "Rate by hospital, 2024", "Persons and episodes"]
+U_RATE_LOG = "Episodes with F84 per 100,000 GRD episodes (log)"
+U_RATE = "Episodes with F84 per 100,000 GRD episodes"
+U_DEPTH = "F84 per 100,000 episodes in stratum"
+U_DEPTH_X = "Coded diagnoses per episode (stratum)"
+U_POP = "Episodes with F84 per 100,000 population (log)"
+U_AGE_X = "Age group (years)"
+U_RANK = "Hospitals ranked by rate (n = {})"
+U_HOSP_X = "F84 per 100,000 hospital episodes (log, exact 95% CI)"
+U_COUNT = "Episodes / persons (thousands)"
+U_MF = "Male:female ratio"
+L_ANY_OBS, L_ANY_FIX = "Any position, observed panel", "Any position, fixed panel of 65"
+L_PRI_OBS, L_PRI_FIX = "Principal, observed panel", "Principal, fixed panel of 65"
+L_ACT = ["All activity", "Strict hospitalisation", "Major ambulatory surgery (CMA)"]
+L_DEPTH_ALL, L_DEPTH_F84, L_DEPTH_INSET = "All episodes", "Episodes with F84", "Mean depth"
+L_MALES, L_FEMALES = "Males", "Females"
+L_FIXED, L_NEW = "Fixed panel 2019–2024 ({})", "Added in 2023–2024 ({})"
+L_EPISODES, L_PERSONS = "Episodes with F84 (any position)", "Unique persons within year"
+L_MF = "M:F ratio of episodes (95% CI)"
+L_HOSP_N, L_NATIONAL, L_YEAR = "Hospitals:", "National", "Year"
+N_PANDEMIC = "Reporting\ndisruption\n2020–21"
+N_LAW = "Law 21.545\n(March 2023,\ncontext)"
+N_POP = ("Numerator: place of care (public GRD\nhospitals); denominator: residence\n"
+         "(INE base 2017). Complementary reading.")
+
+DEPTH_BINS = ["1", "2", "3", "4", "5", "6-7", "8-10", "11+"]
+AGE_GROUPS = ["0-4", "5-9", "10-14", "15-19", "20-24", "25-29", "30-34", "35-39", "40-44", "45+"]
+
+
+# --------------------------------------------------------------------------------------------------
+# Reading the tracked tables
+# --------------------------------------------------------------------------------------------------
+def _read(name):
+    return pd.read_csv(ROOT / name, encoding="utf-8-sig")
+
+
+def _dash(s):
+    """The study's interval rule: an interval a reader reads takes an en dash. '6-7' -> '6–7'."""
+    return re.sub(r"(?<=\d)-(?=\d)", "–", str(s))
+
+
+def year_summary():
+    """`grd_year_summary.csv` restricted to the plate's definition, F84 without Rett."""
+    t = _read(SOURCES[0])
+    return t[t.variant == VARIANT]
+
+
+def ys(t, panel, activity, position):
+    """One annual series of the year summary, reindexed on the six GRD years."""
+    d = t[(t.panel == panel) & (t.activity == activity) & (t.position == position)]
+    d = d.set_index("year").reindex(YEARS)
+    return d.rename(columns={"rate_per_100k_episodes": "rate", "rate_lo": "lo", "rate_hi": "hi"})
+
+
+def depth_year(year):
+    """The eight coding-depth strata of one year, in the plate's order (the empty `0` bin dropped)."""
+    t = _read(SOURCES[2])
+    d = t[(t.variant == VARIANT) & (t.panel == "observed") & (t.activity == "all") & (t.year == year)]
+    return d.set_index("depth_bin").reindex(DEPTH_BINS)
+
+
+def depth_ceiling():
+    """The plate's own ceiling for (c): 2.35 × the highest upper limit over all years and strata."""
+    t = _read(SOURCES[2])
+    d = t[(t.variant == VARIANT) & (t.panel == "observed") & (t.activity == "all")
+          & (t.depth_bin.isin(DEPTH_BINS))]
+    return float(d.rate_hi.max()) * 2.35
+
+
+def pop_rates(sex, year):
+    """One age curve of panel (d): rate per 100,000 INE population with its exact limits, 45+ pooled."""
+    name = {"HOMBRE": "hombre", "MUJER": "mujer"}[sex]
+    t = _read(f"docs/study/data/grd_age_{name}_{year}.csv")
+    return t.set_index("age_group").reindex(AGE_GROUPS).reset_index()
+
+
+_RATE_CELL = re.compile(r"^\s*([\d,]+\.?\d*)\s*\(\s*([\d,]+\.?\d*)\s+to\s+([\d,]+\.?\d*)\s*\)\s*$")
+
+
+def _cell(s):
+    """'5,210.7 (4,771.6 to 5,679.4)' -> (5210.7, 4771.6, 5679.4)."""
+    m = _RATE_CELL.match(str(s))
+    if not m:
+        raise ValueError(f"unparsed rate cell: {s!r}")
+    return tuple(float(g.replace(",", "")) for g in m.groups())
+
+
+def _count(s):
+    """'9,941' -> 9941."""
+    return int(str(s).replace(",", "").strip())
+
+
+def hospitals():
+    """The 72 hospitals of 2024, ranked from lowest to highest rate, with their exact limits."""
+    t = _read(SOURCES[8])
+    t.columns = [c.strip() for c in t.columns]
+    rate = t["Rate per 100,000 episodes (exact 95% CI)"].map(_cell)
+    h = pd.DataFrame({
+        "rate": [v[0] for v in rate], "lo": [v[1] for v in rate], "hi": [v[2] for v in rate],
+        "episodes": t["GRD episodes 2024"].map(_count),
+        "f84": t["Episodes with F84 2024"].map(_count),
+        "fixed": t["Fixed panel of 65"].str.strip().str.lower().eq("yes"),
+    })
+    return h.sort_values("rate").reset_index(drop=True)
+
+
+def _wilson(k, n, alpha=0.05):
+    """Wilson limits on a proportion (the pipeline's `common.wilson`)."""
+    z = float(stats.norm.ppf(1 - alpha / 2))
+    p = k / n
+    den = 1 + z ** 2 / n
+    centre = (p + z ** 2 / (2 * n)) / den
+    half = z * np.sqrt(p * (1 - p) / n + z ** 2 / (4 * n ** 2)) / den
+    return p, max(0.0, centre - half), min(1.0, centre + half)
+
+
+def mf_ratio():
+    """Male:female ratio of episodes with F84, by year, with the pipeline's `ratio_ci` interval.
+
+    The counts are the plate's own age-sex table summed over every age group (the 'unknown' age
+    included, as the pipeline's `_mf_ratio` sums it); the interval is Wilson on males / (males +
+    females) mapped back to the ratio.
+    """
+    t = _read(SOURCES[7])
+    t = t[t.variant == VARIANT]
+    g = t.groupby(["year", "sex"]).n_f84.sum().unstack().reindex(YEARS)
+    rows = []
+    for y in YEARS:
+        m, w = float(g.loc[y, "HOMBRE"]), float(g.loc[y, "MUJER"])
+        _p, lo, hi = _wilson(m, m + w)
+        rows.append(dict(year=y, males=m, females=w, ratio=m / w,
+                         lo=lo / (1 - lo), hi=hi / (1 - hi)))
+    return pd.DataFrame(rows).set_index("year")
+
+
+# --------------------------------------------------------------------------------------------------
+# Drawing helpers, as the plate draws them
+# --------------------------------------------------------------------------------------------------
+def _log_axis(ax, axis="y"):
+    """The plate's log axis: major ticks at 1, 2 and 5 of each decade, written out in full."""
+    a = ax.yaxis if axis == "y" else ax.xaxis
+    (ax.set_yscale if axis == "y" else ax.set_xscale)("log")
+    a.set_major_locator(LogLocator(base=10, subs=(1.0, 2.0, 5.0), numticks=12))
+    a.set_major_formatter(FuncFormatter(
+        lambda v, p: num(v, "en", 0 if v >= 1 else (1 if v >= 0.1 else 2))))
+    a.set_minor_formatter(NullFormatter())
+
+
+def _fmt(ax, axis="y", dec=0):
+    f = FuncFormatter(lambda v, p: num(v, "en", dec))
+    if axis in ("y", "both"):
+        ax.yaxis.set_major_formatter(f)
+    if axis in ("x", "both"):
+        ax.xaxis.set_major_formatter(f)
+
+
+def _rate(ax, d, color, label, ls="-", mk="o", band=True, lw=2.2):
+    """One rate series: line, marker (open when the series is dashed) and its exact-CI ribbon."""
+    ax.plot(d.index, d.rate, ls=ls, marker=mk, color=color, lw=lw, markersize=5.5, label=label,
+            markerfacecolor=color if ls == "-" else "white")
+    if band:
+        ax.fill_between(d.index, d.lo, d.hi, color=color, alpha=0.13, lw=0)
+
+
+def _end_label(ax, y, s, color):
+    return ax.annotate(s, (LAST, y), xytext=(3, 0), textcoords="offset points",
+                       fontsize=FS_MIN + 0.5, color=color, va="center", fontweight="bold")
+
+
+def _shade_years(ax, years=PANDEMIC):
+    for y in years:
+        ax.axvspan(y - 0.5, y + 0.5, color="grey", alpha=0.12, zorder=0)
+
+
+def _context(ax, law_y=0.97, pandemic_label=True, pandemic_y=0.97, law_label=True):
+    """The two context marks: the 2020–21 reporting disruption and the Law 21.545 line.
+
+    Both are labelled once per plate — in (a) — because the caption says they mean the same in every
+    panel; the labels carry the plate's translucent white frame so a series stays visible under them.
+    """
+    _shade_years(ax)
+    if pandemic_label:
+        ax.text(2020.5, pandemic_y, N_PANDEMIC, transform=ax.get_xaxis_transform(), ha="center",
+                va="top", fontsize=FS_MIN, color=GREY_TEXT, linespacing=1.15, bbox=dict(NOTE_BBOX))
+    ax.axvline(LAW_X, color="#444444", ls=":", lw=1.0, zorder=1)
+    if law_label:
+        ax.text(LAW_X + 0.06, law_y, N_LAW, transform=ax.get_xaxis_transform(), ha="left", va="top",
+                fontsize=FS_MIN, color="#444444", linespacing=1.15, bbox=dict(NOTE_BBOX))
+
+
+def _framed_legend(ax, *args, loc="upper right", fontsize=FS_MIN, **kw):
+    """A legend on the plate's opaque white card, so no series reads through its text."""
+    lg = ax.legend(*args, loc=loc, fontsize=fontsize, frameon=True, framealpha=1.0,
+                   edgecolor="#cccccc", facecolor="white", borderpad=0.25, **kw)
+    lg.set_zorder(6)
+    lg.set_in_layout(False)
+    return lg
+
+
+def _plain_legend(ax, *args, loc="upper right", fontsize=FS_MIN, **kw):
+    lg = ax.legend(*args, loc=loc, fontsize=fontsize, **kw)
+    lg.set_in_layout(False)
+    return lg
+
+
+def _drop_clear(ax, anns, pad_pt=1.5, limit=60):
+    """Slide an end label down until it clears the opaque legend and the label above it.
+
+    Panel (b) ends its three series a few points apart and prints each one's 2024 value beside its
+    marker; the topmost of them, 872, reaches into the legend card, which is opaque on purpose. The
+    stored plate drops the labels that collide, one step at a time, keeping their order; this is the
+    same move, measured rather than hand-placed. It does nothing when nothing collides.
+    """
+    fig = ax.figure
+    fig.canvas.draw()
+    r = fig.canvas.get_renderer()
+    blocking = []
+    lg = ax.get_legend()
+    if lg is not None and lg.get_visible() and lg.get_frame_on():
+        blocking.append(lg.get_window_extent(r).padded(pad_pt))
+    for a in sorted(anns, key=lambda t: -t.xy[1]):        # highest series first
+        for _ in range(limit):
+            if not any(a.get_window_extent(r).padded(pad_pt).overlaps(q) for q in blocking):
+                break
+            dx, dy = a.get_position()                     # the offset, in points
+            a.set_position((dx, dy - 1.0))
+        blocking.append(a.get_window_extent(r).padded(pad_pt))
+
+
+def _align_titles(fig, axes, titles):
+    """Anchor every panel head to the left edge of ITS grid cell, not to its axes.
+
+    In a narrow cell the axes start well to the right of the cell — the y label and its tick column
+    take 15–20 mm — so a title anchored to the axes drifts inward and the six heads no longer line
+    up. The stored plate anchors them to the cell, 2 mm in; this is that move.
+    """
+    fig.canvas.draw()
+    ncols = 2
+    for ax, t in zip(axes, titles):
+        try:
+            col = ax.get_subplotspec().colspan.start
+        except Exception:                                # pragma: no cover — defensive
+            col = 0 if ax.get_position().x0 < 0.5 else 1
+        target = col / ncols + CELL_MARGIN               # left edge of the cell, 2 mm in
+        pos = ax.get_position()
+        t.set_x((target - pos.x0) / pos.width)
+
+
+def _tuck_ylabels(fig, axes, titles, pad_px=2.0):
+    """Slide a rotated y label down until it clears the panel head above it.
+
+    'Episodes with F84 per 100,000 GRD episodes (log)' is taller at 8 pt than the 62 mm cell it
+    labels, so matplotlib, which centres it on the axes, pushes its last words up into the head of
+    the panel. The stored plate drops the label by the overlap — it then runs a little past the foot
+    of the axes, over blank canvas beside the year ticks, where nothing else is drawn. This is that
+    move, measured rather than hand-placed.
+    """
+    fig.canvas.draw()
+    r = fig.canvas.get_renderer()
+    for ax, t in zip(axes, titles):
+        lab = ax.yaxis.label
+        if not str(lab.get_text()).strip():
+            continue
+        top = min(t.get_window_extent(r).y0 - pad_px, fig.bbox.y1 - pad_px)
+        over = lab.get_window_extent(r).y1 - top
+        if over > 0.5:
+            lab.set_y(lab.get_position()[1] - over / ax.bbox.height)
+
+
+# --------------------------------------------------------------------------------------------------
+# The plate
+# --------------------------------------------------------------------------------------------------
+def draw_fig2_grd_core():
+    t = year_summary()
+    ao, af = ys(t, "observed", "all", "any"), ys(t, "fixed65", "all", "any")
+    po, pf = ys(t, "observed", "all", "principal"), ys(t, "fixed65", "all", "principal")
+
+    style()
+    plt.rcParams.update(PLATE_RC)
+    fig, ax = plt.subplots(3, 2, figsize=(PLATE_W_IN, PLATE_H_IN), layout="constrained")
+    try:
+        fig.get_layout_engine().set(w_pad=0.03, h_pad=0.03, wspace=0.05, hspace=0.06)
+    except AttributeError:                               # pragma: no cover — older matplotlib
+        pass
+    axes, titles = [], []
+
+    def head(a, k):
+        axes.append(a)
+        titles.append(a.set_title(f"({'abcdef'[k]}) {T[k]}", loc="left",
+                                  fontsize=FS_TITLE, fontweight="bold"))
+
+    # (a) any position and principal, observed panel and fixed panel of 65 ---------------------
+    a = ax[0, 0]
+    _rate(a, ao, BLUE, L_ANY_OBS)
+    _rate(a, af, BLUE, L_ANY_FIX, ls="--", mk="o", band=False, lw=1.0)
+    _rate(a, po, ORANGE, L_PRI_OBS, mk="s")
+    _rate(a, pf, ORANGE, L_PRI_FIX, ls="--", mk="s", band=False, lw=1.0)
+    ends_a = [_end_label(a, d_.rate.iloc[-1], num(d_.rate.iloc[-1], "en", 0), colr)
+              for d_, colr in ((ao, BLUE), (po, ORANGE))]
+    _log_axis(a)
+    a.set_ylim(8, 4000)
+    a.set_xticks(YEARS); a.set_xticklabels([str(y) for y in YEARS], fontsize=FS_MIN + 0.5)
+    a.set_xlabel(L_YEAR); a.set_ylabel(U_RATE_LOG); a.margins(x=0.13)
+    # the panel counts are a foot row of their own: the rate is a ratio, and the number of hospitals
+    # behind it belongs beside the year, not on the rate axis.
+    a.text(0.01, 0.085, L_HOSP_N, transform=a.transAxes, fontsize=FS_MIN, color=DARK,
+           ha="left", va="center")
+    for y in YEARS:
+        a.text(y, 10.0, num(ao.loc[y, "hospitals_n"], "en", 0), fontsize=FS_MIN, ha="center",
+               va="center", color=DARK)
+    _context(a, law_y=0.40, pandemic_y=0.40)
+    _plain_legend(a, loc="upper right", handlelength=1.5)
+    head(a, 0)
+
+    # (b) strict hospitalisation against major ambulatory surgery, observed panel ----------------
+    b = ax[0, 1]
+    ends_b = []
+    for act, lab, colr, mk in (("all", L_ACT[0], BLUE, "o"),
+                               ("hospitalisation", L_ACT[1], GREEN, "s"),
+                               ("cma", L_ACT[2], PINK, "^")):
+        d_ = ys(t, "observed", act, "any")
+        _rate(b, d_, colr, lab, mk=mk)
+        ends_b.append(_end_label(b, d_.rate.iloc[-1], num(d_.rate.iloc[-1], "en", 0), colr))
+    # 'other' is deliberately absent: its denominator is 0 from 2020 on, which is a category that
+    # stopped being reported, not a zero, and a line through it would read as a collapse.
+    b.set_xticks(YEARS); b.set_xticklabels([str(y) for y in YEARS], fontsize=FS_MIN + 0.5)
+    b.set_xlabel(L_YEAR); b.margins(x=0.13)
+    b.set_ylim(0, 1050); b.set_yticks([0, 200, 400, 600, 800])
+    b.set_ylabel(U_RATE); _fmt(b, "y", 0)
+    _context(b, pandemic_label=False, law_label=False)
+    _framed_legend(b, loc="upper right", handlelength=1.5)
+    head(b, 1)
+
+    # (c) the rate inside each coding-depth stratum, 2019 against 2024 ---------------------------
+    c = ax[1, 0]
+    xb = np.arange(len(DEPTH_BINS))
+    for off, year, colr in ((-0.2, FIRST, LIGHT_BLUE), (0.2, LAST, BLUE)):
+        r = depth_year(year)
+        c.bar(xb + off, r.rate_per_100k_episodes, width=0.38, color=colr, label=str(year))
+        c.errorbar(xb + off, r.rate_per_100k_episodes,
+                   yerr=[r.rate_per_100k_episodes - r.rate_lo, r.rate_hi - r.rate_per_100k_episodes],
+                   fmt="none", ecolor=DARK, elinewidth=0.6, capsize=1.2)
+    c.set_xticks(xb); c.set_xticklabels([_dash(s) for s in DEPTH_BINS], fontsize=FS_MIN + 0.5)
+    c.set_xlabel(U_DEPTH_X); c.set_ylabel(U_DEPTH)
+    _fmt(c, "y", 0); c.set_ylim(0, depth_ceiling())
+    _plain_legend(c, loc="upper left", handlelength=1.2, title=L_YEAR, title_fontsize=FS_MIN)
+    ci = c.inset_axes([0.36, 0.60, 0.60, 0.36])
+    ci.plot(ao.index, ao.coding_depth_mean_all, "o-", color=GREY_TEXT, lw=1.0, markersize=2.6,
+            label=L_DEPTH_ALL)
+    ci.plot(ao.index, ao.coding_depth_mean_f84, "s-", color=ORANGE, lw=1.0, markersize=2.6,
+            label=L_DEPTH_F84)
+    _shade_years(ci)
+    ci.set_xticks(YEARS); ci.set_xticklabels([f"'{y % 100:02d}" for y in YEARS], fontsize=FS_MIN)
+    ci.tick_params(labelsize=FS_MIN, length=1.6, pad=1.0)
+    ci.set_title(L_DEPTH_INSET, fontsize=FS_MIN + 0.8, fontweight="bold", pad=1.6)
+    lg = ci.legend(fontsize=FS_MIN, loc="lower right", handlelength=1.0, borderpad=0.2,
+                   labelspacing=0.15)
+    lg.set_in_layout(False)
+    ci.set_ylim(3.5, 7.6); _fmt(ci, "y", 1); ci.grid(alpha=0.3)
+    head(c, 2)
+
+    # (d) population rate by age and sex, first year against last --------------------------------
+    d = ax[1, 1]
+    series = [(FIRST, "HOMBRE", LIGHT_BLUE, "o", "--"), (LAST, "HOMBRE", BLUE, "o", "-"),
+              (FIRST, "MUJER", LIGHT_ORANGE, "s", "--"), (LAST, "MUJER", ORANGE, "s", "-")]
+    xd = np.arange(len(AGE_GROUPS))
+    for year, sex, colr, mk, ls in series:
+        r = pop_rates(sex, year)
+        off = -0.1 if sex == "HOMBRE" else 0.1
+        d.errorbar(xd + off, r.rate.replace(0, np.nan),
+                   yerr=[(r.rate - r.lo).clip(lower=0), r.hi - r.rate], fmt=mk + ls, color=colr,
+                   lw=1.1, capsize=1.2, markersize=2.8, elinewidth=0.6,
+                   label=f"{L_MALES if sex == 'HOMBRE' else L_FEMALES} {year}")
+    d.set_xticks(xd)
+    d.set_xticklabels([_dash(g) for g in AGE_GROUPS], rotation=60, ha="right", fontsize=FS_MIN)
+    _log_axis(d); d.set_ylim(0.06, 700)
+    d.tick_params(axis="y", labelsize=FS_MIN)
+    d.set_xlabel(U_AGE_X); d.set_ylabel(U_POP, fontsize=FS_MIN + 0.5)
+    # the numerator is located by place of care and the denominator by residence: the panel is a
+    # complementary reading, never a use rate for a defined population.
+    d.text(0.02, 0.03, N_POP, transform=d.transAxes, fontsize=FS_MIN, color=GREY_TEXT,
+           va="bottom", linespacing=1.25)
+    _plain_legend(d, loc="upper right", ncol=2, handlelength=1.4, columnspacing=0.7)
+    head(d, 3)
+
+    # (e) the 72 hospitals of 2024, ranked ------------------------------------------------------
+    e = ax[2, 0]
+    h = hospitals()
+    yr = np.arange(len(h))
+    colours = [BLUE if v else ORANGE for v in h.fixed]
+    floor = max(1.0, float(h.rate[h.rate > 0].min()) * 0.5)
+    e.errorbar(h.rate.clip(lower=floor), yr,
+               xerr=[(h.rate - h.lo).clip(lower=0), h.hi - h.rate], fmt="none",
+               ecolor="#a5a5a5", elinewidth=0.5, zorder=1)
+    e.scatter(h.rate.clip(lower=floor), yr, c=colours, s=7, zorder=3, edgecolor="white",
+              linewidth=0.3)
+    national = PER * h.f84.sum() / h.episodes.sum()
+    e.axvline(national, color=DARK, ls="--", lw=0.9)
+    # the left ~9% and right ~20% of the panel are kept clear of data: the eight extreme hospitals
+    # are labelled there, and their label positions are computed from these limits.
+    x_lo, x_hi = floor * 0.42, float(h.hi.max()) * 6.5
+    y_lo, y_hi = -2.5, len(h) + 0.5
+    _log_axis(e, axis="x"); e.set_xlim(x_lo, x_hi)
+    e.xaxis.set_major_locator(LogLocator(base=10, subs=(1.0,), numticks=8))
+    e.set_ylim(y_lo, y_hi); e.set_yticks([])
+
+    def fx(frac):                                        # panel-width fraction -> log data coord
+        return x_lo * (x_hi / x_lo) ** frac
+
+    def fy(frac):
+        return y_lo + frac * (y_hi - y_lo)
+
+    e.text(national, 0.985, f"{L_NATIONAL} = {num(national, 'en', 0)}",
+           transform=e.get_xaxis_transform(), fontsize=FS_MIN, color=DARK, va="top", ha="center")
+    # the extremes are numbered here and named in the caption: eight hospital names do not fit
+    # legibly in a 62 mm cell. Each label sits in the margin on a fixed step, joined to its point by
+    # a leader drawn as a line rather than as an arrow.
+    for k, i in enumerate(range(len(h) - 1, len(h) - 6, -1)):
+        y_lab = fy(0.975 - 0.075 * k)
+        e.plot([h.hi.iloc[i], fx(0.885)], [yr[i], y_lab], color=LEADER, lw=0.4, zorder=1,
+               solid_capstyle="butt")
+        e.text(fx(0.905), y_lab, str(k + 1), fontsize=FS_MIN, ha="left", va="center", color=DARK,
+               fontweight="bold")
+    for k in range(3):
+        y_lab = fy(0.170 - 0.075 * k)
+        e.plot([max(h.lo.iloc[k], floor), fx(0.092)], [yr[k], y_lab], color=LEADER, lw=0.4,
+               zorder=1, solid_capstyle="butt")
+        e.text(fx(0.072), y_lab, "xyz"[k], fontsize=FS_MIN, ha="right", va="center", color=DARK,
+               fontweight="bold")
+    n_fixed, n_new = int(h.fixed.sum()), int((~h.fixed).sum())
+    _framed_legend(e, handles=[
+        Line2D([0], [0], marker="o", color="w", markerfacecolor=BLUE, markersize=3.6,
+               label=L_FIXED.format(num(n_fixed, "en", 0))),
+        Line2D([0], [0], marker="o", color="w", markerfacecolor=ORANGE, markersize=3.6,
+               label=L_NEW.format(num(n_new, "en", 0)))], loc="lower right", handlelength=1.0)
+    e.set_ylabel(U_RANK.format(num(len(h), "en", 0)))
+    e.set_xlabel(U_HOSP_X)
+    e.tick_params(axis="x", labelsize=FS_MIN + 0.5)
+    e.grid(axis="y", visible=False)
+    head(e, 4)
+
+    # (f) episodes, unique persons within the year and the male:female ratio ---------------------
+    f = ax[2, 1]
+    x = np.array(YEARS, dtype=float)
+    # counts in THOUSANDS: the exact figures are in the plate's table and its caption, and six-figure
+    # tick labels leave no room for the rotated axis label in a 90 mm cell.
+    f.bar(x - 0.2, ao.n_episodes_f84 / 1e3, width=0.38, color=LIGHT_BLUE, label=L_EPISODES)
+    f.bar(x + 0.2, ao.persons_within_year / 1e3, width=0.38, color=BLUE, label=L_PERSONS)
+    for xi, ne, npers in zip(x, ao.n_episodes_f84, ao.persons_within_year):
+        f.text(xi, max(ne, npers) / 1e3 * 1.03, num(ne / npers, "en", 2), ha="center",
+               fontsize=FS_MIN, color=DARK)
+    f.set_ylim(0, float(ao.n_episodes_f84.max()) / 1e3 * 2.5)
+    f.set_xticks(YEARS); f.set_xticklabels([str(y) for y in YEARS], fontsize=FS_MIN + 0.5)
+    f.set_xlabel(L_YEAR); _fmt(f, "y", 0); f.set_ylabel(U_COUNT)
+    f2 = f.twinx(); f2.spines["right"].set_visible(True); f2.grid(False)
+    mf = mf_ratio()
+    f2.errorbar(x, mf.ratio, yerr=[mf.ratio - mf.lo, mf.hi - mf.ratio], fmt="o-", color=ORANGE,
+                lw=1.2, capsize=1.6, markersize=3.0, elinewidth=0.6, label=L_MF)
+    f2.set_ylim(0, 6.6); f2.set_yticks([0, 1, 2, 3, 4, 5, 6]); f2.set_ylabel(U_MF)
+    _fmt(f2, "y", 1); f2.tick_params(labelsize=FS_TICK, right=True)
+    _context(f, pandemic_label=False, law_label=False)
+    h1, l1 = f.get_legend_handles_labels()
+    h2, l2 = f2.get_legend_handles_labels()
+    _framed_legend(f, h1 + h2, l1 + l2, loc="upper right", handlelength=1.4)
+    head(f, 5)
+
+    for a_ in axes:
+        for txt in a_.texts:
+            txt.set_in_layout(False)
+    _align_titles(fig, axes, titles)
+    _tuck_ylabels(fig, axes, titles)
+    _drop_clear(a, ends_a)
+    _drop_clear(b, ends_b)
+    return fig
+
+
+# --------------------------------------------------------------------------------------------------
+# Verification: the drawn values against the tables and against the stored plate
+# --------------------------------------------------------------------------------------------------
+#: Values read off `docs/study/corpus/figures/fig2_grd_core.jpg` (pixel positions of markers, caps
+#: and printed labels), used to confirm the redraw plots the same series as the stored plate.
+PLATE_READ = {
+    "(a) any position 2024 end label": "804",
+    "(a) principal 2024 end label": "36",
+    "(a) hospitals foot row": "65 65 65 65 68 72",
+    "(b) end labels (all / hospitalisation / CMA)": "804 / 872 / 524",
+    "(c) 2024 bar heights": [16.5, 662.7, 1068.0, 1051.4, 1038.0, 1041.6, 898.0, 646.5],
+    "(d) males 2024 at 0-4 and 5-9": [177.2, 347.6],
+    "(e) five highest / three lowest": [5210.7, 3610.4, 3513.1, 2068.8, 1662.6, 67.9, 69.2, 79.0],
+    "(e) national line": 804.0,
+    "(f) multiplicity labels": ["1.20", "1.22", "1.21", "1.19", "1.23", "1.22"],
+    "(f) M:F point and caps, 2019": [3.2613, 2.9550, 3.6036],
+    "(f) M:F point, 2021": 3.2252,
+}
+
+
+def _check():
+    """Compare what `draw()` plots with the tables it parses and with the stored plate."""
+    out = []
+    t = year_summary()
+
+    # the definition: `grd_selected_definition.csv` is the sin_rett slice of the year summary
+    sel = _read(SOURCES[1])
+    out.append(("definition of the selected series", sorted(sel.variant.unique()), [VARIANT],
+                sorted(sel.variant.unique()) == [VARIANT]))
+    con = _read(SOURCES[0])
+    con = con[(con.variant == "con_rett") & (con.panel == "observed") & (con.activity == "all")
+              & (con.position == "any") & (con.year == FIRST)]
+    sin = ys(t, "observed", "all", "any")
+    out.append(("sin_rett 2019 episodes, not con_rett", int(sin.loc[FIRST, "n_episodes_f84"]),
+                int(con.n_episodes_f84.iloc[0]), int(sin.loc[FIRST, "n_episodes_f84"]) == 2334
+                and int(con.n_episodes_f84.iloc[0]) == 2385))
+
+    # (a) the two end labels and the foot row
+    ao = sin
+    po = ys(t, "observed", "all", "principal")
+    for name, v in (("(a) any position 2024 end label", ao.rate.iloc[-1]),
+                    ("(a) principal 2024 end label", po.rate.iloc[-1])):
+        drawn = num(v, "en", 0)
+        out.append((name, drawn, PLATE_READ[name], drawn == PLATE_READ[name]))
+    foot = " ".join(str(int(v)) for v in ao.hospitals_n)
+    out.append(("(a) hospitals foot row", foot, PLATE_READ["(a) hospitals foot row"],
+                foot == PLATE_READ["(a) hospitals foot row"]))
+
+    # (b) the three end labels, and 'other' left out because its denominator is 0
+    ends = " / ".join(num(ys(t, "observed", a, "any").rate.iloc[-1], "en", 0)
+                      for a in ("all", "hospitalisation", "cma"))
+    key = "(b) end labels (all / hospitalisation / CMA)"
+    out.append((key, ends, PLATE_READ[key], ends == PLATE_READ[key]))
+    other = ys(t, "observed", "other", "any")
+    out.append(("(b) 'other' denominator 2020-2024 is 0 (absent, not zero)",
+                list(other.n_episodes_total_same_panel_activity.iloc[1:].fillna(0).astype(int)),
+                [0, 0, 0, 0, 0],
+                list(other.n_episodes_total_same_panel_activity.iloc[1:].fillna(0).astype(int))
+                == [0, 0, 0, 0, 0]))
+
+    # (c) the eight 2024 bars and the two inset points of 2019
+    bars = [round(v, 1) for v in depth_year(LAST).rate_per_100k_episodes]
+    out.append(("(c) 2024 bar heights", bars, PLATE_READ["(c) 2024 bar heights"],
+                bars == PLATE_READ["(c) 2024 bar heights"]))
+    inset = [round(float(ao.loc[FIRST, "coding_depth_mean_all"]), 3),
+             round(float(ao.loc[FIRST, "coding_depth_mean_f84"]), 3)]
+    out.append(("(c) mean depth 2019, all and F84", inset, [4.386, 4.966], inset == [4.386, 4.966]))
+
+    # (d) the male 2024 curve at its peak and at 0-4
+    m24 = pop_rates("HOMBRE", LAST).set_index("age_group").rate
+    got = [round(float(m24["0-4"]), 1), round(float(m24["5-9"]), 1)]
+    out.append(("(d) males 2024 at 0-4 and 5-9", got, PLATE_READ["(d) males 2024 at 0-4 and 5-9"],
+                got == PLATE_READ["(d) males 2024 at 0-4 and 5-9"]))
+    out.append(("(d) ten age groups with 45+ pooled", len(m24), 10, len(m24) == 10))
+
+    # (e) the eight extremes, the panel size and the national line
+    h = hospitals()
+    ext = [round(v, 1) for v in list(h.rate.iloc[::-1][:5]) + list(h.rate.iloc[:3])]
+    out.append(("(e) five highest / three lowest", ext, PLATE_READ["(e) five highest / three lowest"],
+                ext == PLATE_READ["(e) five highest / three lowest"]))
+    nat = PER * h.f84.sum() / h.episodes.sum()
+    out.append(("(e) national line", round(nat), PLATE_READ["(e) national line"],
+                round(nat) == PLATE_READ["(e) national line"]))
+    out.append(("(e) hospitals drawn (fixed + added)", [int(h.fixed.sum()), int((~h.fixed).sum())],
+                [65, 7], [int(h.fixed.sum()), int((~h.fixed).sum())] == [65, 7]))
+    out.append(("(e) national line equals the observed-panel 2024 rate", round(nat, 1),
+                round(float(ao.rate.iloc[-1]), 1), round(nat, 1) == round(float(ao.rate.iloc[-1]), 1)))
+
+    # (f) the six multiplicity labels and the M:F line against the image
+    mult = [num(n / p, "en", 2) for n, p in zip(ao.n_episodes_f84, ao.persons_within_year)]
+    out.append(("(f) multiplicity labels", mult, PLATE_READ["(f) multiplicity labels"],
+                mult == PLATE_READ["(f) multiplicity labels"]))
+    mf = mf_ratio()
+    got = [round(float(mf.loc[2019, c]), 4) for c in ("ratio", "lo", "hi")]
+    read = PLATE_READ["(f) M:F point and caps, 2019"]
+    # the image is read at the OUTER edge of a drawn cap, so the caps read wide by about 0.012;
+    # the test is that the drawn interval sits inside what the image shows, and within 0.02 of it.
+    ok = (got[1] >= read[1] - 0.02 and got[2] <= read[2] + 0.001 and abs(got[0] - read[0]) < 0.02)
+    out.append(("(f) M:F point and caps, 2019", got, read, ok))
+    got21 = round(float(mf.loc[2021, "ratio"]), 4)
+    out.append(("(f) M:F point, 2021", got21, PLATE_READ["(f) M:F point, 2021"],
+                abs(got21 - PLATE_READ["(f) M:F point, 2021"]) < 0.005))
+
+    # the plate's own companion table, T2, prints the panel and the episode denominators
+    t2 = _read(SOURCES[9])
+    t2.columns = [c.strip() for c in t2.columns]
+    row = t2[t2.Indicator.str.startswith("Hospitals observed")].iloc[0]
+    got = [int(str(row[str(y)]).replace(",", "")) for y in YEARS]
+    out.append(("T2: hospitals observed", got, [65, 65, 65, 65, 68, 72],
+                got == [65, 65, 65, 65, 68, 72]))
+    row = t2[t2.Indicator.str.startswith("GRD episodes, observed panel")].iloc[0]
+    got = [int(str(row[str(y)]).replace(",", "")) for y in YEARS]
+    want = [int(v) for v in ao.n_episodes_total_same_panel_activity]
+    out.append(("T2: observed-panel episode denominators", got, want, got == want))
+    return out
+
+
+draw_fig2_grd_core()
+```
+
+### Figure 4. Figure 4. Aggregated REM administrative pathway for autism in the Chilean public network, 2019–2025: detection (A03), counselling, referral and rehabilitation (A27, A28), entry and discharge (A05) and population under control (P2, P6) — F84 without Rett variant
+
+```{python}
+#| label: lamina-fig3_rem_pathway
+#| fig-cap: "Figure 4. Redrawn here from the published tables by the code above."
+from pathlib import Path
+import re
+import sys
+import textwrap
+
+import numpy as np
+import pandas as pd
+import matplotlib
+import matplotlib.pyplot as plt
+from matplotlib.ticker import FixedLocator, NullFormatter
+
+sys.path.insert(0, str(ROOT / "docs" / "study"))   # docs/study, so `figstyle` resolves
+from figstyle import *                                          # noqa: E402,F401,F403  (house style)
+
+PLATE = "fig3_rem_pathway"
+SOURCES = [
+    "docs/study/data/rem_pathway_annual.csv",
+    "docs/study/corpus/tables/F3_rem_pathway_data.csv",
+]
+TIDY_FILE, PUBLISHED_FILE = SOURCES
+NOTE = ("Redraws the six panels of Figure 3 — A03 detection by definition era, A27/A28 counselling, "
+        "referral and rehabilitation, A05 entries and clinical discharges across the 2021 definition "
+        "break, and the P2 and P6 December stocks — from the tidy REM pathway file "
+        "docs/study/data/rem_pathway_annual.csv, with every plotted number checked against the "
+        "published table docs/study/corpus/tables/F3_rem_pathway_data.csv.")
+
+ROOT = BASE.parent.parent                       # docs/study -> docs -> repository root
+
+# --------------------------------------------------------------------------------------------
+# palette
+# --------------------------------------------------------------------------------------------
+# One sequential blue per calendar year for the dot rows of (a) and (b): ColorBrewer Blues, the
+# seven darkest of nine steps, 2019 lightest to 2025 darkest.
+_BLUES = matplotlib.colormaps['Blues'].resampled(9)
+YEAR_BLUE = {year: _BLUES(i) for i, year in enumerate(range(2019, 2026), start=2)}
+DOT_EDGE = _BLUES(8)
+
+BROAD_A = '#888888'        # broad-PDD entries / primary care, the pre-2021 definition
+BROAD_B = '#505050'        # broad-PDD discharges / specialty, the pre-2021 definition
+N_LINE = GREY              # the reporting-establishments line on the right-hand axis
+BREAK_GREY = '#8a8a8a'     # definition-break rule and its label
+NOTE_GREY = '#5a5a5a'      # in-panel notes
+
+# The stored plate sets the dot panels (a) and (b) in a smaller face than the time-series panels:
+# their row labels carry the code name and its n range and would not otherwise fit the gutter.
+DOT_TICK, DOT_LABEL, HEAD_PT, ANNOT_PT, NOTE_PT = 8.4, 9.0, 8.4, 9.0, 9.4
+
+
+def _light(colour, amount=0.35):
+    """The PDD-family variant of a series colour: the same hue lifted towards white."""
+    r, g, b = matplotlib.colors.to_rgb(colour)
+    return (r + (1 - r) * amount, g + (1 - g) * amount, b + (1 - b) * amount)
+
+
+# Law 21.545 was published on 10 March 2023 (day 69). The stored plate marks it against the middle
+# of each plotted year, so the rule sits a little before the 2023 tick. Context only; no estimate
+# depends on it.
+LAW_X = 2023 + 69 / 365 - 0.5
+BREAK_X = 2020.5           # broad PDD (to 2020) | strict autism (from 2021)
+YEARS_FULL = list(range(2019, 2026))
+
+
+# --------------------------------------------------------------------------------------------
+# the tracked tables
+# --------------------------------------------------------------------------------------------
+def _read_tidy():
+    """`rem_pathway_annual.csv` as {(code, measure, year): (total, n, era)}.
+
+    A handful of codes appear twice, once as `single_code` and once under the case-definition
+    variant that contains them (`strict_autism`, `broad_pre2021`); those duplicates carry identical
+    totals and establishment counts, so one row per (code, measure, year) is kept. The combined
+    family rows are the `sin_rett` ones and are addressed by their explicit code strings, so the
+    five-code `con_rett` rows are never selected.
+    """
+    raw = pd.read_csv(ROOT/TIDY_FILE, dtype={'code': str})
+    raw = raw.drop_duplicates(subset=['code', 'measure', 'year'])
+    out = {}
+    for row in raw.itertuples():
+        out[(row.code, row.measure, int(row.year))] = (
+            float(row.total), int(row.n_reporting_establishments), str(row.era))
+    return out
+
+
+_MEASURE = {'annual sum of months (flow)': 'annual_sum',
+            'December stock': 'december_stock',
+            'June stock (sensitivity)': 'june_stock'}
+
+
+def _read_published():
+    """`F3_rem_pathway_data.csv` as {(code, measure, year): (value, n, panel, series)}.
+
+    The presentation cells are formatted strings — "8,221", "1,082" — and are parsed back to
+    integers here; that parsed table is the reference every drawn number is checked against.
+    """
+    raw = pd.read_csv(ROOT/PUBLISHED_FILE, dtype=str).fillna('')
+    out = {}
+    for row in raw.itertuples():
+        key = (row.Code.strip(), _MEASURE[row.Measure.strip()], int(row.Year))
+        out[key] = (_int(row.Value), _int(getattr(row, '_9')),   # 'Reporting establishments'
+                    row.Panel.strip(), row.Series.strip())
+    return out
+
+
+def _int(cell):
+    """'15,859' -> 15859."""
+    m = re.fullmatch(r'[\d,]+', str(cell).strip())
+    if not m:
+        raise ValueError(f'not a count cell: {cell!r}')
+    return int(str(cell).replace(',', ''))
+
+
+def _label(published, code, measure, year):
+    """The series name the published table gives a code, without its module prefix.
+
+    The plate's legends and row labels drop the module tag the table carries ('A05 Entries: strict
+    autism' is drawn as 'Entries: strict autism'); the wording itself is the table's, not ours.
+    """
+    name = published[(code, measure, year)][3]
+    return re.sub(r'^(A05|A27|A28|P2|P6)\s+', '', name)
+
+
+# --------------------------------------------------------------------------------------------
+# what each panel draws, in the plate's order
+# --------------------------------------------------------------------------------------------
+# (title, years, the era every code in the block must start in, codes). The era string is checked
+# against the tidy file so a code from a neighbouring era can never slip into a block.
+A03_BLOCKS = [                                   # panel (a)
+    ('2019–2022 · M-CHAT (03500406/07)', [2019, 2020, 2021, 2022], '2019',
+     ['03500406', '03500407']),
+    ('2023–2024 · M-CHAT-R/F\n(09600212–19)', [2023, 2024], '2023',
+     ['09600212', '09600213', '09600214', '09600215', '09600216',
+      '09600217', '09600218', '09600219']),
+]
+A03_LATER_BLOCKS = [                             # panel (b)
+    ('2024 · 31–59 months (03700104–09)', [2024], '2024',
+     ['03700104', '03700105', '03700106', '03700107', '03700108', '03700109']),
+    ('2025 · redesign (03710013–21)', [2025], '2025',
+     ['03710013', '03710014', '03710015', '03710016', '03710017',
+      '03710018', '03710019', '03710020', '03710021']),
+]
+A27_A28 = [('29101566', BLUE), ('29101574', ORANGE),      # panel (c)
+           ('29101629', GREEN), ('29101651', PINK)]
+
+# panel (d): (code, measure, years, colour, marker, linestyle, linewidth, markersize)
+BROAD_YEARS, STRICT_YEARS = [2019, 2020], [2021, 2022, 2023, 2024, 2025]
+A05_SERIES = [
+    ('06902600', BROAD_YEARS, BROAD_A, 'o', '-', 2.0, 6.5),
+    ('05225000', BROAD_YEARS, BROAD_B, 's', '--', 2.0, 5.6),
+    ('05990022+05990023+05990025+05990026', STRICT_YEARS, _light(BLUE), 'o', '-', 1.3, 4.6),
+    ('05990027+05990028+05990030+05990031', STRICT_YEARS, _light(ORANGE), 's', '--', 1.3, 4.2),
+    ('05990022', STRICT_YEARS, BLUE, 'o', '-', 2.2, 6.5),
+    ('05990027', STRICT_YEARS, ORANGE, 's', '--', 2.2, 5.6),
+]
+# the establishment line of (d): the entries code of each era, so the line breaks where the
+# definition does
+A05_N_LINE = [('06902600', BROAD_YEARS), ('05990022', STRICT_YEARS)]
+
+P6_SERIES = [                                            # panel (f)
+    ('P6223000', BROAD_YEARS, BROAD_A, 'o', '-', 2.0, 6.5),
+    ('P6223380', BROAD_YEARS, BROAD_B, 's', '--', 2.0, 5.6),
+    ('P6241010+P6241020+P6241040+P6241050', STRICT_YEARS, _light(GOLD), 'o', '-', 1.3, 4.6),
+    ('P6241060+P6241070+P6241090+P6241100', STRICT_YEARS, _light(SKY), 's', '--', 1.3, 4.2),
+    ('P6241010', STRICT_YEARS, GOLD, 'o', '-', 2.2, 6.5),
+    ('P6241060', STRICT_YEARS, SKY, 's', '--', 2.2, 5.6),
+]
+
+# every (code, measure, year) this module reads, for the check against the published table
+def _used_keys():
+    keys = []
+    for _, years, _, codes in A03_BLOCKS + A03_LATER_BLOCKS:
+        keys += [(c, 'annual_sum', y) for c in codes for y in years]
+    keys += [(c, 'annual_sum', y) for c, _ in A27_A28 for y in (2023, 2024, 2025)]
+    for code, years, *_ in A05_SERIES + P6_SERIES:
+        measure = 'december_stock' if code.startswith('P6') else 'annual_sum'
+        keys += [(code, measure, y) for y in years]
+    keys += [('P2500500', 'december_stock', y) for y in YEARS_FULL]
+    keys += [('P2500500', 'june_stock', y) for y in YEARS_FULL]
+    keys += [('P2501878', 'december_stock', y) for y in (2023, 2024, 2025)]
+    return [k for k in keys if k != ('09600217', 'annual_sum', 2024)]   # code existed in 2023 only
+
+
+def _check_published(tidy, published):
+    """Every number this module draws, against the published table cell for it."""
+    bad = []
+    for key in _used_keys():
+        total, n, _ = tidy[key]
+        value, n_pub, _, _ = published[key]
+        if round(total) != value or n != n_pub:
+            bad.append(f'{key}: tidy {round(total)} (n={n}) vs published {value} (n={n_pub})')
+    if bad:
+        raise AssertionError('drawn values disagree with F3_rem_pathway_data.csv:\n  '
+                             + '\n  '.join(bad))
+
+
+# --------------------------------------------------------------------------------------------
+# small drawing helpers
+# --------------------------------------------------------------------------------------------
+def _n_range(ns):
+    """'198–399', or '247' when a code was reported in a single year."""
+    lo, hi = min(ns), max(ns)
+    return num(lo, 'en') if lo == hi else f"{num(lo, 'en')}–{num(hi, 'en')}"
+
+
+def _break_rule(ax, y_text, label=True):
+    """The dash-dot rule at the broad-PDD | strict-autism definition break."""
+    ax.axvline(BREAK_X, color=BREAK_GREY, ls=(0, (6, 2, 1, 2)), lw=1.1, zorder=2)
+    if label:
+        ax.text(BREAK_X - 0.09, y_text, 'definition break', transform=ax.get_xaxis_transform(),
+                rotation=90, ha='right', va='bottom', fontsize=NOTE_PT, color=BREAK_GREY)
+
+
+def _law_rule(ax, label=None, y=0.478):
+    """Law 21.545 (March 2023) as context, dotted; labelled once, in (d)."""
+    ax.axvline(LAW_X, color='#1a1a1a', ls=(0, (1, 2.2)), lw=1.4, zorder=2)
+    if label:
+        ax.text(LAW_X + 0.05, y, label, transform=ax.get_xaxis_transform(), ha='left', va='top',
+                fontsize=NOTE_PT, color=NOTE_GREY, linespacing=1.15)
+
+
+def _log_x(ax):
+    """The shared log axis of (a) and (b): decade ticks only, as on the stored plate."""
+    ax.set_xscale('log')
+    ax.xaxis.set_major_locator(FixedLocator([1_000, 10_000]))
+    ax.xaxis.set_minor_locator(FixedLocator([]))
+    ax.xaxis.set_major_formatter(thousands('en'))
+    ax.xaxis.set_minor_formatter(NullFormatter())
+
+
+def _block_head(ax, text):
+    ax.text(0.0, 1.012, text, transform=ax.transAxes, ha='left', va='bottom', fontsize=HEAD_PT,
+            fontweight='bold', linespacing=1.3)
+
+
+def _right_axis(ax, top, ticks):
+    """The reporting-establishments axis: counts of establishments, never of people."""
+    ax2 = ax.twinx()
+    ax2.set_ylim(0, top)
+    ax2.set_yticks(ticks)
+    ax2.yaxis.set_major_formatter(thousands('en'))
+    ax2.set_ylabel('Reporting establishments (n)')
+    ax2.grid(False)
+    for side in ('top', 'left'):
+        ax2.spines[side].set_visible(False)
+    ax2.spines['right'].set_visible(True)
+    return ax2
+
+
+def _heading(fig, x, y, text):
+    fig.text(x, y, text, fontweight='bold', fontsize=12.5, ha='left', va='top')
+
+
+# --------------------------------------------------------------------------------------------
+# (a) and (b): A03 by definition era, one dot row per code
+# --------------------------------------------------------------------------------------------
+def _dot_block(ax, tidy, published, block, markersize):
+    head, years, era, codes = block
+    labels = []
+    for i, code in enumerate(codes):
+        points = [(y, tidy[(code, 'annual_sum', y)]) for y in years
+                  if (code, 'annual_sum', y) in tidy]
+        values = [t for _, (t, _, _) in points]
+        assert all(e.startswith(era) for _, (_, _, e) in points), (code, era)
+        if len(values) > 1:                       # the era's lowest and highest value, joined
+            ax.plot([min(values), max(values)], [i, i], color=LIGHT, lw=1.7, zorder=2,
+                    solid_capstyle='round')
+        for year, (total, _, _) in points:
+            ax.plot([total], [i], marker='o', ms=markersize, color=YEAR_BLUE[year],
+                    mec=DOT_EDGE, mew=0.55, ls='none', zorder=3 + year - 2019)
+        series = _label(published, code, 'annual_sum', points[0][0])
+        labels.append(f"{series} · n {_n_range([n for _, (_, n, _) in points])}")
+    clean(ax, grid='x')
+    ax.set_yticks(range(len(codes)))
+    ax.set_yticklabels(labels)
+    ax.set_ylim(len(codes) - 0.5, -0.5)
+    ax.tick_params(axis='both', length=0, labelsize=DOT_TICK)
+    _block_head(ax, head)
+
+
+def _panel_ab(ax_top, ax_bottom, tidy, published, blocks, xlabel, markersize, footnote=None):
+    for ax, block in ((ax_top, blocks[0]), (ax_bottom, blocks[1])):
+        _dot_block(ax, tidy, published, block, markersize)
+    lo = min(tidy[(c, 'annual_sum', y)][0]
+             for _, years, _, codes in blocks for c in codes for y in years
+             if (c, 'annual_sum', y) in tidy)
+    hi = max(tidy[(c, 'annual_sum', y)][0]
+             for _, years, _, codes in blocks for c in codes for y in years
+             if (c, 'annual_sum', y) in tidy)
+    span = np.log10(hi) - np.log10(lo)           # the two blocks share one log scale
+    xlim = (10 ** (np.log10(lo) - 0.22 * span), 10 ** (np.log10(hi) + 0.22 * span))
+    for ax in (ax_top, ax_bottom):
+        _log_x(ax)
+        ax.set_xlim(*xlim)
+    ax_top.tick_params(axis='x', labelbottom=False)
+    ax_top.spines['bottom'].set_visible(False)
+    ax_bottom.set_xlabel(xlabel, fontsize=DOT_LABEL)
+    if footnote:
+        ax_bottom.text(0.5, -0.163, footnote, transform=ax_bottom.transAxes, ha='center', va='top',
+                       fontsize=9.1)
+
+
+# --------------------------------------------------------------------------------------------
+# (c) A27 and A28, 2023-2025
+# --------------------------------------------------------------------------------------------
+def _panel_c(ax, tidy, published):
+    years = [2023, 2024, 2025]
+    offsets = (-0.3, -0.1, 0.1, 0.3)
+    for (code, colour), off in zip(A27_A28, offsets):
+        totals = [tidy[(code, 'annual_sum', y)][0] for y in years]
+        ns = [tidy[(code, 'annual_sum', y)][1] for y in years]
+        label = _label(published, code, 'annual_sum', 2023)
+        ax.bar([y + off for y in years], totals, width=0.17, color=colour, label=label, zorder=3)
+        for y, total, n in zip(years, totals, ns):
+            ax.text(y + off, total + 550, f"{num(total, 'en')} · n={num(n, 'en')}", rotation=90,
+                    ha='center', va='bottom', fontsize=9.0, color=colour, zorder=4)
+    clean(ax)
+    ax.set_xlim(2022.5, 2025.5)
+    ax.set_ylim(0, 40_000)
+    ax.set_yticks(range(0, 40_001, 5_000))
+    ax.yaxis.set_major_formatter(thousands('en'))
+    year_ticks(ax, years)
+    ax.set_xlabel('Year (codes from 2023)')
+    ax.set_ylabel('Interventions (annual flow; not persons)')
+    ax.legend(loc='upper left', bbox_to_anchor=(0.03, 1.0), title='n = reporting establishments',
+              frameon=False, alignment='left', handlelength=1.1, handleheight=1.0,
+              labelspacing=0.32, borderpad=0.2)
+
+
+# --------------------------------------------------------------------------------------------
+# (d) A05 entries and clinical discharges, and (f) P6 under control in December
+# --------------------------------------------------------------------------------------------
+def _era_lines(ax, tidy, published, series, measure_of):
+    handles = []
+    for code, years, colour, marker, ls, lw, ms in series:
+        measure = measure_of(code)
+        totals = [tidy[(code, measure, y)][0] for y in years]
+        label = textwrap.fill(_label(published, code, measure, years[0]), 27)
+        line, = ax.plot(years, totals, marker=marker, ls=ls, lw=lw, ms=ms, color=colour,
+                        mec=colour, label=label, zorder=3, clip_on=False)
+        handles.append(line)
+    return handles
+
+
+def _panel_d(ax, tidy, published):
+    shade_pandemic(ax)
+    _break_rule(ax, 0.04)
+    _law_rule(ax, 'Law 21.545\n(context)')
+    ax.text(2021.1, 0.547, 'Reporting\ndisruption 2020–21', transform=ax.get_xaxis_transform(),
+            ha='center', va='center', fontsize=NOTE_PT, color=NOTE_GREY, linespacing=1.15, zorder=4)
+
+    handles = _era_lines(ax, tidy, published, A05_SERIES, lambda c: 'annual_sum')
+    clean(ax)
+    ax.set_xlim(2018.5, 2025.5)
+    ax.set_ylim(0, 50_000)
+    ax.set_yticks(range(0, 50_001, 10_000))
+    ax.yaxis.set_major_formatter(thousands('en'))
+    year_ticks(ax, YEARS_FULL, short=True)
+    ax.set_xlabel('Year')
+    ax.set_ylabel('Entries / clinical discharges (annual flow)')
+
+    ax2 = _right_axis(ax, 3_800, range(0, 3_501, 500))
+    for code, years in A05_N_LINE:               # one segment per definition era
+        ax2.plot(years, [tidy[(code, 'annual_sum', y)][1] for y in years], color=N_LINE, lw=1.3,
+                 zorder=2)
+    n_line, = ax.plot([], [], color=N_LINE, lw=1.3, label='n reporting establishments')
+
+
+    # the strict-autism entries, labelled year by year as on the stored plate
+    for year in STRICT_YEARS:
+        total = tidy[('05990022', 'annual_sum', year)][0]
+        dx, ha = (6.5, 'left') if year <= 2023 else (-6.0, 'right')
+        ax.annotate(num(total, 'en'), (year, total), xytext=(dx, 8.3),
+                    textcoords='offset points', ha=ha, va='center', fontsize=ANNOT_PT,
+                    color=BLUE, zorder=5)
+
+    ax.legend(handles=handles + [n_line], loc='upper left', bbox_to_anchor=(0.01, 1.005),
+              frameon=False, handlelength=1.6, labelspacing=0.30, borderpad=0.15, fontsize=9.4)
+
+
+def _panel_f(ax, tidy, published):
+    shade_pandemic(ax)
+    _break_rule(ax, 0.40)
+    _law_rule(ax)
+    handles = _era_lines(ax, tidy, published, P6_SERIES, lambda c: 'december_stock')
+    clean(ax)
+    ax.set_xlim(2018.19, 2025.81)
+    ax.set_ylim(0, 55_440)
+    ax.set_yticks(range(0, 50_001, 10_000))
+    ax.yaxis.set_major_formatter(thousands('en'))
+    year_ticks(ax, YEARS_FULL, short=True)
+    ax.set_xlabel('Year')
+    ax.set_ylabel('People under control in December (stock)')
+
+    for code, colour, dx in (('P6241010', GOLD, -3.5), ('P6241060', SKY, -5.0)):
+        total = tidy[(code, 'december_stock', 2025)][0]
+        ax.annotate(num(total, 'en'), (2025, total), xytext=(dx, 10.0),
+                    textcoords='offset points', ha='right', va='center', fontsize=ANNOT_PT,
+                    color=colour, zorder=5)
+    primary = [tidy[('P6241010', 'december_stock', y)][1] for y in STRICT_YEARS]
+    specialty = [tidy[('P6241060', 'december_stock', y)][1] for y in STRICT_YEARS]
+    ax.text(0.965, 0.012, f"n primary care\n{_n_range(primary)} ·\nspecialty {_n_range(specialty)}",
+            transform=ax.transAxes, ha='right', va='bottom', fontsize=NOTE_PT, color=NOTE_GREY,
+            linespacing=1.2)
+    ax.legend(handles=handles, loc='upper left', bbox_to_anchor=(0.01, 1.005), frameon=False,
+              handlelength=1.6, labelspacing=0.30, borderpad=0.15)
+
+
+# --------------------------------------------------------------------------------------------
+# (e) P2 NANEAS with ASD, December stock with the June sensitivity
+# --------------------------------------------------------------------------------------------
+def _panel_e(ax, tidy, published):
+    shade_pandemic(ax)
+    _law_rule(ax)
+    december = [tidy[('P2500500', 'december_stock', y)][0] for y in YEARS_FULL]
+    june = [tidy[('P2500500', 'june_stock', y)][0] for y in YEARS_FULL]
+    dec_line, = ax.plot(YEARS_FULL, december, marker='o', ms=7.0, lw=2.4, color=PINK, mec=PINK,
+                        label=_label(published, 'P2500500', 'december_stock', 2019), zorder=3)
+    # the June markers sit above the December series: in 2019 the two stocks almost coincide and
+    # the stored plate shows the hollow June ring over the filled December point
+    jun_line, = ax.plot(YEARS_FULL, june, marker='o', ms=7.0, ls='none', color=PINK, mec=PINK,
+                        mfc='white', mew=1.6,
+                        label=_label(published, 'P2500500', 'june_stock', 2019), zorder=4)
+    clean(ax)
+    ax.set_xlim(2018.19, 2025.81)
+    ax.set_ylim(0, 44_070)
+    ax.set_yticks(range(0, 40_001, 5_000))
+    ax.yaxis.set_major_formatter(thousands('en'))
+    year_ticks(ax, YEARS_FULL, short=True)
+    ax.set_xlabel('Year')
+    ax.set_ylabel('People under control in December (stock)')
+
+    ax2 = _right_axis(ax, 5_203, range(0, 5_001, 1_000))
+    n_dec = [tidy[('P2500500', 'december_stock', y)][1] for y in YEARS_FULL]
+    n_jun = [tidy[('P2500500', 'june_stock', y)][1] for y in YEARS_FULL]
+    ax2.plot(YEARS_FULL, n_dec, color=N_LINE, lw=1.3, zorder=2)
+    ax2.plot(YEARS_FULL, n_jun, color=N_LINE, lw=1.0, ls=(0, (1, 1.7)), zorder=2)
+    h_dec, = ax.plot([], [], color=N_LINE, lw=1.3, label='n establishments, Dec.')
+    h_jun, = ax.plot([], [], color=N_LINE, lw=1.0, ls=(0, (1, 1.7)),
+                     label='n establishments, Jun.')
+
+    for year, offset, ha in ((2019, (7, 8.6), 'left'), (2025, (1, -17), 'right')):
+        total = tidy[('P2500500', 'december_stock', year)][0]
+        ax.annotate(num(total, 'en'), (year, total), xytext=offset, textcoords='offset points',
+                    ha=ha, va='center', fontsize=ANNOT_PT, color=PINK, zorder=5)
+
+    # ASD per 100 NANEAS under control: the same December stock over the total NANEAS code
+    ratio = '; '.join(
+        f"{y}: {100 * tidy[('P2500500', 'december_stock', y)][0] / tidy[('P2501878', 'december_stock', y)][0]:.1f}"
+        for y in (2023, 2024, 2025))
+    ax.text(0.032, 0.478, 'ASD per 100 NANEAS\n' + textwrap.fill(f'(Dec.) {ratio}', 24),
+            transform=ax.transAxes, ha='left', va='top', fontsize=NOTE_PT, color=NOTE_GREY,
+            linespacing=1.2, zorder=4)
+
+    ax.legend(handles=[dec_line, jun_line, h_dec, h_jun], loc='upper left',
+              bbox_to_anchor=(0.01, 1.005), frameon=True, facecolor='white', edgecolor='#cccccc',
+              framealpha=0.95, handlelength=1.6, labelspacing=0.30, borderpad=0.35)
+
+
+# --------------------------------------------------------------------------------------------
+def draw_fig3_rem_pathway():
+    tidy = _read_tidy()
+    published = _read_published()
+    _check_published(tidy, published)
+
+    style()
+    plt.rcParams.update({'xtick.labelsize': 9.5, 'ytick.labelsize': 9.5, 'axes.labelsize': 11.0,
+                         'legend.fontsize': 8.6, 'legend.title_fontsize': 8.6,
+                         'xtick.major.size': 0, 'ytick.major.size': 0,
+                         'xtick.major.pad': 4, 'ytick.major.pad': 5})
+    fig = plt.figure(figsize=(10.0, 13.61))      # the stored plate's proportions, 1000 x 1361 px
+
+    def rect(x0, y0, x1, y1):                    # pixel box of the stored plate -> figure fraction
+        return [x0/1000, 1 - y1/1361, (x1 - x0)/1000, (y1 - y0)/1361]
+
+    ax_a_top = fig.add_axes(rect(212, 52, 437, 112))
+    ax_a_bot = fig.add_axes(rect(212, 143, 437, 370))
+    ax_b_top = fig.add_axes(rect(706, 47, 931, 169))
+    ax_b_bot = fig.add_axes(rect(706, 187, 931, 370))
+    ax_c = fig.add_axes(rect(212, 541, 437, 887))
+    ax_d = fig.add_axes(rect(706, 541, 931, 887))
+    ax_e = fig.add_axes(rect(212, 972, 428, 1319))
+    ax_f = fig.add_axes(rect(706, 972, 931, 1319))
+
+    _panel_ab(ax_a_top, ax_a_bot, tidy, published, A03_BLOCKS,
+              'Screening records (annual flow)', markersize=5.6,
+              footnote='*among children with language/social alteration')
+    handles, labels = [], []
+    for year in YEARS_FULL[:-1]:                 # panel (a) spans 2019-2024
+        handles.append(plt.Line2D([], [], marker='o', ls='none', ms=5.6, color=YEAR_BLUE[year],
+                                  mec=DOT_EDGE, mew=0.55))
+        labels.append(str(year))
+    ax_a_bot.legend(handles, labels, loc='upper center', bbox_to_anchor=(0.5, -0.437), ncol=6,
+                    frameon=False, handlelength=1.0, columnspacing=1.1, handletextpad=0.35,
+                    fontsize=8.0)
+
+    _panel_ab(ax_b_top, ax_b_bot, tidy, published, A03_LATER_BLOCKS,
+              'Children or records (annual flow)', markersize=6.0)
+    ax_b_bot.legend([plt.Line2D([], [], marker='o', ls='none', ms=6.0, color=YEAR_BLUE[y],
+                                mec=DOT_EDGE, mew=0.55) for y in (2024, 2025)],
+                    ['2024', '2025'], loc='upper center', bbox_to_anchor=(0.5, -0.189), ncol=2,
+                    frameon=False, handlelength=1.0, columnspacing=1.1, handletextpad=0.35,
+                    fontsize=8.0)
+
+    _panel_c(ax_c, tidy, published)
+    _panel_d(ax_d, tidy, published)
+    _panel_e(ax_e, tidy, published)
+    _panel_f(ax_f, tidy, published)
+
+    for x, y, text in ((0.012, 5, '(a) A03: M-CHAT and M-CHAT-R/F'),
+                       (0.512, 5, '(b) A03: 2024 and 2025 redesign'),
+                       (0.012, 523, '(c) A27 and A28, 2023–2025'),
+                       (0.512, 523, '(d) A05 entries and discharges'),
+                       (0.012, 954, '(e) P2 NANEAS with ASD (Dec.)'),
+                       (0.512, 954, '(f) P6 under control in December')):
+        _heading(fig, x, 1 - y/1361, text)
+    return fig
+
+
+draw_fig3_rem_pathway()
+```
+
+### Figure 5. Figure 5. Educational triangulation and population benchmarks of administrative autism recognition, Chile 2019–2025 — F84 without Rett variant
+
+::: {.callout-note collapse="true"}
+## Stored image — this plate has no drawing code here
+
+Its series are not fully carried by any published table, so it cannot be redrawn from a
+clone. The code that produced it is in `study/pipeline/`; what is missing is the microdata
+it reads.
+:::
+
+![**Figure 5. Educational triangulation and population benchmarks of administrative autism recognition, Chile 2019–2025 — F84 without Rett variant** (a) Autistic students in the School Integration Programme (PIE; annual school stock, national enrolment): strict ASD and ASD-Asperger 2019–2023 (Apuntes 60, Table 6), the harmonised ASD + Asperger series 2019–2025 (Apuntes 60 to 2023; SINACES 2024–2025, hollow markers and dashed line), the harmonised figure as printed by SINACES 2022–2025, and autism in special schools 2022–2025. 2022 discrepancy: SINACES prints 42,945 while 45,014 − 2,074 = 42,940 matches Apuntes 60; 42,940 is adopted (5 students, 0.01%). (b) JUNAEB (Student Vulnerability Survey): % of students with caregiver-reported ASD by level; 2024 (EXP_REG weight) and 2025 (EXP) with 95% CIs; 2023 has no published weight (hollow markers, unweighted % with Wilson CI); 2019–2022 have no ASD item and Grade 9 in 2024 has an empty variable, both marked &#x27;not estimable&#x27; in the lower strip and never as zero. Selected school cohorts and caregiver report; not national prevalence. (c) Design-based weighted proportions (weight, stratum and cluster; logit-t 95% CIs): ENDIDE 2022 adults 18+, children 2–17 with caregiver-reported autism and with physician-confirmed report, and ENCAVI 2023–2024 persons 15+ with an ASD diagnosis, total and by sex; to the right of each row, % (95% CI); in the row label, cases / unweighted domain n; imprecise estimates (&lt; 30 cases or relative SE &gt; 30%) in grey. Log scale. (d) Indices (first common year 2021 = 100; log scale) of series with different units, denominators and coverage: GRD F84 in any position per 100,000 episodes (observed panel), DEIS principal F84 per 100,000 discharges, A05 autism entries (flow; reporting establishments 2021–2025: 449/658/920/1,070/952), P2 December stock (establishments 2019–2025: 460/400/640/897/1,012/1,218/1,325) and harmonised PIE (hollow markers and dashed line 2023–2025 = SINACES source, as in a); these are indices, not comparable levels. (e) Five stacked strips, each with its own vertical axis, per 100,000 INE population (2017 Census base, 30 June, total population of all ages; residence): GRD episodes with F84 (variant), unique persons within the year, A05 entries and the P2 December stock (numerators by place of care, public network; n = reporting establishments) and harmonised PIE. Hatched bars are stocks and solid bars flows, and they never share an axis; each strip&#x27;s maximum is labelled on its own axis and heights are not compared across strips. (f) F84 in the principal position: DEIS discharges (all establishments and the SNSS subset) per 100,000 discharges against GRD episodes (observed panel, all activity and strict hospitalisation; n = hospitals) per 100,000 episodes, exact 95% Poisson CIs; DEIS does not record secondary diagnoses (DIAG2 is the external cause), so secondary F84 in GRD has no equivalent. Shading: 2020–2021 reporting disruption; dotted line: Law 21.545 (March 2023) as context, not as an intervention; both mean the same in every panel and are labelled once, in (a). Sources are not person-linked; counts are administrative recognition, not prevalence or incidence.](study/corpus/figures/fig4_triangulation.jpg){fig-align="center" width="100%"}
+
+
+## Core supplementary plates of the article
+
+### Figure S1. Figure S1. Sensitivity of the GRD series to the inclusion of Rett syndrome (F84.2): full F84 versus F84 without Rett, 2019–2024
+
+::: {.callout-note collapse="true"}
+## Stored image — this plate has no drawing code here
+
+Its series are not fully carried by any published table, so it cannot be redrawn from a
+clone. The code that produced it is in `study/pipeline/`; what is missing is the microdata
+it reads.
+:::
+
+![**Figure S1. Sensitivity of the GRD series to the inclusion of Rett syndrome (F84.2): full F84 versus F84 without Rett, 2019–2024** (a) Episodes with F84 in any position per 100,000 GRD episodes (observed panel, all activity) in both variants, with exact 95% CI. (b) Same for principal F84. (c) Strict hospitalisation and CMA (any position) by variant. (d) Episodes with F84.2 in any position and as principal diagnosis by year, with their percentage of the full F84 family. (e) Relative difference (with − without)/without, in %, for each series: any position, principal, hospitalisation, CMA and unique persons within year. (f) Fixed panel of 65 hospitals (any position and principal, log scale) and unique persons within year (bars, right axis) by variant. The strict REM autism and F84.0 series do not change between variants. Shading: 2020–2021 reporting disruption; dotted line: Law 21.545 as context. Identical in both variants; counts are administrative recognition.](study/corpus/figures/figS1_grd_variants.jpg){fig-align="center" width="100%"}
+
+### Figure S2. Figure S2. F84 subcode composition and code position in GRD episodes, 2019–2024 — F84 without Rett variant
+
+::: {.callout-note collapse="true"}
+## Stored image — this plate has no drawing code here
+
+Its series are not fully carried by any published table, so it cannot be redrawn from a
+clone. The code that produced it is in `study/pipeline/`; what is missing is the microdata
+it reads.
+:::
+
+![**Figure S2. F84 subcode composition and code position in GRD episodes, 2019–2024 — F84 without Rett variant** Subcodes of the variant (F84 without Rett). (a) Percentage distribution of F84 subcode mentions in any position by year (an episode may carry more than one subcode: mentions ≠ episodes). (b) Mentions by subcode (log scale). (c) Percentage of each subcode&#x27;s mentions recorded as principal diagnosis (subcodes with ≥ 20 mentions in every year) and of the whole family. (d) Episodes with F84 by code position (principal only, principal and secondary, secondary only; observed panel, all activity) and percentage secondary only. (e) F84.0 only (identical in both variants) versus the variant&#x27;s F84 family per 100,000 GRD episodes, with exact CIs. (f) Episodes with F84.2 (Rett syndrome) by position: included in the full-F84 variant and excluded in the without-Rett variant. Shading: 2020–2021 reporting disruption; dotted line: Law 21.545 as context. Administrative recognition, not prevalence.](study/corpus/figures/figS2_grd_subcodes.jpg){fig-align="center" width="100%"}
+
+### Figure S3. Figure S3. Heterogeneity across GRD hospitals: hospital effects, coding depth and rates 2019 versus 2024 — F84 without Rett variant
+
+::: {.callout-note collapse="true"}
+## Stored image — this plate has no drawing code here
+
+Its series are not fully carried by any published table, so it cannot be redrawn from a
+clone. The code that produced it is in `study/pipeline/`; what is missing is the microdata
+it reads.
+:::
+
+![**Figure S3. Heterogeneity across GRD hospitals: hospital effects, coding depth and rates 2019 versus 2024 — F84 without Rett variant** (a) Hospital fixed effects from the quasi-Poisson model 2019–2024 (hospital indicators, common trend, log(episodes) offset), expressed as rate ratios against the geometric mean of hospitals, with 95% CI; crosses: adjusted for hospital-year coding depth; colour: 2019–2024 fixed panel (65) versus hospitals added in 2023–2024. (b) Posterior means of the Poisson random intercept (Laplace/MAP) against the centred fixed effect: shrinkage towards zero reflects the uncertainty of small hospitals; intercept SD with CI. (c) 2024 rate per 100,000 hospital episodes versus the hospital&#x27;s mean coding depth (ecological association, Spearman ρ); implies neither causality nor quality. (d) Distribution of hospital rates by year (boxes: median and quartiles; points: hospitals; line: fixed-panel median; log scale). (e, f) Rate of each of the 65 fixed-panel hospitals in 2019 versus 2024, ranked by the 2024 rate and split at its median so that every hospital carries a legible name: (e) the half with the higher 2024 rate, (f) the half with the lower one (log scale; cross: no F84 episodes in 2019; abbreviated names). If hospital_effects.csv is unavailable, a and b say so. Descriptive results by place of care; 2020–2021 shading: reporting disruption; Law 21.545 as context only.](study/corpus/figures/figS3_grd_hospital_effects.jpg){fig-align="center" width="100%"}
+
+### Figure S4. Figure S4. Quasi-Poisson models of administrative recognition of autism: GRD, REM, education and DEIS, Chile 2019–2025 — F84 without Rett variant
+
+::: {.callout-note collapse="true"}
+## Stored image — this plate has no drawing code here
+
+Its series are not fully carried by any published table, so it cannot be redrawn from a
+clone. The code that produced it is in `study/pipeline/`; what is missing is the microdata
+it reads.
+:::
+
+![**Figure S4. Quasi-Poisson models of administrative recognition of autism: GRD, REM, education and DEIS, Chile 2019–2025 — F84 without Rett variant** (a) GRD episodes with documented F84 in any position per 100,000 GRD episodes (all activity): points = observed with exact Poisson 95% CI; lines = quasi-Poisson log-linear fit 2019–2024 with log(episodes) offset and 95% band; observed annual panel (n = hospitals per year) and fixed panel of 65 hospitals. (b) Principal F84 in GRD (observed and fixed) and DEIS discharges with F84 in DIAG1 per 100,000 discharges: principal-versus-principal comparison (DEIS publishes no secondary diagnoses). (c) Annual percent change (APC) and 95% CI of GRD models by panel, activity, position, covariates (mean coding depth; 2020–2021 reporting-disruption indicator, not causal), window (2019–2024, 2021–2024), hospital-year models (fixed effects, robust SE, random intercept) and age-adjusted population rate. (d) Episodes per 100,000 INE population (base 2017, residence; place-of-care numerator): crude and WHO-standardised rates by sex, Fay–Feuer 95% CI. (e) Indices (2021 = 100, first common year; log scale) of series with different units and denominators: indices, not comparable levels. (f) APC of REM A05 (autism entries 2021–2025 with population offset, per reporting establishment, stable panel and age adjustment), P2 (December ASD stock 2019–2025 with and without establishment offset, disruption indicator, 2021–2025 window and per 100 NANEAS 2023–2025), P6 (December stocks 2021–2025), harmonised PIE (2019–2025; 2019–2023 Apuntes 60 only) and DEIS principal. Shading: 2020–2021 reporting disruption; dotted line: Law 21.545 (March 2023) as context, not intervention. Counts are administrative recognition, not prevalence or incidence.](study/corpus/figures/figS4_models_cpa.jpg){fig-align="center" width="100%"}
+
+### Figure S5. Figure S5. REM June versus December stocks (P2 ASD, P6 primary care and specialty), 2019–2025: semester sensitivity, never summed — F84 without Rett variant
+
+::: {.callout-note collapse="true"}
+## Stored image — this plate has no drawing code here
+
+Its series are not fully carried by any published table, so it cannot be redrawn from a
+clone. The code that produced it is in `study/pipeline/`; what is missing is the microdata
+it reads.
+:::
+
+![**Figure S5. REM June versus December stocks (P2 ASD, P6 primary care and specialty), 2019–2025: semester sensitivity, never summed — F84 without Rett variant** People under control (stock) in the June row (MES=06, hatched bars) and the December row (MES=12, filled bars) of each year; n = establishments with a row in that semester. (a) P2 ASD (P2500500) 2019–2025: June 2020 collapses to 172 people in 28 establishments (reporting disruption) against 1,919 in 400 establishments in December. (b) P6 primary care: broad PDD 2019–2020 (P6223000, grey; different definition, separated by the break marker) and strict autism 2021–2025 (P6241010); diamonds: variant PDD family (P6241010, P6241020, P6241040, P6241050). (c) P6 specialty: broad PDD (P6223380) and strict autism (P6241060); diamonds: variant family (P6241060, P6241070, P6241090, P6241100). (d) June/December ratio of the stock (circles) and of the number of reporting establishments (squares) by series and era segment; segments are not joined across the 2021 break. (e) P2 ASD by establishment in 2019, 2020, 2022 and 2025: June versus December value (+1, log scale) in establishments with both rows; the legend gives how many have both, December only or June only. (f) Number of establishments by semester reporting pattern (both semesters, December only, June only) for P2 ASD and P6 primary care (broad PDD to 2020, strict autism from 2021). Shading: 2020–2021 reporting disruption; dotted line: Law 21.545 as context. Semesters are stock cuts and are never summed; administrative counts, not prevalence.](study/corpus/figures/figS5_rem_june_december.jpg){fig-align="center" width="100%"}
+
+### Figure S6. Figure S6. Stable establishment panel versus all reporting establishments in REM A05, P2 and P6, 2019–2025 — F84 without Rett variant
+
+::: {.callout-note collapse="true"}
+## Stored image — this plate has no drawing code here
+
+Its series are not fully carried by any published table, so it cannot be redrawn from a
+clone. The code that produced it is in `study/pipeline/`; what is missing is the microdata
+it reads.
+:::
+
+![**Figure S6. Stable establishment panel versus all reporting establishments in REM A05, P2 and P6, 2019–2025 — F84 without Rett variant** Filled bars: national total over all establishments with a row for the code in the year (n = reporting establishments); hatched bars: total restricted to the stable panel, defined as establishments with a row for the code (or family) in every year of its definition era (December for stocks); black line (right axis): percentage of the volume retained by the stable panel. (a) A05 entries: broad PDD 2019–2020 (06902600, grey, own stable panel of 395 establishments) and strict autism 2021–2025 (05990022, panel of 258), separated by the break marker. (b) A05 entries of the variant&#x27;s PDD family (05990022, 05990023, 05990025, 05990026), 2021–2025. (c) P2 ASD in December (P2500500), 2019–2025, panel of 193. (d) P6 primary care in December: broad PDD 2019–2020 (P6223000, panel of 594) and strict autism 2021–2025 (P6241010, panel of 353). (e) P6 specialty: broad PDD (P6223380, panel of 104) and strict autism (P6241060, panel of 68). (f) Percentage of the volume (circles) and of the establishments (squares) retained by the stable panel, by series and year, eras 2021–2025 (2019–2025 for P2). A falling retained share indicates that growth in the totals is concentrated in establishments joining the reporting base; units: entries (flow, A–B) and people under control in December (stock, C–E). Shading: 2020–2021 reporting disruption; dotted line: Law 21.545 as context. Administrative counts, not prevalence.](study/corpus/figures/figS6_rem_stable_panel.jpg){fig-align="center" width="100%"}
+
+### Figure S7. Figure S7. REM A05 by age and sex, P2/P6 stocks and PIE: standardised rates and log-linear fits, 2019–2025 — F84 without Rett variant
+
+::: {.callout-note collapse="true"}
+## Stored image — this plate has no drawing code here
+
+Its series are not fully carried by any published table, so it cannot be redrawn from a
+clone. The code that produced it is in `study/pipeline/`; what is missing is the microdata
+it reads.
+:::
+
+![**Figure S7. REM A05 by age and sex, P2/P6 stocks and PIE: standardised rates and log-linear fits, 2019–2025 — F84 without Rett variant** (a) REM A05 entries for strict autism (code 05990022, 2021–2025) per 100,000 INE population (base 2017, residence; place-of-care numerator in the public network): crude (exact Poisson CI) and WHO age-standardised rates (Fay–Feuer CI) by sex; n = reporting establishments per year. (b) Same for the variant&#x27;s PDD family (05990022–05990026; without 05990024 in the without-Rett variant). (c) Age- and sex-specific rates of strict-autism entries in 2021 and 2025 (exact Poisson CI; ages 0–39). (d) P2: NANEAS population with ASD under control in December 2019–2025 (points), quasi-Poisson log-linear fit without offset (95% band) and fit with log(reporting establishments) offset (dashed: fitted count), June stock as sensitivity marker (never summed with December), stable panel of 193 establishments and December reporting establishments (bars, right axis). (e) P6: population under control for strict autism in December 2021–2025 in primary care (P6241010) and specialty (P6241060) with log-linear fit and reporting establishments; broad PDD 2019–2020 is a different definition and is excluded. (f) PIE: students with ASD + ASD-Asperger (harmonised; Apuntes 60 2019–2023, SINACES 2024–2025) with log-linear fit 2019–2025, and strict ASD and ASD-Asperger series 2019–2023. Shading: 2020–2021 reporting disruption; dotted line: Law 21.545 (March 2023) as context. Stocks and flows are never combined on one axis; counts are administrative recognition, not prevalence.](study/corpus/figures/figS7_rem_education_models.jpg){fig-align="center" width="100%"}
+
+### Figure S8. Figure S8. REM A05 entries by age group and sex per year, 2021–2025: strict autism and the variant's PDD family — F84 without Rett variant
+
+::: {.callout-note collapse="true"}
+## Stored image — this plate has no drawing code here
+
+Its series are not fully carried by any published table, so it cannot be redrawn from a
+clone. The code that produced it is in `study/pipeline/`; what is missing is the microdata
+it reads.
+:::
+
+![**Figure S8. REM A05 entries by age group and sex per year, 2021–2025: strict autism and the variant&#x27;s PDD family — F84 without Rett variant** Mental-health programme entries (annual flow) read from the age × sex cells (COL04–COL37) of in-era A05 rows, summed over establishment and month; five-year groups up to 45–49 and 50+ pooled; n = establishments reporting the code or family in the year. (a–b) Heat maps of strict autism (05990022) in males and females, with the count in each cell (&#x27;n/e&#x27; = the age × sex cell appears in no row of the code that year: an absent row, not a zero). (c) Percentage distribution by age band of strict-autism entries, both sexes. (d) Male:female ratio of strict-autism entries by age group (0–34 years) and year, with 95% CI (Poisson log-normal approximation); 1:1 and 3:1 reference lines. (e–f) Heat maps of the variant&#x27;s PDD family (05990022, 05990023, 05990025, 05990026) in males and females. The sum of the cells may differ by a few units from the COL01 total of the same code (numeric table S7). Administrative counts by place of care, not prevalence.](study/corpus/figures/figS8_a05_age_sex.jpg){fig-align="center" width="100%"}
+
+### Figure S9. Figure S9. Regional distribution of administrative recognition: GRD by region of residence (both variants) and REM A05 by region of establishment — F84 without Rett variant
+
+::: {.callout-note collapse="true"}
+## Stored image — this plate has no drawing code here
+
+Its series are not fully carried by any published table, so it cannot be redrawn from a
+clone. The code that produced it is in `study/pipeline/`; what is missing is the microdata
+it reads.
+:::
+
+![**Figure S9. Regional distribution of administrative recognition: GRD by region of residence (both variants) and REM A05 by region of establishment — F84 without Rett variant** (a, b) GRD episodes in 2024 with documented F84 in any position per 100,000 INE population (base 2017, 30 June) by region of residence (comuna recorded in the GRD, linked by normalised name to the INE crosswalk; no fuzzy matching), for the full F84 family (a) and F84 without Rett (b); episodes with unknown residence excluded (F84 without Rett variant: 2/0/0/0/0/0 in 2019–2024). (c) REM A05 entries for strict autism (code 05990022) in 2024 per 100,000 population by region of the reporting establishment (place of care; n = establishments with a row in the region). Maps in an equal-area conic projection (Albers), three north–centre–south strips at the same metric scale; oceanic islands clipped. (d) Regions in 2024: GRD (residence) vs A05 (place of care), log scales; Spearman ρ = 0.38. (e) GRD (F84 without Rett variant) by region of residence and year 2019–2024. (f) A05 by region of establishment and year 2021–2025; under each year, the national number of reporting establishments (2025: 952 vs 1,070 in 2024). WARNING: REM locates the provider and GRD the residence; patients treated outside their region of residence (e.g. referrals to the Metropolitan Region) are not corrected; an ecological comparison implying neither causality nor quality of care. Administrative counts, not prevalence.](study/corpus/figures/figS9_regional_maps.jpg){fig-align="center" width="100%"}
+
+### Figure S10. Figure S10. Sensitivity of population denominators: INE base 2017 vs Census 2024 and base 2024 — F84 without Rett variant
+
+::: {.callout-note collapse="true"}
+## Stored image — this plate has no drawing code here
+
+Its series are not fully carried by any published table, so it cannot be redrawn from a
+clone. The code that produced it is in `study/pipeline/`; what is missing is the microdata
+it reads.
+:::
+
+![**Figure S10. Sensitivity of population denominators: INE base 2017 vs Census 2024 and base 2024 — F84 without Rett variant** (a) National population 2019–2025 by projection base: INE base Census 2017 at 30 June (primary denominator), INE base 2024 at 30 June and 1 January (sensitivity) and the population enumerated by the 2024 Census (18,480,432). (b) Ratio base 2024 / base 2017 by year and Census 2024 / base 2017 in 2024: since any population rate is inversely proportional to its denominator, the ratio equals the relative change in rates. (c) Ratio Census 2024 / base 2017 by region, 2024 (regions north to south; dotted line = national ratio). (d) Ratio by WHO five-year age group, 2024 national: base 2024 and Census 2024 against base 2017. (e) GRD episodes in 2024 with documented F84 (F84 without Rett variant, observed panel, all activity, any position; episodes without valid age excluded) per 100,000 population by age group under the three denominators (log scale). (f) GRD episodes 2024 (F84 without Rett variant) by region of residence per 100,000 population with base 2017 (exact Poisson 95% CI) vs Census 2024 (stars). Bases are never combined within one series; the 2024 Census is an enumerated population (not a mid-year projection) and differences reflect migration revisions, census omission and age structure. Place-of-care numerators (public network) against residence denominators. Administrative counts, not prevalence.](study/corpus/figures/figS10_denominators.jpg){fig-align="center" width="100%"}
+
+### Figure S11. Figure S11. Coverage layers: FONASA, APS enrolment and ISAPRE by age and sex (2025) and national series 2019–2025 — F84 without Rett variant
+
+::: {.callout-note collapse="true"}
+## Stored image — this plate has no drawing code here
+
+Its series are not fully carried by any published table, so it cannot be redrawn from a
+clone. The code that produced it is in `study/pipeline/`; what is missing is the microdata
+it reads.
+:::
+
+![**Figure S11. Coverage layers: FONASA, APS enrolment and ISAPRE by age and sex (2025) and national series 2019–2025 — F84 without Rett variant** (a) FONASA beneficiaries at December 2025 by five-year age group and sex (official comuna aggregates summed nationally; undetermined sex and unknown age excluded from the pyramid). (b) Validated APS enrolment at December 2025 by 10-year band and sex (comuna of the enrolment centre, not residence; 2019–2023 are published in 20-year bands and 2024–2025 in 10-year bands). (c) ISAPRE beneficiaries (contributors + dependants) at December 2025 by five-year group and sex (administrative comuna of the beneficiary). (d) National series 2019–2025: INE population base 2017 (30 June), FONASA beneficiaries, APS enrolment (n = centres with enrolees) and ISAPRE beneficiaries, in millions. (e) Ratio of each layer to the INE population of the same year: not an insurance-coverage rate (it mixes December stocks with the June projection, omits the armed forces and other regimes, and the geographies — residence, domicile/enrolment, centre — differ). (f) Age structure in 2025 (% by 10-year band) of INE, FONASA, APS and ISAPRE: structural differences justify age standardisation when a layer is used as a denominator. Each layer answers a different question (territorial, insurance, operational coverage) and none is the population at risk of the indicators; identical in both variants. Shading: 2020–2021 reporting disruption; dotted line: Law 21.545 as context.](study/corpus/figures/figS11_coverage_age_sex.jpg){fig-align="center" width="100%"}
+
+### Figure S12. Figure S12. JUNAEB: caregiver-reported ASD by sex and school level, 2023–2025 — F84 without Rett variant
+
+::: {.callout-note collapse="true"}
+## Stored image — this plate has no drawing code here
+
+Its series are not fully carried by any published table, so it cannot be redrawn from a
+clone. The code that produced it is in `study/pipeline/`; what is missing is the microdata
+it reads.
+:::
+
+![**Figure S12. JUNAEB: caregiver-reported ASD by sex and school level, 2023–2025 — F84 without Rett variant** JUNAEB Student Vulnerability Survey (selected school cohorts: pre-school NT1–NT2, Grade 1, Grade 5 and Grade 9; caregiver report with the wording of each annual questionnaire). (a) 2023: unweighted % with Wilson 95% CI (no published weight; hollow bars), by sex and level. (b) 2024: weighted % with EXP_REG and 95% CI; Grade 9 not estimable (ASD variable entirely empty), marked with a hatched square and never as zero. (c) 2025: weighted % with EXP and 95% CI. (d) Male:female ratio of the ASD % by level and year, with approximate 95% CI (delta method on the log scale; for 2023 the SE is derived from the Wilson CI). (e) Students with a response (unweighted n, thousands) by level and year 2019–2025, with the number of reported ASD cases (2019–2022 had no ASD item). (f) Weighted vs unweighted % in 2024–2025 (dotted identity): weighting changes the estimates little. Proportions describe caregiver report in school cohorts, not national prevalence; identical in both variants.](study/corpus/figures/figS12_junaeb_sex_level.jpg){fig-align="center" width="100%"}
+
+### Figure S13. Figure S13. Monthly seasonality of REM reporting: A05 entries and A03 screening by year, index relative to each year's monthly mean — F84 without Rett variant
+
+::: {.callout-note collapse="true"}
+## Stored image — this plate has no drawing code here
+
+Its series are not fully carried by any published table, so it cannot be redrawn from a
+clone. The code that produced it is in `study/pipeline/`; what is missing is the microdata
+it reads.
+:::
+
+![**Figure S13. Monthly seasonality of REM reporting: A05 entries and A03 screening by year, index relative to each year&#x27;s monthly mean — F84 without Rett variant** Each line is one year: national monthly total (sum of the establishment × month rows present) divided by that year&#x27;s 12-month mean × 100; months without any row would be blank, not zero. n = establishments with at least one row for the code in the year. Definition eras are drawn as separate lines per year and are never joined. (a) A05 strict-autism entries (05990022), 2021–2025. (b) A05 entries of the variant&#x27;s PDD family (05990022, 05990023, 05990025, 05990026), 2021–2025. (c) A05 broad-PDD entries (06902600), 2019–2020: the April–August 2020 fall reflects the pandemic reporting disruption. (d) A03 M-CHAT done among children with language/social alteration (03500406), 2019–2022: February 2019 holds 1,051 records in the file (outlying value, shown uncorrected) and 2020 shows the April–September fall. (e) A03 M-CHAT-R/F part-1 results: 2023–2024 sum of low/medium/high risk (09600213–09600215) and 2025 sum of the redesign&#x27;s risk categories (03710016–03710019, dashed); different code families. (f) Number of establishments with a row in each month for A05 entries: broad PDD 2019–2020 (dashed) and strict autism 2021–2025; the 2020 fall is in reporting establishments, not in persons. Administrative counts, not prevalence or incidence.](study/corpus/figures/figS13_rem_seasonality.jpg){fig-align="center" width="100%"}
+
+### Figure S14. Figure S14. DEIS hospital discharges with F84 as principal diagnosis by sex, age and ownership, 2019–2024 — F84 without Rett variant
+
+::: {.callout-note collapse="true"}
+## Stored image — this plate has no drawing code here
+
+Its series are not fully carried by any published table, so it cannot be redrawn from a
+clone. The code that produced it is in `study/pipeline/`; what is missing is the microdata
+it reads.
+:::
+
+![**Figure S14. DEIS hospital discharges with F84 as principal diagnosis by sex, age and ownership, 2019–2024 — F84 without Rett variant** DEIS discharges (all establishments in the country) with F84 (F84 without Rett variant) in DIAG1 per 100,000 discharges of the same stratum, exact Poisson 95% CI. DEIS records DIAG1 (principal) and DIAG2 (external cause, ICD-10 V01–Y98), which never contains F84: &#x27;any position&#x27; = principal. (a) By sex and year 2019–2024 (both sexes dashed). (b) By WHO five-year age group in 2021 (detailed-age layout) and 2024 (canonical); the canonical files publish 10-year bands in 2019–2023. (c) 2024 by sex and WHO age group. (d) Rate by harmonised 10-year band and year. (e) SNSS establishments (public hospitals) vs non-SNSS (private clinics, armed forces, mutual insurers, delegated administration) and records masked by DEIS. (f) Discharges with principal F84 by ownership (stacked) and % SNSS. Shading: 2020–2021 reporting disruption; dotted line: Law 21.545 as context. Discharges are events, not persons; administrative counts, not prevalence.](study/corpus/figures/figS14_deis_sex_age.jpg){fig-align="center" width="100%"}
+
+### Figure S15. Figure S15. Reproduction controls: pre-specified protocol values vs values reproduced by the pipeline — F84 without Rett variant
+
+::: {.callout-note collapse="true"}
+## Stored image — this plate has no drawing code here
+
+Its series are not fully carried by any published table, so it cannot be redrawn from a
+clone. The code that produced it is in `study/pipeline/`; what is missing is the microdata
+it reads.
+:::
+
+![**Figure S15. Reproduction controls: pre-specified protocol values vs values reproduced by the pipeline — F84 without Rett variant** Each point is a numeric control from the phase-1 and phase-2 modules (00 provenance, 01 GRD, 01b DEIS, 02 REM, 03 denominators, 04 surveys, 05 education, 06 models, 07 controls), with the expected value (brief, DATA_REVIEW.md, manifests and config.CONTROLS) and the observed value. (a) Observed vs expected on symlog axes (zeros shown in the linear segment) with the dotted identity; controls that differ are labelled. (b) Relative difference (%) by expected magnitude (expected ≠ 0), with the ±0.5% tolerance used for rates and means. (c) Number of controls per module and status (matches, differs with explanation, informative without an expected value). (d) GRD and DEIS detail. (e) REM, denominators, surveys, education and models detail. (f) List of the controls that differ and their explanation: in every case the difference is a panel issue (expected from the fixed panel of 65 vs the observed annual panel of 68/72 hospitals), invalid identifiers (1 person) or repeated rows kept. The table is identical in both variants because the controls were defined on the full F84 family and the other series do not depend on the variant. No control was filled in by plausibility.](study/corpus/figures/figS15_controls.jpg){fig-align="center" width="100%"}

@@ -1,0 +1,57 @@
+---
+title: "Extended tables"
+subtitle: "The complete set of supporting tables produced by the analysis pipeline, each opening to its full contents"
+---
+
+```{python}
+#| label: cargar-corpus
+from pathlib import Path
+import sys
+
+ROOT = Path.cwd().parent if Path.cwd().name == "docs" else Path.cwd()
+sys.path.insert(0, str(ROOT / "docs" / "study"))
+sys.path.insert(0, str(ROOT / "scripts"))
+import render_helpers as rh
+from report_helpers import kpis
+
+idx = rh.corpus_index(); caps = rh.corpus_captions(); titles = rh.corpus_titles()
+kpis([
+    (str(len(idx["article_tables"]) + len(idx["tables"])), "Tables in this chapter"),
+    (str(len(idx["article_tables"])), "Principal tables"),
+    (str(len(idx["tables"])), "Supporting tables"),
+])
+```
+
+These are the numeric tables behind the extended plates, each with its title and its methodological
+note, unfolding to its full contents. They are data you can read and reuse: unlike the plates, which
+needed the microdata to draw, every table here ships with the repository.
+
+The [result tables](tables.qmd) chapter holds the tables the main figures are built from; this chapter
+holds the wider set the pipeline produced. The case definition is the one of the main analysis, F84
+without Rett syndrome, and every count is administrative recognition, not prevalence or incidence.
+
+## Principal tables
+
+```{python}
+#| label: corpus-tablas-articulo
+#| output: asis
+for it in idx["article_tables"]:
+    stem = it["file"].replace(".csv", "")
+    meta = rh.corpus_lookup(stem, titles["main"], titles["extra"], it["id"], it["desc"])
+    print(rh.corpus_table_html(stem, meta) + "\n")
+```
+
+## Supplementary tables
+
+```{python}
+#| label: corpus-tablas-suplementarias
+#| output: asis
+group = None
+for it in idx["tables"]:
+    if it["group"] != group:
+        group = it["group"]; print(f"\n### {group}\n")
+    stem = it["file"].replace(".csv", "")
+    meta = rh.corpus_lookup(stem, titles["main"], titles["extra"], it["id"], it["desc"])
+    meta = dict(meta); meta["title"] = f"{it['id']}. " + meta["title"] if not meta["title"].startswith(it["id"]) else meta["title"]
+    print(rh.corpus_table_html(stem, meta) + "\n")
+```

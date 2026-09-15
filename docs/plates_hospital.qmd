@@ -1,0 +1,2572 @@
+---
+title: "Hospital episodes in detail"
+subtitle: "Every plate describing the hospital discharge records in depth"
+---
+
+```{python}
+#| label: preparacion
+import sys
+from pathlib import Path
+
+ROOT = Path.cwd().parent if Path.cwd().name == "docs" else Path.cwd()
+sys.path.insert(0, str(ROOT / "docs" / "study"))
+sys.path.insert(0, str(ROOT / "scripts"))
+import numpy as np, pandas as pd
+import matplotlib.pyplot as plt
+import render_helpers as rh
+from report_helpers import kpis
+from figstyle import *
+
+idx = rh.corpus_index(); caps = rh.corpus_captions(); titles = rh.corpus_titles()
+kpis([
+    ("7", "Plates redrawn here, with their code"),
+    ("3", "Plates kept as stored images"),
+    ("10", "Plates in this chapter"),
+])
+```
+
+Of the 10 plates in this chapter, 7 are redrawn from the published tables by the code shown
+with each one; the rest are stored images because their series are not fully carried by any published
+table. Use **Show the code that produced this** under a redrawn plate to read how it is built.
+
+::: {.callout-important}
+## Redrawn plates are faithful reconstructions, not the original artwork
+
+The code that produced the stored plates lives in `study/pipeline/` and reads microdata that is not in
+this repository. What is shown here was written from the published aggregates: the panels, the series
+and the numbers are the same, checked value by value against the original, but the artwork is not
+pixel-identical — fonts, tick formatting and label placement differ. Each module in
+`docs/study/plates/` records its own deviations.
+:::
+
+
+## Hospital episodes in detail
+
+### Figure S16. Plate EF1. Seasonality and monthly series of GRD episodes with documented F84 — F84 family excluding Rett syndrome
+
+```{python}
+#| label: lamina-ef1_seasonality_monthly
+#| fig-cap: "Figure S16. Redrawn here from the published tables by the code above."
+import re
+import textwrap
+
+import numpy as np, pandas as pd
+import matplotlib.pyplot as plt
+from scipy.stats import chi2
+from figstyle import *
+
+PLATE = "EF1_seasonality_monthly"
+SOURCES = [
+    "docs/study/corpus/tables/EF1_seasonality_monthly.csv",
+    "docs/study/corpus/tables/E1_grd_seasonality.csv",
+    "docs/study/corpus/tables/E18_rem_monthly_series.csv",
+]
+NOTE = ("Redraws the six panels of plate EF1 — monthly GRD episodes with documented F84 (F84 family "
+        "excluding Rett), their rate per 100,000 GRD episodes of the same month, the within-year "
+        "seasonal index, the 2020–2021 ratios to 2019, the REM A05 monthly series and the index of "
+        "dispersion — from the EF1 companion table, E1 and E18, with the monthly all-GRD denominator "
+        "back-derived as count / rate x 100,000 because it is not published on its own.")
+
+ROOT = BASE.parents[1]                      # figstyle.BASE is docs/study; ROOT is the repository root
+FIG_W_IN, FIG_H_IN = 180 / 25.4, 245 / 25.4     # the plate canvas of the pipeline: 180 x 245 mm
+YEARS = [2019, 2020, 2021, 2022, 2023, 2024]    # GRD years of the stored plate
+MONTHS = ["January", "February", "March", "April", "May", "June",
+          "July", "August", "September", "October", "November", "December"]
+MONTH_ABBR = ["Jan", "Feb", "Mar", "Apr", "May", "Jun", "Jul", "Aug", "Sep", "Oct", "Nov", "Dec"]
+MONTH_INITIALS = list("JFMAMJJASOND")
+# Okabe-Ito, in the order the pipeline gives the six years (sky, blue, green, yellow, gold, orange).
+YEAR_COLORS = [SKY, BLUE, GREEN, YELLOW, GOLD, ORANGE]
+F84_COLOR, ALL_COLOR = BLUE, GREY
+PER = 100_000.0
+LAW_X = 2023 + 2.5 / 12     # Law 21.545, March 2023, on the decimal-year axis of a monthly series
+CTX = dict(facecolor="white", edgecolor="none", alpha=0.75, pad=1.4)
+TITLES = {
+    "a": "Episodes with F84 by month of admission and year",
+    "b": "Monthly rate per 100,000 GRD episodes of the same month",
+    "c": "Within-year seasonal index (year mean = 1)",
+    "d": "2020–2021 disruption: month versus same month of 2019",
+    "e": "REM A05 comparison: monthly autism programme entries (2021–2025)",
+    "f": "Index of dispersion of the monthly counts",
+}
+
+# --------------------------------------------------------------------------- reading the tables
+# The presentation tables store every value as a formatted string: "210 (211.3)" is a count and its
+# rate, "1,104 (411)" a count and the establishments reporting it, "2,334" a plain total.
+_CELL = re.compile(r"^\s*(-?[\d.,]+)\s*(?:\(\s*(-?[\d.,]+)\s*\))?")
+
+
+def _num(s):
+    """One formatted number -> float; 'n/e' (not estimable) and blanks -> nan."""
+    s = str(s).strip()
+    if not s or s.lower() in {"n/e", "nan", "—", "-"}:
+        return float("nan")
+    return float(s.replace(",", "").replace("−", "-"))
+
+
+def _cell(s):
+    """'210 (211.3)' -> (210.0, 211.3); '2,334' -> (2334.0, nan); 'n/e' -> (nan, nan)."""
+    m = _CELL.match(str(s))
+    if not m:
+        return float("nan"), float("nan")
+    return _num(m.group(1)), (_num(m.group(2)) if m.group(2) else float("nan"))
+
+
+def _table(rel):
+    """A tracked presentation table, keyed by its first column (they are written with a BOM)."""
+    t = pd.read_csv(ROOT / rel, encoding="utf-8-sig", dtype=str)
+    return t.set_index(t.columns[0])
+
+
+def _row(t, prefix, suffix=""):
+    """The row whose label starts with `prefix` and ends with `suffix` (labels carry a ' · ' tail)."""
+    hit = [k for k in t.index if str(k).startswith(prefix) and str(k).endswith(suffix)]
+    if not hit:
+        raise KeyError(f"no row starting with {prefix!r} and ending with {suffix!r}")
+    return t.loc[hit[0]]
+
+
+def grd_monthly():
+    """Monthly counts, published rates and the derived all-GRD denominator, months x years."""
+    t = _table(SOURCES[0])
+    counts = np.full((12, len(YEARS)), np.nan)
+    rates = np.full((12, len(YEARS)), np.nan)
+    for i, month in enumerate(MONTHS):
+        for j, year in enumerate(YEARS):
+            counts[i, j], rates[i, j] = _cell(t.loc[month, str(year)])
+    # The denominator of the rate is not published: it is recovered from the pair it was printed with.
+    denom = counts / rates * PER
+    totals = np.array([_num(t.loc["Total", str(y)]) for y in YEARS])
+    unparsable = np.array([_num(_row(t, "Unparsable admission date")[str(y)]) for y in YEARS])
+    disp_f84 = np.array([_num(_row(t, "Variance / mean", "Episodes with documented F84")[str(y)])
+                         for y in YEARS])
+    disp_all = np.array([_num(_row(t, "Variance / mean", "All GRD episodes")[str(y)]) for y in YEARS])
+    # The plate's own arithmetic, checked against the table it is drawn from.
+    assert np.allclose(counts.sum(axis=0) + unparsable, totals), "monthly counts do not add to the total"
+    return counts, rates, denom, disp_f84, disp_all
+
+
+def seasonal_index():
+    """The within-year seasonal index (mean of the year's 12 months = 1) as E1 publishes it."""
+    t = _table(SOURCES[1])
+    idx = np.full((12, len(YEARS)), np.nan)
+    counts = np.full((12, len(YEARS)), np.nan)
+    for i, month in enumerate(MONTHS):
+        for j, year in enumerate(YEARS):
+            counts[i, j], idx[i, j] = _cell(t.loc[month, str(year)])
+    # E1 and the EF1 companion table must be the same series before either is drawn.
+    assert np.allclose(np.round(counts / counts.mean(axis=0), 2), idx), "E1 index is not count / year mean"
+    return idx
+
+
+def rem_a05():
+    """REM A05 strict-autism entries by month, and the establishments reporting the code."""
+    t = pd.read_csv(ROOT / SOURCES[2], encoding="utf-8-sig", dtype=str)
+    s = t[t["Series"] == "A05 Strict autism"]
+    years = sorted(int(_num(y)) for y in s["Year"])
+    entries, establishments = {}, {}
+    for y in years:
+        row = s[s["Year"] == str(y)].iloc[0]
+        pairs = [_cell(row[m]) for m in MONTH_ABBR]
+        entries[y] = np.array([p[0] for p in pairs])
+        establishments[y] = np.array([p[1] for p in pairs])
+        assert np.isclose(entries[y].sum(), _num(row["Year total"])), f"REM A05 {y} does not add up"
+    return years, entries, establishments
+
+
+# --------------------------------------------------------------------------- panel furniture
+def _month_axis(ax):
+    ax.set_xticks(range(1, 13))
+    ax.set_xticklabels(MONTH_INITIALS)
+    ax.set_xlabel("Month of admission")
+
+
+def _title(ax, key):
+    """Panel title, wrapped where the pipeline's measured wrap breaks it.
+
+    Returns the title artist (a left title is its own Text, not `ax.title`) and its line count."""
+    lines = textwrap.fill(TITLES[key], 41)
+    t = ax.set_title(lines, loc="left", fontsize=9, fontweight="bold", linespacing=1.15)
+    return t, lines.count("\n") + 1
+
+
+def draw_EF1_seasonality_monthly():
+    style()
+    plt.rcParams.update({
+        "axes.titlesize": 9, "axes.titleweight": "bold", "axes.titlepad": 4.0, "axes.titlelocation": "left",
+        "legend.frameon": True, "legend.framealpha": 0.82, "legend.facecolor": "white",
+        "legend.edgecolor": "none", "legend.borderpad": 0.25, "legend.handlelength": 1.4,
+        "legend.handletextpad": 0.5, "legend.columnspacing": 1.0, "legend.labelspacing": 0.35,
+        "legend.borderaxespad": 0.3, "legend.fontsize": 7, "legend.title_fontsize": 7,
+        "grid.alpha": 0.32, "grid.linewidth": 0.5,
+    })
+    counts, rates, denom, disp_f84, disp_all = grd_monthly()
+    index = seasonal_index()
+    rem_years, rem_entries, rem_estab = rem_a05()
+    months = np.arange(1, 13)
+
+    fig, axes = plt.subplots(3, 2, figsize=(FIG_W_IN, FIG_H_IN), layout="constrained")
+    # The top strip the rect leaves free is for the panel letters: they stand on the first line of a
+    # two-line title, which the layout engine does not know about and would push off the canvas.
+    fig.get_layout_engine().set(w_pad=0.055, h_pad=0.045, wspace=0.045, hspace=0.055,
+                                rect=(0, 0, 1, 0.986))
+    ax = axes.ravel()
+
+    # (a) episodes by month of admission and year -------------------------------------------------
+    for j, year in enumerate(YEARS):
+        ax[0].plot(months, counts[:, j], marker="o", ms=3.4, lw=1.6, color=YEAR_COLORS[j], label=str(year))
+    _month_axis(ax[0])
+    ax[0].set_ylabel("Episodes with documented F84")
+    ax[0].set_ylim(top=np.nanmax(counts) * 1.20)
+    ax[0].legend(ncol=3, title="Year", loc="upper left")
+    ax[0].yaxis.set_major_formatter(thousands("en"))
+    clean(ax[0], "both")
+
+    # (b) rate per 100,000 GRD episodes of the same month, exact Poisson band ----------------------
+    x = np.array([y + (m - 0.5) / 12 for y in YEARS for m in months])
+    k = counts.T.ravel()                      # month within year, in calendar order
+    rate = rates.T.ravel()
+    d = denom.T.ravel()
+    lo = chi2.ppf(0.025, 2 * k) / 2 / d * PER          # exact Poisson 95 % limits on the monthly count
+    hi = chi2.ppf(0.975, 2 * (k + 1)) / 2 / d * PER
+    smooth = pd.Series(rate).rolling(12, center=True, min_periods=12).mean()
+    ax[1].fill_between(x, lo, hi, color=F84_COLOR, alpha=0.18, lw=0)
+    ax[1].plot(x, rate, lw=1.5, color=F84_COLOR)
+    ax[1].plot(x, smooth, lw=2.2, color=ORANGE, ls="--")
+    shade_pandemic(ax[1], 2020.0, 2022.0)
+    ax[1].text(2021.0, 0.97, "Reporting\ndisruption 2020–21", transform=ax[1].get_xaxis_transform(),
+               ha="center", va="top", fontsize=7, color="#555555", bbox=CTX, zorder=6)
+    ax[1].axvline(LAW_X, color="#444444", ls=":", lw=1.2, zorder=1)
+    ax[1].text(LAW_X + 0.06, 0.97, "Law 21.545\n(2023)", transform=ax[1].get_xaxis_transform(),
+               ha="left", va="top", fontsize=7, color="#444444", bbox=CTX, zorder=6)
+    year_ticks(ax[1], YEARS + [2025])
+    ax[1].set_xlim(2019, 2025)
+    ax[1].set_ylim(top=float(np.nanmax(hi)) * 1.12)
+    ax[1].set_xlabel("Year")
+    ax[1].set_ylabel("Per 100,000 GRD episodes")
+    ax[1].yaxis.set_major_formatter(thousands("en"))
+    clean(ax[1], "both")
+
+    # (c) within-year seasonal index --------------------------------------------------------------
+    im = ax[2].imshow(index, cmap="RdYlBu_r", aspect="auto")
+    lo_i, hi_i = float(np.nanmin(index)), float(np.nanmax(index))
+    for i in range(12):
+        for j in range(len(YEARS)):
+            shade = (index[i, j] - lo_i) / (hi_i - lo_i)
+            ax[2].text(j, i, num(index[i, j], "en", 2), ha="center", va="center", fontsize=6.4,
+                       color="white" if shade > 0.62 else "#1a1a1a")
+    ax[2].set_xticks(range(len(YEARS))); ax[2].set_xticklabels([str(y) for y in YEARS], fontsize=8)
+    ax[2].set_yticks(range(12)); ax[2].set_yticklabels(MONTH_INITIALS)
+    ax[2].set_xlabel("Year")
+    ax[2].grid(False)
+    cb = fig.colorbar(im, ax=ax[2], fraction=0.035, pad=0.015)
+    cb.ax.tick_params(labelsize=7)
+    cb.set_label(textwrap.fill(TITLES["c"], 32), fontsize=7)
+
+    # (d) 2020 and 2021 against the same month of 2019 --------------------------------------------
+    for j, year in enumerate([2020, 2021], start=1):
+        colour = YEAR_COLORS[j]
+        ax[3].plot(months, counts[:, j] / counts[:, 0], marker="o", ms=3.4, lw=1.7, color=colour,
+                   label=f"{year} · Episodes with\ndocumented F84")
+        ax[3].plot(months, denom[:, j] / denom[:, 0], marker="s", ms=3.0, lw=1.4, ls="--", color=colour,
+                   alpha=0.75, label=f"{year} · All GRD episodes")
+    ax[3].axhline(1.0, color="#444444", lw=1.0, ls=":")
+    _month_axis(ax[3])
+    ax[3].set_ylabel("Ratio to 2019 (same month)")
+    ratios = np.concatenate([counts[:, 1:3] / counts[:, [0]], denom[:, 1:3] / denom[:, [0]]], axis=1)
+    ax[3].set_ylim(float(np.nanmin(ratios)) * 0.94, float(np.nanmax(ratios)) * 1.34)
+    ax[3].legend(ncol=1, loc="upper left", fontsize=6.4)
+    clean(ax[3], "both")
+
+    # (e) the REM pathway: a different source on its own axis --------------------------------------
+    for i, year in enumerate(rem_years):
+        ax[4].plot(months, rem_entries[year], marker="o", ms=3.2, lw=1.5,
+                   color=YEAR_COLORS[i % len(YEAR_COLORS)], label=str(year))
+    _month_axis(ax[4])
+    ax[4].set_ylabel("REM A05 entries (month)")
+    top = max(v.max() for v in rem_entries.values()) * 1.27
+    ax[4].set_ylim(-0.11 * top, top)        # room for the legend above and for the note below
+    ax[4].legend(ncol=3, title="A05 autism entries (05990022)", loc="upper center")
+    ax[4].text(0.02, 0.02, textwrap.fill("Different source, own axis: REM is not GRD", 38),
+               transform=ax[4].transAxes, fontsize=7, color="#555555", ha="left", va="bottom")
+    # Every REM panel states how many establishments report the code: the numerator follows the reporting.
+    estab = "; ".join(
+        f"{y}: {num(np.median(rem_estab[y]), 'en')} ({num(rem_estab[y].min(), 'en')}–{num(rem_estab[y].max(), 'en')})"
+        for y in rem_years)
+    ax[4].set_xlabel(textwrap.fill("Month of admission — REM establishments reporting the code, "
+                                   f"monthly median (min.–max.): {estab}", 41), fontsize=6.4)
+    ax[4].yaxis.set_major_formatter(thousands("en"))
+    clean(ax[4], "both")
+
+    # (f) index of dispersion of the 12 monthly counts ---------------------------------------------
+    w = 0.38
+    years = np.array(YEARS, dtype=float)
+    ax[5].bar(years - w / 2, disp_f84, width=w, color=F84_COLOR, label="Episodes with documented\nF84")
+    ax[5].bar(years + w / 2, disp_all, width=w, color=ALL_COLOR, label="All GRD episodes")
+    ax[5].axhline(1.0, color="#444444", ls=":", lw=1.1)
+    log_axis(ax[5], "y", "en")
+    ax[5].set_ylim(0.75, float(np.nanmax(disp_all)) * 15)
+    ax[5].text(0.015, 0.02, "Poisson (= 1)", transform=ax[5].transAxes, fontsize=7, color="#444444",
+               va="bottom", ha="left", bbox=CTX, zorder=6)
+    year_ticks(ax[5], YEARS)
+    ax[5].set_xlabel("Year")
+    ax[5].set_ylabel("Variance / mean of the 12 months")
+    ax[5].legend(loc="upper left")
+    clean(ax[5], "y")
+
+    # Letters and titles last. The titles are set first so the layout reserves their height, the
+    # layout is then resolved and frozen, and only then are letter and title moved to the left edge
+    # of their own cell — where the pipeline puts them, and where a two-column title still fits on
+    # the canvas. The letter sits on the title's FIRST line, so it rises with a wrapped title.
+    titles = {key: _title(a, key) for a, key in zip(ax, "abcdef")}
+    fig.draw_without_rendering()
+    fig.set_layout_engine("none")
+    margin = 2.0 / 180.0                    # 2 mm left margin of the cell
+    gap = 22.0 / (FIG_W_IN * 72)            # gap between the panel letter and its title
+    line_h = 10.8 / (FIG_H_IN * 72)         # one title line at 9 pt
+    for i, (a, key) in enumerate(zip(ax, "abcdef")):
+        cell = margin + (i % 2) * 0.5
+        pos = a.get_position()
+        artist, nlines = titles[key]
+        artist.set_x((cell + gap - pos.x0) / pos.width)
+        letter(fig, a, f"({key})", dx=cell - pos.x0, dy=0.012 + (nlines - 1) * line_h)
+    return fig
+
+
+draw_EF1_seasonality_monthly()
+```
+
+### Figure S17. Plate EF2. Length of stay of episodes with documented F84 — F84 family excluding Rett syndrome
+
+```{python}
+#| label: lamina-ef2_length_of_stay
+#| fig-cap: "Figure S17. Redrawn here from the published tables by the code above."
+import sys
+from pathlib import Path
+
+import numpy as np, pandas as pd
+import matplotlib.pyplot as plt
+from matplotlib.ticker import FuncFormatter, MultipleLocator
+
+sys.path.insert(0, str(ROOT / "docs" / "study"))   # docs/study, so `figstyle` resolves
+from figstyle import *                                          # noqa: F401,F403  (house style)
+
+PLATE = "EF2_length_of_stay"
+SOURCES = [
+    "docs/study/data/grd_length_of_stay.csv",
+    "docs/study/corpus/tables/E66_grd_length_of_stay_full.csv",
+    "docs/study/corpus/tables/E4_grd_episode_features.csv",
+    "docs/study/corpus/tables/EF2_length_of_stay.csv",
+]
+LOS, AGE, FEATURES, PUBLISHED = SOURCES
+NOTE = ("Redraws the six panels of EF2 — median and P25–P75 by code position, pooled mean and 2024 "
+        "median by WHO age group, the 90th percentile, the zero-day share across all activities and "
+        "for hospitalisation only, the 2024 stay bands against all GRD episodes, and episodes and "
+        "median days by activity — from the published GRD length-of-stay, age and episode-feature "
+        "tables, on the sin_rett definition and the observed hospital panel, with n_valid_dates as "
+        "the denominator of every statistic.")
+
+ROOT = BASE.parent.parent          # docs/study -> docs -> repository root
+VARIANT, PANEL = 'sin_rett', 'observed'
+ALL_GRD = 'all_episodes'           # every GRD episode of the same year, panel and activity
+YEARS = [2019, 2020, 2021, 2022, 2023, 2024]
+BAND_YEAR = 2024                   # the only year (e) can compare: E4 carries one all-GRD column
+
+BAR_GREY = '0.6'                   # the comparison bars of (b) and (e)
+DARK = '#555555'                   # all GRD, hospitalisation only: the darker of the two grey lines
+# Law 21.545 was published on 10 March 2023 (day 69). Years are plotted as integers, so the marker
+# sits at the day's place inside 2023 measured from the middle of each plotted year, as in EF6.
+# It is context only: no estimate in this plate depends on it.
+LAW_X = 2023 + 69 / 365 - 0.5
+DISRUPTION = 'Reporting\ndisruption 2020–21'
+LAW_LABEL = 'Law 21.545\n(2023)'
+COUNT = FuncFormatter(lambda v, p: num(v, 'en', 0))
+
+#: (a) — the three F84 position series are dodged by 0.09 of a year around the tick; the all-GRD
+#: comparison sits two dodge steps further right, clear of the F84 whiskers, as in the stored plate.
+POSITIONS = [(VARIANT, 'any', BLUE, 'o', '-', 'Any position', -0.09),
+             (VARIANT, 'principal', ORANGE, 'o', '-', 'Principal F84', 0.00),
+             (VARIANT, 'secondary_only', GOLD, 'o', '-', 'Secondary only', +0.09),
+             (ALL_GRD, 'all', GREY, 's', '--', 'All GRD episodes', +0.27)]
+
+#: (c) — the same comparison without the secondary-only series, principal F84 marked by a triangle.
+P90_SERIES = [(VARIANT, 'any', BLUE, 'o', '-', 'Any position'),
+              (VARIANT, 'principal', ORANGE, '^', '-', 'Principal F84'),
+              (ALL_GRD, 'all', GREY, 's', '--', 'All GRD episodes')]
+
+#: (d) — F84 and all GRD, each across all activities and restricted to hospitalisation.
+ZERO_SERIES = [(VARIANT, 'any', 'all', BLUE, '-',
+                'Episodes with documented F84 · all\nactivities'),
+               (VARIANT, 'any', 'hospitalisation', GREEN, '-',
+                'Episodes with documented F84 ·\nhospitalisation'),
+               (ALL_GRD, 'all', 'all', GREY, '--', 'All GRD episodes · all activities'),
+               (ALL_GRD, 'all', 'hospitalisation', DARK, '--',
+                'All GRD episodes · hospitalisation')]
+
+#: (f) — the two activities the plate separates, bars on the left axis, median days on the right.
+ACTIVITIES = [('hospitalisation', GREEN, BLACK, 'o', '-', 'Hospitalisation'),
+              ('cma', PINK, GREY, 's', '--', 'Major ambulatory surgery')]
+DAYS_PER_EPISODE = 2000            # (f): the two axes of the stored plate, 2,000 episodes per day
+
+#: (b) — the WHO five-year groups of E66, in the plate's order, with the label the plate prints.
+AGE_GROUPS = [('0–4', '0–4'), ('5–9', '5–9'), ('10–14', '10–14'), ('15–19', '15–19'),
+              ('20–24', '20–24'), ('25–29', '25–29'), ('30–34', '30–34'), ('35–39', '35–39'),
+              ('40–44', '40–44'), ('45–49', '45–49'), ('50–54', '50–54'), ('55–59', '55–59'),
+              ('60–64', '60–64'), ('65–69', '65–69'), ('70–74', '70–74'), ('75–79', '75–79'),
+              ('80+', '80+'), ('Age not reported', 'not reported')]
+AGE_BLOCK = 'WHO age group (hospitalisation, any position)'
+F84_ROW, ALL_ROW = 'Documented F84 · {}', 'All GRD episodes · {}'
+
+#: (e) — the stay bands of E4, in the plate's order (by band, not by frequency).
+STAY_BANDS = ['0', '1', '2', '3–4', '5–7', '8–14', '15–30', '31–90', '91+', 'not reported']
+
+
+# ---------------------------------------------------------------- tracked tables and their parsing
+def _read(rel, **kw):
+    """Read one tracked table by its repository-relative path (the paths listed in SOURCES)."""
+    return pd.read_csv(ROOT/rel, **kw)
+
+
+def _int(s):
+    """'8,221' -> 8221 ; the presentation tables store counts as formatted strings."""
+    return int(str(s).replace(',', '').replace(' ', '').strip())
+
+
+def _count(cell):
+    """Count out of a presentation cell such as '1,751 (20.1%)' or '7,616 (+3)'."""
+    return _int(str(cell).split('(')[0])
+
+
+def _los():
+    """The tidy length-of-stay grid restricted to the hospital panel of the plate."""
+    return _read(LOS).query('panel == @PANEL').copy()
+
+
+def _cell(d, variant, position, activity):
+    """One (variant, position, activity) series of the grid, indexed by year, in year order."""
+    s = d[(d.variant == variant) & (d.position == position) & (d.activity == activity)]
+    return s.sort_values('year').set_index('year')
+
+
+def _age_table():
+    """The WHO age block of E66, one row per 'Documented F84 · <band>' / 'All GRD episodes · <band>'."""
+    t = _read(AGE, encoding='utf-8-sig')
+    return t[t.Block == AGE_BLOCK].set_index('Indicator')
+
+
+def _age_cell(text):
+    """'1,319; 3 (1–5); 5.4' -> (1319, 3.0, 5.4) ; 'n/e' -> (0, nan, nan).
+
+    The cell is 'n; median (IQR); mean'. Only the count, the median and the mean are plotted, so the
+    interquartile range is parsed and dropped.
+    """
+    text = str(text).strip()
+    if text in ('n/e', 'nan', ''):
+        return 0, np.nan, np.nan
+    n, median_iqr, mean = text.split(';')
+    return _int(n), float(median_iqr.split('(')[0].strip()), float(mean)
+
+
+def _age_series(t, template):
+    """Pooled 2019–2024 mean and 2024 median for one of the two series of (b).
+
+    The pooled mean is the n-weighted average of the six per-year means the table prints, which is
+    what the stored plate's bars are; the unweighted average of the six would be a different number.
+    Age groups with no episode in any year (documented F84 never reports 'age not reported') come
+    back as nan and are not drawn.
+    """
+    pooled, median_2024 = [], []
+    for key, _label in AGE_GROUPS:
+        row = t.loc[template.format(key)]
+        cells = [_age_cell(row[str(y)]) for y in YEARS]
+        n = np.array([c[0] for c in cells], float)
+        mean = np.array([c[2] for c in cells], float)
+        keep = n > 0
+        pooled.append(float((n[keep] * mean[keep]).sum() / n[keep].sum()) if keep.any() else np.nan)
+        median_2024.append(_age_cell(row[str(BAND_YEAR)])[1])
+    return np.array(pooled), np.array(median_2024)
+
+
+def _bands():
+    """(e): the 2024 stay bands, as a share of episodes with F84 and of all GRD episodes.
+
+    E4 prints each cell as '<count> (<pct>%)' with the percentage already rounded to one decimal.
+    The shares are recomputed from the counts and the column totals, because only then do the
+    plate's difference labels come out right ('−0.7' for the 3–4 band, '+0.0' for 'not reported').
+    """
+    t = _read(FEATURES, encoding='utf-8-sig')
+    t = t[t.Variable == 'los_bin'].set_index('Category')
+    whole = next(c for c in t.columns if c.startswith('All GRD'))
+    f84 = np.array([_count(t.loc[b, str(BAND_YEAR)]) for b in STAY_BANDS], float)
+    grd = np.array([_count(t.loc[b, whole]) for b in STAY_BANDS], float)
+    return 100 * f84 / f84.sum(), 100 * grd / grd.sum(), f84.sum(), grd.sum()
+
+
+def _diff(pp):
+    """The plate's difference label: an explicit sign, one decimal, a true minus sign."""
+    return ('+' if pp >= 0 else '−') + num(abs(pp), 'en', 1)
+
+
+# --------------------------------------------------------------------- agreement with the corpus
+def _check_published(d):
+    """Compare what will be drawn against the published presentation table of the plate.
+
+    EF2 prints, for four of the plotted series, 'median (P25–P75)', the P90, the zero-day count and
+    share and the episode count with its excluded invalid dates, so this checks the estimator, the
+    denominator and the case definition at once. The quartiles and the P90 of the tidy grid are not
+    whole days (the 2021 principal P75 is 24.75), so they are compared rounded, the way the table
+    prints them. The age and stay-band tables are checked against their own year totals.
+    """
+    t = _read(PUBLISHED, encoding='utf-8-sig')
+    t = t.set_index(t.columns[0])
+    bad = []
+    rows = [('Episodes with documented F84 · hospitalisation', VARIANT, 'any', 'hospitalisation'),
+            ('Principal F84 · hospitalisation', VARIANT, 'principal', 'hospitalisation'),
+            ('Episodes with documented F84 · major ambulatory surgery', VARIANT, 'any', 'cma'),
+            ('All GRD episodes · hospitalisation', ALL_GRD, 'all', 'hospitalisation')]
+    for label, variant, position, activity in rows:
+        s = _cell(d, variant, position, activity)
+        for year in YEARS:
+            r = s.loc[year]
+            got = {
+                'Median (P25–P75)': (round(r.median_days), round(r.q25_days), round(r.q75_days)),
+                'P90 of stay (days)': round(r.p90_days),
+                '% of episodes with zero-day stay': (int(r.n_los_zero),
+                                                     round(100 * r.n_los_zero / r.n_valid_dates, 1)),
+                'n': (int(r.n_valid_dates), int(r.n_invalid_dates)),
+            }
+            for stat, value in got.items():
+                cell = str(t.loc[f'{label} — {stat}', str(year)]).strip()
+                if stat == 'Median (P25–P75)':
+                    median, iqr = cell.split(' (')
+                    want = (_int(median), *(_int(x) for x in iqr.rstrip(')').split('–')))
+                elif stat == 'P90 of stay (days)':
+                    want = _int(cell)
+                elif stat == 'n':
+                    n, invalid = cell.split(' (+')
+                    want = (_int(n), _int(invalid.rstrip(')')))
+                else:
+                    n, pct = cell.split(' (')
+                    want = (_int(n), float(pct.rstrip('%)')))
+                if value != want:
+                    bad.append(f'{label} — {stat} {year}: {value} vs published {want}')
+
+    age = _age_table()
+    for template, variant, position in ((F84_ROW, VARIANT, 'any'), (ALL_ROW, ALL_GRD, 'all')):
+        s = _cell(d, variant, position, 'hospitalisation')
+        for year in YEARS:
+            total = sum(_age_cell(age.loc[template.format(k)][str(year)])[0] for k, _ in AGE_GROUPS)
+            if total != int(s.loc[year].n_valid_dates):
+                bad.append(f'{template.format("<age>")} {year}: age groups sum to {total} but the '
+                           f'grid holds {int(s.loc[year].n_valid_dates)} episodes')
+
+    _f84, _grd, n_f84, n_grd = _bands()
+    s = _cell(d, VARIANT, 'any', 'all').loc[BAND_YEAR]
+    if n_f84 != int(s.n_episodes_cell):
+        bad.append(f'stay bands {BAND_YEAR}: sum to {int(n_f84)}, grid holds {int(s.n_episodes_cell)}')
+    g = _cell(d, ALL_GRD, 'all', 'all').loc[BAND_YEAR]
+    if n_grd != int(g.n_episodes_cell):
+        bad.append(f'all-GRD stay bands {BAND_YEAR}: sum to {int(n_grd)}, grid holds '
+                   f'{int(g.n_episodes_cell)}')
+
+    if bad:
+        raise AssertionError('redraw disagrees with the published tables:\n  ' + '\n  '.join(bad))
+
+
+# ------------------------------------------------------------------------------------------ panels
+#: title block of a panel, as the stored plate sets it: the letter sits at the sheet margin, the
+#: title beside it, the block anchored on its bottom just above the axes, and the letter level with
+#: the title's first line — so one line of title height, in figure fractions, is needed to raise it.
+TITLE_SIZE, TITLE_LEADING = 10.5, 1.25
+LINE = TITLE_SIZE * TITLE_LEADING / 72 / (286 / 25.4)
+
+
+def _panel_title(fig, ax, ch, title, gap=0.004):
+    """Bold panel letter and title above the axes; `gap` makes room for a panel that also writes the
+    name of its vertical scale in a line of its own above the axes, as (b) does."""
+    pos = ax.get_position()
+    x = 0.013 + 0.5 * (pos.x0 > 0.3)
+    top = pos.y1 + gap
+    fig.text(x, top + title.count('\n') * LINE, ch, fontweight='bold', fontsize=11, ha='left',
+             va='bottom')
+    fig.text(x + 0.0425, top, title, fontweight='bold', fontsize=TITLE_SIZE, ha='left', va='bottom',
+             linespacing=TITLE_LEADING)
+
+
+def _disruption(ax, y):
+    """The shaded 2020–2021 reporting disruption and the note the stored plate writes inside it."""
+    shade_pandemic(ax)
+    ax.text(2020.5, y, DISRUPTION, transform=ax.get_xaxis_transform(), ha='center', va='top',
+            fontsize=7.3, color=GREY, linespacing=1.15,
+            bbox=dict(facecolor='white', edgecolor='none', pad=1.2))
+
+
+def _law(ax, y=0.105):
+    """The Law 21.545 marker: dotted, labelled, and context only.
+
+    `y` is where the label hangs from, in axis fractions: the stored plate tucks it under the lowest
+    series of each panel, so (d) — whose all-GRD hospitalisation line runs flat along the bottom —
+    sets it lower than the others.
+    """
+    ax.axvline(LAW_X, color='#444444', ls=(0, (1.6, 1.8)), lw=0.8, zorder=1)
+    ax.text(LAW_X + 0.06, y, LAW_LABEL, transform=ax.get_xaxis_transform(), fontsize=6.6,
+            color='#444444', ha='left', va='top', linespacing=1.1)
+
+
+def _panel_quartiles(fig, ax, d):
+    """(a): median with the interquartile range, by year and by where F84 sits in the record."""
+    hi = 0
+    for variant, position, colour, marker, ls, label, dx in POSITIONS:
+        s = _cell(d, variant, position, 'hospitalisation')
+        y = s.median_days.to_numpy()
+        lo, up = s.q25_days.to_numpy(), s.q75_days.to_numpy()
+        hi = max(hi, up.max())
+        ax.errorbar(s.index.to_numpy() + dx, y, yerr=[y - lo, up - y], color=colour, ecolor=colour,
+                    marker=marker, ls=ls, ms=3.6, lw=1.3, elinewidth=1.0, capsize=2.0, capthick=1.0,
+                    label=label, zorder=3)
+    # the stored plate keeps the whiskers in the lower three-quarters: the legend takes the top of
+    # the axes and the disruption and law notes the strip under zero.
+    ax.set_ylim(-0.14 * hi, 1.41 * hi)
+    ax.set_yticks(np.arange(0, 31, 5))
+    _disruption(ax, 0.108)
+    _law(ax)
+    year_ticks(ax, YEARS)
+    ax.set_xlabel('Year')
+    ax.set_ylabel('Median (P25–P75) · days')
+    ax.legend(loc='upper left', ncol=2, columnspacing=1.2, handletextpad=0.5, borderaxespad=0.2,
+              labelspacing=0.35)
+    clean(ax, 'both')
+
+
+def _panel_age(fig, ax):
+    """(b): pooled 2019–2024 mean (bars) and 2024 median (points) by five-year WHO age group."""
+    t = _age_table()
+    f84_mean, f84_median = _age_series(t, F84_ROW)
+    grd_mean, grd_median = _age_series(t, ALL_ROW)
+    y = np.arange(len(AGE_GROUPS))
+    f84_bar = ax.barh(y - 0.2, np.nan_to_num(f84_mean), height=0.38, color=BLUE, zorder=3,
+                      label='Episodes with\ndocumented F84 · x̄')
+    grd_bar = ax.barh(y + 0.2, np.nan_to_num(grd_mean), height=0.38, color=BAR_GREY, zorder=2,
+                      label='All GRD episodes · x̄')
+    f84_pt, = ax.plot(f84_median, y - 0.2, 'o', color=BLACK, ms=4.2, ls='none', zorder=5,
+                      label='Episodes with\ndocumented F84 · 2024\nmed.')
+    grd_pt, = ax.plot(grd_median, y + 0.2, 's', color=DARK, ms=3.8, ls='none', zorder=4,
+                      label='All GRD episodes ·\n2024 med.')
+    ax.set_xlim(0, 1.9 * np.nanmax(np.concatenate([f84_mean, grd_mean])))
+    ax.xaxis.set_major_locator(MultipleLocator(10))
+    ax.set_yticks(y)
+    ax.set_yticklabels([label for _key, label in AGE_GROUPS])
+    ax.set_ylim(len(AGE_GROUPS) - 0.5, -0.5)          # first group at the top, as in the plate
+    ax.set_xlabel('Days')
+    ax.text(0, 1.015, 'Age group', transform=ax.transAxes, ha='left', va='bottom')
+    handles = [f84_pt, grd_pt, f84_bar, grd_bar]       # points first, then the bars, as in the plate
+    leg = ax.legend(handles, [h.get_label() for h in handles], loc='upper right',
+                    handletextpad=0.6, labelspacing=0.55, borderaxespad=0.2)
+    for txt in leg.get_texts():
+        txt.set_linespacing(1.15)
+    clean(ax, 'x')
+    ax.tick_params(axis='y', length=0)
+
+
+def _panel_p90(fig, ax, d):
+    """(c): the 90th percentile of stay, the tail the median and the quartiles cannot show."""
+    lo, hi = np.inf, 0
+    for variant, position, colour, marker, ls, label in P90_SERIES:
+        s = _cell(d, variant, position, 'hospitalisation')
+        v = s.p90_days.to_numpy()
+        lo, hi = min(lo, v.min()), max(hi, v.max())
+        ax.plot(s.index.to_numpy(), v, marker=marker, ls=ls, color=colour, ms=4, lw=1.5,
+                label=label, zorder=3)
+    ax.set_ylim(0.62 * lo, 1.21 * hi)                  # room for the legend and the two notes
+    ax.yaxis.set_major_locator(MultipleLocator(10))
+    _disruption(ax, 0.108)
+    _law(ax)
+    year_ticks(ax, YEARS)
+    ax.set_xlabel('Year')
+    ax.set_ylabel('P90 of stay (days)')
+    ax.legend(loc='upper right', borderaxespad=0.2, labelspacing=0.35, handletextpad=0.6)
+    clean(ax, 'both')
+
+
+def _panel_zero(fig, ax, d):
+    """(d): the share of episodes discharged on the day of admission.
+
+    All activities and hospitalisation only are drawn side by side on purpose: major ambulatory
+    surgery is a zero-day stay by definition, so the all-activity series is a mix of case mix and
+    modality mix and the two must not be read as one.
+    """
+    hi, lo = 0, np.inf
+    for variant, position, activity, colour, ls, label in ZERO_SERIES:
+        s = _cell(d, variant, position, activity)
+        v = (100 * s.n_los_zero / s.n_valid_dates).to_numpy()
+        hi, lo = max(hi, v.max()), min(lo, v.min())
+        ax.plot(s.index.to_numpy(), v, marker='o', ls=ls, color=colour, ms=3.6, lw=1.4,
+                label=label, zorder=3)
+    ax.set_ylim(0.08 * lo, 1.52 * hi)
+    ax.yaxis.set_major_locator(MultipleLocator(5))
+    _disruption(ax, 0.58)
+    _law(ax, 0.096)
+    year_ticks(ax, YEARS)
+    ax.set_xlabel('Year')
+    ax.set_ylabel('% of episodes with zero-day stay')
+    leg = ax.legend(loc='upper right', borderaxespad=0.2, labelspacing=0.45, handletextpad=0.6,
+                    fontsize=6.6)
+    for txt in leg.get_texts():
+        txt.set_linespacing(1.15)
+    clean(ax, 'both')
+
+
+def _panel_bands(fig, ax):
+    """(e): the 2024 distribution across stay bands, F84 against all GRD episodes of the same year."""
+    f84, grd, _n_f84, _n_grd = _bands()
+    y = np.arange(len(STAY_BANDS))
+    ax.barh(y - 0.2, f84, height=0.38, color=BLUE, zorder=3,
+            label='Episodes with\ndocumented F84')
+    ax.barh(y + 0.2, grd, height=0.38, color=BAR_GREY, zorder=3, label='All GRD episodes')
+    for yi, a, b in zip(y, f84, grd):
+        ax.annotate(_diff(a - b), (max(a, b), yi), xytext=(4, 0), textcoords='offset points',
+                    ha='left', va='center', fontsize=7.5, color=BLACK)
+    ax.set_xlim(0, 1.25 * max(f84.max(), grd.max()))
+    ax.xaxis.set_major_locator(MultipleLocator(5))
+    ax.set_yticks(y)
+    ax.set_yticklabels(STAY_BANDS)
+    ax.set_ylim(len(STAY_BANDS) - 0.5, -0.5)
+    ax.set_xlabel('% of episodes')
+    ax.set_ylabel('Stay band (days)')
+    ax.legend(loc='lower right', borderaxespad=0.2, labelspacing=0.5, handletextpad=0.6)
+    clean(ax, 'x')
+    ax.tick_params(axis='y', length=0)
+
+
+def _panel_activity(fig, ax, d):
+    """(f): episodes with F84 by activity (bars) and the median days of each activity (lines).
+
+    The two axes are locked together at 2,000 episodes per day, the way the stored plate sets them,
+    so the median-day line reads against the right axis without a second grid.
+    """
+    hi = 0
+    for i, (activity, colour, _lc, _m, _ls, label) in enumerate(ACTIVITIES):
+        s = _cell(d, VARIANT, 'any', activity)
+        n = s.n_valid_dates.to_numpy()
+        hi = max(hi, n.max())
+        ax.bar(s.index.to_numpy() + (i - 0.5) * 0.36, n, 0.34, color=colour, label=label, zorder=3)
+    shade_pandemic(ax)
+    top = 2.04 * hi                                   # the stored plate's headroom for its legend
+    ax.set_ylim(0, top)
+    ax.yaxis.set_major_locator(MultipleLocator(DAYS_PER_EPISODE))
+    ax.yaxis.set_major_formatter(COUNT)
+    year_ticks(ax, YEARS)
+    ax.set_xlabel('Year')
+    ax.set_ylabel('Episodes with documented F84')
+    ax.text(2020.5, 0.62, DISRUPTION, transform=ax.get_xaxis_transform(), ha='center', va='top',
+            fontsize=7.3, color=GREY, linespacing=1.15)
+    clean(ax, 'both')
+
+    r = ax.twinx()
+    for activity, _bar, colour, marker, ls, label in ACTIVITIES:
+        s = _cell(d, VARIANT, 'any', activity)
+        r.plot(s.index.to_numpy(), s.median_days.to_numpy(), marker=marker, ls=ls, color=colour,
+               ms=4.2, lw=1.6, zorder=4, label=f'Median days (line) ·\n{label.lower()}')
+    r.set_ylim(0, top / DAYS_PER_EPISODE)
+    r.yaxis.set_major_locator(MultipleLocator(1))
+    r.set_ylabel('Median days (line)')
+    r.grid(False)
+    for spine in ('top', 'right'):
+        r.spines[spine].set_visible(False)
+
+    handles, labels = ax.get_legend_handles_labels()   # the bars live on the left axis
+    h2, l2 = r.get_legend_handles_labels()             # the lines on the right one
+    leg = r.legend(handles + h2, labels + l2, loc='upper right', borderaxespad=0.2,
+                   labelspacing=0.45, handletextpad=0.6, fontsize=7)
+    for txt in leg.get_texts():
+        txt.set_linespacing(1.15)
+
+
+# -------------------------------------------------------------------------------------------- draw
+def draw_EF2_length_of_stay():
+    """Draw the six panels of EF2 and hand back the figure."""
+    d = _los()
+    _check_published(d)
+    style()
+    fig = plt.figure(figsize=(210/25.4, 286/25.4))    # the stored plate is a full page, six panels
+    # axes placed as in the stored plate: two columns, three rows, room above each for its title.
+    col, width, height = (0.118, 0.596), 0.362, 0.2565
+    row = (0.6899, 0.3696, 0.0338)
+    axes = [fig.add_axes([col[i % 2], row[i // 2], width, height]) for i in range(6)]
+    a, b, c, e, f = axes[0], axes[1], axes[2], axes[4], axes[5]
+
+    _panel_quartiles(fig, a, d)
+    _panel_age(fig, b)
+    _panel_p90(fig, c, d)
+    _panel_zero(fig, axes[3], d)
+    _panel_bands(fig, e)
+    _panel_activity(fig, f, d)
+
+    # (b) writes 'Age group' above its axes, so its title is set a line higher than the others
+    titles = [('(a)', 'Median and P25–P75 by year and position\n(hospitalisation)', 0.004),
+              ('(b)', 'Stay by age group: pooled 2019–2024\nmean and 2024 median', 0.0213),
+              ('(c)', '90th percentile of stay by year', 0.004),
+              ('(d)', 'Episodes with zero-day stay (%)', 0.004),
+              ('(e)', 'Distribution by stay bands, 2024', 0.004),
+              ('(f)', 'Hospitalisation versus major ambulatory\nsurgery', 0.004)]
+    for ax, (ch, title, gap) in zip(axes, titles):
+        _panel_title(fig, ax, ch, title, gap)
+    return fig
+
+
+draw_EF2_length_of_stay()
+```
+
+### Figure S18. Plate EF3. Administrative characteristics of the episode: documented F84 versus all GRD episodes — F84 family excluding Rett syndrome
+
+```{python}
+#| label: lamina-ef3_episode_features
+#| fig-cap: "Figure S18. Redrawn here from the published tables by the code above."
+import re
+
+import numpy as np
+import pandas as pd
+from matplotlib.ticker import MaxNLocator
+from figstyle import *
+
+PLATE = "EF3_episode_features"
+SOURCES = ["docs/study/corpus/tables/EF3_episode_features.csv"]
+NOTE = ("Redraws the six episode-feature panels of EF3 from the published EF3 companion table: the "
+        "within-cell share of each register category among documented F84 episodes and among all GRD "
+        "episodes, 2019–2024 pooled, with the percentage-point difference beside each pair.")
+
+TABLE = BASE / "corpus" / "tables" / "EF3_episode_features.csv"
+
+#: (row key of the table, panel heading of the plate), in the plate's panel order a–f.
+PANELS = [("TIPO_INGRESO", "Type of admission"),
+          ("TIPO_ACTIVIDAD", "Type of activity"),
+          ("TIPO_PROCEDENCIA", "Provenance"),
+          ("TIPOALTA", "Type of discharge"),
+          ("PREVISION_grouped", "Insurance (tramo)"),
+          ("ESPECIALIDAD_MEDICA", "Medical specialty")]
+
+KEEP = 7            # named categories kept per panel before the rest are pooled
+POOLED = 'Other categories (pooled) ({})'
+WRAP = 24           # characters per line of a category label
+GREY_BAR = '0.6'    # the comparison series of the plate: a mid grey, lighter than figstyle's GREY
+F84_LABEL = 'Episodes with\ndocumented F84'
+ALL_LABEL = 'All GRD episodes'
+
+
+def _count(cell):
+    """Count out of a presentation cell such as '8,221 (731)' or '16,705 (66.0%)'."""
+    return int(str(cell).split('(')[0].replace(',', '').replace(' ', '').strip())
+
+
+def _wrap(s, width=WRAP):
+    """A register category label as the plate writes it: at most two lines, the overflow of the
+    second cut off with an ellipsis. The pooled row is not a register category and is left alone."""
+    if s.startswith(POOLED.split('(')[0]):
+        return s
+    words, line, i = s.split(), '', 0
+    while i < len(words) and len((line + ' ' + words[i]).strip()) <= width:
+        line = (line + ' ' + words[i]).strip(); i += 1
+    if not line:                              # a first word longer than the line
+        line, i = words[0], 1
+    rest = ' '.join(words[i:])
+    if not rest:
+        return line
+    return line + '\n' + (rest if len(rest) <= width else rest[:width - 1] + '…')
+
+
+def load():
+    """The EF3 companion table with the two counts of every category parsed out."""
+    t = pd.read_csv(TABLE, encoding='utf-8-sig')
+    f84 = next(c for c in t.columns if c.startswith('Documented F84'))
+    whole = next(c for c in t.columns if c.startswith('All GRD'))
+    return t.assign(n_f84=t[f84].map(_count), n_all=t[whole].map(_count))
+
+
+def panel_rows(t, var):
+    """Label, % of F84 episodes and % of all GRD episodes, for one panel of the plate.
+
+    The categories are ranked by their F84 count; past the eighth the plate pools them, and the
+    pooled bar is the sum of the counts, not the sum of the rounded percentages.
+    """
+    d = t[t.Variable == var].sort_values('n_f84', ascending=False, kind='stable')
+    n_f84, n_all = d.n_f84.sum(), d.n_all.sum()
+    rows = [(c, f, a) for c, f, a in zip(d.Category, d.n_f84, d.n_all)]
+    if len(rows) > KEEP + 1:
+        rest = d.iloc[KEEP:]
+        rows = rows[:KEEP] + [(POOLED.format(len(rest)), rest.n_f84.sum(), rest.n_all.sum())]
+    return [(c, 100 * f / n_f84, 100 * a / n_all) for c, f, a in rows]
+
+
+def _diff(pp):
+    """The plate's difference label: an explicit sign, one decimal, a true minus sign."""
+    return ('+' if pp >= 0 else '−') + num(abs(pp), 'en', 1)
+
+
+def draw_EF3_episode_features():
+    style()
+    t = load()
+    fig, axes = plt.subplots(3, 2, figsize=(6.89, 9.38))
+    fig.subplots_adjust(left=0.2245, right=0.992, top=0.9794, bottom=0.0338, wspace=0.924, hspace=0.232)
+    for k, ((var, heading), ax) in enumerate(zip(PANELS, axes.ravel())):
+        rows = panel_rows(t, var)
+        y = np.arange(len(rows))
+        f84 = np.array([r[1] for r in rows])
+        whole = np.array([r[2] for r in rows])
+        ax.barh(y - 0.2, f84, height=0.4, color=BLUE, label=F84_LABEL)
+        ax.barh(y + 0.2, whole, height=0.4, color=GREY_BAR, label=ALL_LABEL)
+        for yi, f, a in zip(y, f84, whole):
+            ax.annotate(_diff(f - a), (max(f, a), yi), xytext=(2, 0), textcoords='offset points',
+                        ha='left', va='center', fontsize=6.3, color=BLACK)
+        ax.set_xlim(0, 1.24 * max(f84.max(), whole.max()))
+        ax.xaxis.set_major_locator(MaxNLocator(nbins=6, steps=[1, 2, 2.5, 5, 10]))
+        ax.set_yticks(y)
+        ax.set_yticklabels([_wrap(r[0]) for r in rows], fontsize=6.9)
+        ax.invert_yaxis()
+        ax.set_xlabel('% of episodes', fontsize=7.8, labelpad=1)
+        clean(ax, grid='x')
+        ax.tick_params(axis='both', length=0)
+        pos = ax.get_position()
+        x0 = 0.011 + 0.5 * (k % 2)
+        top = pos.y1 + 1.5 / 72 / fig.get_figheight()
+        fig.text(x0, top, f'({"abcdef"[k]})', fontweight='bold', fontsize=9, ha='left', va='bottom')
+        fig.text(x0 + 0.041, top, heading, fontweight='bold', fontsize=9, ha='left', va='bottom')
+    leg = axes[0, 0].legend(loc='lower right', fontsize=6.8, handlelength=1.2, handletextpad=0.55,
+                            labelspacing=0.35, borderpad=0.2, borderaxespad=0.4)
+    for txt in leg.get_texts():
+        txt.set_linespacing(1.1)
+    return fig
+
+
+draw_EF3_episode_features()
+```
+
+### Figure S19. Plate EF4. Severity, IR-29301 mortality risk, GRD weight and in-hospital lethality — F84 family excluding Rett syndrome
+
+::: {.callout-note collapse="true"}
+## Stored image — this plate has no drawing code here
+
+Its series are not fully carried by any published table, so it cannot be redrawn from a
+clone. The code that produced it is in `study/pipeline/`; what is missing is the microdata
+it reads.
+:::
+
+![**Plate EF4. Severity, IR-29301 mortality risk, GRD weight and in-hospital lethality — F84 family excluding Rett syndrome** (a) Severity and (b) mortality risk of the IR-29301 grouper (0 = minor to 3 = extreme; &#x27;not reported&#x27; as its own category) by year: solid bars, episodes with documented F84; hatched bars, all GRD episodes of the same panel. (c) IR-29301 relative weight of episodes with F84: median (line), interquartile range (band) and mean (dotted) by year and code position. (d) Twelve most frequent GRD groups among episodes with F84, pooled 2019–2024, as a percentage of those episodes and with their mean relative weight; module 11 keeps each year&#x27;s top 15 groups and pools the remainder. (e) In-hospital lethality (discharge recorded as &#x27;died&#x27;) by year with Jeffreys 95% intervals, for episodes with F84 and for all GRD episodes; counts are small and the interval reflects it. (f) Mean weight by code position (lines) and percentage of episodes without a recorded weight (grey bars, right axis). Shading: 2020–2021 reporting disruption; dotted line: Law 21.545 (March 2023) as context. Definition: F84 family excluding Rett syndrome. Lethality describes the episode, not the mortality of autistic people.](study/corpus/figures/EF4_severity_weight.jpg){fig-align="center" width="100%"}
+
+### Figure S20. Plate EF5. Co-diagnoses of episodes with documented F84 — F84 family excluding Rett syndrome
+
+```{python}
+#| label: lamina-ef5_codiagnoses
+#| fig-cap: "Figure S20. Redrawn here from the published tables by the code above."
+import re
+import sys
+import textwrap
+from pathlib import Path
+
+import numpy as np
+import pandas as pd
+import matplotlib.pyplot as plt
+
+sys.path.insert(0, str(ROOT / "docs" / "study"))   # docs/study, so `figstyle` resolves
+from figstyle import *                                          # noqa: E402,F401,F403  (house style)
+
+PLATE = "EF5_codiagnoses"
+SOURCES = [
+    "docs/study/corpus/tables/EF5_codiagnoses.csv",
+    "docs/study/corpus/tables/E7_grd_codiagnosis_chapters.csv",
+    "docs/study/corpus/tables/E8_grd_principal_when_secondary.csv",
+    "docs/study/data/grd_year_summary.csv",
+]
+NOTE = ("Redraws the six panels of EF5 — the top ten co-diagnosis categories pooled, the six ICD-10 "
+        "chapters by year, the thirteen mental-health blocks in 2019 against 2024, the principal "
+        "diagnosis when F84 is secondary only, the 2019-to-2024 change of the top ten and the coding "
+        "depth — from the published EF5, E7 and E8 tables and the annual GRD summary, keeping "
+        "'episodes with at least one mention' as the unit and each panel's own denominator.")
+
+TABLES = BASE/"corpus"/"tables"
+EF5_TABLE = TABLES/"EF5_codiagnoses.csv"
+CHAPTER_TABLE = TABLES/"E7_grd_codiagnosis_chapters.csv"
+SECONDARY_TABLE = TABLES/"E8_grd_principal_when_secondary.csv"
+YEAR_SUMMARY = DATA/"grd_year_summary.csv"
+
+VARIANT, PANEL_SET, ACTIVITY = "sin_rett", "observed", "all"
+YEARS = [2019, 2020, 2021, 2022, 2023, 2024]
+TOP = 10                 # categories kept in the ranking panels; the table keeps twenty-five
+CHAPTERS = 6             # rows of the heat map
+POOLED_COL = "2019–2024"
+
+#: rows of the EF5 table that are not co-diagnosis categories but the two coding-depth series of (f)
+CATS_PER_EPISODE = "Distinct ICD-10 categories per episode"
+DEPTH_F84 = "Coded diagnoses per episode · Episodes with documented F84"
+
+#: colours of the stored plate (Okabe–Ito, as in `figstyle`)
+C_F84, C_SECONDARY, C_2019, C_2024, C_ALL = BLUE, GOLD, SKY, ORANGE, "#7f8c8d"
+CONNECT = "#bbbbbb"      # the dumbbell connector of (c) and (e)
+CTX = "#444444"          # the Law 21.545 marker
+CTX_BBOX = dict(facecolor="white", edgecolor="none", alpha=0.75, pad=1.4)
+CELL_BBOX = dict(facecolor="white", edgecolor="none", alpha=0.78, pad=0.9)
+
+#: Law 21.545 on a year axis of centred years, as the original placed it: the year of publication plus
+#: March (2.5/12) minus the half year that centres the tick, i.e. 2022.708, between 2022 and 2023.
+LAW_X = 2023 + 2.5/12 - 0.5
+
+FS_TITLE, FS_LETTER, FS_BASE, FS_TICK, FS_ANN, FS_CELL = 9.0, 10.0, 8.0, 7.0, 6.4, 6.0
+
+PCT_F84 = "% of episodes with F84"
+PCT_SECONDARY = "% of episodes with F84 secondary only"
+DEPTH_LABEL = "Coded diagnoses per episode"
+CBAR_LABEL = "Episodes with ≥ 1 mention per\n100\nepisodes with F84"
+CONTEXT_XLABEL = ("Year — shading: Reporting disruption\n2020–21; dotted line: Law 21.545 (March\n"
+                  "2023, context)")
+
+TITLES = [("(a)", "10 most frequent three-character ICD-10\ncategories, 2019–2024"),
+          ("(b)", "ICD-10 chapters: episodes with a mention\nper 100 episodes with F84"),
+          ("(c)", "Mental-health blocks (F00–F99, excluding\nF84)"),
+          ("(d)", "Principal diagnosis when F84 is secondary\nonly"),
+          ("(e)", "Change between 2019 and 2024 (top 10\ncategories)"),
+          ("(f)", "Categories per episode and coding depth")]
+
+# axes of the stored plate, measured on it: two columns of 300 px and three rows of 341 px on the
+# 1000 x 1361 px canvas, with the colour bar of (b) outside its axes on the right margin.
+AX_X, AX_Y = (0.147, 0.616), (0.713446, 0.363703, 0.033799)
+AX_W, AX_H = 0.300, 0.250551
+CBAR_BOX = (0.923, 0.761205, 0.013, 0.155768)
+
+
+# ---------------------------------------------------------------------------------------------
+# reading the tracked tables
+# ---------------------------------------------------------------------------------------------
+def _n_pct(cell):
+    """'1,045 (44.8%)' -> (1045, 44.8); anything else -> None."""
+    m = re.fullmatch(r"([\d,]+)\s*\(([\d.]+)%\)", str(cell).strip())
+    if not m:
+        return None
+    return int(m.group(1).replace(",", "")), float(m.group(2))
+
+
+def _read_counts(path, key, keep=None):
+    """A published table of `n (percentage)` cells, as {label: {year: (n, published %)}}.
+
+    `keep` filters the rows on the table's own grouping column; rows whose cells are not counts (the
+    two coding-depth rows of the EF5 table) are left out and read separately.
+    """
+    raw = pd.read_csv(path, dtype=str, encoding="utf-8-sig").fillna("")
+    raw.columns = [c.strip() for c in raw.columns]
+    out = {}
+    for _, row in raw.iterrows():
+        if keep is not None and row[keep[0]].strip() != keep[1]:
+            continue
+        cells = {y: _n_pct(row[str(y)]) for y in YEARS}
+        if any(v is None for v in cells.values()):
+            continue
+        out[row[key].strip()] = cells
+    return out
+
+
+def _read_ef5():
+    """The EF5 companion table: the twenty-five categories and the distinct-categories series of (f)."""
+    raw = pd.read_csv(EF5_TABLE, dtype=str, encoding="utf-8-sig").fillna("")
+    raw.columns = [c.strip() for c in raw.columns]
+    key = raw.columns[0]
+    cats = _read_counts(EF5_TABLE, key)
+    pooled = {}
+    for _, row in raw.iterrows():
+        parsed = _n_pct(row[POOLED_COL])
+        if parsed is not None:
+            pooled[row[key].strip()] = parsed
+    depth = raw.set_index(key)
+    cats_per_episode = {y: float(depth.loc[CATS_PER_EPISODE, str(y)]) for y in YEARS}
+    depth_f84_published = {y: float(depth.loc[DEPTH_F84, str(y)]) for y in YEARS}
+    return cats, pooled, cats_per_episode, depth_f84_published
+
+
+def _read_year_summary():
+    """The annual summary of the same cell: the two denominators and the two coding depths of (f).
+
+    'any' is the number of episodes with F84 in any diagnostic position, which panels (a), (b), (c)
+    and (e) divide by; 'secondary_only' is the different denominator of panel (d). Neither is printed
+    by any of the presentation tables.
+    """
+    d = pd.read_csv(YEAR_SUMMARY)
+    d = d[(d.variant == VARIANT) & (d.panel == PANEL_SET) & (d.activity == ACTIVITY)]
+    any_pos = d[d.position == "any"].set_index("year").sort_index()
+    secondary = d[d.position == "secondary_only"].set_index("year").sort_index()
+    den_any = {y: int(any_pos.n_episodes_f84[y]) for y in YEARS}
+    den_sec = {y: int(secondary.n_episodes_f84[y]) for y in YEARS}
+    depth_f84 = {y: float(any_pos.coding_depth_mean_f84[y]) for y in YEARS}
+    depth_all = {y: float(any_pos.coding_depth_mean_all[y]) for y in YEARS}
+    return den_any, den_sec, depth_f84, depth_all
+
+
+def _pooled_rank(counts, top=None):
+    """Labels ordered by the pooled 2019–2024 count, with that count: the plate's own ranking."""
+    order = sorted(counts, key=lambda k: -sum(n for n, _ in counts[k].values()))
+    order = order if top is None else order[:top]
+    return [(k, sum(n for n, _ in counts[k].values())) for k in order]
+
+
+def _share(counts, label, year, denominator):
+    """Episodes with at least one mention of `label` in `year`, per 100 episodes of the denominator."""
+    return 100 * counts[label][year][0] / denominator[year]
+
+
+# ---------------------------------------------------------------------------------------------
+# the published values every drawn number is checked against
+# ---------------------------------------------------------------------------------------------
+def _check_published(cats, pooled, cats_per_episode, depth_f84_published, chapters, blocks,
+                     secondary, den_any, den_sec, depth_f84):
+    """Every percentage drawn here is recomputed from counts; each must round to its published cell."""
+    bad = []
+    for name, counts, denominator in (("EF5", cats, den_any), ("E7 chapter", chapters, den_any),
+                                      ("E7 block", blocks, den_any), ("E8", secondary, den_sec)):
+        for label, cells in counts.items():
+            for year, (n, published) in cells.items():
+                got = round(100 * n / denominator[year], 1)
+                if abs(got - published) > 0.051:
+                    bad.append(f"{name} {label} {year}: {got} vs published {published}")
+    total = sum(den_any.values())
+    for label, (n, published) in pooled.items():
+        got = round(100 * n / total, 1)
+        if abs(got - published) > 0.051:
+            bad.append(f"EF5 pooled {label}: {got} vs published {published}")
+    for year in YEARS:                      # the orange series of (f), against its published rounding
+        if abs(round(float(depth_f84[year]), 2) - depth_f84_published[year]) > 0.005:
+            bad.append(f"coding depth {year}: {depth_f84[year]} vs published {depth_f84_published[year]}")
+    if not 3.0 < min(cats_per_episode.values()) <= max(cats_per_episode.values()) < 6.0:
+        bad.append(f"categories per episode out of range: {cats_per_episode}")
+    if bad:
+        raise AssertionError("EF5 redraw does not match the published tables:\n  " + "\n  ".join(bad))
+
+
+# ---------------------------------------------------------------------------------------------
+# small drawing helpers, the plate's own
+# ---------------------------------------------------------------------------------------------
+def _clip(text, width):
+    """A label too long for its line, cut with an ellipsis and never left mid-word without one."""
+    s = str(text)
+    return s if len(s) <= width else s[:max(1, width - 1)].rstrip() + "…"
+
+
+def _tick(text, width=18, lines=2):
+    """A categorical tick label for a narrow cell: at most `lines` lines before it is clipped."""
+    parts = textwrap.wrap(str(text), width) or [str(text)]
+    if len(parts) <= lines:
+        return "\n".join(parts)
+    keep = parts[:lines]
+    keep[-1] = _clip(keep[-1] + " " + parts[lines], width)
+    return "\n".join(keep)
+
+
+def _icd_label(text):
+    """E8 writes 'G40 — Epilepsy'; the plate, like EF5 and E7, writes 'G40 · Epilepsy'."""
+    return re.sub(r"\s+—\s+", " · ", str(text))
+
+
+def _grid(ax):
+    ax.set_axisbelow(True)
+    ax.grid(True, color="#b0b0b0", alpha=0.32, lw=0.5)
+    for side in ("top", "right"):
+        ax.spines[side].set_visible(False)
+
+
+def _heading(fig, letter_x, top, letter, title):
+    fig.text(letter_x, top, letter, fontsize=FS_LETTER, fontweight="bold", ha="left", va="top")
+    fig.text(letter_x + 0.0425, top, title, fontsize=FS_TITLE, fontweight="bold", ha="left", va="top",
+             linespacing=1.13)
+
+
+def _rank_bars(ax, rows, colour, xlabel):
+    """A ranking panel: horizontal bars, the longest on top, with the glossed label in two lines."""
+    y = np.arange(len(rows))
+    ax.barh(y, [v for _, v in rows], color=colour)
+    ax.set_yticks(y)
+    ax.set_yticklabels([_tick(label) for label, _ in rows], fontsize=FS_ANN)
+    ax.invert_yaxis()
+    ax.set_xlabel(xlabel, fontsize=FS_BASE)
+    _grid(ax)
+
+
+def _dumbbell(ax, rows):
+    """A 2019-against-2024 panel: the two years joined by a grey connector, one row per category."""
+    y = np.arange(len(rows))
+    for i, (_, first, last) in enumerate(rows):
+        ax.plot([first, last], [i, i], color=CONNECT, lw=1.6, zorder=1)
+    ax.scatter([r[1] for r in rows], y, s=26, color=C_2019, zorder=2, label="2019")
+    ax.scatter([r[2] for r in rows], y, s=26, color=C_2024, zorder=2, label="2024")
+    ax.set_yticks(y)
+    ax.set_yticklabels([_tick(r[0]) for r in rows], fontsize=FS_ANN)
+    ax.invert_yaxis()
+    ax.set_xlabel(PCT_F84, fontsize=FS_BASE)
+    _grid(ax)
+    ax.legend(loc="lower right", fontsize=FS_TICK, frameon=True, framealpha=0.92, facecolor="white",
+              edgecolor="none", borderpad=0.28, labelspacing=0.3, handlelength=1.4,
+              handletextpad=0.5, borderaxespad=0.3)
+
+
+# ---------------------------------------------------------------------------------------------
+# the six panels
+# ---------------------------------------------------------------------------------------------
+def _panel_a(ax, cats, den_any):
+    """(a) The ten most frequent three-character categories, pooled over 2019–2024."""
+    total = sum(den_any.values())
+    rows = [(label, 100 * n / total) for label, n in _pooled_rank(cats, TOP)]
+    _rank_bars(ax, rows, C_F84, PCT_F84)
+
+
+def _panel_b(fig, ax, chapters, den_any):
+    """(b) The six chapters with the most affected episodes, per 100 episodes with F84 of the year."""
+    rows = [label for label, _ in _pooled_rank(chapters, CHAPTERS)]
+    data = np.array([[_share(chapters, label, y, den_any) for y in YEARS] for label in rows])
+    im = ax.imshow(data, cmap="YlGnBu", aspect="auto")
+    ax.set_xticks(range(len(YEARS)))
+    ax.set_xticklabels([str(y) for y in YEARS], fontsize=FS_BASE)
+    ax.set_yticks(range(len(rows)))
+    ax.set_yticklabels([_tick(label, 20) for label in rows], fontsize=FS_CELL)
+    ax.grid(False)
+    lo, hi = float(data.min()), float(data.max())
+    for i in range(data.shape[0]):
+        for j in range(data.shape[1]):
+            pale = (data[i, j] - lo) / (hi - lo) <= 0.62      # the text lightens only on dark cells
+            ax.text(j, i, num(data[i, j], "en", 1), ha="center", va="center", fontsize=FS_CELL,
+                    color="#1a1a1a" if pale else "white", bbox=CELL_BBOX if pale else None)
+    # context over a column axis: the disruption covers the 2020 and 2021 columns, the law falls
+    # between 2022 and 2023; the gloss goes under the axis, not over the cells.
+    ax.axvspan(0.5, 2.5, color="grey", alpha=0.16, zorder=3)
+    ax.axvline(3.5, color="#222222", ls=":", lw=1.2, zorder=4)
+    ax.set_xlabel(CONTEXT_XLABEL, fontsize=FS_ANN)
+    cax = fig.add_axes(CBAR_BOX)
+    bar = fig.colorbar(im, cax=cax)
+    bar.ax.tick_params(labelsize=FS_TICK)
+    # the stored plate breaks the colour-bar label into three lines and sets them solid, at the
+    # smallest body of the plate: that is what keeps the block inside the right margin of the canvas.
+    bar.set_label(CBAR_LABEL, fontsize=FS_CELL, labelpad=0.0)
+    bar.ax.yaxis.label.set_linespacing(1.0)
+
+
+def _panel_c(ax, blocks, den_any):
+    """(c) The thirteen mental-health blocks (F00–F99 without F84), 2019 against 2024."""
+    rows = [(label, _share(blocks, label, 2019, den_any), _share(blocks, label, 2024, den_any))
+            for label, _ in _pooled_rank(blocks)]
+    _dumbbell(ax, rows)
+
+
+def _panel_d(ax, secondary, den_sec):
+    """(d) Principal diagnosis of the episodes in which F84 appears only as a secondary diagnosis."""
+    total = sum(den_sec.values())
+    rows = [(_icd_label(label), 100 * n / total) for label, n in _pooled_rank(secondary, TOP)]
+    _rank_bars(ax, rows, C_SECONDARY, PCT_SECONDARY)
+
+
+def _panel_e(ax, cats, den_any):
+    """(e) The ten categories of (a), 2019 against 2024, in the same order."""
+    rows = [(label, _share(cats, label, 2019, den_any), _share(cats, label, 2024, den_any))
+            for label, _ in _pooled_rank(cats, TOP)]
+    _dumbbell(ax, rows)
+
+
+def _panel_f(ax, cats_per_episode, depth_f84, depth_all):
+    """(f) Distinct categories per episode against the coding depth of F84 and of all GRD episodes."""
+    ax.plot(YEARS, [cats_per_episode[y] for y in YEARS], marker="o", ms=4.2, lw=1.7, color=C_F84,
+            label=CATS_PER_EPISODE)
+    ax.plot(YEARS, [depth_f84[y] for y in YEARS], marker="^", ms=4.0, lw=1.5, color=C_2024,
+            label="Episodes with documented F84")
+    ax.plot(YEARS, [depth_all[y] for y in YEARS], marker="s", ms=3.8, lw=1.4, ls="--", color=C_ALL,
+            label="All GRD episodes")
+    for year in (2020, 2021):                       # the reporting disruption, one span per year
+        ax.axvspan(year - 0.5, year + 0.5, color="grey", alpha=0.12, zorder=0)
+    ax.text(2020.5, 0.97, "Reporting\ndisruption 2020–21", transform=ax.get_xaxis_transform(),
+            ha="center", va="top", fontsize=FS_TICK, color="#555555", bbox=CTX_BBOX, zorder=6)
+    ax.axvline(LAW_X, color=CTX, ls=":", lw=1.2, zorder=1)
+    ax.text(LAW_X + 0.06, 0.5, "Law 21.545\n(2023)", transform=ax.get_xaxis_transform(), ha="left",
+            va="top", fontsize=FS_TICK, color=CTX, bbox=CTX_BBOX, zorder=6)
+    ax.set_xticks(YEARS)
+    ax.set_xticklabels([str(y) for y in YEARS])
+    ax.set_xlabel("Year", fontsize=FS_BASE)
+    ax.set_ylabel(DEPTH_LABEL, fontsize=FS_BASE)
+    _grid(ax)
+    lo, hi = ax.get_ylim()                          # room under the series for the legend box
+    ax.set_ylim(lo - (hi - lo) * 0.46, hi)
+    lo, hi = ax.get_ylim()                          # and the headroom the stored plate keeps above
+    ax.set_ylim(top=hi + (hi - lo) * 0.024)         # the 2020 peak, under the disruption label
+    handles, labels = ax.get_legend_handles_labels()
+    ax.legend(handles, [textwrap.fill(t, 24) for t in labels], loc="lower right", fontsize=FS_ANN,
+              title=DEPTH_LABEL, title_fontsize=FS_TICK, frameon=True, framealpha=0.9,
+              facecolor="white", edgecolor="none", borderpad=0.28, labelspacing=0.3,
+              handlelength=1.4, handletextpad=0.5, borderaxespad=0.3)
+
+
+# ---------------------------------------------------------------------------------------------
+def draw_EF5_codiagnoses():
+    """Draw the six panels of EF5 and hand back the figure."""
+    cats, pooled, cats_per_episode, depth_f84_published = _read_ef5()
+    chapters = _read_counts(CHAPTER_TABLE, "Group", keep=("Grouping", "ICD-10 chapter"))
+    blocks = _read_counts(CHAPTER_TABLE, "Group", keep=("Grouping", "Mental-health block (F)"))
+    secondary = _read_counts(SECONDARY_TABLE, "Principal diagnosis (ICD-10, 3 characters)")
+    den_any, den_sec, depth_f84, depth_all = _read_year_summary()
+    _check_published(cats, pooled, cats_per_episode, depth_f84_published, chapters, blocks,
+                     secondary, den_any, den_sec, depth_f84)
+
+    style()
+    plt.rcParams.update({
+        "axes.labelsize": FS_BASE, "xtick.labelsize": FS_TICK, "ytick.labelsize": FS_TICK,
+        "axes.edgecolor": "#333333", "axes.linewidth": 0.7, "axes.labelpad": 2.0,
+        # the stored plate draws no tick marks — the grid carries the scale — but keeps their length
+        # in the gap between the spine and the tick label, which is where the labels of (a) to (e) sit
+        "xtick.bottom": False, "ytick.left": False, "xtick.major.size": 2.2, "ytick.major.size": 2.2,
+        "xtick.major.width": 0.6, "ytick.major.width": 0.6,
+        "xtick.major.pad": 1.6, "ytick.major.pad": 1.6,
+        "lines.linewidth": 1.1, "lines.markersize": 3.2})
+    fig = plt.figure(figsize=(180/25.4, 245/25.4))     # the plate norm: 180 x 245 mm, three by two
+    ax = [fig.add_axes([AX_X[i % 2], AX_Y[i // 2], AX_W, AX_H]) for i in range(6)]
+
+    _panel_a(ax[0], cats, den_any)
+    _panel_b(fig, ax[1], chapters, den_any)
+    _panel_c(ax[2], blocks, den_any)
+    _panel_d(ax[3], secondary, den_sec)
+    _panel_e(ax[4], cats, den_any)
+    _panel_f(ax[5], cats_per_episode, depth_f84, depth_all)
+
+    for i, (letter_, title) in enumerate(TITLES):
+        top = AX_Y[i // 2] + AX_H + (41 if title.count("\n") else 21)/1361
+        _heading(fig, 0.013 + 0.500 * (i % 2), top, letter_, title)
+    return fig
+
+
+draw_EF5_codiagnoses()
+```
+
+### Figure S21. Plate EF6. Readmission and multiplicity of episodes per identifier — F84 family excluding Rett syndrome
+
+```{python}
+#| label: lamina-ef6_readmission_multiplicity
+#| fig-cap: "Figure S21. Redrawn here from the published tables by the code above."
+import sys
+import textwrap
+from pathlib import Path
+
+import numpy as np, pandas as pd
+import matplotlib.pyplot as plt
+from matplotlib.ticker import FuncFormatter, MultipleLocator
+
+sys.path.insert(0, str(ROOT / "docs" / "study"))   # docs/study, so `figstyle` resolves
+from figstyle import *                                          # noqa: F401,F403  (house style)
+
+PLATE = "EF6_readmission_multiplicity"
+SOURCES = [
+    "docs/study/data/grd_readmission.csv",
+    "docs/study/data/grd_year_summary.csv",
+    "docs/study/corpus/tables/E10_grd_multiplicity.csv",
+    "docs/study/corpus/tables/EF6_readmission_multiplicity.csv",
+]
+READMISSION, YEAR_SUMMARY, MULTIPLICITY, PUBLISHED = SOURCES
+NOTE = ("Redraws the six panels of EF6 — readmission at 30, 90 and 365 days with Wilson intervals, "
+        "readmission by the position of F84, episodes per identifier, persons within year and the "
+        "eligibility states — from the published GRD readmission, multiplicity and annual-summary "
+        "tables, keeping n_eligible as the denominator and suppressing years with fewer than 30 "
+        "eligible discharges.")
+
+ROOT = BASE.parent.parent          # docs/study -> docs -> repository root
+VARIANT, PANEL = 'sin_rett', 'observed'
+MIN_ELIGIBLE = 30                  # below this the percentage is not estimable ('n/e' in the table)
+YEARS = [2019, 2020, 2021, 2022, 2023, 2024]
+ERAS = ['2019-2020', '2021-2024']
+HORIZONS = [(30, BLUE, '30 days'), (90, GREEN, '90 days'), (365, ORANGE, '365 days')]
+POSITIONS = [('any', BLUE, 'Any position'), ('principal', ORANGE, 'Principal F84'),
+             ('secondary_only', GOLD, 'Secondary only')]
+# Law 21.545 was published on 10 March 2023 (day 69). The stored plate marks it a little before the
+# 2023 position, i.e. against the middle of each plotted year; LAW_X reproduces that placement. The
+# marker is context only — no estimate depends on it.
+LAW_X = 2023 + 69 / 365 - 0.5
+ERA_NOTE = ("Year — series split by identifier era (2019–2020 | 2021–2024); 'n/e': fewer than "
+            f"{MIN_ELIGIBLE} eligible discharges, percentage not estimable and therefore not plotted")
+PERSON_NOTE = ("Year (shading: 2020–2021 reporting disruption) — persons only within year: the "
+               "identifier format changes between 2020 and 2021")
+STATE_NOTE = "Year — 365-day horizon: eligibility falls at the end of each identifier era"
+COUNT = FuncFormatter(lambda v, p: num(v, 'en', 0))
+
+
+# ---------------------------------------------------------------- tracked tables and their parsing
+def _read(rel, **kw):
+    """Read one tracked table by its repository-relative path (the paths listed in SOURCES)."""
+    return pd.read_csv(ROOT/rel, **kw)
+
+
+def _int(s):
+    """'8,221' -> 8221 ; the presentation tables store counts as formatted strings."""
+    return int(str(s).replace(',', '').replace(' ', '').strip())
+
+
+def _readmission():
+    """The readmission table restricted to the case definition and hospital panel of the plate."""
+    d = _read(READMISSION)
+    return d[(d.variant == VARIANT) & (d.panel == PANEL)].copy()
+
+
+def _series(d, position, horizon, value='any_cause'):
+    """Year, percentage and Wilson bounds for one position and horizon, era by era.
+
+    Years with fewer than MIN_ELIGIBLE eligible discharges are dropped, so the lines break where the
+    era ends rather than running through a percentage that the table itself refuses to print.
+    """
+    s = d[(d.position == position) & (d.horizon_days == horizon) & (d.n_eligible >= MIN_ELIGIBLE)]
+    for era in ERAS:
+        e = s[s.era == era].sort_values('year')
+        if len(e):
+            yield e.year.to_numpy(), e[f'pct_{value}'].to_numpy(), \
+                  e[f'pct_{value}_lo'].to_numpy(), e[f'pct_{value}_hi'].to_numpy()
+
+
+def _multiplicity():
+    """Episodes per identifier within each era, as counts and as a share of the era's identifiers."""
+    m = _read(MULTIPLICITY, encoding='utf-8-sig')
+    eras = list(m.columns[1:3])                      # '2019–2020', '2021–2024' (en dash in the file)
+    groups = m[m.columns[0]].astype(str).tolist()
+    total = {e: _int(m[e].iloc[groups.index('Total identifiers')]) for e in eras}
+    rows = [g for g in groups if g != 'Total identifiers']
+    out = {}
+    for e in eras:
+        counts = [_int(m[e].iloc[groups.index(g)].split('(')[0]) for g in rows]
+        out[e] = np.array([100 * c / total[e] for c in counts])
+    return rows, eras, out
+
+
+def _persons():
+    """Persons within year and episodes per person, on the same case definition as the plate."""
+    y = _read(YEAR_SUMMARY)
+    y = y[(y.variant == VARIANT) & (y.panel == PANEL) & (y.activity == 'all') & (y.position == 'any')]
+    y = y.sort_values('year')
+    return y.year.to_numpy(), y.persons_within_year.to_numpy(), \
+        (y.n_episodes_f84 / y.persons_within_year).to_numpy()
+
+
+def _check_published(d):
+    """Compare what will be drawn against the published presentation table of the plate.
+
+    The table prints '<numerator>/<denominator>; <pct> (<lo>–<hi>)' or 'n/e' where the percentage is
+    not estimable, so it checks the counts, the percentages, the Wilson bounds and the suppression
+    rule at once. It also carries the multiplicity shares and the persons of (c) and (d).
+    """
+    t = _read(PUBLISHED, encoding='utf-8-sig')
+    t = t.set_index(t.columns[0])
+    bad = []
+
+    def cell(row, year):
+        return str(t.loc[row, str(year)]).strip()
+
+    for horizon, _c, _l in HORIZONS:
+        for value, label in (('any_cause', 'any cause'), ('f84', 'with F84')):
+            row = f'{horizon} days — {label}'
+            for year in YEARS:
+                r = d[(d.position == 'any') & (d.horizon_days == horizon) & (d.year == year)].iloc[0]
+                counts, pct = cell(row, year).split(';')
+                n, den = (_int(x) for x in counts.split('/'))
+                got = (r[f'n_readmitted_{value}'], r.n_eligible)
+                if (n, den) != got:
+                    bad.append(f'{row} {year}: counts {got} vs published {(n, den)}')
+                if 'n/e' in pct:
+                    if r.n_eligible >= MIN_ELIGIBLE:
+                        bad.append(f'{row} {year}: published n/e but n_eligible={r.n_eligible}')
+                    continue
+                v, lo, hi = (float(x) for x in pct.replace('(', ' ').replace(')', '')
+                             .replace('–', ' ').split())
+                for a, b, what in ((r[f'pct_{value}'], v, 'pct'), (r[f'pct_{value}_lo'], lo, 'lo'),
+                                   (r[f'pct_{value}_hi'], hi, 'hi')):
+                    if round(float(a), 1) != b:
+                        bad.append(f'{row} {year} {what}: {a} vs published {b}')
+
+    rows, eras, shares = _multiplicity()
+    for era, col in zip(eras, ['2019–2020', '2021–2024']):
+        published = dict(p.split(': ') for p in cell(f'Episodes per identifier within the era — {col}',
+                                                     YEARS[0]).split('; '))
+        for g, share in zip(rows, shares[era]):
+            want = float(published[g].split('(')[1].rstrip('%)'))
+            if round(share, 1) != want:
+                bad.append(f'multiplicity {era} {g}: {share:.2f}% vs published {want}%')
+
+    years, persons, per_person = _persons()
+    for year, p, r in zip(years, persons, per_person):
+        if p != _int(cell('Persons within year', year)):
+            bad.append(f'persons {year}: {p} vs published {cell("Persons within year", year)}')
+        if round(float(r), 2) != float(cell('Episodes per person', year)):
+            bad.append(f'episodes per person {year}: {r:.4f} vs published {cell("Episodes per person", year)}')
+
+    if bad:
+        raise AssertionError('redraw disagrees with the published table:\n  ' + '\n  '.join(bad))
+
+
+# ------------------------------------------------------------------------------------------ panels
+def _panel_title(fig, ax, ch, title, gap=0.008):
+    """Bold panel letter and title above the axes, the way the stored plate sets them.
+
+    `gap` leaves room for the panels that name their unit in a line of their own above the axes.
+    """
+    lines = title.count('\n')
+    letter(fig, ax, ch, dx=-0.048, dy=gap + 0.0165 * lines)
+    pos = ax.get_position()
+    fig.text(pos.x0, pos.y1 + gap, title, fontweight='bold', fontsize=10.5, ha='left', va='bottom',
+             linespacing=1.25)
+
+
+def _disruption(ax, y=0.80):
+    """The shaded 2020–2021 reporting disruption and its note, as the stored plate labels it."""
+    shade_pandemic(ax)
+    ax.text(2020.5, y, 'Reporting\ndisruption 2020–21', transform=ax.get_xaxis_transform(),
+            ha='center', va='top', fontsize=7.3, color=GREY, linespacing=1.15,
+            bbox=dict(facecolor='white', edgecolor='none', pad=1.2))
+
+
+def _context(ax, note_x):
+    """Reporting-disruption band, the law marker and the 'n/e' notes of panels (a) and (b)."""
+    _disruption(ax)
+    ax.axvline(LAW_X, color='#444444', ls=(0, (1.6, 1.8)), lw=0.8, zorder=1)
+    ax.text(LAW_X + 0.06, 0.97, 'Law 21.545\n(2023)', transform=ax.get_xaxis_transform(),
+            fontsize=6.6, color='#444444', ha='left', va='top', linespacing=1.1)
+    for x in note_x:
+        ax.text(x, 0.10, 'n/e\n365 days', transform=ax.get_xaxis_transform(), ha='center', va='top',
+                fontsize=7, color=ORANGE, linespacing=1.15,
+                bbox=dict(facecolor='white', edgecolor='none', pad=1.2))
+
+
+def _panel_readmission(fig, ax, d, value, ticks):
+    """(a) and (b): readmission percentage by horizon, one line per identifier era."""
+    for horizon, colour, label in HORIZONS:
+        first = True
+        for years, pct, lo, hi in _series(d, 'any', horizon, value):
+            ax.errorbar(years, pct, yerr=[pct - lo, hi - pct], fmt='o-', color=colour, ecolor=colour,
+                        ms=3.4, lw=1.3, elinewidth=0.9, capsize=1.8, capthick=0.9,
+                        label=label if first else None, zorder=3)
+            first = False
+    # the years the 365-day horizon cannot reach: its eligibility window leaves the era
+    cut = sorted(d[(d.position == 'any') & (d.horizon_days == 365)
+                   & (d.n_eligible < MIN_ELIGIBLE)].year.unique())
+    _context(ax, cut)
+    s = d[(d.position == 'any') & (d.n_eligible >= MIN_ELIGIBLE)]
+    # the stored plate keeps the data in the lower third and fills the rest with the legend and notes
+    ax.set_ylim(s[f'pct_{value}_lo'].min() * 0.15, s[f'pct_{value}_hi'].max() * 2.4)
+    ax.set_yticks(ticks)                      # tick step as in the stored plate: 6 pp in (a), 5 in (b)
+    year_ticks(ax, YEARS)
+    ax.set_xlabel(textwrap.fill(ERA_NOTE, 45), fontsize=7.3, linespacing=1.2)
+    ax.legend(title='Horizon', loc='upper center', bbox_to_anchor=(0.5, 0.62), ncol=3,
+              handletextpad=0.5, columnspacing=1.4, frameon=True, facecolor='white',
+              edgecolor='none', framealpha=0.85)
+    clean(ax, 'both')
+
+
+def _panel_multiplicity(fig, ax):
+    """(c): how many episodes with F84 each identifier accumulates inside its era."""
+    rows, eras, shares = _multiplicity()
+    x = np.arange(len(rows))
+    for i, (era, colour) in enumerate(zip(eras, (BLUE, ORANGE))):
+        ax.bar(x + (i - 0.5) * 0.4, shares[era], 0.38, color=colour, label=era, zorder=3)
+    ax.set_xticks(x); ax.set_xticklabels(rows)
+    ax.set_ylim(0, 110); ax.set_yticks(np.arange(0, 101, 20))
+    ax.set_xlabel('Episodes with F84 per identifier')
+    ax.set_ylabel('% of identifiers')
+    ax.legend(title='Identifier era', loc='upper right')
+    clean(ax, 'both')
+
+
+def _panel_persons(fig, ax):
+    """(d): persons within year (bars) and episodes per person (line, right axis)."""
+    years, persons, per_person = _persons()
+    ax.bar(years, persons, 0.62, color=BLUE, label='Persons within year', zorder=3)
+    shade_pandemic(ax)
+    ax.set_ylim(0, persons.max() * 1.41)
+    ax.yaxis.set_major_locator(MultipleLocator(2000)); ax.yaxis.set_major_formatter(COUNT)
+    year_ticks(ax, YEARS)
+    ax.text(0, 1.015, 'Persons within year', transform=ax.transAxes, ha='left', va='bottom')
+    ax.set_xlabel(textwrap.fill(PERSON_NOTE, 43), fontsize=7.3, linespacing=1.2)
+    clean(ax, 'both')
+
+    r = ax.twinx()
+    r.plot(years, per_person, 'o-', color=ORANGE, ms=4, lw=1.6, zorder=4, label='Episodes per person')
+    span = per_person.max() - per_person.min()
+    r.set_ylim(per_person.min() - 0.08 * span, per_person.max() + 0.20 * span)
+    r.yaxis.set_major_locator(MultipleLocator(0.005))
+    r.yaxis.set_major_formatter(FuncFormatter(lambda v, p: num(v, 'en', 3)))
+    r.set_ylabel('Episodes per person')
+    r.grid(False); r.spines['top'].set_visible(False); r.spines['right'].set_visible(False)
+
+    handles, labels = ax.get_legend_handles_labels()          # the bars live on the left axis
+    h2, l2 = r.get_legend_handles_labels()                     # the line on the right one
+    r.legend(handles + h2, labels + l2, loc='upper right', borderaxespad=0.2, labelspacing=0.3,
+             handletextpad=0.5, frameon=True, facecolor='white', edgecolor='none', framealpha=0.85)
+
+
+def _panel_position(fig, ax, d):
+    """(e): the same 30-day readmission, split by where F84 sits in the discharge record."""
+    s = d[(d.horizon_days == 30) & (d.n_eligible >= MIN_ELIGIBLE)]
+    for i, (position, colour, label) in enumerate(POSITIONS):
+        p = s[s.position == position].sort_values('year')
+        ax.bar(p.year + (i - 1) * 0.27, p.pct_any_cause, 0.25, color=colour, label=label, zorder=3,
+               yerr=[p.pct_any_cause - p.pct_any_cause_lo, p.pct_any_cause_hi - p.pct_any_cause],
+               ecolor=BLACK, capsize=2, error_kw=dict(elinewidth=0.8, capthick=0.8, zorder=4))
+    _disruption(ax, 0.98)
+    ax.set_ylim(0, s.pct_any_cause_hi.max() * 1.3); ax.set_yticks(np.arange(0, 41, 5))
+    year_ticks(ax, YEARS)
+    ax.set_xlabel('Year'); ax.set_ylabel('% of eligible discharges')
+    ax.legend(loc='upper right', frameon=True, facecolor='white', edgecolor='none', framealpha=0.85)
+    clean(ax, 'both')
+
+
+def _panel_states(fig, ax, d):
+    """(f): index discharges, those with a full 365-day horizon, and overlapping next admissions."""
+    s = d[(d.position == 'any') & (d.horizon_days == 365)].sort_values('year')
+    bars = [('n_discharges', GREY, 'Index discharges'),
+            ('n_eligible', BLUE, 'Eligible with full\nhorizon'),
+            ('n_with_overlapping_next_admission', PINK, 'With overlapping next\nadmission')]
+    for i, (column, colour, label) in enumerate(bars):
+        ax.bar(s.year + (i - 1) * 0.27, s[column], 0.25, color=colour, label=label, zorder=3)
+    ax.set_ylim(0, s.n_discharges.max() * 1.48)
+    ax.yaxis.set_major_locator(MultipleLocator(2000)); ax.yaxis.set_major_formatter(COUNT)
+    year_ticks(ax, YEARS)
+    ax.text(0, 1.015, 'Episodes', transform=ax.transAxes, ha='left', va='bottom')
+    ax.set_xlabel(textwrap.fill(STATE_NOTE, 48), fontsize=7.3, linespacing=1.2)
+    ax.legend(loc='upper left', labelspacing=0.5, handletextpad=0.5)
+    clean(ax, 'both')
+
+
+# -------------------------------------------------------------------------------------------- draw
+def draw_EF6_readmission_multiplicity():
+    """Draw the six panels of EF6 and hand back the figure."""
+    d = _readmission()
+    _check_published(d)
+    style()
+    fig = plt.figure(figsize=(210/25.4, 286/25.4))   # the stored plate is a full page, six panels
+    # axes placed as in the stored plate: two columns, three rows, room under each for its note.
+    # (d) is the narrower one of the right column: it carries a second axis on its right edge.
+    col = [(0.059, 0.396), (0.527, 0.403)]
+    row = [(0.731, 0.215), (0.386, 0.214), (0.045, 0.211)]
+    box = [list(col[i % 2]) for i in range(6)]
+    box[3] = [0.535, 0.382]
+    axes = [fig.add_axes([box[i][0], row[i // 2][0], box[i][1], row[i // 2][1]]) for i in range(6)]
+    a, b, c, e, f = axes[0], axes[1], axes[2], axes[4], axes[5]
+
+    _panel_readmission(fig, a, d, 'any_cause', np.arange(6, 43, 6))
+    a.set_ylabel('% of eligible discharges')
+    _panel_readmission(fig, b, d, 'f84', np.arange(5, 36, 5))
+    b.text(0, 1.015, '% of eligible discharges', transform=b.transAxes, ha='left', va='bottom')
+    _panel_multiplicity(fig, c)
+    _panel_persons(fig, axes[3])
+    _panel_position(fig, e, d)
+    _panel_states(fig, f, d)
+
+    titles = [('(a)', 'All-cause readmission (Wilson 95% CI)', 0.008),
+              ('(b)', 'Readmission with documented F84\n(Wilson 95% CI)', 0.018),
+              ('(c)', 'Episodes per identifier within the era', 0.008),
+              ('(d)', 'Persons within year and episodes per\nperson', 0.018),
+              ('(e)', '30-day readmission by F84 position', 0.008),
+              ('(f)', 'Data states: discharges, eligible and\noverlaps', 0.018)]
+    for ax, (ch, title, gap) in zip(axes, titles):
+        _panel_title(fig, ax, ch, title, gap)
+    return fig
+
+
+draw_EF6_readmission_multiplicity()
+```
+
+### Figure S22. Plate EF7. Age detail of episodes with documented F84 — F84 family excluding Rett syndrome
+
+```{python}
+#| label: lamina-ef7_age_detail
+#| fig-cap: "Figure S22. Redrawn here from the published tables by the code above."
+import re
+import sys
+from pathlib import Path
+
+import numpy as np, pandas as pd
+import matplotlib.pyplot as plt
+from matplotlib.ticker import MultipleLocator, NullFormatter
+from scipy.stats import chi2
+
+sys.path.insert(0, str(ROOT / "docs" / "study"))   # docs/study, so `figstyle` resolves
+from figstyle import *                                          # noqa: F401,F403  (house style)
+
+PLATE = "EF7_age_detail"
+SOURCES = [
+    "docs/study/corpus/tables/EF7_age_detail.csv",
+    "docs/study/corpus/tables/E63_grd_age_single_sex_full.csv",
+    "docs/study/data/grd_age_sex_year.csv",
+    "docs/study/data/grd_age_hombre_2024.csv",
+    "docs/study/data/grd_age_mujer_2024.csv",
+    "output_files/consolidacion/population_regional.csv",
+]
+COMPANION, SINGLE_YEAR, AGE_SEX_YEAR, HOMBRE_2024, MUJER_2024, POPULATION = SOURCES
+NOTE = ("Redraws the six panels of EF7 — single-year age by sex, the crude rate per 100,000 "
+        "population by age group and year, the pooled male-to-female ratio, the cumulative age "
+        "distribution with its median, the age-by-year rate heat map and the 2024 rate by age and "
+        "sex — from the EF7 and E63 companion tables and from the tracked GRD age-by-sex counts over "
+        "the national sum of the regional INE population, case definition sin_rett, observed panel.")
+
+ROOT = BASE.parents[1]                  # figstyle.BASE is docs/study; ROOT is the repository root
+FIG_W_IN, FIG_H_IN = 210 / 25.4, 286 / 25.4     # the plate canvas of the pipeline: a full page
+
+YEARS = [2019, 2020, 2021, 2022, 2023, 2024]
+#: year colours of the stored plate, pale to dark across 2019–2024
+YEAR_COLOURS = [SKY, BLUE, GREEN, YELLOW, GOLD, ORANGE]
+SEXES = [('HOMBRE', 'Males', BLUE), ('MUJER', 'Females', ORANGE)]
+DETAIL_YEARS = [(2019, '-.', SKY), (2024, '-', ORANGE)]   # the two years detailed in (a) and (d)
+MAX_SINGLE_AGE = 40                     # panel (a) stops at 40 completed years, as the plate does
+MAX_CUM_AGE = 60                        # panel (d) runs to 60
+UNKNOWN_ROW = 'Unknown age (episodes)'
+MEDIAN_ROW = 'Median age (years)'
+RATE_LABEL = 'Per 100,000 population'
+MISMATCH = 'Numerator: place of care · Denominator:\nresidence'
+#: the stored plate writes the numerator/denominator note in a dark grey, not in figstyle's GREY
+MISMATCH_COLOUR = '#444444'
+A_YLABEL = "% of the year's and sex's\nepisodes"
+AGE_LABEL = 'Age (completed years)'
+HEAT_CMAP = 'YlOrRd'
+HEAT_WHITE = 0.60                       # above this share of the maximum the cell label turns white
+TITLES = [('(a)', 'Single-year age by sex, 2019 and 2024'),
+          ('(b)', 'Rate per 100,000 population by age group\nand year'),
+          ('(c)', 'Male-to-female ratio by age group'),
+          ('(d)', 'Shift of the age distribution, 2019 versus\n2024'),
+          ('(e)', 'Rate per 100,000 population: age group ×\nyear'),
+          ('(f)', 'Rate by age and sex, 2024 (exact 95% CI)')]
+
+#: presentation cell of the companion table: 'episodes; rate (exact Poisson 95% CI)'
+CELL = re.compile(r'^([\d,]+)\s*;\s*([\d.]+)\s*\(([\d.]+)[–-]([\d.]+)\)$')
+#: the M:F column: 'ratio (delta-method 95% CI)'
+RATIO = re.compile(r'^([\d.]+)\s*\(([\d.]+)[–-]([\d.]+)\)$')
+
+
+# ---------------------------------------------------------------- tracked tables and their parsing
+def _read(rel, **kw):
+    """Read one tracked table by its repository-relative path (the paths listed in SOURCES)."""
+    return pd.read_csv(ROOT/rel, **kw)
+
+
+def _int(s):
+    """'1,418' -> 1418 ; the presentation tables store counts as formatted strings."""
+    return int(str(s).replace(',', '').replace(' ', '').strip())
+
+
+def _key(label):
+    """'0–4' (the table's en dash) -> '0-4', the spelling of the tidy files and of the population."""
+    return str(label).strip().replace('–', '-')
+
+
+def _poisson(k, pop):
+    """Rate per 100,000 and its exact Poisson 95% interval, the estimator of (b), (e) and (f).
+
+    A zero count keeps a zero rate and a zero lower bound: it is a true zero, not a missing value,
+    and it is drawn as such (on a log axis matplotlib clips it to the bottom of the panel).
+    """
+    k, pop = np.asarray(k, float), np.asarray(pop, float)
+    lo = np.where(k > 0, chi2.ppf(0.025, 2*np.maximum(k, 1))/2, 0.0)
+    hi = chi2.ppf(0.975, 2*(k + 1))/2
+    return k/pop*1e5, lo/pop*1e5, hi/pop*1e5
+
+
+def _companion():
+    """The EF7 companion table, parsed: counts, rates, exact Poisson bounds, ratios, median age."""
+    t = _read(COMPANION, encoding='utf-8-sig')
+    t.columns = [c.strip() for c in t.columns]
+    first, ratio_col = t.columns[0], t.columns[-1]
+    rows = t[first].astype(str).str.strip().tolist()
+    groups = [g for g in rows if g not in (UNKNOWN_ROW, MEDIAN_ROW)]
+    t = t.set_index(first)
+
+    n = np.zeros((len(groups), len(YEARS)), int)
+    rate, lo, hi = (np.zeros((len(groups), len(YEARS))) for _ in range(3))
+    for i, g in enumerate(groups):
+        for j, y in enumerate(YEARS):
+            m = CELL.match(str(t.loc[g, str(y)]).strip())
+            n[i, j] = _int(m.group(1))
+            rate[i, j], lo[i, j], hi[i, j] = (float(m.group(k)) for k in (2, 3, 4))
+    ratio = np.array([[float(x) for x in RATIO.match(str(t.loc[g, ratio_col]).strip()).groups()]
+                      for g in groups])
+    unknown = np.array([_int(t.loc[UNKNOWN_ROW, str(y)]) for y in YEARS])
+    median = np.array([float(t.loc[MEDIAN_ROW, str(y)]) for y in YEARS])
+    return dict(groups=groups, n=n, rate=rate, lo=lo, hi=hi, ratio=ratio.T,
+                unknown=unknown, median=median)
+
+
+def _single_year():
+    """E63: episodes by completed age and sex, one column per year, counts parsed out.
+
+    Returns the ages actually reported (0–91), the per-sex counts indexed by age, and the sex totals
+    of each year — the totals include the 'Age not reported' row, because panel (a) is a share of all
+    the episodes of that year and sex.
+    """
+    e = _read(SINGLE_YEAR, encoding='utf-8-sig')
+    age_col, sex_col = e.columns[0], e.columns[1]
+    for c in e.columns[2:]:
+        e[c] = e[c].map(_int)
+    e[age_col] = e[age_col].astype(str).str.strip()
+    known = e[e[age_col].str.fullmatch(r'\d+')].copy()
+    known['age'] = known[age_col].astype(int)
+    by_sex = {s: known[known[sex_col] == s].set_index('age') for s in e[sex_col].unique()}
+    totals = {s: e[e[sex_col] == s][[str(y) for y in YEARS]].sum() for s in e[sex_col].unique()}
+    return known, by_sex, totals
+
+
+def _share(by_sex, totals, sex, year, ages):
+    """Panel (a): episodes of one sex and year at each completed age, as a % of that sex's year."""
+    counts = by_sex[sex][str(year)].reindex(ages, fill_value=0).to_numpy(float)
+    return 100 * counts / totals[sex][str(year)]
+
+
+def _cumulative(known, year):
+    """Panel (d): ages and the cumulative % of the episodes of known age of that year, both sexes."""
+    s = known.groupby('age')[str(year)].sum().sort_index()
+    return s.index.to_numpy(float), 100 * s.cumsum().to_numpy(float) / s.sum()
+
+
+def _median_from_cumulative(ages, cum):
+    """The age at which the cumulative curve of (d) crosses 50%, linearly between two whole ages.
+
+    This is the recipe that reproduces the published 'Median age (years)' row; `_check_sources()`
+    asserts it for all six years before the plate is drawn.
+    """
+    i = int(np.searchsorted(cum, 50.0))
+    below = cum[i-1] if i else 0.0
+    return ages[i] - 1 + (50.0 - below) / (cum[i] - below)
+
+
+def _population(year):
+    """National population of `year` by sex and age group: the sum of the sixteen regions."""
+    p = _read(POPULATION)
+    return p[p.year == year].groupby(['sex', 'age_group'])['population'].sum()
+
+
+def _sex_rates_2024(groups):
+    """Panel (f): 2024 episodes, population, rate and exact Poisson bounds by sex and age group."""
+    g = _read(AGE_SEX_YEAR)
+    g = g[(g.variant == 'sin_rett') & (g.panel == 'observed') & (g.position == 'any')
+          & (g.activity == 'all') & (g.year == 2024)].set_index(['sex', 'age_group'])['n_f84']
+    pop = _population(2024)
+    keys = [_key(x) for x in groups]
+    out = {}
+    for sex, _label, _colour in SEXES:
+        k = np.array([int(g.loc[(sex, a)]) for a in keys], float)
+        d = np.array([float(pop.loc[(sex, a)]) for a in keys])
+        rate, lo, hi = _poisson(k, d)
+        out[sex] = dict(n=k, population=d, rate=rate, lo=lo, hi=hi)
+    return out
+
+
+# ------------------------------------------------------------------------------------ verification
+def _check_sources(tab, known, totals, sex_2024):
+    """Prove every drawn value against a second tracked table before the figure is built.
+
+    Five checks: the companion counts against the tidy age-by-sex counts; the companion rates and
+    exact Poisson bounds against those counts over the national population sum; the M:F column
+    against the pooled counts with a delta-method interval; the 2024 sex-specific rates against the
+    two published `grd_age_*_2024.csv` files, the eight bands above 44 through their pooled 45+ row;
+    and the E63 year totals and cumulative medians against the companion table.
+    """
+    bad = []
+    keys = [_key(g) for g in tab['groups']]
+    g = _read(AGE_SEX_YEAR)
+    g = g[(g.variant == 'sin_rett') & (g.panel == 'observed') & (g.position == 'any')
+          & (g.activity == 'all')]
+    pooled = g.groupby(['sex', 'age_group'])['n_f84'].sum()
+
+    for j, year in enumerate(YEARS):
+        pop = _population(year)
+        counts = g[g.year == year].groupby('age_group')['n_f84'].sum()
+        for i, a in enumerate(keys):
+            if int(counts.get(a, 0)) != tab['n'][i, j]:
+                bad.append(f'{a} {year}: {counts.get(a, 0)} episodes vs published {tab["n"][i, j]}')
+            d = sum(float(pop.loc[(s, a)]) for s, _l, _c in SEXES)
+            rate, lo, hi = _poisson(tab['n'][i, j], d)
+            for got, want, what in ((rate, tab['rate'][i, j], 'rate'), (lo, tab['lo'][i, j], 'lo'),
+                                    (hi, tab['hi'][i, j], 'hi')):
+                if round(float(got), 1) != want:
+                    bad.append(f'{a} {year} {what}: {float(got):.3f} vs published {want}')
+        if int(counts.get('unknown', 0)) != tab['unknown'][j]:
+            bad.append(f'unknown age {year}: {counts.get("unknown", 0)} vs published '
+                       f'{tab["unknown"][j]}')
+
+    for i, a in enumerate(keys):
+        m, f = float(pooled.loc[('HOMBRE', a)]), float(pooled.loc[('MUJER', a)])
+        se = np.sqrt(1/m + 1/f)
+        for got, want, what in ((m/f, tab['ratio'][0, i], 'ratio'),
+                                (m/f*np.exp(-1.959964*se), tab['ratio'][1, i], 'lo'),
+                                (m/f*np.exp(+1.959964*se), tab['ratio'][2, i], 'hi')):
+            if round(float(got), 2) != want:
+                bad.append(f'M:F {a} {what}: {float(got):.4f} vs published {want}')
+
+    for (sex, _label, _colour), path in ((SEXES[0], HOMBRE_2024), (SEXES[1], MUJER_2024)):
+        ref = _read(path).set_index('age_group')
+        s = sex_2024[sex]
+        for i, a in enumerate(keys):
+            if a not in ref.index:
+                continue
+            for got, want, what in ((s['n'][i], ref.loc[a, 'count'], 'count'),
+                                    (s['population'][i], ref.loc[a, 'population'], 'population'),
+                                    (s['rate'][i], ref.loc[a, 'rate'], 'rate'),
+                                    (s['lo'][i], ref.loc[a, 'lo'], 'lo'),
+                                    (s['hi'][i], ref.loc[a, 'hi'], 'hi')):
+                if abs(float(got) - float(want)) > 1e-9:
+                    bad.append(f'2024 {sex} {a} {what}: {float(got)} vs published {float(want)}')
+        above = [i for i, a in enumerate(keys) if a not in ref.index]     # 45–49 … 80+
+        rate, lo, hi = _poisson(s['n'][above].sum(), s['population'][above].sum())
+        for got, want, what in ((s['n'][above].sum(), ref.loc['45+', 'count'], 'count'),
+                                (s['population'][above].sum(), ref.loc['45+', 'population'], 'pop'),
+                                (rate, ref.loc['45+', 'rate'], 'rate'), (lo, ref.loc['45+', 'lo'], 'lo'),
+                                (hi, ref.loc['45+', 'hi'], 'hi')):
+            if abs(float(got) - float(want)) > 1e-9:
+                bad.append(f'2024 {sex} 45+ {what}: {float(got)} vs published {float(want)}')
+
+    for j, year in enumerate(YEARS):
+        ages, cum = _cumulative(known, year)
+        if round(_median_from_cumulative(ages, cum), 1) != tab['median'][j]:
+            bad.append(f'median {year}: {_median_from_cumulative(ages, cum):.3f} vs published '
+                       f'{tab["median"][j]}')
+        total = sum(int(t[str(year)]) for t in totals.values())
+        if total != int(tab['n'][:, j].sum() + tab['unknown'][j]):
+            bad.append(f'E63 total {year}: {total} vs companion '
+                       f'{int(tab["n"][:, j].sum() + tab["unknown"][j])}')
+
+    if bad:
+        raise AssertionError('redraw disagrees with the tracked tables:\n  ' + '\n  '.join(bad))
+
+
+# ------------------------------------------------------------------------------------------ panels
+def _log_y(ax):
+    """A log y axis labelled 10^k, the powers-of-ten labels the stored plate carries in (b), (c), (f).
+
+    `figstyle.log_axis` writes the decades out as plain numbers; this plate does not, so the default
+    scientific formatter is kept and only the minor labels are silenced. Non-positive values — the
+    zero rates of (b), (e) and the male 80+ of (f) — are clipped to the bottom by matplotlib's own
+    log scale, which is what draws them running off the panel in the stored plate.
+    """
+    ax.set_yscale('log')
+    ax.yaxis.set_minor_formatter(NullFormatter())
+
+
+def _categorical(ax, labels):
+    """The seventeen WHO age groups on the x axis, written the way the companion table writes them."""
+    ax.set_xticks(np.arange(len(labels)))
+    ax.set_xticklabels(labels, rotation=90)
+
+
+def _panel_single_year(ax, by_sex, totals):
+    """(a) single-year age by sex, 2019 dash-dotted and 2024 solid, each within its own sex-year."""
+    ages = np.arange(0, MAX_SINGLE_AGE + 1)
+    for year, style_, _colour in DETAIL_YEARS:
+        for sex, label, colour in SEXES:
+            ax.plot(ages, _share(by_sex, totals, label, year, ages), ls=style_, color=colour,
+                    lw=1.3, label=f'{year} · {label}', zorder=3)
+    ax.set_xticks(np.arange(0, MAX_SINGLE_AGE + 1, 5))
+    ax.set_ylim(-0.41, 12.53)          # the stored plate's headroom: the four-entry legend sits in it
+    ax.set_yticks(np.arange(0, 13, 2))
+    ax.set_xlabel(AGE_LABEL)
+    ax.set_ylabel(A_YLABEL)
+    ax.legend(loc='upper right', handlelength=2.2)
+    clean(ax, 'both')
+
+
+def _panel_rate_by_year(ax, tab):
+    """(b) the crude rate per 100,000 by age group, one line per year, on a log axis."""
+    for j, (year, colour) in enumerate(zip(YEARS, YEAR_COLOURS)):
+        ax.plot(np.arange(len(tab['groups'])), tab['rate'][:, j], 'o-', color=colour, ms=3.4,
+                lw=1.3, label=str(year), zorder=3)
+    _log_y(ax)
+    positive = tab['rate'][tab['rate'] > 0]
+    ax.set_ylim(positive.min() * 0.2, tab['rate'].max() * 10)   # a decade of room for the legend
+    _categorical(ax, tab['groups'])
+    ax.set_xlabel('Age group')
+    ax.set_ylabel(RATE_LABEL)
+    ax.text(0.022, 0.016, MISMATCH, transform=ax.transAxes, fontsize=7.3, color=MISMATCH_COLOUR,
+            ha='left', va='bottom', linespacing=1.2)
+    ax.legend(title='Year', loc='upper left', ncol=3, columnspacing=0.75, handletextpad=0.5)
+    clean(ax, 'both')
+
+
+def _panel_ratio(ax, tab):
+    """(c) the male-to-female ratio of episodes pooled over 2019–2024, delta-method 95% CI."""
+    ratio, lo, hi = tab['ratio']
+    x = np.arange(len(tab['groups']))
+    ax.errorbar(x, ratio, yerr=[ratio - lo, hi - ratio], fmt='o', color=BLUE, ecolor=BLUE,
+                ms=5, elinewidth=1.3, capsize=2.6, capthick=1.1, zorder=3)
+    ax.axhline(1, color=BLACK, ls=':', lw=1.0, zorder=2)
+    _log_y(ax)
+    _categorical(ax, tab['groups'])
+    ax.set_ylabel('Male:female ratio (95% CI)')
+    clean(ax, 'both')
+
+
+def _panel_cumulative(ax, known, median):
+    """(d) the cumulative age distribution of 2019 against 2024, with the published medians marked."""
+    marked = [median[YEARS.index(year)] for year, _style, _colour in DETAIL_YEARS]
+    for (year, _style, colour), m in zip(DETAIL_YEARS, marked):
+        ages, cum = _cumulative(known, year)
+        ax.plot(ages, cum, '-', color=colour, lw=2.0, label=str(year), zorder=3)
+        ax.axvline(m, color=colour, ls=':', lw=1.3, zorder=2)      # the published median of the year
+    ax.axhline(50, color=GREY, ls=':', lw=1.0, zorder=2)
+    ax.set_xlim(0, MAX_CUM_AGE)
+    ax.set_ylim(-5, 128)               # the stored plate's headroom for the median note and legend
+    ax.set_yticks(np.arange(0, 121, 20))
+    ax.xaxis.set_major_locator(MultipleLocator(10))
+    ax.set_xlabel(AGE_LABEL)
+    ax.set_ylabel('Cumulative % of episodes')
+    ax.text(0.985, 0.972, f'Median: {marked[0]:.1f} → {marked[-1]:.1f} years', transform=ax.transAxes,
+            ha='right', va='top', fontsize=8)
+    ax.legend(loc='upper right', bbox_to_anchor=(1.0, 0.938), handlelength=1.6)
+    clean(ax, 'both')
+
+
+def _panel_heatmap(fig, ax, tab):
+    """(e) the same rates as a heat map, age group by year, every cell labelled as the plate does."""
+    rate = tab['rate']
+    im = ax.imshow(rate, cmap=HEAT_CMAP, aspect='auto', vmin=0, vmax=rate.max())
+    for i in range(rate.shape[0]):
+        for j in range(rate.shape[1]):
+            white = rate[i, j] >= HEAT_WHITE * rate.max()
+            ax.text(j, i, f'{rate[i, j]:.1f}', ha='center', va='center', fontsize=7,
+                    color='white' if white else BLACK,
+                    bbox=None if white else dict(facecolor='white', edgecolor='none',
+                                                 alpha=0.65, pad=1.1))
+    ax.set_xticks(np.arange(len(YEARS)))
+    ax.set_xticklabels([str(y) for y in YEARS], fontsize=8.5)
+    ax.set_yticks(np.arange(len(tab['groups'])))
+    ax.set_yticklabels(tab['groups'])
+    ax.set_xlabel('Year')
+    ax.grid(False)
+    for s in ('top', 'right'):
+        ax.spines[s].set_visible(False)
+    cax = fig.add_axes([0.4530, 0.0639, 0.0140, 0.1984])    # the colour bar of the stored plate
+    cb = fig.colorbar(im, cax=cax, ticks=MultipleLocator(50))
+    cb.set_label(RATE_LABEL)
+    cb.outline.set_visible(False)
+    cax.tick_params(length=0)
+
+
+def _panel_sex_2024(ax, tab, sex_2024):
+    """(f) the 2024 rate by age group and sex, exact Poisson 95% CI, on a log axis.
+
+    Male 80+ is a true zero: the point is clipped to the bottom of the log axis and only its upper
+    bound is visible, which is why the blue line runs off the panel at the right edge.
+    """
+    x = np.arange(len(tab['groups']))
+    for sex, label, colour in SEXES:
+        s = sex_2024[sex]
+        ax.errorbar(x, s['rate'], yerr=[s['rate'] - s['lo'], s['hi'] - s['rate']], fmt='o-',
+                    color=colour, ecolor=colour, ms=3.4, lw=1.3, elinewidth=1.0, capsize=2.2,
+                    capthick=0.9, label=label, zorder=3)
+    _log_y(ax)
+    ax.set_ylim(4.5e-3, 4.0e3)         # the stored plate's limits: the legend and the note sit above
+    _categorical(ax, tab['groups'])
+    ax.set_ylabel(RATE_LABEL)
+    ax.text(0.020, 0.986, MISMATCH, transform=ax.transAxes, fontsize=7.3, color=MISMATCH_COLOUR,
+            ha='left', va='top', linespacing=1.2)
+    ax.legend(loc='upper right')
+    clean(ax, 'both')
+
+
+# -------------------------------------------------------------------------------------------- draw
+def _panel_title(fig, ax, ch, title, col):
+    """Bold panel letter and title above the axes, placed as the stored plate places them."""
+    line = 10.5 * 1.15 / 72 / FIG_H_IN                       # one title line, in figure fractions
+    y = ax.get_position().y1
+    fig.text(0.012 + 0.5*col, y + line * title.count('\n'), ch, fontweight='bold', fontsize=11,
+             ha='left', va='bottom')
+    fig.text(0.054 + 0.5*col, y, title, fontweight='bold', fontsize=10.5, ha='left', va='bottom',
+             linespacing=1.15)
+
+
+def draw_EF7_age_detail():
+    """Draw the six panels of EF7 and hand back the figure."""
+    tab = _companion()
+    known, by_sex, totals = _single_year()
+    sex_2024 = _sex_rates_2024(tab['groups'])
+    _check_sources(tab, known, totals, sex_2024)
+
+    style()
+    fig = plt.figure(figsize=(FIG_W_IN, FIG_H_IN))
+    # axes placed as in the stored plate: two columns of three, measured off the stored image
+    col_x, col_w = (0.0645, 0.6005), (0.3850, 0.3840)
+    row_y, row_h = (0.71693, 0.37160, 0.03950), 0.24725
+    axes = [fig.add_axes([col_x[i % 2], row_y[i // 2], col_w[i % 2], row_h]) for i in range(6)]
+    for ax in axes:
+        ax.tick_params(length=0)                             # the stored plate draws no tick marks
+
+    _panel_single_year(axes[0], by_sex, totals)
+    _panel_rate_by_year(axes[1], tab)
+    _panel_ratio(axes[2], tab)
+    _panel_cumulative(axes[3], known, tab['median'])
+    _panel_heatmap(fig, axes[4], tab)
+    _panel_sex_2024(axes[5], tab, sex_2024)
+
+    for i, (ax, (ch, title)) in enumerate(zip(axes, TITLES)):
+        _panel_title(fig, ax, ch, title, i % 2)
+    return fig
+
+
+draw_EF7_age_detail()
+```
+
+### Figure S23. Plate EF8. GRD panel hospitals: rates, rank stability and concentration — F84 family excluding Rett syndrome
+
+```{python}
+#| label: lamina-ef8_hospitals
+#| fig-cap: "Figure S23. Redrawn here from the published tables by the code above."
+import sys
+from pathlib import Path
+
+import numpy as np, pandas as pd
+import matplotlib.pyplot as plt
+from matplotlib.ticker import FuncFormatter, MultipleLocator
+from scipy import stats
+
+sys.path.insert(0, str(ROOT / "docs" / "study"))   # docs/study, so `figstyle` resolves
+from figstyle import *                                          # noqa: F401,F403  (house style)
+
+PLATE = "EF8_hospitals"
+SOURCES = [
+    "docs/study/corpus/tables/ST1_grd_hospital_panel.csv",
+    "docs/study/corpus/tables/E61_grd_hospital_year_full.csv",
+    "docs/study/corpus/tables/S_hospital_rates_2024.csv",
+]
+PANEL, FULL, RATES_2024 = SOURCES
+NOTE = ("Redraws the six panels of EF8 — the hospital heat map, the Spearman rank stability, the "
+        "share of the ten largest hospitals, the fixed panel of 65 against the hospitals added in "
+        "2023–2024, the within-year distribution of hospital rates and the Lorenz curve with its "
+        "Gini index — from the published hospital × year panel ST1, every cell checked against the "
+        "published E61 and 2024 hospital tables.")
+
+ROOT = BASE.parent.parent          # docs/study -> docs -> repository root
+YEARS = [2019, 2020, 2021, 2022, 2023, 2024]
+NAMED = 12                         # named rows of the heat map; the rest are pooled into one row
+LABEL_CHARS = 17                   # the stored plate clips the abbreviated name at 17 characters
+RNG_SEED = 8                       # the strip of (e) needs a jitter; keep it reproducible
+MISSING = '—'                      # ST1 writes an em dash where a hospital did not report that year
+# Law 21.545 was published on 10 March 2023 (day 69); the stored plate marks it against the middle
+# of each plotted year, which is what this expression reproduces. Context only — no estimate uses it.
+LAW_X = 2023 + 69 / 365 - 0.5
+BOX_FILL = '#e0eef6'               # the pale fill of the boxes in (e)
+BOX_EDGE = '#26485c'
+COUNT = FuncFormatter(lambda v, p: num(v, 'en', 0))
+# the stored plate sets the heat map and the explanatory notes in smaller type than the axes
+CELL_PT, ROW_PT, YEAR_PT, NOTE_PT, KEY_PT = 6.5, 6.2, 8.4, 6.6, 6.9
+TITLE_PT, LETTER_PT = 9.2, 10.5
+
+# the stored plate is a full page of six panels on a fixed two-column grid
+FIGSIZE = (185 / 25.4, 252 / 25.4)
+COLUMN = [(0.150, 0.300), (0.628, 0.300)]                 # x0, width
+ROW = [(0.6943, 0.2542), (0.3769, 0.2542), (0.0338, 0.2542)]   # y0, height
+LETTER_X = [0.013, 0.513]
+TITLE_X = [0.0555, 0.5555]
+TITLES = [
+    '(a)', 'Rate per 100,000 hospital episodes (12\nhospitals with most F84 episodes and the\nrest pooled)',
+    '(b)', 'Rank stability across years (Spearman ρ)',
+    '(c)', 'Contribution of the 10 largest hospitals',
+    '(d)', 'Fixed panel of 65 versus hospitals added',
+    '(e)', 'Distribution of hospital rates by year',
+    '(f)', 'Concentration of episodes with F84\n(Lorenz curve)',
+]
+# 'Hospital Clínico Regional Dr. X (Santiago, Y)' -> 'H.C.R. Dr. X' + '(Y)', longest prefix first
+ABBREVIATIONS = [
+    ('Hospital Clínico Regional ', 'H.C.R. '), ('Hospital Clínico de Niños ', 'H. Niños '),
+    ('Hospital de Niños ', 'H. Niños '), ('Hospital Clínico ', 'H.C. '),
+    ('Complejo Hospitalario ', 'C.H. '), ('Complejo Asistencial ', 'C.A. '), ('Hospital ', 'H. '),
+]
+
+
+# ---------------------------------------------------------------- tracked tables and their parsing
+def _read(rel):
+    """Read one tracked table by its repository-relative path (the paths listed in SOURCES)."""
+    return pd.read_csv(ROOT/rel, encoding='utf-8-sig', dtype=str)
+
+
+def _int(s):
+    """'1,151,475' -> 1151475 ; the presentation tables store counts as formatted strings."""
+    return int(str(s).replace(',', '').replace(' ', '').strip())
+
+
+def _cell(s):
+    """'19,727 (38)' -> (19727, 38) ; an em dash means the hospital did not report that year."""
+    s = str(s).strip()
+    if s == MISSING:
+        return np.nan, np.nan
+    episodes, f84 = s.split('(')
+    return _int(episodes), _int(f84.rstrip(')'))
+
+
+def _panel_table():
+    """The hospital × year panel: F84 counts, GRD denominators and the fixed-panel flag.
+
+    Returns the 72 hospital rows only; the five summary rows at the foot of the table (they carry no
+    code) are handed back separately because `_check_published` totals the panel against them.
+    """
+    t = _read(PANEL)
+    hospitals, summary = t[t.Code.notna()], t[t.Code.isna()]
+    counts, denominators = {}, {}
+    for year in YEARS:
+        parsed = hospitals[str(year)].map(_cell)
+        denominators[year] = parsed.map(lambda c: c[0]).to_numpy(float)
+        counts[year] = parsed.map(lambda c: c[1]).to_numpy(float)
+    index = pd.Index(hospitals.Hospital.to_numpy(), name='hospital')
+    return (pd.DataFrame(counts, index=index), pd.DataFrame(denominators, index=index),
+            (hospitals['Fixed panel of 65'] == 'Yes').to_numpy(),
+            hospitals.Code.to_numpy(), summary.set_index('Hospital'))
+
+
+def _rate(counts, denominators):
+    """Rate per 100,000 episodes of the same hospital and year — the estimator of every panel."""
+    return 100_000 * counts / denominators
+
+
+def _check_published(counts, denominators, fixed, codes, summary):
+    """Compare the parsed panel against the other two published hospital tables before drawing.
+
+    E61 prints the same 72 × 6 cells as 'count; rate (exact 95% CI)' and S_hospital_rates_2024 prints
+    the 2024 denominators and rates again, so between them every number this plate draws is checked
+    against a second published table, and the annual totals against the summary rows of ST1 itself.
+    """
+    bad = []
+    rate = _rate(counts, denominators)
+
+    full = _read(FULL)
+    full['code'] = full[full.columns[0]].str.split(' — ').str[0].str.strip()
+    full = full.set_index('code')
+    for code, hospital in zip(codes, counts.index):
+        row = full.loc[code]
+        for year in YEARS:
+            cell = str(row[str(year)]).strip()
+            if cell == 'not reported':
+                if np.isfinite(denominators.loc[hospital, year]):
+                    bad.append(f'{code} {year}: ST1 reports but E61 does not')
+                continue
+            published_count, published_rate = cell.split(';')
+            if _int(published_count) != counts.loc[hospital, year]:
+                bad.append(f'{code} {year}: F84 {counts.loc[hospital, year]:.0f} vs E61 '
+                           f'{published_count.strip()}')
+            value = float(published_rate.split('(')[0].replace(',', ''))
+            if round(rate.loc[hospital, year], 1) != value:
+                bad.append(f'{code} {year}: rate {rate.loc[hospital, year]:.1f} vs E61 {value}')
+
+    latest = _read(RATES_2024).set_index('Code')
+    for code, hospital in zip(codes, counts.index):
+        row = latest.loc[code]
+        for got, published, what in (
+                (denominators.loc[hospital, 2024], _int(row['GRD episodes 2024']), 'episodes'),
+                (counts.loc[hospital, 2024], _int(row['Episodes with F84 2024']), 'F84')):
+            if got != published:
+                bad.append(f'{code} 2024 {what}: {got:.0f} vs S table {published}')
+        value = float(row['Rate per 100,000 episodes (exact 95% CI)'].split('(')[0].replace(',', ''))
+        if round(rate.loc[hospital, 2024], 1) != value:
+            bad.append(f'{code} 2024 rate: {rate.loc[hospital, 2024]:.1f} vs S table {value}')
+
+    for label, keep in (('Total, observed annual panel', np.ones(len(counts), bool)),
+                        ('Total, fixed panel of 65 hospitals', fixed)):
+        for year in YEARS:
+            episodes, f84 = _cell(summary.loc[label, str(year)])
+            got = (counts[keep][year].sum(), denominators[keep][year].sum())
+            if got != (f84, episodes):
+                bad.append(f'{label} {year}: {got[0]:.0f}/{got[1]:.0f} '
+                           f'vs published {f84}/{episodes}')
+    for year in YEARS:
+        if denominators[year].notna().sum() != _int(summary.loc['Observed hospitals (n)', str(year)]):
+            bad.append(f'hospitals reporting in {year}: {denominators[year].notna().sum()} vs '
+                       f'published {summary.loc["Observed hospitals (n)", str(year)]}')
+
+    if bad:
+        raise AssertionError('redraw disagrees with the published tables:\n  ' + '\n  '.join(bad))
+
+
+def _abbreviate(name):
+    """'Hospital Clínico de Niños Dr. Roberto del Río (Santiago, Independencia)' -> two label lines.
+
+    The stored plate writes the abbreviated hospital on one line and its locality, the last part of
+    the parenthesis, on the next, clipping the name at LABEL_CHARS characters with an ellipsis.
+    """
+    body, _, locality = name.partition(' (')
+    locality = locality.rstrip(')').split(', ')[-1]
+    for long, short in ABBREVIATIONS:
+        if body.startswith(long):
+            body = short + body[len(long):]
+            break
+    if len(body) > LABEL_CHARS:
+        body = body[:LABEL_CHARS] + '…'
+    return f'{body}\n({locality})'
+
+
+# ------------------------------------------------------------------------ what each panel is made of
+def _heatmap(counts, denominators):
+    """(a): the NAMED hospitals with most F84 episodes over 2019–2024, the remaining ones pooled.
+
+    The pooled row is a group rate — the other hospitals' F84 episodes over their GRD episodes — so
+    it is built from the summed counts and denominators, never from the mean of their rates.
+    """
+    order = counts.sum(axis=1).sort_values(ascending=False, kind='mergesort').index
+    named, rest = order[:NAMED], order[NAMED:]
+    rows = _rate(counts.loc[named], denominators.loc[named]).to_numpy()
+    pooled = _rate(counts.loc[rest].sum(), denominators.loc[rest].sum()).to_numpy()
+    labels = [_abbreviate(h) for h in named] + [f'All other hospitals ({len(rest)})']
+    return np.vstack([rows, pooled]), labels
+
+
+def _rank_stability(counts, denominators):
+    """(b): Spearman ρ of hospital rates, over the hospitals present in both years of each pair."""
+    rate = _rate(counts, denominators)
+    pairs = list(zip(YEARS, YEARS[1:])) + [(YEARS[0], YEARS[-1])]
+    out = []
+    for a, b in pairs:
+        both = rate[a].notna() & rate[b].notna()
+        out.append((f'{a}–\n{b}', stats.spearmanr(rate.loc[both, a], rate.loc[both, b]).statistic,
+                    int(both.sum())))
+    return out
+
+
+def _concentration(counts):
+    """(c): share of episodes with F84 held by the ten largest hospitals of the year, and by the
+    ten largest of 2024 held fixed. 'Largest' is by episodes with F84, which is what the plate plots.
+    """
+    fixed_ten = counts[YEARS[-1]].sort_values(ascending=False, kind='mergesort').index[:10]
+    same, held = [], []
+    for year in YEARS:
+        column = counts[year]
+        same.append(100 * column.sort_values(ascending=False, kind='mergesort').head(10).sum()
+                    / column.sum())
+        held.append(100 * column.loc[fixed_ten].sum() / column.sum())
+    return np.array(same), np.array(held)
+
+
+def _groups(counts, denominators, fixed):
+    """(d): the fixed panel of 65 hospitals against the hospitals that joined in 2023–2024.
+
+    Both rate lines are group rates: the group's F84 episodes over the group's GRD episodes. Years in
+    which the added group does not exist have no denominator and are left out of its line.
+    """
+    out = {}
+    for name, mask in (('fixed', fixed), ('added', ~fixed)):
+        episodes = counts[mask].sum().to_numpy()
+        denominator = denominators[mask].sum().to_numpy()
+        with np.errstate(invalid='ignore', divide='ignore'):
+            rate = np.where(denominator > 0, 100_000 * episodes / denominator, np.nan)
+        out[name] = (episodes, rate)
+    return out
+
+
+def _distribution(counts, denominators):
+    """(e): the rates of the hospitals that reported in the year and have at least one F84 episode.
+
+    Hospitals that reported but coded no F84 episode have a rate of exactly zero and cannot be placed
+    on a logarithmic axis; the plate says so in a note and leaves them out of the boxes as well.
+    """
+    rate = _rate(counts, denominators)
+    values, zeros = [], 0
+    for year in YEARS:
+        column = rate[year]
+        zeros += int(((column == 0) & column.notna()).sum())
+        values.append(column[column > 0].to_numpy())
+    return values, zeros
+
+
+def _lorenz(column):
+    """Cumulative share of hospitals against cumulative share of episodes with F84, and the Gini.
+
+    Runs over the hospitals that reported that year — hospitals with no F84 episode are part of the
+    inequality and stay in; hospitals that did not report at all are not in the panel of that year.
+    """
+    value = np.sort(column[column.notna()].to_numpy())
+    n = len(value)
+    share = np.concatenate([[0], np.cumsum(value) / value.sum()]) * 100
+    hospitals = np.arange(n + 1) / n * 100
+    gini = 2 * np.sum(np.arange(1, n + 1) * value) / (n * value.sum()) - (n + 1) / n
+    return hospitals, share, gini
+
+
+# ------------------------------------------------------------------------------------------ panels
+def _panel_title(fig, ax, side, letter_text, title):
+    """Bold panel letter and title above the axes, at the fixed column positions of the plate.
+
+    The title grows upwards from the axes, so a panel whose title needs three lines pushes its first
+    line higher; the letter rides on that first line rather than on the last.
+    """
+    pos = ax.get_position()
+    line = TITLE_PT * 1.2 / 72 / fig.get_figheight()          # one line of the title, in figure units
+    fig.text(LETTER_X[side], pos.y1 + 0.003 + line * title.count('\n'), letter_text,
+             fontweight='bold', fontsize=LETTER_PT, ha='left', va='bottom')
+    fig.text(TITLE_X[side], pos.y1 + 0.003, title, fontweight='bold', fontsize=TITLE_PT, ha='left',
+             va='bottom', linespacing=1.2)
+
+
+def _panel_heatmap(fig, ax, values, labels):
+    """(a): hospital × year rates, the value printed in every cell."""
+    image = ax.imshow(values, cmap='YlGnBu', aspect='auto', vmin=0, vmax=values.max())
+    ax.set_xticks(range(len(YEARS))); ax.set_xticklabels(YEARS)
+    ax.set_yticks(range(len(labels))); ax.set_yticklabels(labels, linespacing=1.15)
+    ax.set_xlabel('Year')
+    ax.grid(False)
+    ax.tick_params(length=0)            # the cells are the grid; the plate draws no tick marks here
+    ax.tick_params(axis='x', labelsize=YEAR_PT)
+    ax.tick_params(axis='y', labelsize=ROW_PT)
+    for i in range(values.shape[0]):
+        for j in range(values.shape[1]):
+            red, green, blue, _ = image.cmap(image.norm(values[i, j]))
+            dark = 0.2126 * red + 0.7152 * green + 0.0722 * blue < 0.5   # is the cell too dark?
+            ax.text(j, i, num(values[i, j], 'en', 0), ha='center', va='center', fontsize=CELL_PT,
+                    color='white' if dark else BLACK, zorder=3, bbox=None if dark else
+                    dict(facecolor='white', alpha=0.7, edgecolor='none', boxstyle='square,pad=0.25'))
+    bar = fig.colorbar(image, cax=ax.inset_axes([1.027, 0.196, 0.037, 0.607]))
+    bar.set_label('Hospital rate per 100,000\nepisodes', fontsize=CELL_PT, linespacing=1.15)
+    bar.set_ticks(np.arange(1000, values.max(), 1000))
+    bar.ax.yaxis.set_major_formatter(COUNT)
+    bar.ax.tick_params(labelsize=CELL_PT)
+    bar.outline.set_visible(False)
+
+
+def _panel_rank(fig, ax, pairs):
+    """(b): rank correlation between consecutive years, and between the two ends of the series."""
+    labels = [p[0] for p in pairs]
+    rho = np.array([p[1] for p in pairs])
+    colours = [BLUE] * (len(pairs) - 1) + [ORANGE]     # the 2019–2024 pair is set apart
+    ax.bar(range(len(pairs)), rho, 0.8, color=colours, zorder=3)
+    for i, (_, value, n) in enumerate(pairs):
+        ax.annotate(f'n={n}', (i, value), xytext=(0, 4), textcoords='offset points', ha='center',
+                    va='bottom', fontsize=7.5)
+    ax.set_xticks(range(len(pairs))); ax.set_xticklabels(labels, linespacing=1.15)
+    ax.set_ylim(0, 1.13); ax.set_yticks(np.arange(0, 1.01, 0.2))
+    ax.set_ylabel('Spearman ρ between years')
+    clean(ax, 'x')
+
+
+def _panel_concentration(fig, ax, same, held):
+    """(c): the two shares of the ten largest hospitals, with the reporting band and the law marker."""
+    ax.plot(YEARS, same, 'o-', color=BLUE, ms=4.4, lw=1.6, zorder=4,
+            label='10 largest of the same\nyear')
+    ax.plot(YEARS, held, 's--', color=ORANGE, ms=4.4, lw=1.6, zorder=4,
+            label='10 largest of 2024\n(fixed)')
+    shade_pandemic(ax)
+    ax.text(2020.5, 0.125, 'Reporting\ndisruption 2020–21', transform=ax.get_xaxis_transform(),
+            ha='center', va='top', fontsize=7.3, color=GREY, linespacing=1.15)
+    ax.axvline(LAW_X, color='#444444', ls=(0, (1.4, 1.8)), lw=0.9, zorder=1)
+    ax.text(LAW_X + 0.07, 0.135, 'Law 21.545\n(2023)', transform=ax.get_xaxis_transform(),
+            fontsize=7.3, color='#444444', ha='left', va='top', linespacing=1.15)
+    low = np.floor(min(same.min(), held.min())) - 1
+    ax.set_ylim(low, low + (max(same.max(), held.max()) - low) * 1.285)
+    ax.set_yticks(np.arange(low, low + 9, 2))
+    year_ticks(ax, YEARS)
+    ax.set_xlabel('Year'); ax.set_ylabel('% of episodes with F84')
+    ax.legend(loc='upper right', labelspacing=0.45, handletextpad=0.6, borderaxespad=0.3,
+              fontsize=KEY_PT, frameon=True, facecolor='white', edgecolor='none', framealpha=0.9)
+    clean(ax, 'both')
+
+
+def _panel_groups(fig, ax, groups):
+    """(d): episodes of each group (bars) and the rate of each group (lines, right axis)."""
+    years = np.array(YEARS, float)
+    bars = [('fixed', -0.2, BLUE, 'Fixed panel of 65\nhospitals'),
+            ('added', 0.2, ORANGE, 'Hospitals added in\n2023–2024')]
+    for key, offset, colour, label in bars:
+        ax.bar(years + offset, groups[key][0], 0.35, color=colour, label=label, zorder=3)
+    ax.set_ylim(0, groups['fixed'][0].max() * 1.341)
+    ax.yaxis.set_major_locator(MultipleLocator(2000)); ax.yaxis.set_major_formatter(COUNT)
+    year_ticks(ax, YEARS)
+    ax.set_ylabel('Episodes with documented F84')
+    ax.set_xlabel('Year — lines (right axis): rate per 100,000\nepisodes of each group',
+                  fontsize=NOTE_PT, linespacing=1.2)
+    ax.legend(loc='upper left', labelspacing=0.55, handletextpad=0.6, borderaxespad=0.3,
+              fontsize=KEY_PT)
+    clean(ax, 'y')
+
+    right = ax.twinx()
+    for key, style_, colour, marker in (('fixed', '-', BLACK, 'o'), ('added', '--', GREY, 's')):
+        rate = groups[key][1]
+        keep = np.isfinite(rate)
+        right.plot(years[keep], rate[keep], marker + style_, color=colour, ms=4.4, lw=1.6, zorder=4)
+    rates = np.concatenate([groups[k][1][np.isfinite(groups[k][1])] for k in ('fixed', 'added')])
+    span = rates.max() - rates.min()
+    right.set_ylim(rates.min() - 0.05 * span, rates.max() + 0.322 * span)
+    right.yaxis.set_major_locator(MultipleLocator(100))
+    right.yaxis.set_major_formatter(COUNT)
+    right.set_ylabel('Per 100,000 GRD episodes')
+    right.grid(False)
+    for spine in ('top', 'right'):
+        right.spines[spine].set_visible(False)
+
+
+def _panel_distribution(fig, ax, values, zeros):
+    """(e): every hospital of the year as a point, with the median and quartiles behind them."""
+    box = ax.boxplot(values, positions=range(len(YEARS)), widths=0.6, patch_artist=True,
+                     showfliers=False, medianprops=dict(color=ORANGE, lw=1.3),
+                     boxprops=dict(facecolor=BOX_FILL, edgecolor=BOX_EDGE, lw=0.9),
+                     whiskerprops=dict(color=BLACK, lw=1.0), capprops=dict(color=BLACK, lw=1.0),
+                     zorder=2)
+    for patch in box['boxes']:
+        patch.set_zorder(2)
+    rng = np.random.default_rng(RNG_SEED)
+    for i, column in enumerate(values):
+        ax.scatter(i + rng.uniform(-0.23, 0.23, len(column)), column, s=8, color=SKY, alpha=0.6,
+                   linewidths=0.35, edgecolors=BLUE, zorder=4)
+    ax.set_yscale('log')                # decade labels as powers of ten, as the stored plate has them
+    low = min(c.min() for c in values) * 10 ** -0.15
+    ax.set_ylim(low, max(c.max() for c in values) * 10 ** 0.52)
+    ax.set_xticks(range(len(YEARS))); ax.set_xticklabels(YEARS)
+    ax.set_xlim(-0.5, len(YEARS) - 0.5)
+    ax.set_xlabel('Year'); ax.set_ylabel('Hospital rate per 100,000\nepisodes', linespacing=1.2)
+    ax.text(0.015, 0.985, 'Boxes: median and quartiles of hospitals with\nepisodes; hospitals with '
+            'no F84 episodes are\noutside the log scale', transform=ax.transAxes, ha='left',
+            va='top', fontsize=NOTE_PT, color=GREY, linespacing=1.25)
+    assert zeros, 'the note only makes sense if some hospital-year really did code no F84 episode'
+    clean(ax, 'both')
+
+
+def _panel_lorenz(fig, ax, curves):
+    """(f): how unequally the episodes with F84 sit across hospitals, at the two ends of the series."""
+    ax.plot([0, 100], [0, 100], ls=(0, (1.5, 2)), lw=0.9, color=GREY, zorder=2)
+    for (year, colour), (hospitals, share, gini) in zip(((YEARS[0], SKY), (YEARS[-1], ORANGE)),
+                                                        curves):
+        ax.plot(hospitals, share, color=colour, lw=2.0, zorder=3,
+                label=f'{year} · Gini {gini:.2f}')
+    ax.set_xlim(-5, 105); ax.set_ylim(-5, 122)
+    ax.set_xticks(np.arange(0, 101, 20)); ax.set_yticks(np.arange(0, 121, 20))
+    ax.set_xlabel('Cumulative % of hospitals (ascending)')
+    ax.set_ylabel('Cumulative % of episodes with\nF84', linespacing=1.2)
+    ax.legend(loc='upper right', borderaxespad=0.3, handletextpad=0.6, fontsize=KEY_PT)
+    clean(ax, 'both')
+
+
+# -------------------------------------------------------------------------------------------- draw
+def draw_EF8_hospitals():
+    """Draw the six panels of EF8 and hand back the figure."""
+    counts, denominators, fixed, codes, summary = _panel_table()
+    _check_published(counts, denominators, fixed, codes, summary)
+    style()
+    fig = plt.figure(figsize=FIGSIZE)
+    axes = [fig.add_axes([COLUMN[i % 2][0], ROW[i // 2][0], COLUMN[i % 2][1], ROW[i // 2][1]])
+            for i in range(6)]
+
+    values, labels = _heatmap(counts, denominators)
+    _panel_heatmap(fig, axes[0], values, labels)
+    _panel_rank(fig, axes[1], _rank_stability(counts, denominators))
+    _panel_concentration(fig, axes[2], *_concentration(counts))
+    _panel_groups(fig, axes[3], _groups(counts, denominators, fixed))
+    _panel_distribution(fig, axes[4], *_distribution(counts, denominators))
+    _panel_lorenz(fig, axes[5], [_lorenz(counts[YEARS[0]]), _lorenz(counts[YEARS[-1]])])
+
+    for i, ax in enumerate(axes):
+        _panel_title(fig, ax, i % 2, TITLES[2 * i], TITLES[2 * i + 1])
+    return fig
+
+
+draw_EF8_hospitals()
+```
+
+### Figure S24. Plate EF9. Territory: episodes and persons by reported region and comuna of residence — F84 family excluding Rett syndrome
+
+::: {.callout-note collapse="true"}
+## Stored image — this plate has no drawing code here
+
+Its series are not fully carried by any published table, so it cannot be redrawn from a
+clone. The code that produced it is in `study/pipeline/`; what is missing is the microdata
+it reads.
+:::
+
+![**Plate EF9. Territory: episodes and persons by reported region and comuna of residence — F84 family excluding Rett syndrome** (a) Episodes with documented F84 per 100,000 residents: reported region of residence × year. (b) Regional trend 2019–2024 (grey: each region; colour: the four with the highest rate in 2024; black dashed: national total). (c) One row per region, ordered north to south: episodes (circle) and persons within year (square), both per 100,000 residents in 2024; the segment joins the region&#x27;s two values and its length is the multiplicity of episodes per person within the year. Persons are never deduplicated across years. (d) Comuna map of the observed/expected ratio smoothed by empirical Bayes (Marshall), pooled 2019–2024: expected = INE comuna population × the period&#x27;s national rate (a crude ratio, not age-standardised, because GRD does not publish age by comuna); the map displays no counts, and comunas with fewer than five episodes are suppressed in the tables. (e) Episodes whose comuna of residence could not be linked to the auditable crosswalk (bars) and their percentage of the total (line, right axis). (f) Regional rate in 2019 versus 2024. The numerator covers only public hospitals with GRD, so the rate per resident is not a hospitalisation rate of the regional population; it combines residence (INE denominator) with episodes attended in the public network. Definition: F84 family excluding Rett syndrome.](study/corpus/figures/EF9_territory.jpg){fig-align="center" width="100%"}
+
+### Figure S25. Plate EF10. DEIS discharges with F84 as principal diagnosis: detail and comparison with GRD — F84 family excluding Rett syndrome
+
+::: {.callout-note collapse="true"}
+## Stored image — this plate has no drawing code here
+
+Its series are not fully carried by any published table, so it cannot be redrawn from a
+clone. The code that produced it is in `study/pipeline/`; what is missing is the microdata
+it reads.
+:::
+
+![**Plate EF10. DEIS discharges with F84 as principal diagnosis: detail and comparison with GRD — F84 family excluding Rett syndrome** (a) DEIS hospital discharges with F84 as principal diagnosis (DIAG1) by year (bars) and rate per 100,000 discharges with exact Poisson 95% CIs (line, right axis); DEIS publishes only the principal diagnosis, so this source has no equivalent of &#x27;F84 in any position&#x27;. (b) Rate by establishment membership of the National Health Services System (SNSS) versus the rest (private clinics, armed forces and police, mutual insurers, delegated administration) and cells masked by DEIS, which are kept as a category of their own and never redistributed. (c) Rate by recorded sex, with the masked category shown separately. (d) Rate by ten-year age band in 2019 and 2024. (e) The only homologous comparison between sources: principal F84 per 100,000 DEIS discharges and per 100,000 GRD episodes (and hospitalisation only in GRD). The sources are not linked by person or episode, cover different universes —DEIS all establishments, GRD the public hospitals with GRD— and no ratio between them is computed. (f) Composition of F84 subcodes in DIAG1 by year and number of F84 cells masked by DEIS. Definition: F84 family excluding Rett syndrome. Administrative recognition, not prevalence or incidence.](study/corpus/figures/EF10_deis_detail.jpg){fig-align="center" width="100%"}
