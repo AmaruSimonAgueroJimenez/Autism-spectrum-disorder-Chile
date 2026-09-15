@@ -44,11 +44,11 @@ def html_table(title, columns, rows, kinds, notes, small=True):
 
 def figure_md(fig_id, lang, title, caption):
     preview = f'{REL}/qa/Figure_{fig_id}_{lang}_preview.png'
-    exts = ('png', 'pdf') if fig_id in ('S1', 'S6') else ('png', 'svg', 'pdf')     # S1 and S6: inherited plates without SVG
+    exts = ('png', 'svg', 'pdf')      # every plate is drawn here now, so all three formats exist
     links = ' · '.join(f'[{ext.upper()}]({REL}/figures/{lang}/Figure_{fig_id}.{ext})' for ext in exts)
     cap = f'**{escape(title)}** {escape(caption)}'
     lab = LABELS[lang]
-    files = lab['files'].format(dpi=lab['dpi'] if fig_id not in ('S1', 'S6') else lab['dpi_static'])
+    files = lab['files'].format(dpi=lab['dpi'])
     return (f'![{cap}]({preview}){{fig-align="center" width="100%"}}\n\n'
             f'<p class="fig-links">{files}{links}</p>')
 

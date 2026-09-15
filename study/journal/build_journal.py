@@ -54,7 +54,7 @@ from pathlib import Path
 HERE = Path(__file__).resolve().parent            # study/journal
 LA = HERE.parent                                  # study
 REPO = LA.parent
-for p in (str(HERE), str(LA), str(REPO / "paper")):
+for p in (str(HERE), str(LA)):   # references.py y authors.py viven en study/ (LA); paper/ ya no existe
     if p not in sys.path:
         sys.path.insert(0, p)
 

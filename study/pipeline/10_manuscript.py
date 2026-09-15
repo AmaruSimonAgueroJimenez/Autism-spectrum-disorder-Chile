@@ -95,7 +95,7 @@ import config as CFG  # noqa: E402
 import controls_registry as CR  # noqa: E402  (ámbitos con nombre de los controles)
 import prose_en  # noqa: E402
 import prose_es  # noqa: E402
-import references as REFS  # noqa: E402  (paper/references.py, shared Vancouver formatter)
+import references as REFS  # noqa: E402  (study/references.py, shared Vancouver formatter)
 import equations as EQ  # noqa: E402  (las 33 ecuaciones de la metodología extendida)
 import labels as LB  # noqa: E402  (glosario de impresión: la forma que el lector ve)
 from common import fmt_ci, fmt_number  # noqa: E402
@@ -210,8 +210,11 @@ def log(msg: str) -> None:
 # ---------------------------------------------------------------------------
 # Autores (paper/prose.py) y referencias en inglés
 # ---------------------------------------------------------------------------
-def load_paper_authors(path: Path = REPO / "paper" / "prose.py") -> tuple[list, list]:
-    """AUTHORS y AFFILIATIONS de paper/prose.py leídos con `ast` (sin importar el módulo ni sus efectos)."""
+def load_paper_authors(path: Path = LA / "authors.py") -> tuple[list, list]:
+    """AUTHORS y AFFILIATIONS de study/authors.py leídos con `ast` (sin importar el módulo ni sus efectos).
+
+    Antes se leían de paper/prose.py, que nunca estuvo versionado y ya no existe; sólo la autoría se
+    versiona ahora, en study/authors.py, porque el texto del manuscrito no está en este repositorio."""
     tree = ast.parse(path.read_text(encoding="utf-8"))
     found = {}
     for node in tree.body:
@@ -2112,7 +2115,7 @@ def write_memo(report: dict, path: Path = MEMO_PATH) -> Path:
       f"(orden definido en `supplementary_material.py`), de modo que no depende de qué párrafos se conserven y es idéntica en el "
       f"manuscrito, en el apéndice separado y en los dos idiomas. Las citas de figuras y tablas del artículo las produce el "
       f"registro (`R.mfig()` / `R.mtab()`): no hay ningún número escrito a mano en `prose_en.py` ni en `prose_es.py`.")
-    A("- Los conectores en español del formateador Vancouver compartido (`paper/references.py`: «Disponible en:», «editores», «En:») "
+    A("- Los conectores en español del formateador Vancouver compartido (`study/references.py`: «Disponible en:», «editores», «En:») "
       "se traducen en los documentos en inglés dentro de este módulo sin modificar `paper/`.")
     A(f"- La última tabla del texto principal es la versión compacta de controles; la tabla completa va al material suplementario "
       f"({lab_t8}).")

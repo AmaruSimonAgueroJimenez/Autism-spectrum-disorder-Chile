@@ -19,7 +19,7 @@ ROOT = Path(__file__).resolve().parents[1]
 PAGE = ROOT / "docs" / "version_10_panels.qmd"
 STUDY = ROOT / "docs" / "study"
 BUILDER = ROOT / "scripts" / "build_version_pages.py"
-GENERATED = ["1", "2", "3", "4", "S2", "S3", "S4", "S5", "S7", "S8", "S9"]
+GENERATED = ["1", "2", "3", "4", "S1", "S2", "S3", "S4", "S5", "S6", "S7", "S8", "S9"]
 
 
 def page_chunks():
@@ -70,13 +70,13 @@ class PageCarriesTheDrawingCode(unittest.TestCase):
                                  f"figure {fig_id} differs between the page and {module}; "
                                  f"run python scripts/build_version_pages.py")
 
-    def test_no_figure_is_shown_from_a_stored_file_unless_it_is_inherited(self):
-        """Only S1 and S6 may come from a folder: nothing in the repository draws them."""
+    def test_no_figure_is_shown_from_a_stored_file(self):
+        """Every figure must be drawn by a chunk. Nothing on the page may come from a stored file."""
         shown = set(re.findall(r"figure_md\(\s*[\"'](S?\d+)[\"']", PAGE.read_text(encoding="utf-8")))
         shown |= set(re.findall(r'for fid in \("(S\d+)", "(S\d+)"\)', PAGE.read_text(encoding="utf-8"))[0]
                      if re.search(r'for fid in \("S\d+", "S\d+"\)', PAGE.read_text(encoding="utf-8")) else [])
-        self.assertTrue(shown <= {"S1", "S6"},
-                        f"these figures are shown from a stored file but the repository can draw them: {sorted(shown - {'S1', 'S6'})}")
+        self.assertEqual(shown, set(),
+                         f"these figures are shown from a stored file but the repository can draw them: {sorted(shown)}")
 
     def test_the_page_is_what_the_builder_writes(self):
         result = subprocess.run([sys.executable, str(BUILDER), "--check"], capture_output=True, text=True, cwd=ROOT)

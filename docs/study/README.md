@@ -21,7 +21,7 @@ The pipeline code (`study/*.py`, `pipeline/`, `journal/`) is versioned.
 | `data/contenido_v10.json` | Resolved text (numbered citations), tables, legends, equations and references of the four documents (manuscript and supplement, en and es) | `export_docs_content.py` (revision 10), which runs the real builder with its writing methods intercepted |
 | `data/facts_v10.json` | Verified figures that resolve the placeholders of the text | copy |
 | `figstyle.py`, `overlap_qa.py`, `figuras_principales.py`, `figuras_suplementarias.py` | Generators of plates 1–4 and S2–S9 (en and es), with the automatic overlap checker; adapted copies of `technical/sources/` of revision 10 (only the paths and the commune source change) | revision 10 |
-| `figures/<language>/Figure_*.{png,svg,pdf}` | 175 mm plates (PNG at 300 dpi; vector SVG and PDF). S1 and S6 are plates inherited from revision 09 (no SVG) | generated here |
+| `figures/<language>/Figure_*.{png,svg,pdf}` | 175 mm plates (PNG at 300 dpi; vector SVG and PDF). Every plate is drawn from the tracked tables | generated here |
 | `qa/` | 150 dpi previews (the ones embedded in the HTML pages) and `figuras_*_qa.json` records (size, fonts, off-canvas text and overlaps, which must be zero) | generated here |
 | `equations/<language>/` | The 23 equations of the extended methods, composed with STIX at 600 dpi by `study/equations.py` | copies |
 | `render_helpers.py` | Presentation in the QMD pages: text, tables, figures, equations, references and the corpus index | |
@@ -31,7 +31,7 @@ The pipeline code (`study/*.py`, `pipeline/`, `journal/`) is versioned.
 
 ```sh
 python3 docs/study/figuras_principales.py          # Figure_1 … Figure_4, en and es
-python3 docs/study/figuras_suplementarias.py       # Figure_S2 … Figure_S9 and the check of S1 and S6
+python3 docs/study/figuras_suplementarias.py       # Figure_S1 … Figure_S9
 python3 scripts/render_reports.py --figures  # the above and then the seven QMD documents (requires Quarto and Jupyter)
 ```
 

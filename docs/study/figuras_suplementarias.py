@@ -1,15 +1,19 @@
-"""Supplementary figures S2–S9 of the manuscript (version 10), in English and Spanish, for docs/study.
+"""Supplementary figures S1–S9 of the manuscript (version 10), in English and Spanish, for docs/study.
 
-Adapted copy of `technical/sources/build_v10_supp_figures.py` of revision 10. S1 (data flow) and S6
-(territorial maps) are static plates inherited from revision 09, stored in `docs/study/figures/<language>/`;
-the sensitivity to the count threshold (S7d) is read precomputed from `S7d_threshold_sensitivity.csv`
-because the complete commune file is not published.
-Usage: python3 figuras_suplementarias.py [S2 S3 S4 S5 S7 S8 S9 copy]
+Adapted copy of `technical/sources/build_v10_supp_figures.py` of revision 10. Every plate is now drawn
+here: S1 (data flow) and S6 (territorial maps), which revision 09 shipped as static artwork, are redrawn
+from the tracked tables of `docs/study/data/` and `docs/study/corpus/tables/`. S6 also needs the commune
+polygons of `data/comunas.shp`, which git does not track (docs/grd.qmd already depends on that file on the
+same terms). The sensitivity to the count threshold (S7d) is read precomputed from
+`S7d_threshold_sensitivity.csv` because the complete commune file is not published.
+Usage: python3 figuras_suplementarias.py [S1 S2 S3 S4 S5 S6 S7 S8 S9]
 """
-import sys, shutil
+import sys
 import numpy as np, pandas as pd
 import matplotlib.pyplot as plt
 from matplotlib.ticker import FuncFormatter
+from matplotlib.patches import Ellipse, FancyArrowPatch, FancyBboxPatch, PathPatch
+from matplotlib.path import Path as MplPath   # `Path` itself is pathlib's, re-exported by figstyle
 from figstyle import *
 from figuras_principales import load_grd_summary, load_age_rates, rem_series, YRS_GRD, YRS_REM
 CHAP_EN = {'Factores que influyen en el estado de salud': 'Health status and contact with services', 'Sistema respiratorio': 'Respiratory diseases',
@@ -33,6 +37,216 @@ def age_sex_panel(ax, source, y0, y1, lang, ymin):
     log_axis(ax, 'y', lang); ax.set_ylim(ymin, 1000)
     ax.set_xlabel(text('Age group (years)', 'Grupo de edad (años)', lang)); ax.set_ylabel(text('Records per 100 000 residents\n(log scale)', 'Registros por 100 000 residentes\n(escala log)', lang))
     ax.legend(loc='upper right', fontsize=6.2, ncol=2, handlelength=1.4, columnspacing=0.8, borderaxespad=0.2)
+
+# ------------------------------------------------------------------ S1 data-flow schematic
+# Palette of the inherited revision-09 plate, sampled from docs/study/figures/*/Figure_S1.png.
+# These are NOT the Okabe-Ito constants of figstyle; they are declared here so the redrawn plate
+# stays visually identical to the one already printed in the manuscript.
+S1_COLOURS = {'grd': ('#0B5FA5', '#E9F1FA'), 'a05': ('#0E7C7B', '#E5F4F3'),
+              'p2': ('#177535', '#E9F4ED'), 'b': ('#6C4E94', '#EFEAF7')}
+S1_RED, S1_GREY = '#B12D1D', '#474747'
+S1_W, S1_H = 2067, 2245          # canvas of the inherited plate: 175.0 x 190.1 mm at 300 dpi
+CORPUS = BASE/'corpus'/'tables'  # presentation tables of the version-02 corpus; figstyle exposes only DATA/TIDY
+
+
+def _s1_in(x, y):
+    """A pixel of the inherited 2067x2245 canvas -> inches, for fig.dpi_scale_trans.
+
+    Everything in S1 is drawn in inches rather than in axes fractions so that the rounded corners
+    and the cylinder lids stay circular whatever the aspect ratio of the anchor axes."""
+    return x/300.0, (S1_H - y)/300.0
+
+
+def _s1_box(fig, ax, x0, y0, x1, y1, ec, fc='white', lw=1.2, r=0.035):
+    """Rounded box in plate pixels. FancyBboxPatch is neither a Rectangle nor a Polygon, so
+    overlap_qa._marks() ignores it; set_gid('bg') repeats the exemption explicitly."""
+    ix0, iy0 = _s1_in(x0, y1); ix1, iy1 = _s1_in(x1, y0)
+    p = FancyBboxPatch((ix0, iy0), ix1 - ix0, iy1 - iy0, boxstyle=f'round,pad=0,rounding_size={r}',
+                       transform=fig.dpi_scale_trans, fc=fc, ec=ec, lw=lw, zorder=2, mutation_aspect=1)
+    p.set_gid('bg'); ax.add_patch(p); return p
+
+
+def _s1_cyl(fig, ax, x0, y0, x1, y1, ec, fc='white', lw=1.2, ry=15):
+    """Database cylinder in plate pixels; returns the vertical centre of its body (label anchor)."""
+    cx, rx = (x0 + x1)/2, (x1 - x0)/2; yt, yb = y0 + ry, y1 - ry
+    t = np.linspace(0, np.pi, 60)
+    top = np.column_stack([cx + rx*np.cos(t), yt - ry*np.sin(t)])   # right -> left over the lid
+    bot = np.column_stack([cx - rx*np.cos(t), yb + ry*np.sin(t)])   # left -> right under the base
+    pts = np.vstack([top, [[x0, yb]], bot, [[x1, yt]]])
+    verts = [_s1_in(px, py) for px, py in pts]
+    body = PathPatch(MplPath(verts, [MplPath.MOVETO] + [MplPath.LINETO]*(len(verts) - 1)),
+                     transform=fig.dpi_scale_trans, fc=fc, ec=ec, lw=lw, zorder=2)
+    body.set_gid('bg'); ax.add_patch(body)
+    lid = Ellipse(_s1_in(cx, yt), (x1 - x0)/300.0, 2*ry/300.0, transform=fig.dpi_scale_trans,
+                  fc=fc, ec=ec, lw=lw, zorder=3)
+    lid.set_gid('bg'); ax.add_patch(lid)
+    return (yt + y1)/2
+
+
+def _s1_arrow(fig, ax, x0, y0, x1, y1, ec, lw=1.3, ms=12):
+    a = FancyArrowPatch(_s1_in(x0, y0), _s1_in(x1, y1), transform=fig.dpi_scale_trans, arrowstyle='-|>',
+                        mutation_scale=ms, color=ec, lw=lw, shrinkA=0, shrinkB=0, zorder=4)
+    a.set_gid('bg'); ax.add_patch(a)
+
+
+def _s1_lines(fig, ax, x, y, lines, size=6.8, color=BLACK, weight='normal'):
+    """One Text artist per box: the QA overlap check then only has to see that boxes do not collide."""
+    ix, iy = _s1_in(x, y)
+    return ax.text(ix, iy, '\n'.join(lines), transform=fig.dpi_scale_trans, ha='center', va='center',
+                   fontsize=size, color=color, fontweight=weight, linespacing=1.235, zorder=5)
+
+
+def figS1(lang):
+    style(); fig = plt.figure(figsize=(S1_W/300, S1_H/300))
+    axa = fig.add_axes([0.018, 0.417, 0.964, 0.530]); axb = fig.add_axes([0.018, 0.054, 0.964, 0.277])
+    for ax in (axa, axb): ax.set_axis_off(); ax.grid(False); ax.set_xlim(0, 1); ax.set_ylim(0, 1)
+
+    # ---- every number of the schematic, recomputed from the tracked tables -------------------
+    g = pd.read_csv(TIDY/'grd_year_summary.csv').query("panel=='observed' and activity=='all'")
+    gany = g.query("variant=='sin_rett' and position=='any'")
+    tot = int(gany.n_episodes_total_same_panel_activity.sum())
+    anys = int(gany.n_episodes_f84.sum())
+    rett_only = int(g.query("variant=='con_rett' and position=='any'").n_episodes_f84.sum()) - anys
+    prin = int(g.query("variant=='sin_rett' and position=='principal'").n_episodes_f84.sum())
+    sec = int(g.query("variant=='sin_rett' and position=='secondary_only'").n_episodes_f84.sum())
+    st = pd.read_csv(CORPUS/'ST10_grd_f84_subcodes.csv')
+    yr0, yr1 = int(gany.year.min()), int(gany.year.max())
+    rett_any = int(st[st['ICD-10 subcode'].str.startswith('F84.2') & (st['F84 code position'] == 'Any position')]
+                   [[str(y) for y in range(yr0, yr1 + 1)]].iloc[0].astype(str).str.replace(',', '').astype(int).sum())
+    rett_kept = rett_any - rett_only
+    hosp = gany.set_index('year').hospitals_n
+    fixed = int(pd.read_csv(TIDY/'grd_year_summary.csv')
+                .query("panel=='fixed65' and activity=='all' and position=='any' and variant=='sin_rett'").hospitals_n.max())
+
+    rp = pd.read_csv(TIDY/'rem_pathway_annual.csv', low_memory=False); rp['code'] = rp.code.astype(str)
+    a05 = rp.query("module=='A05' and code=='05990022' and variant=='single_code'").set_index('year').sort_index()
+    p2 = rp.query("module=='P2' and code=='P2500500' and measure=='december_stock'").set_index('year').sort_index()
+    a_y0, a_y1 = int(a05.era_start.iloc[0]), int(a05.era_end.iloc[0])
+    p_y0, p_y1 = int(p2.era_start.iloc[0]), int(p2.era_end.iloc[0])
+    a_stable = int(a05.n_stable_panel_establishments.max()); p_stable = int(p2.n_stable_panel_establishments.max())
+    a_rep0, a_rep1 = int(a05.n_reporting_establishments.iloc[0]), int(a05.n_reporting_establishments.iloc[-1])
+    a_t0, a_t1 = int(a05.total.iloc[0]), int(a05.total.iloc[-1])
+    # The plate quotes the P2 stock from the 2021 age-definition break, not from era_start (2019).
+    # Like the age lines of box 2, that break year lives only in contenido_v10.json, not in a tracked CSV.
+    p_yA = 2021
+    p_tA, p_t1 = int(p2.total.loc[p_yA]), int(p2.total.iloc[-1])
+
+    ed = pd.read_csv(TIDY/'education_summary_year.csv').set_index('year')
+    pie = ed[ed.pie_harmonised_n.notna()]
+    e_y0, e_y1 = int(pie.index.min()), int(pie.index.max())
+    split = ed[ed.pie_tea_strict_n.notna() & ed.pie_tea_asperger_n.notna()].index
+    s_y0, s_y1 = int(split.min()), int(split.max())
+    sinaces = int(ed.index[ed.pie_harmonised_source.fillna('').str.contains('SINACES')].min())
+    e_n0, e_n1 = int(pie.pie_harmonised_n.iloc[0]), int(pie.pie_harmonised_n.iloc[-1])
+
+    sv = pd.read_csv(TIDY/'survey_estimates.csv'); tot_rows = sv[sv.subgroup_type == 'total']
+    endide = tot_rows[tot_rows.survey.str.startswith('ENDIDE')]
+    n_ad = int(endide[(endide.module == 'Adultos (18+)') & (endide.estimate_type == 'primary')].n.iloc[0])
+    n_nna = int(endide[endide.module.str.startswith('NNA (2-17)') &
+                       (endide.domain == 'ENDIDE NNA 2-17: autismo reportado')].n.iloc[0])
+    encavi = tot_rows[tot_rows.survey.str.startswith('ENCAVI')]
+    n_val = int(encavi[encavi.estimate_type == 'primary'].n.iloc[0])
+    n_base = int(encavi[encavi.estimate_type == 'sensitivity'].n.iloc[0])
+    n_exc = n_base - n_val
+    endide_lbl = endide.survey.iloc[0].replace('-', '–'); encavi_lbl = encavi.survey.iloc[0].replace('-', '–')
+
+    # ---- panel (a): the three administrative sources, processed in parallel -------------------
+    bands = [('grd', 38, 670), ('a05', 716, 1350), ('p2', 1396, 2030)]
+    heads = [text('GRD · hospital activity', 'GRD · actividad hospitalaria', lang),
+             text('A05 · annual entries', 'A05 · ingresos anuales', lang),
+             text('P2 · December follow-up', 'P2 · seguimiento en diciembre', lang)]
+    cyls = [[f'{yr0}–{yr1}', f"{num(tot, lang)} {text('episodes', 'episodios', lang)}"],
+            [f"{a_y0}–{a_y1} · {text('code', 'código', lang)} 05990022",
+             text('Establishment-month records', 'Registros establecimiento-mes', lang)],
+            [f"{p_y0}–{p_y1} · {text('code', 'código', lang)} P2500500",
+             text('Autism among NANEAS', 'Autismo en NANEAS', lang)]]
+    box2 = [[text('Eligible F84 codes¹', 'Códigos F84 elegibles¹', lang),
+             f"{num(anys, lang)} {text('episodes retained', 'episodios incluidos', lang)}",
+             f"{num(rett_only, lang)} {text('with Rett and no eligible code', 'con Rett sin código elegible', lang)}",
+             text(f'excluded; {num(rett_kept, lang)} with Rett and another',
+                  f'excluidos; {num(rett_kept, lang)} con Rett y otro', lang),
+             text('eligible code retained', 'código elegible incluidos', lang)],
+            [text('Strict autism', 'Autismo estricto', lang),
+             text('Sum known monthly totals', 'Sumar totales mensuales conocidos', lang),
+             f"{num(a_t0, lang)} ({a_y0}) {text('to', 'a', lang)} {num(a_t1, lang)} ({a_y1})",
+             text('Missing cells remain missing', 'Celdas vacías siguen faltantes', lang)],
+            # The P2 age universe is stored only as text (contenido_v10.json, manuscript Table 2 and
+            # supplement Table S1); no tracked CSV carries it as a value, so it is written out here.
+            [text('Select December cut', 'Seleccionar corte de diciembre', lang),
+             text('2019–2020: ages 0–9 years', '2019–2020: 0–9 años', lang),
+             text('2021–2025: ages 0–19 years', '2021–2025: 0–19 años', lang),
+             text('Age-definition break in 2021', 'Quiebre de edad en 2021', lang)]]
+    box3 = [[f"Principal: {num(prin, lang)}",
+             f"{text('Exclusively secondary', 'Solo secundario', lang)}: {num(sec, lang)}",
+             text('Mutually exclusive categories', 'Categorías excluyentes', lang)],
+            [f"{num(a_stable, lang)} {text('stable establishments', 'establecimientos estables', lang)}",
+             text('≥1 code row each year', '≥1 fila del código cada año', lang),
+             f"{num(a_rep0, lang)} → {num(a_rep1, lang)} {text('annual reporters', 'reportantes anuales', lang)}"],
+            [f"{num(p_stable, lang)} {text('stable establishments', 'establecimientos estables', lang)}",
+             text('December code row every year', 'Fila del código cada diciembre', lang),
+             text(f'{p_y0}–{p_y1} membership', f'Pertenencia durante {p_y0}–{p_y1}', lang)]]
+    box4 = [[text(f'{num(fixed, lang)} fixed / {num(hosp.min(), lang)}–{num(hosp.max(), lang)} observed hospitals',
+                  f'{num(fixed, lang)} hospitales fijos / {num(hosp.min(), lang)}–{num(hosp.max(), lang)} observados', lang),
+             text('Coding-depth strata', 'Estratos de profundidad de códigos', lang),
+             text('Inpatient / day-case surgery', 'Hospitalización / cirugía ambulatoria', lang),
+             text('Matching activity denominator', 'Denominador de actividad propio', lang)],
+            [text('Annual flow', 'Flujo anual', lang),
+             text('Observed and stable panels', 'Paneles observado y estable', lang),
+             text('Age and sex summaries', 'Resúmenes por edad y sexo', lang),
+             text('Annual row ≠ full monthly reporting', 'Fila anual ≠ reporte mensual completo', lang)],
+            [text('December stock, not a flow', 'Stock de diciembre, no flujo', lang),
+             f"{num(p_tA, lang)} ({p_yA}) {text('to', 'a', lang)} {num(p_t1, lang)} ({p_y1})",
+             text('Observed / stable / under-10', 'Observado / estable / menores de 10', lang),
+             text('June and December never summed', 'Junio y diciembre no se suman', lang)]]
+    rows = [(197, 396), (435, 721), (766, 1005), (1032, 1283)]
+    for i, (key, bx0, bx1) in enumerate(bands):
+        ec, fcb = S1_COLOURS[key]; cx = (bx0 + bx1)/2
+        _s1_box(fig, axa, bx0, 118, bx1, 1311, 'none', fc=fcb, lw=0, r=0.05)
+        _s1_lines(fig, axa, cx, 153, [heads[i]], size=7.8, color=ec, weight='bold')
+        yc = _s1_cyl(fig, axa, bx0 + 26, rows[0][0], bx1 - 26, rows[0][1], ec)
+        _s1_lines(fig, axa, cx, yc, cyls[i])
+        for (y0, y1), lines in zip(rows[1:], (box2[i], box3[i], box4[i])):
+            _s1_box(fig, axa, bx0 + 26, y0, bx1 - 26, y1, ec)
+            _s1_lines(fig, axa, cx, (y0 + y1)/2, lines)
+        for (ya, yb) in ((rows[0][1] + 2, rows[1][0] - 2), (rows[1][1] + 2, rows[2][0] - 2), (rows[2][1] + 2, rows[3][0] - 2)):
+            _s1_arrow(fig, axa, cx, ya, cx, yb, ec)
+    _s1_lines(fig, axa, S1_W/2, 1362,
+              [text('Parallel processing; no person-level linkage or observed care cascade',
+                    'Procesamiento paralelo; sin enlace individual ni cascada asistencial observada', lang)],
+              size=7.4, color=S1_RED, weight='bold')
+
+    # ---- panel (b): education records and the two household surveys --------------------------
+    ec, fcb = S1_COLOURS['b']
+    _s1_box(fig, axb, 38, 1500, 2030, 2126, 'none', fc=fcb, lw=0, r=0.05)
+    yc = _s1_cyl(fig, axb, 64, 1528, 478, 1732, ec, ry=14.5)
+    _s1_lines(fig, axb, 271, yc, ['PIE', f'{e_y0}–{e_y1}'])
+    _s1_box(fig, axb, 565, 1528, 1348, 1732, ec)
+    _s1_lines(fig, axb, 956, 1630, [text('Historical ASD + ASD–Asperger', 'TEA + TEA–Asperger históricos', lang),
+                                    text(f'{s_y0}–{s_y1} categories combined', f'Categorías {s_y0}–{s_y1} combinadas', lang),
+                                    text(f'SINACES source from {sinaces}', f'Fuente SINACES desde {sinaces}', lang)])
+    _s1_box(fig, axb, 1475, 1528, 1997, 1732, ec)
+    _s1_lines(fig, axb, 1736, 1630, [text('Students by year', 'Estudiantes por año', lang),
+                                     f'{num(e_n0, lang)} → {num(e_n1, lang)}'])
+    yc = _s1_cyl(fig, axb, 64, 1782, 980, 2092, ec, ry=14.5)
+    _s1_lines(fig, axb, 522, yc, [endide_lbl,
+                                  f"≥18 {text('years', 'años', lang)}: {num(n_ad, lang)} · 2–17 {text('years', 'años', lang)}: {num(n_nna, lang)}",
+                                  encavi_lbl,
+                                  f"≥15 {text('years', 'años', lang)}: {num(n_base, lang)} {text('respondents', 'participantes', lang)}"])
+    _s1_box(fig, axb, 1096, 1782, 1997, 2092, ec)
+    _s1_lines(fig, axb, 1546, 1937,
+              [text('ENDIDE: complete autism item in both domains', 'ENDIDE: ítem completo en ambos dominios', lang),
+               text(f'ENCAVI: {num(n_val, lang)} valid; {num(n_exc, lang)} excluded²',
+                    f'ENCAVI: {num(n_val, lang)} válidas; {num(n_exc, lang)} excluidas²', lang),
+               text('Domain analysis: weights, strata and clusters', 'Ponderadores, estratos y conglomerados', lang),
+               text('Weighted proportions and design-based 95% CIs', 'Proporciones e IC del 95% según diseño', lang)])
+    for x0, x1, y in ((480, 563, 1630), (1350, 1473, 1630), (982, 1094, 1937)):
+        _s1_arrow(fig, axb, x0, y, x1, y, ec)
+    _s1_lines(fig, axb, S1_W/2, 2186,
+              [text('Arrows indicate data transformations within each source, not movement of people.',
+                    'Las flechas indican transformaciones dentro de cada fuente, no desplazamientos de personas.', lang)],
+              size=7.0, color=S1_GREY)
+    letter(fig, axa, 'a', dx=-0.006, dy=0.033); letter(fig, axb, 'b', dx=-0.006, dy=0.020)
+    save(fig, 'Figure_S1', lang)
 
 # ------------------------------------------------------------------ S2 hospital robustness
 def figS2(lang):
@@ -224,6 +438,208 @@ def figS5(lang):
     for ax, ch in zip([a, b, c, d], 'abcd'): letter(fig, ax, ch, dx=(-0.22 if ch == 'b' else -0.085))
     save(fig, 'Figure_S5', lang)
 
+# ------------------------------------------------------------------ S6 territorial distribution
+# The inherited revision-09 plate was built by build_territorial_revision.py, which does NOT
+# reproject: it draws the shapefile in its native coordinates with an equal aspect ratio. This
+# redraw uses an Albers equal-area projection instead, fitted to the printed artwork, so the map
+# panels are geometrically equivalent but not identical to the inherited plate (band aspect ratios
+# differ by 1-2%). That original source is not in this repository (it lives in the untracked
+# version folders), which is why the projection is declared here rather than imported.
+S6_ALBERS = ('+proj=aea +lat_1=-20 +lat_2=-50 +lat_0=-37 +lon_0=-71 +x_0=0 +y_0=0 '
+             '+datum=WGS84 +units=m +no_defs')
+S6_BANDS = [('North', 'Norte', (15, 1, 2, 3, 4)),
+            ('Central', 'Centro', (5, 13, 6, 7, 16, 8, 9, 14, 10)),
+            ('Austral', 'Austral', (11, 12))]
+S6_OFFGRAPH = (5104, 5201, 12201, 12202)   # outside the spatial graph (342 of 346 comunas remain)
+S6_OFFEXTENT = (5104, 5201)                # Juan Fernandez and Isla de Pascua: outside every band window
+# Cluster colours sampled from the inherited plate. report_helpers.CLUSTER_COLORS carries the
+# near-identical RdBu five-class set (#b2182b / #2166ac / #92c5de / #e8e8e8) that the rest of the site
+# uses; the plate's own values are kept here so the redraw matches the printed figure.
+S6_CLUSTER = {'High–High': '#c0392b', 'Low–Low': '#2471a3', 'Low–High': '#8bb8d8', 'none': '#f2f2f2'}
+S6_MASKED, S6_OFF, S6_EDGE = '#d0d0d0', '#9a9a9a', '#9e9e9e'
+S6_W, S6_H = 2067, 2516        # canvas of the inherited plate: 175.0 x 213.0 mm at 300 dpi
+S6_TOP, S6_BOT, S6_MIDY = 198, 859, 528.5      # pixel band of the tallest strip, and its centre
+S6_CENTRES = (251.5, 531.0, 810.5)             # x centres of the three strips of panel (a)
+S6_PANEL_DX = 1087.0                           # panel (b) repeats them shifted by this much
+
+
+_S6_GEOM = {}
+
+
+def _s6_communes():
+    """Commune polygons keyed by CUT, in the reconstructed Albers equal-area CRS (read once per run).
+
+    data/comunas.shp is NOT tracked by git (.gitignore excludes /data/). docs/grd.qmd already draws
+    its commune maps from that same shapefile, so Figure S6 depends on it on exactly the same terms.
+    Antartica (CUT 12202, 1 episode) has no polygon in the file and can never be drawn."""
+    if 'gdf' in _S6_GEOM: return _S6_GEOM['gdf']
+    import warnings
+    import geopandas as gpd
+    shp = BASE.parents[1]/'data'/'comunas.shp'
+    if not shp.exists():
+        raise FileNotFoundError(f'Figure S6 needs the untracked commune shapefile {shp}; '
+                                'it ships with the working copy, not with a clone.')
+    with warnings.catch_warnings():
+        warnings.simplefilter('ignore')
+        g = gpd.read_file(shp)
+    g = g.loc[g.cod_comuna > 0, ['cod_comuna', 'codregion', 'geometry']].rename(columns={'cod_comuna': 'CUT'})
+    g['geometry'] = g.geometry.simplify(700)
+    _S6_GEOM['gdf'] = g.to_crs(S6_ALBERS)
+    return _S6_GEOM['gdf']
+
+
+def _s6_strips(fig, gdf, lang, dx, draw):
+    """The three north-south strips of one map panel, all at one metric scale.
+
+    A gridspec cannot do this: each strip gets its own axes sized in inches from its own extent in
+    metres, so 'the three strips share a metric scale' is true by construction."""
+    axes = []
+    keep = [gdf[gdf.codregion.isin(regs) & ~gdf.CUT.isin(S6_OFFEXTENT)] for _, _, regs in S6_BANDS]
+    bounds = [k.total_bounds for k in keep]
+    scale = max(b[3] - b[1] for b in bounds) / ((S6_BOT - S6_TOP)/300)     # metres per inch
+    fw, fh = fig.get_figwidth(), fig.get_figheight()
+    for (en, es, regs), b, cx in zip(S6_BANDS, bounds, S6_CENTRES):
+        w_in, h_in = (b[2] - b[0])/scale, (b[3] - b[1])/scale
+        ax = fig.add_axes([((cx + dx)/300 - w_in/2)/fw, ((S6_H - S6_MIDY)/300 - h_in/2)/fh, w_in/fw, h_in/fh])
+        ax.set_xlim(b[0], b[2]); ax.set_ylim(b[1], b[3]); ax.set_aspect('equal')
+        ax.set_axis_off(); ax.grid(False)
+        draw(ax, gdf[gdf.codregion.isin(regs)])
+        fig.text((cx + dx)/S6_W, (S6_H - S6_TOP + 42)/S6_H, text(en, es, lang), ha='center', va='bottom', fontsize=8)
+        axes.append(ax)
+    return axes
+
+
+def _s6_disclosure(ax, sub):
+    """The two disclosure classes the plate shades identically in both maps: hatch colour follows the
+    edge colour of the collection, so masked comunas get white slashes and zero comunas black dots."""
+    off = sub[sub.CUT.isin(S6_OFFGRAPH)]
+    if len(off): off.plot(ax=ax, color=S6_OFF, edgecolor=S6_EDGE, linewidth=0.17)
+    msk = sub[sub.disclosure == 'masked']
+    if len(msk): msk.plot(ax=ax, color=S6_MASKED, edgecolor='white', linewidth=0.17, hatch='///')
+    zero = sub[sub.disclosure == 'zero']
+    if len(zero): zero.plot(ax=ax, color='white', edgecolor='#333333', linewidth=0.17, hatch='....')
+
+
+def figS6(lang):
+    style(); plt.rcParams['hatch.linewidth'] = 0.55      # fine dots and slashes, as on the inherited plate
+    fig = plt.figure(figsize=(S6_W/300, S6_H/300))
+    import matplotlib.colors as mcolors
+    from matplotlib.patches import Patch
+
+    # ---- commune-level inputs of the two maps ------------------------------------------------
+    e40 = pd.read_csv(CORPUS/'E40_grd_smoothed_ratio_comuna.csv')
+    e40.columns = [c.lstrip('﻿') for c in e40.columns]                 # the header carries a BOM
+    obs = e40['Observed episodes'].astype(str).str.strip()
+    e40['disclosure'] = np.where(obs == '0', 'zero', np.where(obs == '<5', 'masked', 'shown'))
+    e40['eb'] = e40['Empirical-Bayes smoothed standardised ratio'].astype(float)
+    n_comunas = len(e40)
+    e51 = pd.read_csv(CORPUS/'E51_lisa_significant_comunas.csv').query("Indicator=='GRD F84 episodes'")
+    e42 = pd.read_csv(CORPUS/'E42_local_class_counts.csv').query("Indicator=='GRD F84 episodes'").iloc[0]
+    counts = {'High–High': int(e42['LISA HH']), 'Low–Low': int(e42['LISA LL']),
+              'Low–High': int(e42['LISA LH']), 'none': int(e42['LISA not significant'])}
+    n_graph = sum(counts.values()) + int(e42['LISA HL'])
+    assert e51.LISA.value_counts().to_dict() == {k: v for k, v in counts.items() if k != 'none' and v}, \
+        'E51 rows and E42 counts disagree'                                  # legend counts cannot drift
+    gdf = _s6_communes().merge(e40[['CUT', 'eb', 'disclosure']], on='CUT', how='left')
+    gdf = gdf.merge(e51[['CUT', 'LISA']], on='CUT', how='left')
+    gdf['LISA'] = gdf.LISA.fillna('none')
+
+    # ---- (a) empirical-Bayes smoothed standardised ratio -------------------------------------
+    norm = mcolors.TwoSlopeNorm(vmin=0, vcenter=1, vmax=3)
+
+    def draw_a(ax, sub):
+        shown = sub[(sub.disclosure == 'shown') & ~sub.CUT.isin(S6_OFFGRAPH)]
+        if len(shown): shown.plot(ax=ax, column='eb', cmap='RdBu_r', norm=norm, edgecolor=S6_EDGE, linewidth=0.17)
+        _s6_disclosure(ax, sub)
+
+    axa = _s6_strips(fig, gdf, lang, 0.0, draw_a)
+    cax = fig.add_axes([126/S6_W, (S6_H - 992)/S6_H, (919 - 126)/S6_W, 26/S6_H])
+    ticks = [0, 0.5, 1, 2, 3]
+    cb = fig.colorbar(plt.cm.ScalarMappable(cmap='RdBu_r', norm=norm), cax=cax, orientation='horizontal',
+                      extend='both', ticks=ticks)
+    labs = [num(v, lang, 1) for v in ticks]
+    if lang == 'es': labs = [s[:-2] if s.endswith(',0') else s for s in labs]
+    cb.ax.set_xticklabels(labs); cb.ax.tick_params(labelsize=7.2, length=2.5, width=0.7)
+    cb.outline.set_linewidth(0.6)
+    cb.set_label(text('EB ratio; national reference = 1', 'Razón EB; referencia nacional = 1', lang),
+                 fontsize=7.4, labelpad=2)
+    dots = text('Dotted: zero · Hatched: 1–4 episodes', 'Punteado: cero · Rayado: 1–4 episodios', lang)
+    fig.text(S6_CENTRES[1]/S6_W, (S6_H - 1157)/S6_H, dots, ha='center', va='bottom', fontsize=7.2)
+
+    # ---- (b) local Moran clusters -------------------------------------------------------------
+    def draw_b(ax, sub):
+        for key, col in S6_CLUSTER.items():
+            z = sub[(sub.LISA == key) & ~sub.CUT.isin(S6_OFFGRAPH)]
+            if len(z): z.plot(ax=ax, color=col, edgecolor=S6_EDGE, linewidth=0.17)
+        _s6_disclosure(ax, sub)
+
+    axb = _s6_strips(fig, gdf, lang, S6_PANEL_DX, draw_b)
+    names = {'High–High': ('High–High', 'Alto–Alto'), 'Low–Low': ('Low–Low', 'Bajo–Bajo'),
+             'Low–High': ('Low–High', 'Bajo–Alto'), 'none': ('No BH rejection', 'Sin rechazo BH')}
+    order = ['High–High', 'Low–Low', 'Low–High', 'none']
+    lax = fig.add_axes([1244/S6_W, (S6_H - 1078)/S6_H, (2030 - 1244)/S6_W, 116/S6_H])
+    lax.set_axis_off(); lax.grid(False)
+    lax.legend(handles=[Patch(fc=S6_CLUSTER[k], ec='#6b6b6b', lw=0.5,
+                              label=f'{text(*names[k], lang)} ({num(counts[k], lang)})') for k in order],
+               loc='upper center', ncol=2, fontsize=7.4, handlelength=1.1, handleheight=1.0,
+               columnspacing=1.0, labelspacing=0.5, borderaxespad=0, frameon=False)
+    fig.text((S6_CENTRES[1] + S6_PANEL_DX)/S6_W, (S6_H - 1194)/S6_H,
+             dots + '\n' + text('Grey: outside the spatial graph', 'Gris: fuera del grafo espacial', lang),
+             ha='center', va='bottom', fontsize=7.2, linespacing=1.3)
+
+    # ---- (c) regional endpoints, 2019 and 2024 ------------------------------------------------
+    ef9 = pd.read_csv(CORPUS/'EF9_territory.csv')
+    ef9 = ef9[~ef9['Region of residence'].isin(['Without a linkable comuna', 'National total'])]
+    y0, y1 = ef9.columns[1], ef9.columns[-1]
+
+    def cell(s):
+        rate, ci = s.split(';')[1].split('(')
+        lo, hi = ci.rstrip(') ').split('–')
+        return float(rate), float(lo), float(hi)
+
+    c = fig.add_axes([351/S6_W, (S6_H - 2347)/S6_H, (951 - 351)/S6_W, (2347 - 1396)/S6_H]); clean(c, grid='x')
+    for yr, col, mk in ((y0, BLUE, 'o'), (y1, ORANGE, 's')):
+        v = np.array([cell(s) for s in ef9[yr]])
+        c.errorbar(v[:, 0], np.arange(len(v)), xerr=[v[:, 0] - v[:, 1], v[:, 2] - v[:, 0]], fmt=mk,
+                   color=col, ms=3.4, capsize=1.4, elinewidth=0.7, lw=0, label=yr)
+    c.set_yticks(range(len(ef9)))
+    c.set_yticklabels([r.replace('Arica y Parinacota', 'Arica y P.') for r in ef9['Region of residence']], fontsize=7.2)
+    c.invert_yaxis(); c.set_xlim(left=0); c.set_ylim(len(ef9) - 0.4, -0.6)   # autoscale: a fixed
+    # upper limit of 80 clipped the 2024 upper Poisson bounds of 81.2 and 86.6 out of the plot.
+    c.set_xlabel(text('Episodes / 100 000 residents\n(Poisson 95% CI)', 'Episodios / 100 000 residentes\n(IC 95% de Poisson)', lang))
+    c.legend(loc='lower center', bbox_to_anchor=(0.5, 1.005), ncol=2, fontsize=7.4, handlelength=1.3, columnspacing=2.6, borderaxespad=0)
+
+    # ---- (d) concentration and coverage -------------------------------------------------------
+    e47 = pd.read_csv(CORPUS/'E47_inequality_gini_theil.csv').query("Indicator=='GRD F84 episodes'")
+    yrs = [int(p) for p in e47.Period if p.isdigit()]
+    ann = e47[e47.Period.isin([str(y) for y in yrs])].set_index('Period')
+    gini = [float(ann.loc[str(y), 'Gini index']) for y in yrs]
+    with_records = [n_comunas - int(ann.loc[str(y), 'Comunas with zero']) for y in yrs]
+    d1 = fig.add_axes([1200/S6_W, (S6_H - 1801)/S6_H, (2037 - 1200)/S6_W, (1801 - 1396)/S6_H]); clean(d1)
+    d1.plot(yrs, gini, color=BLUE, marker='o')
+    end_label(d1, yrs[0], gini[0], num(gini[0], lang, 3), BLUE, dx=-5, dy=10)
+    end_label(d1, yrs[-1], gini[-1], num(gini[-1], lang, 3), BLUE, dx=-3, dy=11, ha='right')
+    d1.set_ylim(0, 0.45); d1.set_yticks([0, 0.1, 0.2, 0.3, 0.4])
+    gl = [num(v, lang, 1) for v in [0, 0.1, 0.2, 0.3, 0.4]]
+    d1.set_yticklabels([g[:-2] if lang == 'es' and g.endswith(',0') else g for g in gl])
+    d1.set_ylabel(text('Gini', 'Gini', lang))
+    year_ticks(d1, yrs, short=True); d1.set_xlim(yrs[0] - 0.4, yrs[-1] + 0.4); d1.set_xticklabels([])
+    d2 = fig.add_axes([1200/S6_W, (S6_H - 2347)/S6_H, (2037 - 1200)/S6_W, (2347 - 1941)/S6_H]); clean(d2)
+    d2.plot(yrs, with_records, color=ORANGE, marker='s')
+    end_label(d2, yrs[0], with_records[0], num(with_records[0], lang), ORANGE, dx=-5, dy=11)
+    end_label(d2, yrs[-1], with_records[-1], num(with_records[-1], lang), ORANGE, dx=-3, dy=11, ha='right')
+    d2.set_ylim(0, 340); d2.set_yticks([0, 100, 200, 300]); d2.yaxis.set_major_formatter(thousands(lang))
+    d2.set_ylabel(text('Communes with records', 'Comunas con registros', lang))
+    year_ticks(d2, yrs, short=True); d2.set_xlim(yrs[0] - 0.4, yrs[-1] + 0.4)
+    d2.set_xlabel(text(f'Year ({yrs[0]}–{yrs[-1]})', f'Año ({yrs[0]}–{yrs[-1]})', lang))
+    fig.text((1200 + 2037)/2/S6_W, (S6_H - 2492)/S6_H,
+             text(f'GRD: residence · {num(n_comunas, lang)} communes; spatial graph: {num(n_graph, lang)}',
+                  f'GRD: residencia · {num(n_comunas, lang)} comunas; grafo espacial: {num(n_graph, lang)}', lang),
+             ha='center', va='bottom', fontsize=7.2)
+    for ax, ch in ((axa[0], 'a'), (axb[0], 'b')): letter(fig, ax, ch, dx=-0.020, dy=0.062)
+    letter(fig, c, 'c', dx=0.0, dy=0.020); letter(fig, d1, 'd', dx=0.0, dy=0.020)
+    save(fig, 'Figure_S6', lang)
+
 # ------------------------------------------------------------------ S7 territorial correlations
 def figS7(lang):
     style(); fig = plt.figure(figsize=(175/25.4, 165/25.4))
@@ -321,20 +737,9 @@ def figS9(lang):
     for ax, ch_ in zip([a, b], 'ab'): letter(fig, ax, ch_, dx=(-0.34 if ch_ == 'a' else -0.085), dy=0.02)
     save(fig, 'Figure_S9', lang)
 
-def copy_reused():
-    """S1 (data flow) and S6 (territorial maps) are static assets inherited from revision 09 (its Figure_S1 and
-    Figure_S3); this only checks that they are present next to the generated plates."""
-    for lang in ('en', 'es'):
-        for name in ('Figure_S1', 'Figure_S6'):
-            for ext in ('png', 'pdf'):
-                assert (BASE/'figures'/lang/f'{name}.{ext}').exists(), (lang, name, ext)
-    print('  S1 and S6: static plates inherited from revision 09 are present')
-
 if __name__ == '__main__':
-    which = sys.argv[1:] or ['S2', 'S3', 'S4', 'S5', 'S7', 'S8', 'S9', 'copy']
+    which = sys.argv[1:] or ['S1', 'S2', 'S3', 'S4', 'S5', 'S6', 'S7', 'S8', 'S9']
     for lang in ('en', 'es'):
         for key in which:
-            if key == 'copy': continue
             globals()['fig' + key](lang)
-    if 'copy' in which: copy_reused()
     write_qa('figuras_suplementarias_qa.json')

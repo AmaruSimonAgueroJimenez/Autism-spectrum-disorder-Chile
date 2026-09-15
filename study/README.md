@@ -1,6 +1,7 @@
 # Administrative recognition of autism in Chile, 2019–2025: multi-system study
 
-Folder holding the analytical pipeline and the manuscript builders. The analysis plan is in
+Folder holding the analytical pipeline and the manuscript builders. `references.py` (Vancouver formatter) and `authors.py` are versioned here because they were lost
+with the deleted `paper/` folder. The analysis plan is in
 `analysis_plan.md` and the source review in `scripts/downloads/DATA_REVIEW.md`.
 It does not modify the reports of `docs/` nor the aggregates of `output_files/`.
 

@@ -73,10 +73,17 @@ python scripts/build_version_pages.py          # rewrite the page from the figur
 python -m pytest tests/test_page_figure_code.py  # fails if the page and the modules differ
 ```
 
-Two figures are the exception: S1 and S6 are inherited from earlier revisions by `copy_reused()`, so no
-drawing code for them exists here. The [version 02 corpus](docs/version_02_corpus.qmd) is stored images
-throughout, because the pipeline that drew those plates reads the GRD and REM microdata, which is not
-part of this repository. Both pages say so on the page itself.
+All thirteen figures are drawn by code. S1 (data flow) and S6 (territorial maps) were static artwork
+inherited from revision 09 until their drawing code was reconstructed from the published aggregates;
+the page marks both as faithful redraws rather than the original plates, because the code that made the
+submitted artwork is not in this repository.
+
+The [version 02 corpus](docs/version_02_corpus.qmd) remains stored images. Its drawing code *is* tracked
+(`study/pipeline/08b_figures_rem.py`, `14_extra_figures_rem.py`, `15b_spatial_correlation.py`,
+`17_extended_material.py`); what is missing is the GRD and REM microdata those modules read, so the
+plates cannot be rebuilt from a clone. Reconstructing them from the aggregates instead was tried and
+rejected: it produced plates with untranslated labels, dropped panels and a changed estimator, which
+would have misrepresented the originals. The page says why it shows stored images.
 
 Requires Quarto and Python with Jupyter, plus the scientific and geospatial stack pinned in `requirements-analysis.txt` (pandas, scipy, statsmodels, pyarrow, geopandas, libpysal, esda).
 

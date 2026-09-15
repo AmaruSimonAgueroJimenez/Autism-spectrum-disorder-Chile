@@ -9,8 +9,8 @@ page is generated from those modules rather than edited by hand, and
     python scripts/build_version_pages.py            # rewrite the page
     python scripts/build_version_pages.py --check    # exit 1 if the page is out of date
 
-Figures S1 and S6 are not generated here: `copy_reused()` inherits them from earlier revisions, so
-there is no drawing code for them in this repository and the page says so.
+Every supplementary figure is now drawn from tracked tables: S1 and S6 were static plates inherited
+from revision 09 until their drawing code was reconstructed from the published aggregates.
 """
 from pathlib import Path
 import argparse
@@ -23,8 +23,7 @@ STUDY = ROOT / "docs" / "study"
 PAGE = ROOT / "docs" / "version_10_panels.qmd"
 
 MAIN = ["1", "2", "3", "4"]
-SUPP = ["S2", "S3", "S4", "S5", "S7", "S8", "S9"]
-INHERITED = ["S1", "S6"]
+SUPP = ["S1", "S2", "S3", "S4", "S5", "S6", "S7", "S8", "S9"]
 
 
 def module_parts(path):
@@ -72,7 +71,6 @@ def build():
     out.append("## Supplementary figures\n")
     for fid in SUPP:
         out.append(figure_section(fid, as_chunk(supp_figs[fid], fid)))
-    out.append(INHERITED_SECTION)
 
     out.append(TABLES)
     PAGE.write_text("\n".join(out), encoding="utf-8")
@@ -139,8 +137,8 @@ BODY_INTRO = '''
 #| label: resumen
 v10 = rh.version("10")
 kpis([
-    ("11", "Figures drawn by this page from the public tables"),
-    ("2", "Figures inherited from earlier revisions, with no drawing code here"),
+    ("13", "Figures drawn by this page from the public tables"),
+    ("0", "Figures inherited from earlier revisions with no drawing code"),
     (str(len(rh.data_tables())), "Public tidy tables the page reads"),
     (f"v{v10['identical_results_to']}", "Version whose results these are, unchanged"),
 ])
@@ -162,26 +160,20 @@ administrative recognition, **not prevalence or incidence**. The [extended corpu
 holds the plates and tables of the earlier versions, and the [index](index.html#versions) records what
 each version of the series added.
 
+::: {.callout-important}
+## Figures S1 and S6 are reconstructions, not the original plates
+
+Until version 10 these two were static artwork inherited from revision 09; this repository held no code
+that drew them. The code shown with them here was written from the published aggregates, and it
+reproduces the same panels and the same numbers, but it is not the code that made the submitted plates
+and the artwork is not pixel-identical to them. Figure S6 in particular uses an equal-area projection
+fitted to the printed original, which drew the shapefile unprojected, so its map panels differ by one
+to two per cent in aspect ratio. Treat both as faithful redraws, not as the originals.
+:::
+
 Use **Show the code that produced this** under any figure or table, or the **`</>` Code** button at the
 top right, to read the code that drew it. Each figure chunk exports the 175 mm PNG, SVG and PDF files
 to `docs/study/figures/` as it runs, in English and Spanish, and displays the English plate.
-'''
-
-INHERITED_SECTION = '''### Figures S1 and S6
-
-These two plates are **not drawn by this repository**. `copy_reused()` in
-`docs/study/figuras_suplementarias.py` inherits them from earlier revisions of the study, so there is
-no drawing code to show for them and they are the only images on this page that come from a folder
-rather than from code.
-
-```{python}
-#| label: laminas-heredadas
-#| output: asis
-for fid in ("S1", "S6"):
-    meta = {e["id"]: e for doc in ("manuscript", "supplement")
-            for e in rh.events(doc, "en") if e.get("kind") == "figure"}.get(fid, {})
-    print(rh.figure_md(fid, "en", meta.get("title", f"Figure {fid}"), meta.get("caption", "")) + "\\n")
-```
 '''
 
 TABLES = '''

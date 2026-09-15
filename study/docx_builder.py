@@ -28,7 +28,7 @@ from docx.table import _Cell
 from PIL import Image
 
 REPO = Path(__file__).resolve().parents[1]
-sys.path.insert(0, str(REPO / "paper"))
+sys.path.insert(0, str(Path(__file__).resolve().parent))   # study/: references.py lives beside this module
 from references import Citations, parse_bib  # noqa: E402
 
 FUENTE = "Times New Roman"
