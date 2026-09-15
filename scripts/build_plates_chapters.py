@@ -39,7 +39,10 @@ CHAPTERS = [
      "The plates that place the health records against population, survey and school sources"),
     ("Sex ratio across sources", "plates_context.qmd", None, None),
     ("Model diagnostics and case-definition sensitivity", "plates_context.qmd", None, None),
+    ("__unlisted__", "plates_context.qmd", None, None),
 ]
+
+UNLISTED = "__unlisted__"
 
 
 def module_source(plate_id):
@@ -125,6 +128,15 @@ def build():
     for it in idx["figures"]:
         by_group.setdefault(it["group"], []).append(it)
 
+    # Two plates ship a stored image but are absent from the pipeline's own extended-material index,
+    # so iterating that index alone drops them from the report entirely — which is what the site did
+    # before. Anything on disk and unlisted is collected here rather than silently lost.
+    listed = {it["file"].replace(".png", "") for items in by_group.values() for it in items}
+    unlisted = sorted(f.stem for f in (STUDY / "corpus" / "figures").glob("*.jpg") if f.stem not in listed)
+    if unlisted:
+        by_group[UNLISTED] = [{"file": f"{stem}.png", "id": stem, "desc": "", "group": UNLISTED,
+                               "origin": "not in the extended-material index"} for stem in unlisted]
+
     pages, written = {}, []
     for group, filename, title, subtitle in CHAPTERS:
         items = by_group.get(group, [])
@@ -180,7 +192,12 @@ pixel-identical — fonts, tick formatting and label placement differ. Each modu
         for group, items in page["parts"]:
             if not items:
                 continue
-            if group != "__article__":
+            if group == UNLISTED:
+                out.append("\n## Plates absent from the pipeline's index\n\n"
+                           "These ship with the repository but are not listed in the pipeline's own\n"
+                           "extended-material index, so every earlier version of this site dropped them.\n"
+                           "They are included here so the report carries everything that was produced.\n")
+            elif group != "__article__":
                 out.append(f"\n## {group}\n")
             for it in items:
                 out.append(plate_section(it, caps, titles, helpers))
