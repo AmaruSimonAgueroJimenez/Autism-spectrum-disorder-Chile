@@ -1,11 +1,7 @@
 ---
-title: "Autism in Chile"
-subtitle: "Administrative recognition of autism in the public health and education systems, 2019–2025: hospital discharges (GRD), outpatient activity and screening (REM), diagnostic trajectories, and the results of every version of the study"
+title: "Administrative recognition of autism in Chile, 2019–2025"
+subtitle: "A multisource study of the routine records of the public health and education systems"
 ---
-
-::: {.report-nav}
-[Home](index.html) [Methods](methods.html) [REM](rem.html) [GRD](grd.html) [v01](version_01_initial.html) [v02 corpus](version_02_corpus.html) [v05](version_05_revision.html) [v06](version_06_expanded.html) [v07](version_07_editorial.html) [v10 results](version_10_panels.html)
-:::
 
 ```{python}
 #| label: cargar-resumen
@@ -17,147 +13,139 @@ import pandas as pd
 
 ROOT = Path.cwd().parent if Path.cwd().name == "docs" else Path.cwd()
 sys.path.insert(0, str(ROOT / "scripts"))
+sys.path.insert(0, str(ROOT / "docs" / "study"))
 from report_helpers import read_result, kpis, number, share, show_table, ci
 
 grd_sources = read_result("grd_source_inventory.csv")
 rem_quality = read_result("rem_quality.csv")
 epi_quality = read_result("grd_epi_quality.csv")
 grd_summary = read_result("grd_cohort_summary.csv")
+cohort = grd_summary.query("era == '2021-2024' and definition == 'TEA_operacional'").iloc[0]
+
+kpis([
+    (number(grd_sources.records.sum()), "Hospital records read · 2019–2024"),
+    (number(epi_quality.records_kept.sum()), "Records with an F84 code"),
+    (number(rem_quality.records.sum()), "Community programme rows · 2017–2024"),
+    (number(cohort.patients), "Identifiers in the trajectory cohort · 2021–2024"),
+])
+```
+
+This report describes how autism is recognised in the routine administrative records of Chile's public
+health and education systems. It brings together every result the study produced, organised by what the
+result is about rather than by when it was computed.
+
+**Nothing here is prevalence or incidence.** Every number is a count of hospital episodes, community
+programme entries, follow-up stocks or school enrolments, presented with its unit, its denominator and
+its coverage. The rise these records show is consistent with greater detection, greater demand and
+changes in coding during the period of Law 21.545; it does not demonstrate a change in how often autism
+occurs.
+
+## What the report contains
+
+**[Methods](methods.qmd).** Sources, case definitions, units, denominators, standardisation, intervals,
+trends, spatial analysis, the rules for reading the monthly returns, quality controls, biases and
+limitations. It is the common reference for everything that follows.
+
+**[Results](results.qmd).** The principal findings: four panel figures and the nine supplementary
+figures that support them, each drawn at render time by the code printed with it.
+
+**[Hospital recognition](hospital.qmd).** The hospital discharge records in depth: magnitude and trend,
+age-standardised rates, sex and age, F84 subcategories, the diagnostic position of the code, episode
+characteristics, co-diagnoses, readmission, territory and spatial autocorrelation, and the
+reconstruction of which diagnoses precede the first observed autism record.
+
+**[Community care](community.qmd).** The monthly statistical returns of the public network: entries to
+and discharges from mental-health programmes with an autism code, their population rates, age, sex,
+regions, communes and facilities, screening in well-child check-ups, rehabilitation entries, and the
+ecological comparison between the two sources.
+
+**[Result tables](tables.qmd)** and **[extended plates](plates.qmd)** hold the complete material,
+including the results that the main chapters summarise. **[Reproducibility](reproducibility.qmd)**
+explains how to rebuild every number in this report from the repository.
+
+## Headline results
+
+```{python}
+#| label: hallazgos-principales
 rates = read_result("grd_rates_national.csv")
 trends = read_result("grd_trends_apc.csv")
 sex_ratio = read_result("grd_sex_ratio.csv")
 rem_rates = read_result("rem_rates_national.csv")
 rem_annual = read_result("rem_annual_by_code.csv")
 moran = read_result("grd_spatial_moran.csv")
-cohort = grd_summary.query("era == '2021-2024' and definition == 'TEA_operacional'").iloc[0]
+
 main = rates.loc[(rates.definition == "TEA_operacional") & (rates.role == "cualquiera") & (rates.sex == "TOTAL")]
 records = main.loc[main.unit == "records"].set_index("year")
 persons = main.loc[main.unit == "persons"].set_index("year")
 last_year = int(records.index.max())
-apc = trends.query("definition == 'TEA_operacional' and unit == 'records' and role == 'cualquiera' and sex == 'TOTAL' and period == '2021-2024'").iloc[0]
+apc = trends.query("definition == 'TEA_operacional' and unit == 'records' and role == 'cualquiera' "
+                   "and sex == 'TOTAL' and period == '2021-2024'").iloc[0]
 ratio = sex_ratio.query("definition == 'TEA_operacional' and unit == 'records' and role == 'cualquiera'").set_index("year")
 rem_last = rem_rates.loc[(rem_rates.series == "05990022") & (rem_rates.sex == "TOTAL")].set_index("year")
 rem_ingresos = rem_annual.loc[rem_annual.code == "05990022"].set_index("year").Col01
 moran_main = moran.query("unit == 'records' and variable == 'sir_eb'").iloc[0]
 
 kpis([
-    (number(grd_sources.records.sum()), "GRD records read · 2019–2024"),
-    (number(epi_quality.records_kept.sum()), "Records with an F84 code"),
-    (number(rem_quality.records.sum()), "REM Series A rows · 2017–2024"),
-    (number(cohort.patients), "Identifiers in the trajectory cohort · 2021–2024"),
-])
-```
-
-This site documents a national study of how autism is recognised in the routine records of Chile's public health and education systems. Nothing here is prevalence or incidence: every number is a count of hospital episodes, programme entries, follow-up stocks or school enrolments, presented with its unit, its denominator and its coverage. Two lines of work share the same data and definitions: the **analytical reports** (GRD, REM and Methods), which describe each source in depth, and the **results of the study**, organised below by the version that produced them. The text of the manuscript is not part of this repository; its results are.
-
-## Analytical reports
-
-**[GRD: hospital epidemiology and trajectories](grd.html).** Describes hospitalisations with an autism spectrum disorder (ASD) code in the public system: magnitude and trend, age-standardised population rates, sex and age, subcategories, code position, episode characteristics, co-diagnoses, readmission, regions, communes and spatial autocorrelation. It also reconstructs which hospital diagnoses precede the first observed autism record and in which position it is recorded.
-
-**[REM: outpatient activity, screening and rehabilitation](rem.html).** Describes entries to and discharges from mental-health programmes with an autism code, their population rates, age, sex, regions, communes and facilities, screening in well-child check-ups (MCHAT and M-CHAT R/F) and rehabilitation entries, and compares both sources ecologically.
-
-**[Methods](methods.html).** Sources, case definitions, units, denominators, standardisation, intervals, trends, spatial analysis, REM reading rules, quality controls, biases, limitations and reproducibility. It is the common reference of the two reports.
-
-## Versions of the study {#versions}
-
-The study was written in ten versions between 3 and 14 September 2026. Their results are organised
-here so that each one can be found and reproduced on its own. What each version added is not an
-editorial summary: `scripts/audit_versions.py` hashes every tidy result table in each version and
-compares them pairwise, and this table is rendered from the registry that script feeds.
-
-```{python}
-#| label: indice-versiones
-#| output: asis
-import sys as _sys
-_sys.path.insert(0, str(ROOT / "docs" / "study"))
-import render_helpers as rh
-print(rh.version_rows_html())
-```
-
-```{python}
-#| label: nota-auditoria
-#| output: asis
-print(f"> **Audit finding.** {rh.audit_note()}\n")
-```
-
-Two versions carry their results on their own page, because the repository ships the public tables
-and plates they need:
-
-**[Version 02 — extended corpus](version_02_corpus.html).** The 59 plates and 132 tables produced by
-the full pipeline (variant without Rett syndrome). This is the corpus against which any figure in the
-later versions is audited.
-
-**[Version 10 — panel results](version_10_panels.html).** The four panel figures and the nine
-supplementary figures of the most recent version, rebuilt at render time from `docs/study/data/` by
-the same scripts that produced the submitted plates, in English and Spanish.
-
-The version folders themselves (DOCX, PDF and 600 dpi plates, about 1.5 GB) are not versioned in git.
-The results that the site reproduces are.
-
-## Main results
-
-```{python}
-#| label: hallazgos-principales
-kpis([
-    (number(records.loc[last_year, "asr"], 1), f"Hospitalisations with an ASD code per 100 000 person-years, age-standardised · {last_year} (was {number(records.asr.iloc[0], 1)} in {int(records.index.min())})"),
-    (number(persons.loc[last_year, "asr"], 1), f"Hospitalised persons with an ASD code per 100 000 population · {last_year}"),
+    (number(records.loc[last_year, "asr"], 1), f"Hospitalisations with an autism code per 100 000 person-years, age-standardised · {last_year} (was {number(records.asr.iloc[0], 1)} in {int(records.index.min())})"),
+    (number(persons.loc[last_year, "asr"], 1), f"Hospitalised persons with an autism code per 100 000 population · {last_year}"),
     (number(apc.apc, 1) + "%", f"Average annual percent change · 2021–2024 (95% CI: {ci(apc.apc_lo, apc.apc_hi)})"),
     (number(ratio.loc[last_year, "asr_ratio"], 2), f"Male:female rate ratio · {last_year} (was {number(ratio.asr_ratio.iloc[0], 2)} in {int(ratio.index.min())})"),
-    (number(rem_last.loc[last_year, "asr"], 1), f"REM A05 entries with an autism code per 100 000 population, age-standardised · {last_year} ({number(rem_ingresos.loc[last_year])} entries)"),
+    (number(rem_last.loc[last_year, "asr"], 1), f"Programme entries with an autism code per 100 000 population, age-standardised · {last_year} ({number(rem_ingresos.loc[last_year])} entries)"),
     (number(moran_main.moran_i, 2), "Moran's I of the smoothed commune hospitalisation ratio (permutation p " + number(moran_main.p_sim, 3) + ")"),
     (number(share(cohort.prior_hospitalization, cohort.patients), 1) + "%", "2021–2024 cohort with observable prior hospitalisations"),
 ])
 ```
 
-Hospitalisations and outpatient programme entries with an autism code have grown rapidly since 2021, more in females than in males, with the greatest intensity between 5 and 14 years of age and with strong territorial heterogeneity. These increases are consistent with greater detection, greater demand and coding changes in the period of Law 21.545; **they do not demonstrate an increase in the occurrence of autism**. No figure in these reports is incidence or prevalence: they are rates of hospitalisations, of hospitalised persons and of recorded programme entries.
-
-In the 2021–2024 hospital trajectories, the first autism record almost always occurs with the code in a secondary position, and only a minority has observable prior hospitalisations. The earlier codes do not show that they were ruled out as differential diagnoses: they may be comorbidities, symptoms or independent reasons for admission.
-
-## Headline figures of the study
+Hospitalisations and community programme entries with an autism code have grown rapidly since 2021,
+more in females than in males, with the greatest intensity between 5 and 14 years of age and with
+strong territorial heterogeneity. In the 2021–2024 hospital trajectories, the first autism record almost
+always occurs with the code in a secondary position, and only a minority has observable prior
+hospitalisations. Those earlier codes do not show that they were ruled out as differential diagnoses:
+they may be comorbidities, symptoms or independent reasons for admission.
 
 ```{python}
-#| label: manuscrito-cifras
+#| label: cifras-cabecera
 facts = json.loads((ROOT / "docs" / "study" / "data" / "facts_v10.json").read_text(encoding="utf-8"))["facts"]
 headline = pd.DataFrame([
-    ("Eligible GRD episodes (F84 family without F84.2, any position)", 2019, number(facts["grd19n"]), 2024, number(facts["grd24n"])),
-    ("Eligible episodes per 100 000 GRD episodes of the same panel", 2019, number(facts["grd19r"], 1), 2024, number(facts["grd24r"], 1)),
-    ("Male:female ratio of eligible GRD episodes", 2019, number(facts["grdmf19"], 2), 2024, number(facts["grdmf24"], 2)),
-    ("REM A05 programme entries, strict autism code", 2021, number(facts["a0521n"]), 2025, number(facts["a0525n"])),
-    ("REM P2 December follow-up stock, ages 0–19", 2021, number(facts["p221"]), 2025, number(facts["p225"])),
-    ("School integration programme (PIE) enrolments with ASD", 2019, number(facts["pie19"]), 2025, number(facts["pie25"])),
+    ("Eligible hospital episodes (F84 family without F84.2, any position)", 2019, number(facts["grd19n"]), 2024, number(facts["grd24n"])),
+    ("Eligible episodes per 100 000 hospital episodes of the same panel", 2019, number(facts["grd19r"], 1), 2024, number(facts["grd24r"], 1)),
+    ("Male:female ratio of eligible hospital episodes", 2019, number(facts["grdmf19"], 2), 2024, number(facts["grdmf24"], 2)),
+    ("Community programme entries, strict autism code", 2021, number(facts["a0521n"]), 2025, number(facts["a0525n"])),
+    ("December follow-up stock, ages 0–19", 2021, number(facts["p221"]), 2025, number(facts["p225"])),
+    ("School integration programme enrolments with autism", 2019, number(facts["pie19"]), 2025, number(facts["pie25"])),
     ("Eligible episodes with the code only in a secondary position, 2024 (%)", np.nan, "—", 2024, number(facts["secondary24pct"], 1)),
     ("Average annual percent change of the hospital indicator, 2019–2024 (%)", np.nan, "—", 2024, number(facts["apcmain"], 1)),
 ], columns=["Indicator", "Start year", "Start value", "End year", "End value"])
-show_table(headline, "Headline figures of version 10, read from the verified facts file the study builds its statements from")
+show_table(headline, "Headline figures of the study, read from the verified facts file")
 ```
 
-## How the analyses are organised
+## How this report was built
+
+Every table and figure is recalculated when the report is rendered; none is pasted in. The chapters read
+the aggregated tables in `output_files/consolidacion/` and `docs/study/data/`, both versioned in git, so
+the whole report can be rebuilt from a clone without the source microdata. The extraction from the
+original microdata runs separately, through the scripts documented in
+[Reproducibility](reproducibility.qmd).
+
+The study itself was written over several rounds of revision, which added results without ever changing
+one that had already been computed — a claim checked rather than asserted, by hashing every result table
+of every round and comparing them pairwise. This report presents the union of all of them as a single
+body of work. Where a result comes from a different observation window or an earlier case definition,
+the table says so on the spot.
 
 ```{python}
 #| label: tabla-organizacion
 organisation = pd.DataFrame([
-    ("GRD · A1", "Universe, units and quality", "grd_epi_quality, grd_annual_positions"),
-    ("GRD · A2", "Annual trend, crude and standardised rates, AAPC, seasonality, sensitivity", "grd_rates_national, grd_trends_apc, grd_epi_monthly"),
-    ("GRD · A3", "Sex ratio, single year of age, age-specific rates", "grd_sex_ratio, grd_epi_age_single, grd_rates_age_specific"),
-    ("GRD · A4", "F84 subcategories and code position", "grd_rates_subcodes, grd_epi_subcodes"),
-    ("GRD · A5", "Admission, activity, specialty, insurance, discharge, case fatality, length of stay, severity, hospitals", "grd_epi_features, grd_epi_los_*, grd_epi_grd_weight, grd_epi_hospitals"),
-    ("GRD · A6", "Readmission and multiplicity", "grd_epi_readmissions, grd_epi_multiplicity"),
-    ("GRD · A7", "Co-diagnoses and principal diagnosis", "grd_epi_codiagnoses"),
-    ("GRD · A8", "Regions, communes, indirect standardisation, Moran, LISA", "grd_rates_regional, grd_rates_comunal, grd_spatial_*"),
-    ("GRD · B", "Trajectories: linkage, position, prior diagnoses, sequences, transitions", "grd_cohort_*, grd_first_*, grd_previous_*, grd_sequences, grd_principal_transitions"),
-    ("REM", "Entries, rates, age and sex, subcategories, regions, communes, panel, screening, rehabilitation, ecological comparison", "rem_*"),
-    ("Versions", "Figures 1–4 and S1–S9 rebuilt from docs/study/data (tidy and verified tables); the corpus of version 02 from its stored plates and presentation tables", "docs/study/data/*.csv, docs/study/corpus/"),
+    ("Hospital · universe", "Records read, F84 records kept, duplicates, exclusions and coding depth", "grd_epi_quality, grd_annual_positions"),
+    ("Hospital · time", "Annual trend, crude and standardised rates, average annual percent change, seasonality", "grd_rates_national, grd_trends_apc, grd_epi_monthly"),
+    ("Hospital · person", "Sex ratio, single year of age, age-specific rates", "grd_sex_ratio, grd_epi_age_single, grd_rates_age_specific"),
+    ("Hospital · code", "F84 subcategories and diagnostic position", "grd_rates_subcodes, grd_epi_subcodes"),
+    ("Hospital · episode", "Admission, activity, specialty, insurance, discharge, length of stay, severity, hospitals", "grd_epi_features, grd_epi_los_*, grd_epi_grd_weight"),
+    ("Hospital · burden", "Readmission, multiplicity, co-diagnoses and principal diagnosis", "grd_epi_readmissions, grd_epi_multiplicity, grd_epi_codiagnoses"),
+    ("Hospital · place", "Regions, communes, indirect standardisation, Moran and LISA", "grd_rates_regional, grd_rates_comunal, grd_spatial_*"),
+    ("Hospital · trajectories", "Identifier continuity, first record, prior diagnoses, sequences, transitions", "grd_cohort_*, grd_first_*, grd_previous_*, grd_sequences"),
+    ("Community", "Entries, rates, age and sex, subcategories, regions, communes, facility panel, screening, rehabilitation", "rem_*"),
+    ("Results", "Panel figures and supplementary figures, drawn from the published tables", "docs/study/data/*.csv"),
 ], columns=["Section", "Content", "Inputs"])
-show_table(organisation, "Site sections and the tables that feed them")
+show_table(organisation, "The report's sections and the tables that feed them")
 ```
-
-The site's documents run **Python** and read the aggregate tables of `output_files/consolidacion/` and `docs/study/data/`, both versioned in git. Tables and figures are recalculated at render time; they contain no hand-pasted figures. Every result on this site carries the code that produced it: use **Show the code that produced this** under any table or figure, or the **`</>` Code** button at the top right to unfold the whole page at once. The extraction from the original microdata runs separately, through the scripts documented in the [repository README](../README.md).
-
-## Interpretation priorities
-
-| Source | Already available | Next extension |
-|---|---|---|
-| GRD | Crude and standardised rates with intervals, trends, sex and age, subcategories, position, episode characteristics, co-diagnoses, readmission, regions, communes, Moran and LISA, cohorts and trajectories | Confirm the linkage with the producer, models adjusted for age, sex, year, contacts and hospital, incorporate deaths and emergency care, validate clinical records |
-| REM | 2017–2024 series, standardised entry rates, age and sex, subcategories, regions, communes, facility panel, screening indicators by stage, rehabilitation, ecological comparison | Validate screening denominators with the manuals, incorporate Series P (population under control), review 2025–2026 |
-
-The original data remain in the external root configured through `ASESORIAS_DATA_ROOT`. The extraction used does not incorporate REM 2025–2026: those files require reviewing integrity, coverage and comparability before extending the series.

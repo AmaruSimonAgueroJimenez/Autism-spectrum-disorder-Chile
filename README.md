@@ -69,7 +69,7 @@ and `figuras_suplementarias.py`, which stay in place for rebuilding the plates o
 the two copies drifting, the page is generated from those modules and a test compares them:
 
 ```sh
-python scripts/build_version_pages.py          # rewrite the page from the figure modules
+python scripts/build_results_chapter.py          # rewrite the page from the figure modules
 python -m pytest tests/test_page_figure_code.py  # fails if the page and the modules differ
 ```
 

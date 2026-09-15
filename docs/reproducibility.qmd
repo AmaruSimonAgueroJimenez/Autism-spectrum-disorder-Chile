@@ -1,0 +1,143 @@
+---
+title: "Reproducibility"
+subtitle: "What ships with the repository, what does not, and how to rebuild every number in this report"
+---
+
+```{python}
+#| label: preparacion
+from pathlib import Path
+import subprocess
+import sys
+
+import pandas as pd
+
+ROOT = Path.cwd().parent if Path.cwd().name == "docs" else Path.cwd()
+sys.path.insert(0, str(ROOT / "scripts"))
+from report_helpers import kpis, show_table
+
+tracked = subprocess.run(["git", "ls-files"], cwd=ROOT, capture_output=True, text=True).stdout.splitlines()
+tidy = list((ROOT / "docs" / "study" / "data").glob("*.csv"))
+aggregates = list((ROOT / "output_files" / "consolidacion").glob("*.csv"))
+
+kpis([
+    (str(len(tidy)), "Result tables versioned in git"),
+    (str(len(aggregates)), "Analytical aggregates versioned in git"),
+    (str(sum(1 for f in tracked if f.endswith(".py"))), "Python files in the repository"),
+    ("0", "Numbers in this report that were typed by hand"),
+])
+```
+
+Every table and figure in this report is recalculated when the report is rendered. None is pasted in.
+This chapter states exactly what a clone contains, what it does not, and what each of those two facts
+means for what you can reproduce.
+
+## What ships with the repository
+
+The report reads two sets of tables, both versioned in git:
+
+`output_files/consolidacion/` holds the analytical aggregates — the annual series, rates, standardised
+rates, sex and age breakdowns, regional and commune summaries, spatial statistics and cohort summaries
+that the source chapters work through.
+
+`docs/study/data/` holds the result tables the figures are built from, together with the verified facts
+file that the headline numbers are read from.
+
+With these two folders, a clone can rebuild the whole report: every chapter, every table and every
+figure, including the panel plates, without touching the original microdata.
+
+```{python}
+#| label: que-se-versiona
+inventory = pd.DataFrame([
+    ("output_files/consolidacion/", f"{len(aggregates)} CSV", "Analytical aggregates behind the source chapters", "yes"),
+    ("docs/study/data/", f"{len(tidy)} CSV + 2 JSON", "Result tables and the verified facts file", "yes"),
+    ("docs/study/corpus/", "135 CSV + 61 JPG", "Extended material produced by the full pipeline", "yes"),
+    ("docs/study/figuras_*.py", "2 modules", "The code that draws the figures", "yes"),
+    ("study/pipeline/", "18 modules", "The extraction and analysis pipeline", "yes"),
+    ("data/", "168 MB", "Source microdata and the commune shapefiles", "no — too large, and partly restricted"),
+    ("study/manuscript/", "~1.5 GB", "Document builds of each round of revision", "no — build outputs, not inputs"),
+], columns=["Path", "Size", "What it is", "Versioned in git"])
+show_table(inventory, "What a clone contains and what it does not")
+```
+
+## What a clone cannot rebuild
+
+Two things need data that is not in the repository.
+
+**The extended plates.** The 61 plates in [extended material](plates.qmd) were drawn by
+`study/pipeline/`, which reads the hospital and community microdata. That code *is* versioned — what is
+missing is its input. Where a plate's series survives in a published table, this report redraws it from
+that table and shows the code; where it does not, the stored image is shown and labelled as such.
+
+**The territorial maps.** Commune polygons live in `data/comunas.shp`, which is excluded from git for
+its size. The maps in this report therefore need that file locally. Everything else about the
+territorial analysis — the rates, the ratios, the spatial statistics — comes from versioned tables.
+
+::: {.callout-note}
+## Three tables are withheld on disclosure grounds, not for size
+
+Two commune-by-year tables and one commune-level analytic file pair a commune identifier with cells of
+fewer than five cases. Published together they could identify individuals. The repository ships
+`communes_public.csv` instead: the same extract without commune identifiers and with small cells masked.
+:::
+
+## Rebuilding the report
+
+```sh
+python3 -m venv .venv
+source .venv/bin/activate
+python -m pip install -r requirements-analysis.txt
+
+python scripts/render_reports.py            # rebuild every chapter
+python scripts/render_reports.py --figures  # also redraw the plates first
+```
+
+Rendering needs Quarto and Python with Jupyter, plus the scientific and geospatial stack pinned in
+`requirements-analysis.txt`. The command reads the aggregates already in the repository, so it does not
+require mounting the external disk — except for the maps, which read the commune shapefile.
+
+To extract from the original microdata instead, and recompute the aggregates before rendering:
+
+```sh
+python scripts/render_reports.py --refresh
+```
+
+## How the report keeps itself honest
+
+Several claims in this report are checked by code rather than asserted in prose.
+
+**The figures shown are drawn by the code printed with them.** The [Results](results.qmd) chapter is
+generated from `docs/study/figuras_principales.py` and `figuras_suplementarias.py` by
+`scripts/build_results_chapter.py`, and `tests/test_page_figure_code.py` fails if the code on the page
+stops matching the modules it came from, or if any generated chapter contains a chunk that does not
+parse.
+
+**The result set is one set, not a sequence of drafts.** The study was written over several rounds of
+revision. `scripts/audit_versions.py` hashes every result table of every round and compares them
+pairwise; it reports that no table ever changed once computed, and that later rounds only ever added
+tables. That is why this report can present the union of all of them as a whole, and it is why the
+tables from the earliest analysis — on a different window and an earlier case definition — are marked
+apart in [Result tables](tables.qmd) rather than merged in silently.
+
+```sh
+python scripts/audit_versions.py            # re-run the comparison
+python -m pytest tests/                     # the guards described above
+```
+
+## Provenance of the sources
+
+```{python}
+#| label: fuentes
+sources = pd.DataFrame([
+    ("Hospital discharges grouped by diagnosis-related groups", "2019–2024", "Public national dataset", "output_files/consolidacion/grd_*"),
+    ("Monthly statistical returns of the public network", "2017–2025", "Public national dataset", "output_files/consolidacion/rem_*"),
+    ("School integration programme enrolments", "2019–2025", "Public national dataset", "docs/study/data/pie_*"),
+    ("Population projections by age and sex", "2019–2025", "National statistics institute", "data/censo_proyecciones_*"),
+    ("Commune and regional boundaries", "current", "National statistics institute", "data/comunas.shp, data/Regional.shp"),
+    ("Population surveys", "2022–2025", "Official survey microdata", "docs/study/data/survey_*"),
+], columns=["Source", "Period", "Origin", "Where it lands in the repository"])
+show_table(sources, "The sources this report reads and where each one lands")
+```
+
+The identifiers in the hospital records are analysed separately for 2019–2020 and 2021–2024, with no
+linkage between the two periods; [Methods](methods.qmd) explains why, and what follows from it for the
+trajectory results.

@@ -1,28 +1,43 @@
 project:
-  type: default
+  type: book
   execute-dir: project
-  render:
+  output-dir: .
+
+book:
+  title: "Administrative recognition of autism in Chile"
+  subtitle: "A multisource study of the public health and education records, 2019–2025"
+  author: "Amaru Simón Agüero Jiménez"
+  date: today
+  search: true
+  page-navigation: true
+  reader-mode: true
+  chapters:
     - index.qmd
-    - methods.qmd
-    - rem.qmd
-    - grd.qmd
-    - version_01_initial.qmd
-    - version_02_corpus.qmd
-    - version_05_revision.qmd
-    - version_06_expanded.qmd
-    - version_07_editorial.qmd
-    - version_10_panels.qmd
+    - part: "The study"
+      chapters:
+        - methods.qmd
+        - results.qmd
+    - part: "The sources in depth"
+      chapters:
+        - hospital.qmd
+        - community.qmd
+    - part: "Extended material"
+      chapters:
+        - tables.qmd
+        - plates.qmd
+        - reproducibility.qmd
+  sidebar:
+    style: docked
+    collapse-level: 2
 
 lang: en
 jupyter: python3
-date: today
 format:
   html:
     theme: cosmo
     toc: true
     toc-depth: 3
     toc-location: right
-    embed-resources: true
     css: styles.css
     code-fold: true
     code-summary: "Show the code that produced this"
@@ -31,8 +46,10 @@ format:
     code-line-numbers: false
     highlight-style: github
     fig-cap-location: bottom
-    number-sections: false
     smooth-scroll: true
+    # embed-resources is deliberately OFF: with every figure inlined as base64 the chapters ran to
+    # 9 MB each and every render wrote a fresh copy into git history. Shared assets now live in
+    # site_libs/ and each chapter stays small.
 execute:
   # echo: true is what makes the fold usable. With echo: false Quarto strips the code before
   # code-fold can wrap it, so every chunk rendered as a result with no way to see how it was made.

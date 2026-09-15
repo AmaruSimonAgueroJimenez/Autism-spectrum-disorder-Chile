@@ -1,0 +1,680 @@
+---
+title: "REM: autism in outpatient care, screening and rehabilitation"
+subtitle: "Series A · 2017–2024 · mental-health programme entries and discharges, population rates, territory, facilities and screening"
+---
+
+```{python}
+#| label: cargar-rem
+from pathlib import Path
+import sys
+import numpy as np
+import pandas as pd
+import matplotlib.pyplot as plt
+from scipy import stats
+
+ROOT = Path.cwd().parent if Path.cwd().name == "docs" else Path.cwd()
+sys.path.insert(0, str(ROOT / "scripts"))
+from report_helpers import (read_result, show_table, kpis, note, number, ci, share, plot_style, load_regions, choropleth,
+                            AGE_GROUPS, SEX_LABELS, SEX_COLORS, MONTHS, REGION_NAMES, REGION_ORDER, COLORS)
+from epi_helpers import annual_percent_change, rate_ratio, count_ratio
+
+annual = read_result("rem_annual_by_code.csv")
+monthly = read_result("rem_monthly_region_raw_columns.csv")
+ages = read_result("rem_a05_age_sex.csv")
+region_ages = read_result("rem_a05_region_age_sex.csv")
+comuna = read_result("rem_annual_comuna.csv")
+panel = read_result("rem_establishment_panel.csv")
+catalogue = read_result("rem_code_catalogue.csv")
+quality = read_result("rem_quality.csv")
+rates = read_result("rem_rates_national.csv")
+age_rates = read_result("rem_rates_age_specific.csv")
+regional_rates = read_result("rem_rates_regional.csv")
+ecological = read_result("rem_grd_ecological.csv")
+ecological_com = read_result("rem_grd_ecological_comunal.csv")
+young = read_result("population_regional_young.csv")
+comuna_catalogue = read_result("catalogo_comunas.csv")
+plot_style()
+
+AUTISM = "05990022"
+INGRESOS = {"05990022": "Autism", "05990023": "Asperger", "05990024": "Rett syndrome", "05990025": "Disintegrative disorder", "05990026": "Unspecified PDD"}
+EGRESOS = {"05990027": "Autism", "05990028": "Asperger", "05990029": "Rett syndrome", "05990030": "Disintegrative disorder", "05990031": "Unspecified PDD"}
+autism = annual.loc[annual.code == AUTISM].sort_values("year").copy()
+last_year = int(autism.year.max())
+rate_last = rates.loc[(rates.series == AUTISM) & (rates.sex == "TOTAL") & (rates.year == last_year)].iloc[0]
+controls = annual.loc[(annual.code == "03500404") & (annual.year == last_year)].iloc[0]
+
+kpis([
+    (number(quality.records.sum()), "Series A rows reviewed · 2017–2024"),
+    (number(autism.loc[autism.year == last_year, "Col01"].iloc[0]), f"A05 entries with an autism code · {last_year}"),
+    (number(rate_last.asr, 1), f"Entries per 100 000 population, age-standardised · {last_year}"),
+    (number(autism.loc[autism.year == last_year, "reporting_establishments"].iloc[0]), f"Facilities reporting autism entries · {last_year}"),
+    (number(controls.Col01 + controls.Col02), f"18-month check-ups reported in the ASD screening section · {last_year}"),
+])
+```
+
+## What REM measures
+
+REM (Resúmenes Estadísticos Mensuales), the monthly statistical summaries of the public network, contains **aggregated records of care activity**: each row is a facility, a month and a service code. A mental-health programme entry does not necessarily represent a new diagnosis, a programme discharge does not describe the outcome of a cohort of entries, and no figure corresponds to unique persons nationally. These counts do not estimate incidence, prevalence, retention or individual times to diagnosis. The population rates presented below are **rates of recorded entries**, an indicator of access and activity in the public system.
+
+The extraction reads the canonical Series A files and applies each year's dictionaries. The generic pervasive developmental disorder (PDD) codes of 2017–2020 are kept separate from the specific codes available from 2021. The [Methods](methods.html) page details the reading rules; the table below summarises them.
+
+| Form | Total and sex | Caveat |
+|---|---|---|
+| A05, mental health | `Col01`: total; `Col02`: males; `Col03`: females | Ages start at `Col04`, in pairs by sex, up to `Col37` |
+| A03, ASD screening sections | `Col01`: males; `Col02`: females | From 2023, `Col03` and `Col04` are Indigenous peoples and migrants; the total of a row requires both sex columns |
+| A28, rehabilitation codes with an ASD condition | `Col01`: both sexes | Entry sections are kept separate; they are not added up as unique persons |
+
+`total_known` adds up only the rows that have a complete total according to that rule. It may be a partial sum when fields are missing; it does not automatically replace the national total. Sums of observed cells are identified as such.
+
+## A05: mental-health programme entries with an autism code
+
+### Annual series 2017–2024
+
+```{python}
+#| label: tabla-rem-ingresos-serie
+generic = annual.loc[annual.code == "06902600"].sort_values("year").copy()
+series = pd.concat([generic.assign(Series="Generic PDD (06902600)"), autism.assign(Series="Specific autism (05990022)")], ignore_index=True)
+series["% females among reported sex"] = 100 * series.Col03 / (series.Col02 + series.Col03)
+series["Rows without total"] = series.rows - series.rows_total_known
+show_table(series[["Series", "year", "Col01", "Col02", "Col03", "% females among reported sex", "reporting_establishments", "months", "rows", "Rows without total"]].rename(columns={
+    "year": "Year", "Col01": "Observed entries", "Col02": "Males", "Col03": "Females",
+    "reporting_establishments": "Facilities with records", "months": "Months present", "rows": "Rows",
+}), "A05 entries with the generic PDD code (2017–2020) and with the specific autism code (2021–2024): sums of observed values", {"% females among reported sex": 1})
+```
+
+The two series are not continuous: the generic code grouped the whole spectrum and disappeared from the dictionary when subcategories were created in 2021. The 2020 value reflects the interruption of face-to-face care during the pandemic. Between 2021 and 2024, entries with an autism code increase more than fivefold, with more reporting facilities and a growing proportion of females.
+
+```{python}
+#| label: fig-rem-tendencias
+#| fig-cap: "A05 entries: annual series of the generic and specific codes, monthly series of the autism code and number of facilities with a record per month."
+#| fig-width: 12
+#| fig-height: 4.4
+autism_monthly = monthly.loc[monthly.CodigoPrestacion == AUTISM].copy()
+trend = autism_monthly.groupby(["year", "Mes"]).agg(entries=("Col01", lambda s: s.sum(min_count=1)), facilities=("reporting_establishments", "sum")).reset_index()
+trend["date"] = pd.to_datetime(dict(year=trend.year, month=trend.Mes, day=1))
+trend = trend.set_index("date").sort_index()
+fig, axes = plt.subplots(1, 3, figsize=(12, 4.4), layout="constrained")
+axes[0].plot(generic.year, generic.Col01, "s--", color=COLORS[3], label="Generic PDD 06902600")
+axes[0].plot(autism.year, autism.Col01, "o-", color=COLORS[0], label="Autism 05990022")
+axes[0].set(title="Annual entries", xlabel="Year", ylabel="Observed records", xticks=range(2017, last_year + 1))
+axes[0].legend(fontsize=8)
+axes[1].plot(trend.index, trend.entries, color=COLORS[1], linewidth=1.8)
+axes[1].set(title="Monthly entries with an autism code", xlabel="Month", ylabel="Observed records")
+axes[2].plot(trend.index, trend.facilities, color=COLORS[2], linewidth=1.8)
+axes[2].set(title="Facilities with a row in the month", xlabel="Month", ylabel="Facilities")
+import matplotlib.dates as mdates
+for ax in axes[1:]:
+    ax.xaxis.set_major_locator(mdates.YearLocator())
+    ax.xaxis.set_major_formatter(mdates.DateFormatter("%Y"))
+plt.show()
+```
+
+### Seasonality
+
+```{python}
+#| label: fig-rem-estacionalidad
+#| fig-cap: "Seasonal index of A05 entries with an autism code, 2021–2024: monthly average relative to the monthly average of its year (mean and standard deviation across years)."
+#| fig-width: 7
+#| fig-height: 3.8
+season = trend.reset_index().copy()
+season["index"] = season.entries / season.groupby("year").entries.transform("mean")
+season = season.loc[season.year >= 2021].groupby("Mes")["index"].agg(["mean", "std"]).reindex(range(1, 13))
+fig, ax = plt.subplots(figsize=(7, 3.8), layout="constrained")
+ax.bar(range(1, 13), season["mean"], yerr=season["std"], color=COLORS[1], capsize=2)
+ax.axhline(1, color="#555555", linewidth=1, linestyle="--")
+ax.set(title="Seasonal index of entries", xlabel="Month", ylabel="Index", xticks=range(1, 13), xticklabels=MONTHS)
+plt.show()
+```
+
+Programme entries are lower in January, February and December, months of holidays and reduced outpatient activity, and higher between March and November. The pattern reflects how facilities operate, not the occurrence of autism.
+
+### Entry rates by population
+
+The rates use the reported age and sex cells (`Col04` to `Col37`) as numerator and the INE (national statistics institute) population of the year as denominator; they are age-standardised to the WHO world standard population and accompanied by 95% gamma intervals. They are rates of **recorded entries**, not of persons or of new cases.
+
+```{python}
+#| label: tabla-rem-tasas
+def rate_table(series_code, caption):
+    frame = rates.loc[rates.series == series_code].copy()
+    frame["Sex"] = frame.sex.map(SEX_LABELS)
+    frame["95% CI crude rate"] = [ci(lo, hi) for lo, hi in zip(frame.crude_lo, frame.crude_hi)]
+    frame["95% CI ASR"] = [ci(lo, hi) for lo, hi in zip(frame.asr_lo, frame.asr_hi)]
+    show_table(frame.sort_values(["year", "sex"])[["year", "Sex", "count", "population", "crude", "95% CI crude rate", "asr", "95% CI ASR"]].rename(columns={
+        "year": "Year", "count": "Entries (age/sex cells)", "population": "Population", "crude": "Crude rate", "asr": "ASR (WHO)"}),
+        caption, {"Crude rate": 1, "ASR (WHO)": 1})
+
+rate_table(AUTISM, "A05 entries with an autism code per 100 000 population, crude and age-standardised, by sex · 2021–2024")
+rate_table("06902600", "A05 entries with the generic PDD code per 100 000 population · 2017–2020")
+```
+
+```{python}
+#| label: fig-rem-tasas
+#| fig-cap: "Age-standardised rates of A05 entries per 100 000 population (left), age- and sex-specific rates in the latest year (centre) and male:female ratio of the age-standardised rates with 95% interval (right)."
+#| fig-width: 13
+#| fig-height: 4.4
+fig, axes = plt.subplots(1, 3, figsize=(13, 4.4), layout="constrained")
+for series_code, style in [("06902600", "s--"), (AUTISM, "o-")]:
+    for sex in ["HOMBRE", "MUJER", "TOTAL"]:
+        frame = rates.loc[(rates.series == series_code) & (rates.sex == sex)].sort_values("year")
+        axes[0].plot(frame.year, frame.asr, style, color=SEX_COLORS[sex], label=f"{SEX_LABELS[sex]} · {'generic' if series_code == '06902600' else 'autism'}")
+        axes[0].fill_between(frame.year, frame.asr_lo, frame.asr_hi, color=SEX_COLORS[sex], alpha=.12)
+axes[0].set(title="ASR of entries", xlabel="Year", ylabel="Entries per 100 000 population", xticks=range(2017, last_year + 1))
+axes[0].legend(fontsize=7)
+spec = age_rates.loc[(age_rates.series == AUTISM) & (age_rates.year == last_year)]
+order = [g for g in AGE_GROUPS if g in set(spec.age_group)][:8]
+x = np.arange(len(order))
+for sex in ["HOMBRE", "MUJER"]:
+    frame = spec.loc[spec.sex == sex].set_index("age_group").reindex(order)
+    axes[1].errorbar(x, frame.rate, yerr=[frame.rate - frame.rate_lo, frame.rate_hi - frame.rate], fmt="o-", color=SEX_COLORS[sex], label=SEX_LABELS[sex], capsize=2)
+axes[1].set(title=f"Age-specific rates · {last_year}", xlabel="Age group", ylabel="Entries per 100 000 population", xticks=x, xticklabels=order)
+axes[1].legend()
+ratio_rows = []
+for series_code in ["06902600", AUTISM]:
+    for year, group in rates.loc[rates.series == series_code].groupby("year"):
+        men = group.loc[group.sex == "HOMBRE"].iloc[0]
+        women = group.loc[group.sex == "MUJER"].iloc[0]
+        rr = rate_ratio(men.asr, men.asr_var, women.asr, women.asr_var)
+        ratio_rows.append(dict(series=series_code, year=year, ratio=rr[0], lo=rr[1], hi=rr[2]))
+ratios = pd.DataFrame(ratio_rows)
+for series_code, style in [("06902600", "s--"), (AUTISM, "o-")]:
+    frame = ratios.loc[ratios.series == series_code]
+    axes[2].errorbar(frame.year, frame.ratio, yerr=[frame.ratio - frame.lo, frame.hi - frame.ratio], fmt=style, color=COLORS[0], capsize=3, label="generic" if series_code == "06902600" else "autism")
+axes[2].axhline(3, color="#999999", linestyle="--", linewidth=1)
+axes[2].set(title="M:F ratio of ASR", xlabel="Year", ylabel="Ratio", xticks=range(2017, last_year + 1), ylim=(0, 5))
+axes[2].legend(fontsize=8)
+plt.show()
+```
+
+```{python}
+#| label: tabla-rem-apc-razon
+apc_rows = []
+for series_code, years in [(AUTISM, [2021, 2022, 2023, 2024]), ("06902600", [2017, 2018, 2019])]:
+    for sex in ["HOMBRE", "MUJER", "TOTAL"]:
+        frame = rates.loc[(rates.series == series_code) & (rates.sex == sex) & rates.year.isin(years)]
+        result = annual_percent_change(frame)
+        apc_rows.append(dict(Series="Autism 05990022" if series_code == AUTISM else "Generic PDD 06902600 (2017–2019, excluding 2020)", Sex=SEX_LABELS[sex],
+                             **{"AAPC (%)": result["apc"], "95% CI": ci(result["apc_lo"], result["apc_hi"]), "p value": result["p_value"], "Years": result["years"]}))
+show_table(pd.DataFrame(apc_rows), "Average annual percent change of the entry rates (quasi-Poisson model with population offset)", {"AAPC (%)": 1, "p value": 4})
+ratios["Series"] = ratios.series.map({"06902600": "Generic PDD", AUTISM: "Autism"})
+ratios["95% CI"] = [ci(lo, hi, 2) for lo, hi in zip(ratios.lo, ratios.hi)]
+show_table(ratios[["Series", "year", "ratio", "95% CI"]].rename(columns={"year": "Year", "ratio": "M:F ratio of ASR"}), "Male:female ratio of the age-standardised entry rates", {"M:F ratio of ASR": 2})
+```
+
+The male:female ratio of entries falls from about 3.5:1 in 2021 to about 2.2:1 in 2024, the same movement shown by hospitalisations in GRD (Grupos Relacionados por el Diagnóstico), the public-hospital discharge database grouped by diagnosis-related groups. Both sources are consistent with a proportionally larger increase in detection among girls and women.
+
+### Age and sex
+
+```{python}
+#| label: fig-rem-edad-sexo
+#| fig-cap: "Entries with an autism code by age and sex, cumulative 2021–2024 (reported cells), and age-group composition of each year."
+#| fig-width: 12
+#| fig-height: 5
+autism_ages = ages.loc[ages.code == AUTISM]
+age_sex = autism_ages.groupby(["age_group", "sex"])["count"].sum(min_count=1).unstack("sex").reindex(AGE_GROUPS)
+fig, axes = plt.subplots(1, 2, figsize=(12, 5), layout="constrained", gridspec_kw={"width_ratios": [1.2, 1]})
+age_sex.rename(columns=SEX_LABELS).plot.barh(ax=axes[0], color=[SEX_COLORS["Hombres"], SEX_COLORS["Mujeres"]], width=.8)
+axes[0].invert_yaxis()
+axes[0].set(xlabel="Observed entries", ylabel="Age (years)", title="Age and sex in A05, 2021–2024")
+axes[0].legend(title="Recorded sex")
+bands = {"0-4": ["0-4"], "5-9": ["5-9"], "10-14": ["10-14"], "15-19": ["15-19"], "20 and over": [g for g in AGE_GROUPS if g not in ["0-4", "5-9", "10-14", "15-19"]]}
+comp = autism_ages.groupby(["year", "age_group"])["count"].sum().unstack("age_group").fillna(0)
+comp_bands = pd.DataFrame({label: comp[cols].sum(axis=1) for label, cols in bands.items()})
+comp_pct = comp_bands.div(comp_bands.sum(axis=1), axis=0) * 100
+bottom = np.zeros(len(comp_pct))
+for label, color in zip(comp_pct.columns, COLORS):
+    axes[1].bar(comp_pct.index.astype(str), comp_pct[label], bottom=bottom, color=color, label=label)
+    bottom += comp_pct[label].values
+axes[1].set(title="Age composition", xlabel="Year", ylabel="% of entries")
+axes[1].legend(title="Age", fontsize=8, loc="upper left", bbox_to_anchor=(1, 1))
+plt.show()
+```
+
+```{python}
+#| label: tabla-rem-edad
+table = comp_bands.copy()
+table["Total"] = table.sum(axis=1)
+for label in bands:
+    table[f"% {label}"] = 100 * table[label] / table.Total
+show_table(table.reset_index().rename(columns={"year": "Year"}), "Entries with an autism code by age group and year (reported cells)", {c: 1 for c in table.columns if c.startswith("%")})
+```
+
+The 17 age groups of form A05 are used, with males and females in separate columns. The sums correspond to reported cells: missing cells do not demonstrate an absence of activity. About half of the entries correspond to children under 10 years, and the proportion of adolescents and adults increases over the years.
+
+### Subcategories, entries and discharges
+
+Programme discharges by clinical discharge are not individually linked to entries. Their ratio is not a retention or resolution rate; it describes the activity balance of the programme. Rett and disintegrative disorder are shown as separate categories from the historical catalogue.
+
+```{python}
+#| label: tabla-rem-subcategorias
+a05 = annual.loc[(annual.sheet == "A05") & (annual.year >= 2021)].copy()
+a05["Category"] = a05.code.map({**INGRESOS, **EGRESOS})
+a05["Activity"] = np.where(a05.code.isin(list(INGRESOS)), "Entry", "Discharge")
+wide = a05.pivot_table(index=["Category"], columns=["Activity", "year"], values="Col01", aggfunc="sum").reindex(list(INGRESOS.values()))
+table = pd.DataFrame({"Category": wide.index})
+for year in range(2021, last_year + 1):
+    table[f"Entries {year}"] = wide[("Entry", year)].values
+for year in range(2021, last_year + 1):
+    table[f"Discharges {year}"] = wide[("Discharge", year)].values
+    table[f"Discharges/entries {year}"] = wide[("Discharge", year)].values / wide[("Entry", year)].replace(0, np.nan).values
+show_table(table, "A05 subcategories: entries, discharges by clinical discharge and discharges/entries ratio by year", {c: 2 for c in table.columns if c.startswith("Discharges/")})
+historical = annual.loc[annual.code.isin(["06902600", "05225000"])].pivot(index="year", columns="code", values="Col01").reset_index()
+historical["Discharges/entries"] = historical["05225000"] / historical["06902600"]
+show_table(historical.rename(columns={"year": "Year", "06902600": "Generic PDD entries", "05225000": "Generic PDD discharges"}), "Earlier generic series: keep separate from the specific codes", {"Discharges/entries": 2})
+```
+
+```{python}
+#| label: fig-rem-subcategorias
+#| fig-cap: "Composition of A05 entries by subcategory (2021–2024) and discharges/entries ratio of the autism code by year."
+#| fig-width: 11
+#| fig-height: 4.2
+comp = a05.loc[a05.Activity == "Entry"].pivot_table(index="year", columns="Category", values="Col01", aggfunc="sum").fillna(0)
+comp = comp[[c for c in INGRESOS.values() if c in comp]]
+comp_pct = comp.div(comp.sum(axis=1), axis=0) * 100
+fig, axes = plt.subplots(1, 2, figsize=(11, 4.2), layout="constrained")
+bottom = np.zeros(len(comp_pct))
+for label, color in zip(comp_pct.columns, COLORS):
+    axes[0].bar(comp_pct.index.astype(str), comp_pct[label], bottom=bottom, color=color, label=label)
+    bottom += comp_pct[label].values
+axes[0].set(title="Composition of A05 entries by subcategory", xlabel="Year", ylabel="% of entries")
+axes[0].legend(fontsize=8)
+ratio_ie = table.set_index("Category").loc["Autism", [f"Discharges/entries {y}" for y in range(2021, last_year + 1)]]
+axes[1].plot(range(2021, last_year + 1), ratio_ie.values, "o-", color=COLORS[0])
+axes[1].set(title="Discharges by clinical discharge / entries · autism", xlabel="Year", ylabel="Ratio", xticks=range(2021, last_year + 1), ylim=(0, max(.5, float(ratio_ie.max()) * 1.2)))
+plt.show()
+```
+
+Specific autism rises from about 40% to about 80% of entries with a spectrum code between 2021 and 2024, while Asperger and unspecified PDD lose relative weight, a change in coding practice consistent with DSM-5 nomenclature. The discharges/entries ratio grows but remains below 0.3: the programme accumulates persons under follow-up.
+
+## Place: regions and communes of the facilities
+
+These are counts by place of recording (facility), not of residence. Differences may reflect population size, supply, coverage or recording practices; they are not interpreted as territorial risk of autism.
+
+```{python}
+#| label: tabla-rem-regiones
+reg = regional_rates.loc[(regional_rates.series == AUTISM) & (regional_rates.sex == "TOTAL")].copy()
+pooled = reg.loc[reg.period == "2021-2024"].set_index("cut_region")
+last = reg.loc[reg.period == str(last_year)].set_index("cut_region")
+first = reg.loc[reg.period == "2021"].set_index("cut_region")
+sexes = regional_rates.loc[(regional_rates.series == AUTISM) & (regional_rates.period == "2021-2024")].pivot(index="cut_region", columns="sex", values="asr")
+est = panel.loc[(panel.code == AUTISM) & (panel.year == last_year)].groupby("IdRegion").IdEstablecimiento.nunique()
+est.index = pd.to_numeric(est.index)
+table = pd.DataFrame({
+    "Region": [REGION_NAMES[r] for r in REGION_ORDER],
+    f"Entries {last_year}": last["count"].reindex(REGION_ORDER).values,
+    f"Facilities {last_year}": est.reindex(REGION_ORDER).values,
+    "Entries 2021–2024": pooled["count"].reindex(REGION_ORDER).values,
+    "ASR 2021–2024": pooled.asr.reindex(REGION_ORDER).values,
+    "95% CI": [ci(lo, hi) for lo, hi in zip(pooled.asr_lo.reindex(REGION_ORDER), pooled.asr_hi.reindex(REGION_ORDER))],
+    "ASR 2021": first.asr.reindex(REGION_ORDER).values,
+    f"ASR {last_year}": last.asr.reindex(REGION_ORDER).values,
+    "M:F ratio 2021–2024": (sexes["HOMBRE"] / sexes["MUJER"]).reindex(REGION_ORDER).values,
+})
+show_table(table, "A05 entries with an autism code by facility region: counts, age-standardised rates per 100 000 population and sex ratio",
+           {"ASR 2021–2024": 1, "ASR 2021": 1, f"ASR {last_year}": 1, "M:F ratio 2021–2024": 2})
+```
+
+```{python}
+#| label: fig-rem-regiones
+#| fig-cap: "Age-standardised rate of A05 entries with an autism code by region (2021–2024 pooled, with 95% interval), annual evolution by region and regional map."
+#| fig-width: 13
+#| fig-height: 5.6
+fig, axes = plt.subplots(1, 3, figsize=(13, 5.6), layout="constrained", gridspec_kw={"width_ratios": [1, 1.15, .8]})
+ordered = pooled.reindex(REGION_ORDER)
+y = np.arange(len(REGION_ORDER))
+axes[0].errorbar(ordered.asr, y, xerr=[ordered.asr - ordered.asr_lo, ordered.asr_hi - ordered.asr], fmt="o", color=COLORS[0], capsize=3)
+axes[0].axvline(np.average(ordered.asr, weights=ordered.population), color="#999999", linestyle="--", linewidth=1)
+axes[0].set_yticks(y)
+axes[0].set_yticklabels([REGION_NAMES[r] for r in REGION_ORDER])
+axes[0].invert_yaxis()
+axes[0].set(title="ASR 2021–2024 by region", xlabel="Entries per 100 000 population")
+annual_reg = reg.loc[reg.year.notna()].pivot(index="cut_region", columns="year", values="asr").reindex(REGION_ORDER)
+image = axes[1].imshow(annual_reg.values, cmap="YlGnBu", aspect="auto")
+axes[1].set_yticks(range(len(REGION_ORDER)))
+axes[1].set_yticklabels([REGION_NAMES[r] for r in REGION_ORDER])
+axes[1].set_xticks(range(annual_reg.shape[1]))
+axes[1].set_xticklabels([str(int(c)) for c in annual_reg.columns])
+for i in range(annual_reg.shape[0]):
+    for j in range(annual_reg.shape[1]):
+        axes[1].text(j, i, number(annual_reg.values[i, j], 0), ha="center", va="center", fontsize=7, color="black" if annual_reg.values[i, j] < np.nanmax(annual_reg.values) * .6 else "white")
+axes[1].set(title="Annual ASR by region")
+axes[1].grid(False)
+fig.colorbar(image, ax=axes[1], shrink=.7, label="Entries per 100 000 population")
+regions_shp = load_regions().merge(pooled[["asr"]].rename(columns={"asr": "asr_rem"}), left_on="cut_region", right_index=True, how="left")
+choropleth(axes[2], regions_shp, "asr_rem", "ASR 2021–2024", legend_label="Entries per 100 000 population")
+plt.show()
+```
+
+```{python}
+#| label: tabla-rem-comunas
+com = comuna.loc[(comuna.code == AUTISM) & (comuna.year == last_year)].copy()
+com["cut_comuna"] = pd.to_numeric(com.IdComuna, errors="coerce")
+com = com.merge(comuna_catalogue[["cut_comuna", "comuna", "region_short"]], on="cut_comuna", how="left")
+com = com.sort_values("Col01", ascending=False)
+com["% of total"] = 100 * com.Col01 / com.Col01.sum()
+com["Cumulative %"] = com["% of total"].cumsum()
+show_table(com.head(20)[["comuna", "region_short", "Col01", "reporting_establishments", "% of total", "Cumulative %"]].rename(columns={
+    "comuna": "Facility commune", "region_short": "Region", "Col01": "Observed entries", "reporting_establishments": "Facilities"}),
+    f"Twenty communes with the most A05 entries with an autism code by facility commune · {last_year}", {"% of total": 1, "Cumulative %": 1})
+note(f"Communes with at least one facility reporting autism entries in {last_year}: {int((com.Col01 > 0).sum())} of {len(comuna_catalogue)}. "
+     f"The top twenty account for {number(com['Cumulative %'].iloc[19], 1)}% of entries.")
+```
+
+## Facility panel
+
+A facility appears in the series only in the months with a row for the code; in practice, A05 rows almost always carry a positive value, so "months with a row" is equivalent to months with reported activity. The **stable panel** gathers the facilities with at least one autism entry reported in each of the years 2021–2024; it allows checking whether the trend is explained by the incorporation of new reporters.
+
+```{python}
+#| label: tabla-rem-panel
+pan = panel.loc[panel.code == AUTISM].copy()
+years_present = pan.groupby("IdEstablecimiento").year.nunique()
+stable_ids = set(years_present.index[years_present == 4])
+pan["panel"] = np.where(pan.IdEstablecimiento.isin(stable_ids), "Stable panel", "Other")
+summary = pan.groupby(["year", "panel"]).agg(facilities=("IdEstablecimiento", "nunique"), entries=("Col01", "sum")).unstack("panel").fillna(0)
+summary.columns = [f"{a} · {b}" for a, b in summary.columns]
+summary["Total facilities"] = pan.groupby("year").IdEstablecimiento.nunique()
+summary["Total entries"] = pan.groupby("year").Col01.sum()
+summary["% of entries in stable panel"] = 100 * summary["entries · Stable panel"] / summary["Total entries"]
+summary["Months with a row per facility (median)"] = pan.groupby("year").months_with_rows.median()
+summary["Entries per facility (median)"] = pan.groupby("year").Col01.median()
+show_table(summary.reset_index().rename(columns={"year": "Year", "facilities · Stable panel": "Stable-panel facilities", "facilities · Other": "Other facilities",
+                                                 "entries · Stable panel": "Stable-panel entries", "entries · Other": "Entries from other facilities"}),
+           f"Panel of facilities with autism entries: stable panel ({len(stable_ids)} facilities present in all four years) versus the rest", {"% of entries in stable panel": 1})
+```
+
+```{python}
+#| label: fig-rem-panel
+#| fig-cap: "Autism entries in the stable panel and in the remaining facilities (left), distribution of months with a row per facility (centre) and concentration of entries among facilities in the latest year (right)."
+#| fig-width: 13
+#| fig-height: 4.2
+fig, axes = plt.subplots(1, 3, figsize=(13, 4.2), layout="constrained")
+axes[0].bar(summary.index.astype(str), summary["entries · Stable panel"], color=COLORS[0], label="Stable panel")
+axes[0].bar(summary.index.astype(str), summary["entries · Other"], bottom=summary["entries · Stable panel"], color=COLORS[2], label="Other facilities")
+axes[0].set(title="Entries by type of facility", xlabel="Year", ylabel="Observed entries")
+axes[0].legend()
+months_dist = pan.groupby(["year", "months_with_rows"]).size().unstack("year").reindex(range(1, 13)).fillna(0)
+for year, color in zip([2021, last_year], [COLORS[3], COLORS[0]]):
+    axes[1].plot(months_dist.index, 100 * months_dist[year] / months_dist[year].sum(), "o-", color=color, label=str(year))
+axes[1].set(title="Months with a row per facility", xlabel="Months in the year", ylabel="% of facilities", xticks=range(1, 13))
+axes[1].legend(title="Year")
+last_pan = pan.loc[pan.year == last_year].sort_values("Col01", ascending=False)
+share_cum = np.cumsum(last_pan.Col01.values) / last_pan.Col01.sum()
+axes[2].plot(np.arange(1, len(share_cum) + 1) / len(share_cum) * 100, 100 * share_cum, color=COLORS[1])
+axes[2].plot([0, 100], [0, 100], color="#999999", linestyle="--", linewidth=1)
+axes[2].set(title=f"Concentration of entries · {last_year}", xlabel="% of facilities (from highest to lowest)", ylabel="Cumulative % of entries")
+plt.show()
+top10 = share_cum[int(np.ceil(len(share_cum) * .1)) - 1]
+note(f"In {last_year}, the 10% of facilities with the most entries account for {number(100 * top10, 1)}% of autism entries; the median number of months with a row per facility is {number(last_pan.months_with_rows.median())}.")
+```
+
+Growth occurs both within the stable panel and through the incorporation of new reporting facilities; the stable panel accounts for most of the entries in every year. Most facilities report the code in few months of the year and with few entries, while a small group concentrates the activity.
+
+## A03: screening and suspicion in well-child check-ups
+
+There is a change of instrument and of age headings: the reviewed sections distinguish the MCHAT series 2019–2022 and M-CHAT R/F 2023–2024; in 2024 a section for 31 to 59 months also appears. Check-ups, administration of the instrument, results of each stage and referral must be distinguished. The ratios presented only relate codes from the same section, instrument and stage; **none is a population positivity rate**, because the denominators are not all screened children. The sums use the observed male and female cells; the complete-rows column indicates how many rows reported both sexes.
+
+### MCHAT series, 2019–2022
+
+```{python}
+#| label: tabla-rem-mchat
+a03 = annual.loc[annual.sheet == "A03"].copy()
+a03["observed"] = a03[["Col01", "Col02"]].sum(axis=1, min_count=1)
+labels_old = {"03500404": "18-month check-ups", "03500405": "With language and/or social impairment", "03500406": "MCHAT screening performed (with impairment)", "03500407": "Abnormal MCHAT screening (with impairment)"}
+old = a03.loc[a03.code.isin(labels_old) & (a03.year <= 2022)].pivot(index="year", columns="code", values="observed")
+old_sex = a03.loc[a03.code.isin(labels_old) & (a03.year <= 2022)].pivot(index="year", columns="code", values=["Col01", "Col02"])
+table = pd.DataFrame({"Year": old.index})
+for code, label in labels_old.items():
+    table[label] = old[code].values
+table["% with impairment among check-ups"] = 100 * old["03500405"].values / old["03500404"].values
+table["% screened among those with impairment"] = 100 * old["03500406"].values / old["03500405"].values
+table["% abnormal among screened"] = 100 * old["03500407"].values / old["03500406"].values
+table["% abnormal among check-ups"] = 100 * old["03500407"].values / old["03500404"].values
+show_table(table, "Section F, MCHAT 2019–2022: sums of observed cells (males + females) and ratios between stages", {c: 1 for c in table.columns if c.startswith("%")})
+sex_old = pd.DataFrame({"Year": old.index})
+for code, label in labels_old.items():
+    sex_old[f"{label} · M"] = old_sex[("Col01", code)].values
+    sex_old[f"{label} · F"] = old_sex[("Col02", code)].values
+sex_old["M:F ratio check-ups"] = old_sex[("Col01", "03500404")].values / old_sex[("Col02", "03500404")].values
+sex_old["M:F ratio abnormal"] = old_sex[("Col01", "03500407")].values / old_sex[("Col02", "03500407")].values
+show_table(sex_old, "MCHAT series by sex and male:female ratio of check-ups and of abnormal screenings", {"M:F ratio check-ups": 2, "M:F ratio abnormal": 2})
+```
+
+`03500406` describes screening performed in children with language or social impairment; the ratio `03500407 / 03500406` is therefore the proportion of abnormal screenings among the screenings performed in that subgroup, not the positivity of the instrument in the 18-month population. The sex ratio of check-ups is close to 1, while abnormal screenings show about two boys for every girl.
+
+### M-CHAT R/F, 2023–2024
+
+```{python}
+#| label: tabla-rem-mchat-rf
+labels_new = {"03500404": "18-month check-ups", "03500405": "With language and/or social impairment", "09600212": "Suspected ASD in other check-ups or consultations",
+              "09600213": "Part 1: low risk", "09600214": "Part 1: medium risk", "09600215": "Part 1: high risk", "09600216": "Part 1: high risk with referral",
+              "09600217": "Part 2: medium risk in Part 1 (2023)", "09600218": "Part 2: referral not required", "09600219": "Part 2: referral required"}
+new = a03.loc[a03.code.isin(labels_new) & (a03.year >= 2023)].pivot(index="year", columns="code", values="observed")
+rows = []
+for year in new.index:
+    values = new.loc[year]
+    first_part = values[["09600213", "09600214", "09600215"]].sum()
+    second_part = values[["09600218", "09600219"]].sum()
+    rows.append({"Year": year, **{label: values.get(code, np.nan) for code, label in labels_new.items()},
+                 "Part 1 results reported": first_part,
+                 "% medium or high risk in Part 1": 100 * (values["09600214"] + values["09600215"]) / first_part,
+                 "% high risk in Part 1": 100 * values["09600215"] / first_part,
+                 "% referred among high risk": 100 * values["09600216"] / values["09600215"],
+                 "Part 2 results reported": second_part,
+                 "% referral required in Part 2": 100 * values["09600219"] / second_part})
+table = pd.DataFrame(rows)
+show_table(table, "Section F, M-CHAT R/F 2023–2024: sums of observed cells and proportions within each stage", {c: 1 for c in table.columns if c.startswith("%")})
+```
+
+```{python}
+#| label: fig-rem-tamizaje
+#| fig-cap: "Screening in 18-month check-ups: check-ups and children with language or social impairment by year (left) and distribution of the M-CHAT R/F Part 1 result (right)."
+#| fig-width: 11
+#| fig-height: 4.2
+fig, axes = plt.subplots(1, 2, figsize=(11, 4.2), layout="constrained")
+all_years = a03.loc[a03.code.isin(["03500404", "03500405"])].pivot(index="year", columns="code", values="observed")
+axes[0].bar(all_years.index.astype(str), all_years["03500404"], color=COLORS[3], label="18-month check-ups")
+axes[0].bar(all_years.index.astype(str), all_years["03500405"], color=COLORS[0], label="With language/social impairment")
+axes[0].set(title="18-month check-ups in the screening section", xlabel="Year", ylabel="Observed records")
+axes[0].legend(fontsize=8)
+risk = new[["09600213", "09600214", "09600215"]].rename(columns={"09600213": "Low risk", "09600214": "Medium risk", "09600215": "High risk"})
+risk_pct = risk.div(risk.sum(axis=1), axis=0) * 100
+bottom = np.zeros(len(risk_pct))
+for label, color in zip(risk_pct.columns, [COLORS[3], COLORS[2], COLORS[4]]):
+    axes[1].bar(risk_pct.index.astype(str), risk_pct[label], bottom=bottom, color=color, label=label)
+    bottom += risk_pct[label].values
+axes[1].set(title="M-CHAT R/F Part 1 result", xlabel="Year", ylabel="% of reported results")
+axes[1].legend(fontsize=8)
+plt.show()
+```
+
+The reported Part 1 results are far fewer than the 18-month check-ups, which indicates that the recorded administration of the instrument does not cover all children seen at check-ups or that recording is incomplete; the proportion of medium or high risk is therefore calculated only among reported results. About a third of the children with medium or high risk in Part 1 require referral after Part 2.
+
+### Section 31 to 59 months, 2024
+
+```{python}
+#| label: tabla-rem-31-59
+labels_f1 = {"03700104": "Assessed at the comprehensive health check-up", "03700105": "Suspected ASD in other check-ups or consultations", "03700106": "Suspected according to the warning-signs checklist: yes",
+             "03700107": "Suspected according to the warning-signs checklist: no", "03700108": "Referral: yes", "03700109": "Referral: no"}
+f1 = a03.loc[a03.code.isin(labels_f1)].copy()
+f1["Indicator"] = f1.code.map(labels_f1)
+f1["% of rows with both sexes"] = 100 * f1.rows_total_known / f1.rows
+show_table(f1[["Indicator", "Col01", "Col02", "observed", "rows", "% of rows with both sexes"]].rename(columns={
+    "Col01": "Males", "Col02": "Females", "observed": "Observed sum", "rows": "Rows"}), "Section F1, 31 to 59 months · 2024", {"% of rows with both sexes": 1})
+alert = f1.set_index("code")["observed"]
+note(f"Suspicion according to the warning-signs checklist among those assessed with a reported checklist: {number(100 * alert['03700106'] / (alert['03700106'] + alert['03700107']), 1)}%; "
+     f"referral among those with a reported referral: {number(100 * alert['03700108'] / (alert['03700108'] + alert['03700109']), 1)}%. Both ratios depend on the completeness of recording.")
+```
+
+### Regions
+
+```{python}
+#| label: tabla-rem-tamizaje-regiones
+screen = monthly.loc[(monthly.year == last_year) & monthly.CodigoPrestacion.isin(["03500404", "03500405", "09600212", "09600214", "09600215", "09600213", "03700106", "03700107"])].copy()
+screen["observed"] = screen[["Col01", "Col02"]].sum(axis=1, min_count=1)
+by_region = screen.groupby(["IdRegion", "CodigoPrestacion"])["observed"].sum().unstack("CodigoPrestacion")
+by_region.index = pd.to_numeric(by_region.index)
+pop1 = young.loc[(young.year == last_year) & (young.age == 1)].set_index("cut_region").population
+table = pd.DataFrame({"Region": [REGION_NAMES[r] for r in REGION_ORDER],
+                      "18-month check-ups": by_region["03500404"].reindex(REGION_ORDER).values,
+                      "Population aged 1 (INE)": pop1.reindex(REGION_ORDER).values})
+table["Check-ups per 100 children aged 1"] = 100 * table["18-month check-ups"] / table["Population aged 1 (INE)"]
+table["% with language/social impairment"] = 100 * by_region["03500405"].reindex(REGION_ORDER).values / table["18-month check-ups"]
+first_part = by_region[["09600213", "09600214", "09600215"]].sum(axis=1)
+table["% medium or high risk (Part 1)"] = 100 * (by_region["09600214"] + by_region["09600215"]).reindex(REGION_ORDER).values / first_part.reindex(REGION_ORDER).values
+table["Suspected in other check-ups"] = by_region["09600212"].reindex(REGION_ORDER).values
+table["% suspected by warning signs (31–59 m)"] = 100 * by_region["03700106"].reindex(REGION_ORDER).values / (by_region["03700106"] + by_region["03700107"]).reindex(REGION_ORDER).values
+show_table(table, f"Screening by region · {last_year}: approximate coverage of 18-month check-ups and proportions within each stage",
+           {"Check-ups per 100 children aged 1": 1, "% with language/social impairment": 1, "% medium or high risk (Part 1)": 1, "% suspected by warning signs (31–59 m)": 1})
+```
+
+The approximate coverage compares the reported 18-month check-ups with the population aged 1 projected by INE; it is a ratio between different units (check-ups and persons, public system and total population) and only serves to rank regions. Screening denominators must be validated in the manual of the same version, stage and age before any use as a performance indicator.
+
+## A28: rehabilitation entries
+
+The codes are kept separate by section. They are not added together as distinct persons and are not labelled as consultations.
+
+```{python}
+#| label: tabla-rem-rehabilitacion
+a28 = annual.loc[annual.sheet == "A28"].copy()
+A28_SECTIONS = {"A.2: INGRESOS POR CONDICIÓN DE SALUD": "A.2: entries by health condition",
+                "B.1: INGRESOS Y EGRESOS  A REHABILITACIÓN INTEGRAL": "B.1: entries to and discharges from comprehensive rehabilitation"}
+a28["Section"] = a28.section.str.replace("SECCIÓN ", "", regex=False).str.slice(0, 60).map(lambda v: A28_SECTIONS.get(v, v))
+show_table(a28[["year", "code", "Section", "Col01", "rows", "rows_total_known", "reporting_establishments"]].rename(columns={
+    "year": "Year", "code": "Code", "Col01": "Observed sum", "rows": "Rows", "rows_total_known": "Rows with total", "reporting_establishments": "Facilities",
+}), "A28: recorded activity by section (translated from the REM dictionary section names)")
+a28_region = monthly.loc[monthly.CodigoPrestacion.isin(["29101629", "29101651"]) & (monthly.year == last_year)].groupby(["IdRegion", "CodigoPrestacion"]).Col01.sum().unstack("CodigoPrestacion")
+a28_region.index = pd.to_numeric(a28_region.index)
+table = pd.DataFrame({"Region": [REGION_NAMES[r] for r in REGION_ORDER],
+                      "A.2 entries by health condition (29101629)": a28_region["29101629"].reindex(REGION_ORDER).values,
+                      "B.1 comprehensive rehabilitation (29101651)": a28_region["29101651"].reindex(REGION_ORDER).values})
+show_table(table, f"A28 by facility region · {last_year}")
+```
+
+## Ecological comparison between REM and GRD
+
+REM entry rates (facility region or commune) and GRD hospitalisation rates (residence) are compared by region and year and, further below, by commune. They measure different activities with different units; the correlation describes only the territorial coherence between sources.
+
+### Regional correlation
+
+```{python}
+#| label: fig-rem-grd-ecologica
+#| fig-cap: "Regional age-standardised rates of A05 entries with an autism code (REM) against age-standardised rates of persons hospitalised with an ASD code (GRD), by year; Spearman correlation."
+#| fig-width: 12
+#| fig-height: 3.6
+years = sorted(ecological.year.dropna().unique())
+fig, axes = plt.subplots(1, len(years), figsize=(12, 3.6), layout="constrained", sharey=False)
+corr_rows = []
+for ax, year in zip(np.atleast_1d(axes), years):
+    frame = ecological.loc[ecological.year == year]
+    rho, p = stats.spearmanr(frame.rem_asr, frame.grd_persons_asr)
+    corr_rows.append(dict(Year=int(year), Regions=len(frame), **{"Spearman ρ": rho, "p value": p}))
+    ax.scatter(frame.rem_asr, frame.grd_persons_asr, color=COLORS[0])
+    for _, row in frame.iterrows():
+        ax.annotate(REGION_NAMES.get(int(row.cut_region), "")[:8], (row.rem_asr, row.grd_persons_asr), fontsize=6, xytext=(2, 2), textcoords="offset points")
+    ax.set(title=f"{int(year)} · ρ = {rho:.2f}", xlabel="REM: entries per 100 000 (ASR)", ylabel="GRD: persons per 100 000 (ASR)")
+plt.show()
+show_table(pd.DataFrame(corr_rows), "Spearman correlation between regional REM and GRD rates by year", {"Spearman ρ": 2, "p value": 3})
+```
+
+The correlations are positive and weak: the regions with the most outpatient entries are not necessarily those with the most hospitalisations, because outpatient supply, hospital supply and recording practices vary independently. Atacama, with very high entry rates and low hospitalisations, illustrates that dissociation.
+
+### Commune-level correlation
+
+At the commune scale the comparison is more demanding: REM assigns entries to the facility commune and GRD to the commune of residence, so a commune without a facility reporting the code has no REM entries even if its residents are hospitalised. As REM only provides totals by commune, both sources are compared with crude rates per 100 000 person-years and with indirect standardised ratios, that is, observed over expected according to the national sex- and age-specific rates of the same source and period: the standardised entry ratio (SER) in REM and the standardised hospitalisation ratio (SHR) in GRD. The main analysis uses the continental communes with at least one reporting facility; as sensitivity analyses, it adds the communes with at least 20 entries and 20 hospitalised persons, where rates are more stable, and all continental communes with zero imputed to those that did not report.
+
+```{python}
+#| label: fig-rem-grd-comunas
+#| fig-cap: "Continental communes with a reporting facility, 2021–2024 pooled: crude rate of REM entries (facility commune) against GRD hospitalised persons (commune of residence), and standardised entry ratio against standardised hospitalisation ratio; logarithmic scales, size proportional to population and Spearman correlation. Communes with zero in either source do not appear on the logarithmic scale but are included in the correlation."
+#| fig-width: 12
+#| fig-height: 5
+pool = ecological_com.loc[(ecological_com.period == "2021-2024") & ecological_com.continental].copy()
+informantes = pool.loc[pool.rem_reported]
+fig, axes = plt.subplots(1, 2, figsize=(12, 5), layout="constrained")
+sizes = 6 + 60 * informantes.population / informantes.population.max()
+labelled = informantes.sort_values("rem_ingresos", ascending=False).head(6)
+panels = [(axes[0], "rem_crude", "grd_persons_crude", "REM: entries per 100 000 person-years", "GRD: hospitalised persons per 100 000", "Crude rates", None),
+          (axes[1], "rem_sir", "grd_persons_sir", "REM: standardised entry ratio (SER)", "GRD: standardised hospitalisation ratio (SHR)", "Indirect standardised ratios", 1.0)]
+for ax, x, y, xlabel, ylabel, title, reference in panels:
+    rho, p = stats.spearmanr(informantes[x], informantes[y], nan_policy="omit")
+    positive = informantes.loc[(informantes[x] > 0) & (informantes[y] > 0)]
+    ax.scatter(positive[x], positive[y], s=sizes.loc[positive.index], color=COLORS[0], alpha=.55, edgecolor="white", linewidth=.3)
+    for _, row in labelled.iterrows():
+        if row[x] > 0 and row[y] > 0:
+            ax.annotate(row.comuna, (row[x], row[y]), fontsize=7, xytext=(3, 3), textcoords="offset points")
+    if reference is not None:
+        ax.axhline(reference, color="#999999", linestyle="--", linewidth=1)
+        ax.axvline(reference, color="#999999", linestyle="--", linewidth=1)
+    ax.set(title=f"{title} · ρ = {rho:.2f} (n = {len(informantes)})", xlabel=xlabel, ylabel=ylabel, xscale="log", yscale="log")
+plt.show()
+```
+
+```{python}
+#| label: tabla-rem-grd-comunas
+def spearman_row(frame, period, subset):
+    row = {"Period": period, "Communes": subset, "n": len(frame)}
+    for label, x, y in [("entries–persons", "rem_crude", "grd_persons_crude"), ("SER–SHR", "rem_sir", "grd_persons_sir"),
+                        ("entries–records", "rem_crude", "grd_records_crude")]:
+        rho, p = stats.spearmanr(frame[x], frame[y], nan_policy="omit")
+        row[f"ρ {label}"] = rho
+        row[f"p {label}"] = p
+    return row
+rows = []
+for period in list(dict.fromkeys(ecological_com.period)):
+    frame = ecological_com.loc[(ecological_com.period == period) & ecological_com.continental]
+    reported = frame.loc[frame.rem_reported]
+    rows.append(spearman_row(reported, period, "With a reporting facility"))
+    rows.append(spearman_row(reported.loc[(reported.rem_ingresos >= 20) & (reported.grd_persons >= 20)], period, "≥ 20 entries and ≥ 20 persons"))
+    rows.append(spearman_row(frame.assign(rem_crude=frame.rem_crude.fillna(0.0), rem_sir=frame.rem_sir.fillna(0.0)), period, "All (no row = 0)"))
+corr_com = pd.DataFrame(rows)
+decimals = {c: 2 for c in corr_com.columns if c.startswith("ρ")} | {c: 3 for c in corr_com.columns if c.startswith("p ")}
+show_table(corr_com, "Spearman correlation between commune-level REM and GRD rates by period and set of continental communes", decimals)
+```
+
+```{python}
+#| label: tabla-rem-grd-comunas-lista
+top = informantes.sort_values("rem_ingresos", ascending=False).head(15)
+table = pd.DataFrame({
+    "Commune": top.comuna.values, "Region": top.region_short.values, "REM entries": top.rem_ingresos.values, "REM rate": top.rem_crude.values,
+    "SER": top.rem_sir.values, "95% CI SER": [ci(lo, hi, 2) for lo, hi in zip(top.rem_sir_lo, top.rem_sir_hi)],
+    "GRD persons": top.grd_persons.values, "GRD rate": top.grd_persons_crude.values, "SHR": top.grd_persons_sir.values,
+    "95% CI SHR": [ci(lo, hi, 2) for lo, hi in zip(top.grd_persons_sir_lo, top.grd_persons_sir_hi)],
+})
+show_table(table, "Fifteen communes with the most REM entries with an autism code · 2021–2024: crude rates per 100 000 and standardised ratios from both sources",
+           {"REM rate": 1, "SER": 2, "GRD rate": 1, "SHR": 2})
+note(f"Continental communes with at least one facility reporting autism entries in 2021–2024: {len(informantes)} of {len(pool)}; "
+     f"with at least 20 entries and 20 hospitalised persons: {int(((informantes.rem_ingresos >= 20) & (informantes.grd_persons >= 20)).sum())}. "
+     "The SER uses the national sex- and age-specific entry rates of REM as reference; the SHR, the national rates of hospitalised persons of GRD.")
+```
+
+The commune-level correlation is positive and weak among the communes with a reporting facility (ρ close to 0.3 in 2021–2024 and between 0.1 and 0.25 in individual years), similar with crude rates and with standardised ratios, and rises to about 0.6 when the analysis is restricted to communes with at least 20 entries and 20 hospitalised persons, where rates depend less on chance. Including all communes with zero imputed raises the correlation for a different reason: the communes without a reporting facility are mostly small and also have few hospitalisations. Chillán combines the highest rates of both sources, while Copiapó reproduces the Atacama dissociation, with very high outpatient entries and low hospitalisations. The difference in territorial unit, facility versus residence, shifts entries towards the communes that concentrate outpatient supply and by itself limits the coherence that can be expected.
+
+## Quality and comparability
+
+```{python}
+#| label: tabla-rem-calidad
+show_table(quality[["year", "records", "selected_records", "exact_duplicates_removed", "a05_rows_sex_comparable",
+                    "a05_rows_sex_mismatch", "a05_rows_age_comparable", "a05_rows_age_mismatch"]].rename(columns={
+    "year": "Year", "records": "Rows read", "selected_records": "Rows selected", "exact_duplicates_removed": "Duplicates removed",
+    "a05_rows_sex_comparable": "Sex-comparable", "a05_rows_sex_mismatch": "Sex mismatches",
+    "a05_rows_age_comparable": "Age-comparable", "a05_rows_age_mismatch": "Age mismatches",
+}), "Checks on selected rows; discrepancies do not alter the source")
+cat = catalogue.groupby(["year", "sheet"]).code.nunique().unstack("sheet").fillna(0).astype(int).reset_index().rename(columns={"year": "Year"})
+show_table(cat, "Codes selected by form and year according to each year's official dictionary")
+```
+
+The sex and age checks only compare rows with all the necessary cells observed. A regional or national total with twelve months present does not certify complete information from all facilities. Zeros are not imputed to absent rows or cells. Manuals and forms have annual versions and updates ([REM, Tarapacá Health Service](https://sstarapaca.redsalud.gob.cl/rem/)); extending to 2025–2026 requires reviewing integrity, coverage and comparability.
+
+# Synthesis
+
+- Mental-health programme entries with an autism code rose from about 2,100 in 2021 to about 11,800 in 2024, that is, from 14 to 81 age-standardised entries per 100 000 population, with an average annual growth close to 70% (95% CI: 49 to 90) and a male:female ratio that fell from 3.5:1 to 2.2:1.
+- About half of the entries correspond to children under 10 years, with a growing proportion of adolescents and adults; specific autism displaces Asperger and unspecified PDD as the coding category.
+- Regional entry rates vary more than sixfold between regions (Ñuble and Atacama versus Magallanes, Tarapacá and the Metropolitan Region); growth occurs in the stable panel of facilities and also through new reporters.
+- Screening in 18-month check-ups shows that the recorded administration of the M-CHAT R/F is far below the number of check-ups and that about a third of children with medium or high risk require referral after Part 2; no ratio from this source is equivalent to a population positivity rate.
+- Territorial coherence between outpatient entries (REM) and hospitalisations (GRD) is weak by region and by commune, and only reaches moderate values among communes with sufficient volumes in both sources, which underlines that each source describes a different part of contact with the system.
+
+## Reproducibility
+
+This QMD performs the groupings, tables and figures in Python. The prior extraction and dictionary validation correspond to `scripts/audit_rem.py`; the population rates to `scripts/epi_rates.py`; the outputs are documented in `output_files/consolidacion/README.md`. Each code keeps its file, sheet and dictionary row in `rem_code_catalogue.csv`. The original files remain intact on the external disk.
+
+::: {.report-nav}
+:::
+

@@ -1,12 +1,12 @@
 """The drawing code shown on the results page must still be the code the modules run.
 
-`docs/version_10_panels.qmd` carries a copy of the plotting code of `docs/study/figuras_principales.py`
+`docs/results.qmd` carries a copy of the plotting code of `docs/study/figuras_principales.py`
 and `figuras_suplementarias.py`, so that each figure on the page is drawn by the code printed with it
 rather than linked from a folder. The modules stay in place for rebuilding the 600 dpi plates outside
 the site, which leaves two copies of the same code. These tests are what stops them drifting: they fail
 if the page no longer matches the modules, and the fix is to regenerate the page.
 
-    python scripts/build_version_pages.py
+    python scripts/build_results_chapter.py
 """
 from pathlib import Path
 import ast
@@ -16,9 +16,9 @@ import sys
 import unittest
 
 ROOT = Path(__file__).resolve().parents[1]
-PAGE = ROOT / "docs" / "version_10_panels.qmd"
+PAGE = ROOT / "docs" / "results.qmd"
 STUDY = ROOT / "docs" / "study"
-BUILDER = ROOT / "scripts" / "build_version_pages.py"
+BUILDER = ROOT / "scripts" / "build_results_chapter.py"
 GENERATED = ["1", "2", "3", "4", "S1", "S2", "S3", "S4", "S5", "S6", "S7", "S8", "S9"]
 
 
@@ -68,7 +68,7 @@ class PageCarriesTheDrawingCode(unittest.TestCase):
                 end = chunk.index("\nplt.close(", start)
                 self.assertEqual(normalise(chunk[start:end]), normalise(module_figure_source(module, fig_id)),
                                  f"figure {fig_id} differs between the page and {module}; "
-                                 f"run python scripts/build_version_pages.py")
+                                 f"run python scripts/build_results_chapter.py")
 
     def test_no_figure_is_shown_from_a_stored_file(self):
         """Every figure must be drawn by a chunk. Nothing on the page may come from a stored file."""
@@ -90,8 +90,7 @@ class GeneratedPagesAreValidPython(unittest.TestCase):
     only reports it minutes into a render. Parsing the chunks here turns that into a one-second failure.
     """
 
-    PAGES = ["version_01_initial.qmd", "version_05_revision.qmd", "version_06_expanded.qmd",
-             "version_07_editorial.qmd", "version_10_panels.qmd"]
+    PAGES = ["results.qmd"]
 
     def test_every_chunk_parses(self):
         for name in self.PAGES:

@@ -5,10 +5,6 @@ bibliography: references.bib
 link-citations: true
 ---
 
-::: {.report-nav}
-[Home](index.html) [Methods](methods.html) [REM](rem.html) [GRD](grd.html) [v01](version_01_initial.html) [v02 corpus](version_02_corpus.html) [v05](version_05_revision.html) [v06](version_06_expanded.html) [v07](version_07_editorial.html) [v10 results](version_10_panels.html)
-:::
-
 ```{python}
 #| label: load-methods
 from pathlib import Path
@@ -30,7 +26,7 @@ kpis([
 ])
 ```
 
-This document describes, in one place, how every result of the [REM](rem.html) and [GRD](grd.html) reports is built. Both reports read aggregate tables produced by reproducible scripts and apply the same definitions, denominators and presentation conventions detailed here. When a result has a specific limitation, the corresponding report repeats it next to the table or figure; this section concentrates the full justification.
+This document describes, in one place, how every result of the [community care](community.qmd) and [hospital recognition](hospital.qmd) reports is built. Both chapters read aggregate tables produced by reproducible scripts and apply the same definitions, denominators and presentation conventions detailed here. When a result has a specific limitation, the corresponding report repeats it next to the table or figure; this section concentrates the full justification.
 
 ## Design and questions
 
@@ -232,5 +228,5 @@ The scripts are Python (pandas, numpy, scipy, statsmodels, geopandas, libpysal, 
 :::
 
 ::: {.report-nav}
-[Back to home](index.html) [REM analysis](rem.html) [GRD analysis](grd.html)
 :::
+

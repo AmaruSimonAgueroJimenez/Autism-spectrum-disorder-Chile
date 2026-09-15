@@ -1,0 +1,142 @@
+---
+title: "Result tables"
+subtitle: "Every table the study produced, grouped by what it is about, with its contents open to inspection"
+---
+
+```{python}
+#| label: preparacion
+from pathlib import Path
+import re
+import sys
+
+import pandas as pd
+
+ROOT = Path.cwd().parent if Path.cwd().name == "docs" else Path.cwd()
+sys.path.insert(0, str(ROOT / "docs" / "study"))
+sys.path.insert(0, str(ROOT / "scripts"))
+from report_helpers import kpis, show_table
+
+DATA = ROOT / "docs" / "study" / "data"
+EARLY = DATA / "v01"
+
+# Tables are grouped by what they describe, not by when they were computed. The order of the rules
+# matters: the first pattern that matches a file name wins, so the specific ones come first.
+GROUPS = [
+    ("Provenance, coverage and audits", r"dataflow|coverage_layers|_audit|_provenance|_check$|identifier"),
+    ("Case definition and its sensitivity", r"^case_definition|^f80_f89|rett|^S7d_|^figS5_|variant"),
+    ("Hospital records", r"^grd_|^burden_|^expanded_hospital|^expanded_deis|^clinical_|^Figure5_|^expanded_age"),
+    ("Community programmes", r"^rem_|^a05_|^p2_|^expanded_a27"),
+    ("Education and surveys", r"^pie_|^junaeb|^education_|^survey|^fig3c_"),
+    ("Territory and spatial structure", r"^S3_|^S4_|communes_public|^Table_regional|regions"),
+    ("Models and convergence between sources", r"^models_|^selected_models|^fig3b_|^central_|^Table_S7|correlations"),
+    ("Figure inputs", r"^fig3a_|^fig3d_"),
+]
+
+
+def group_of(name):
+    for title, pattern in GROUPS:
+        if re.search(pattern, name):
+            return title
+    return "Other tables"
+
+
+tables = sorted(DATA.glob("*.csv"))
+grouped = {}
+for path in tables:
+    grouped.setdefault(group_of(path.name), []).append(path)
+
+kpis([
+    (str(len(tables)), "Result tables published with this report"),
+    (str(len(grouped)), "Subjects they cover"),
+    (str(len(list(EARLY.glob('*.csv')))), "Tables from the earliest analysis, on a different window"),
+    ("3", "Tables withheld to protect small commune cells"),
+])
+```
+
+This chapter holds every result table the study produced, read from `docs/study/data/`. They ship with
+the repository, so each one can be opened, checked and reused without the source microdata. Each table
+below unfolds to show its full contents.
+
+The study was written over several rounds of revision. Each round added tables without ever changing one
+that had already been computed, so what appears here is the union of all of them — a single result set,
+not a sequence of drafts. That claim is checked rather than asserted: `scripts/audit_versions.py` hashes
+every table of every round and compares them pairwise.
+
+::: {.callout-warning}
+## Three tables are deliberately withheld
+
+Two commune-by-year tables and one commune-level analytic file carry cells with fewer than five cases
+next to a commune identifier, which together can identify individuals. They are not published. What is
+published instead is `communes_public.csv`, the same commune extract with the identifiers removed and
+the small cells masked. Every territorial result in this report is computed from data at that level or
+coarser.
+:::
+
+```{python}
+#| label: inventario
+#| output: asis
+def render_group(title, paths):
+    print(f"\n## {title}\n")
+    rows = []
+    for path in paths:
+        frame = pd.read_csv(path)
+        rows.append({"Table": path.name, "Rows": len(frame), "Columns": len(frame.columns),
+                     "Size (KB)": round(path.stat().st_size / 1024, 1)})
+    show_table(pd.DataFrame(rows), f"{len(paths)} tables on {title.lower()}", {"Size (KB)": 1})
+    print()
+    for path in paths:
+        frame = pd.read_csv(path)
+        preview = frame.head(200).to_html(index=False, classes="table table-sm", border=0, na_rep="")
+        more = "" if len(frame) <= 200 else f"<p class='table-note'>First 200 of {len(frame):,} rows.</p>"
+        print(f"<details class='corpus-table'><summary><code>{path.name}</code> "
+              f"<span class='muted'>{len(frame):,} rows × {len(frame.columns)} columns</span></summary>"
+              f"{more}<div class='analysis-table'>{preview}</div></details>\n")
+
+for title, _ in GROUPS + [("Other tables", None)]:
+    if title in grouped:
+        render_group(title, grouped[title])
+```
+
+## The earliest analysis
+
+```{python}
+#| label: nota-v01
+#| output: asis
+print("""
+::: {.callout-important}
+## These five tables are not comparable with the rest of the report
+
+They come from the first analysis of this material, which covered **2017–2024** rather than 2019–2025 and
+predates the split of the case definition into its two variants. Their counts are therefore built on a
+different observation window and a different definition, and a reader should not place them side by side
+with the tables above or read a trend across the two. They are published because they are part of the
+record of what was found, not because they extend the series.
+:::
+""")
+```
+
+```{python}
+#| label: tablas-tempranas
+#| output: asis
+CAPTIONS = {
+    "tabla1": "Characteristics of the records, by period",
+    "tabla2": "Annual series of records and persons, with standardised rates and 95% confidence intervals",
+    "tabla3": "Regional distribution, with standardised rates and indirect ratios",
+    "tabla4": "Ecological correlations between sources, by unit and period",
+    "tabla5": "Summary indicators, by period",
+}
+for path in sorted(EARLY.glob("tabla*.csv")):
+    frame = pd.read_csv(path)
+    title = CAPTIONS.get(path.stem, path.stem)
+    preview = frame.to_html(index=False, classes="table table-sm", border=0, na_rep="")
+    print(f"<details class='corpus-table'><summary>{title} "
+          f"<span class='muted'>(2017–2024 window, earlier case definition)</span></summary>"
+          f"<div class='analysis-table'>{preview}</div></details>\n")
+```
+
+## Where these tables are used
+
+The [Results](results.qmd) chapter draws its figures from these tables; [Hospital
+recognition](hospital.qmd) and [Community care](community.qmd) work through them source by source. The
+[extended plates](plates.qmd) add the material produced by the full pipeline, and
+[Reproducibility](reproducibility.qmd) explains how to regenerate any of it.

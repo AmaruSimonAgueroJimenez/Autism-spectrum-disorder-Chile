@@ -1,6 +1,6 @@
-"""Render the site: home page, methods, REM, GRD and the two version-results pages (the version 02
-corpus and the version 10 panels); optionally refresh the aggregates from the canonical data, and
-regenerate the plates of `docs/study/` with `--figures`.
+"""Render the report: a Quarto book whose chapters are the front page, methods, results, the two
+source chapters and the extended material; optionally refresh the aggregates from the canonical data,
+and regenerate the plates of `docs/study/` with `--figures`.
 
 Refresh order: identifier audit, REM extraction, GRD trajectories, GRD descriptive
 epidemiology and, finally, rates and spatial statistics (which need the INE
@@ -15,7 +15,7 @@ import sys
 
 ROOT = Path(__file__).resolve().parents[1]
 EXTRACTION = ["audit_grd_linkage.py", "audit_rem.py", "grd_trajectories.py", "grd_epidemiology.py"]
-DOCUMENTS = {"index.qmd", "methods.qmd", "rem.qmd", "grd.qmd", "version_01_initial.qmd", "version_02_corpus.qmd", "version_05_revision.qmd", "version_06_expanded.qmd", "version_07_editorial.qmd", "version_10_panels.qmd"}
+DOCUMENTS = {"index.qmd", "methods.qmd", "results.qmd", "hospital.qmd", "community.qmd", "tables.qmd", "plates.qmd", "reproducibility.qmd"}
 
 
 def main():
