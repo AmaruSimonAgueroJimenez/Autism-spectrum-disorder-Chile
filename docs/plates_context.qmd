@@ -19,13 +19,13 @@ from figstyle import *
 
 idx = rh.corpus_index(); caps = rh.corpus_captions(); titles = rh.corpus_titles()
 kpis([
-    ("0", "Plates redrawn here, with their code"),
-    ("10", "Plates kept as stored images"),
+    ("5", "Plates redrawn here, with their code"),
+    ("5", "Plates kept as stored images"),
     ("10", "Plates in this chapter"),
 ])
 ```
 
-Of the 10 plates in this chapter, 0 are redrawn from the published tables by the code shown
+Of the 10 plates in this chapter, 5 are redrawn from the published tables by the code shown
 with each one; the rest are stored images because their series are not fully carried by any published
 table. Use **Show the code that produced this** under a redrawn plate to read how it is built.
 
@@ -80,54 +80,1669 @@ it reads.
 
 ### Figure S38. Figure E23. ENDIDE 2022 and ENCAVI 2023–2024 analysed with their complex sampling design: estimates, precision and flagged domains
 
-::: {.callout-note collapse="true"}
-## Stored image — this plate has no drawing code here
+```{python}
+#| label: lamina-fige23_surveys_detail
+#| fig-cap: "Figure S38. Redrawn here from the published tables by the code above."
+import re
 
-Its series are not fully carried by any published table, so it cannot be redrawn from a
-clone. The code that produced it is in `study/pipeline/`; what is missing is the microdata
-it reads.
-:::
+import numpy as np
+from matplotlib.ticker import FuncFormatter
 
-![**Figure E23. ENDIDE 2022 and ENCAVI 2023–2024 analysed with their complex sampling design: estimates, precision and flagged domains** (a) ENDIDE 2022, adults aged 18 and over: weighted proportion of reported autism by total, sex and age group, with 95% CI and the number of unweighted cases beside each point. (b) ENDIDE 2022, children and adolescents aged 2–17 reported by the main carer. (c) ENCAVI 2023–2024, persons aged 15 and over with a diagnosis of autism spectrum disorder. (d) Design effect (DEFF) by domain, with the DEFF = 1 reference. (e) Relative standard error by domain with the 30% threshold. (f) Unweighted cases and domain size (log scale) with the 30-case threshold. Panels d-f summarise the DOMAIN (the &#x27;total&#x27; row); the sex and age subgroups are in panels a-c and complete in the companion table. Domains with fewer than 30 cases or a relative standard error above 30% are drawn in grey and are NOT presented as reliable estimates. Regional and comuna domains are not estimated because the effective sample does not support them. Unit: surveyed persons; denominator: persons in the domain with a non-missing item; ratio estimator with Taylor linearisation and a logit CI with t and df = PSU − strata. Counts are administrative recognition, never prevalence or incidence. Sources are not person-linked: no ratio between sources is a cascade or an individual probability. Law 21.545 (March 2023) is policy context, not an intervention with an estimable effect. 2020–2021: pandemic reporting disruption.](study/corpus/figures/figE23_surveys_detail.jpg){fig-align="center" width="100%"}
+from figstyle import *
+
+PLATE = "figE23_surveys_detail"
+SOURCES = ["docs/study/corpus/tables/E23_surveys_detail.csv"]
+NOTE = ("Redraws the six panels of E23 from the published E23 companion table: the survey-weighted "
+        "proportion, logit 95% CI and unweighted cases of the three estimation domains by sex and age, "
+        "and the DEFF, relative standard error and case count of the ten domain totals.")
+
+TABLE = BASE / "corpus" / "tables" / "E23_surveys_detail.csv"
+
+# --- the plate's own measurements ------------------------------------------------------------------
+#: The stored plate is 180 x 245 mm; every fraction below was measured on it at 1000 x 1361 px.
+FIG_W_IN, FIG_H_IN = 180 / 25.4, 245 / 25.4
+REF_H = 1361.0                   # height of that reference render
+AX_X = (0.1840, 0.6820)          # left edge of the two panel columns, figure fraction
+AX_W = 0.2980                    # panel width, figure fraction
+AX_TOP = (53.0, 500.0, 925.0)    # top of the three panel rows, in reference pixels
+AX_H_PX = 336.5                  # panel height, in reference pixels
+TITLE_X = (0.0110, 0.5085)       # the panel headings sit at the left edge of their cell
+TITLE_DY = 3.0 / REF_H           # and just above the top of their panel
+#: Useful width of a panel heading: half the plate, less a 5 mm margin and the room for the letter.
+TITLE_W_PT = FIG_W_IN * 72.0 / 2 - 5.0 / 25.4 * 72.0 - 12.0
+
+FS_TITLE, FS_BASE, FS_TICK, FS_LEGEND = 9.0, 8.0, 7.0, 7.0
+FS_ROW = 6.2                     # the estimate/interval/cases label of a forest row
+FS_TINY = 6.4                    # the domain labels of panels d–f, and the plate foot
+FOOT_LINE = 1.30
+
+RED = '#c0392b'                  # threshold lines and the regional-domains note
+INK = '#333333'                  # a reliable row's label, and the DEFF = 1 reference
+MUTED = '#555555'                # the 'n=' labels of panel f and the plate foot
+DIM = '#7f8c8d'                  # a flagged row: marker, interval and label
+DIM_ALPHA = 0.55
+
+ADEQUATE = 'Adequate domain'     # the value of `Precision` that the plate draws in blue
+
+#: Compact, unique label of each domain for the y axis of panels d–f (the table's own `Domain`
+#: strings are too long for a half-plate panel, and truncating them collided two ENDIDE domains).
+TINY = {
+    'ENDIDE adults: reported': 'ENDIDE 18+: reported',
+    'ENDIDE children: reported': 'ENDIDE 2–17: reported',
+    'ENDIDE children: reported & confirmed': 'ENDIDE 2–17: rep.+conf.',
+    'ENDIDE children: confirmed | reported': 'ENDIDE 2–17: conf.|rep.',
+    'ENDIDE children: confirmed (sens.)': 'ENDIDE 2–17: conf. (sens.)',
+    'ENDIDE children: medication | reported': 'ENDIDE 2–17: medic.|rep.',
+    'ENDIDE children: other treatment | reported': 'ENDIDE 2–17: treat.|rep.',
+    'ENCAVI 15+: diagnosed': 'ENCAVI 15+: diagnosed',
+    'ENCAVI 15+: diagnosed (sens.)': 'ENCAVI 15+: diag. (sens.)',
+    'ENCAVI: in treatment | diagnosed': 'ENCAVI 15+: treat.|diag.',
+}
+
+#: Panel a–c: (heading, the `Domain` whose rows the forest draws, foot note and its colour).
+FOREST = [
+    ('ENDIDE 2022, adults aged 18 and over', 'ENDIDE adults: reported', None, None),
+    ('ENDIDE 2022, children and adolescents aged 2–17', 'ENDIDE children: reported',
+     'Additional series: professional confirmation of the report (companion table).', MUTED),
+    ('ENCAVI 2023–2024, persons aged 15 and over', 'ENCAVI 15+: diagnosed',
+     'Regional domains: not estimated (effective sample does not support them); '
+     'no comuna disaggregation.', RED),
+]
+
+RSE_THRESHOLD = 30.0             # the reliability thresholds the plate draws
+CASE_THRESHOLD = 30
+
+
+def _int(cell):
+    """A count out of a presentation cell such as '30,010' or '5,526'."""
+    return int(str(cell).replace(',', '').strip())
+
+
+def _pct(cell):
+    """Point estimate and the two interval limits out of a cell such as '0.29 (0.22–0.38)'."""
+    a, lo, hi = re.match(r'\s*([\d.]+)\s*\(\s*([\d.]+)\s*[–-]\s*([\d.]+)\s*\)\s*$', str(cell)).groups()
+    return float(a), float(lo), float(hi)
+
+
+def load():
+    """The E23 companion table with every plotted number parsed out of its presentation cell."""
+    t = pd.read_csv(TABLE, encoding='utf-8-sig')
+    pct = t['% (95% CI)'].map(_pct)
+    return t.assign(ci_text=t['% (95% CI)'],
+                    n_dom=t['n'].map(_int),
+                    cases=t['Cases'].map(_int),
+                    pct=[p[0] for p in pct],
+                    lo=[p[1] for p in pct],
+                    hi=[p[2] for p in pct],
+                    deff=t['DEFF'].astype(float),
+                    rse=t['RSE'].str.rstrip('%').astype(float),
+                    reliable=t['Precision'].eq(ADEQUATE))
+
+
+def _dec(ax, dec):
+    """The plate's x axis: a fixed number of decimals, thousands separated."""
+    ax.xaxis.set_major_formatter(FuncFormatter(lambda v, p: num(v, 'en', dec)))
+
+
+def _panel(fig, row, col):
+    """One panel of the 3 x 2 plate, at the position measured on the stored image."""
+    return fig.add_axes([AX_X[col], 1 - (AX_TOP[row] + AX_H_PX) / REF_H, AX_W, AX_H_PX / REF_H])
+
+
+def _heading(fig, ax, letter, text):
+    """The bold heading above a panel: '(a)' and the title, folded to the width of the cell."""
+    words, lines, line = text.split(), [], ''
+    for w in words:
+        trial = (line + ' ' + w).strip()
+        if line and _width_pt(fig, trial + ' ', FS_TITLE, 'bold') > TITLE_W_PT:
+            lines.append(line); line = w
+        else:
+            line = trial
+    lines.append(line)
+    lines[0] = f'({letter}) ' + lines[0]
+    pos = ax.get_position()
+    fig.text(TITLE_X[0] if pos.x0 < 0.5 else TITLE_X[1], pos.y1 + TITLE_DY, '\n'.join(lines),
+             fontsize=FS_TITLE, fontweight='bold', ha='left', va='bottom', linespacing=1.2)
+
+
+def _width_pt(fig, s, size, weight='normal'):
+    """Width of one line of text in points, measured on the figure that will carry it."""
+    t = fig.text(0, 0, s, fontsize=size, fontweight=weight)
+    w = t.get_window_extent(fig.canvas.get_renderer()).width / fig.dpi * 72.0
+    t.remove()
+    return w
+
+
+def forest(fig, ax, rows, heading, letter):
+    """Panel a, b or c: one estimation domain, its total and its sex and age subgroups.
+
+    The row label is anchored to the upper end of its own interval and the axis is then widened
+    until the widest of them fits inside the panel — the plate's own rule, and the reason panel (b)
+    reaches 12% for an estimate of 4.6% and panel (a) reaches 1.9% for one of 0.6%.
+    """
+    y = np.arange(len(rows))[::-1]
+    labels = [r.ci_text + f'; n={r.cases}' + ('' if r.reliable else '\n' + r.Precision)
+              for r in rows.itertuples()]
+
+    # Starting width: the widest label gets its share of the panel, the interval keeps the rest.
+    axis_pt = FIG_W_IN * 72.0 / 2.0 - 78.0
+    w_pt = max(max(_width_pt(fig, line, FS_ROW) for line in s.split('\n')) for s in labels)
+    share = min(0.62, w_pt / axis_pt)
+    pad = 5.0 / axis_pt                      # the whisker cap (3 pt) plus 2 pt of white
+    top = float(rows.hi.max())
+    ax.set_xlim(0, max(top * 1.30, top / max(0.2, 1.0 - share - pad)))
+    ax.set_ylim(-0.75, float(len(rows)) - 0.25)
+
+    placed = []
+    for i, r in enumerate(rows.itertuples()):
+        colour = BLUE if r.reliable else DIM
+        ax.errorbar(r.pct, y[i], xerr=[[max(r.pct - r.lo, 0.0)], [max(r.hi - r.pct, 0.0)]], fmt='o',
+                    color=colour, markersize=6, capsize=3, lw=1.6,
+                    alpha=1.0 if r.reliable else DIM_ALPHA)
+        placed.append((ax.text(r.hi + pad * ax.get_xlim()[1], y[i], labels[i], fontsize=FS_ROW,
+                               va='center', ha='left', linespacing=1.15,
+                               color=INK if r.reliable else DIM), r.hi))
+
+    ax.set_yticks(y)
+    ax.set_yticklabels(list(rows.Subgroup), fontsize=7.5)
+    ax.set_xlabel('Weighted proportion (%)', fontsize=FS_BASE)
+    _dec(ax, 1)
+    clean(ax, grid='both')
+    _heading(fig, ax, letter, heading)
+    return placed, pad
+
+
+def fit_labels(fig, panels):
+    """Widen each forest until its label column sits inside its panel.
+
+    With the composition frozen the labels are measured as drawn and the axis is stretched — which
+    pulls every label back towards the centre — until none of them crosses the right-hand edge.
+    """
+    fig.canvas.draw()
+    r = fig.canvas.get_renderer()
+    for ax, (placed, pad) in panels:
+        for _ in range(6):
+            edge = ax.get_window_extent(r)
+            over = max(t.get_window_extent(r).x1 - (edge.x1 - 1.0) for t, _h in placed)
+            if over <= 0.5:
+                break
+            x1 = ax.get_xlim()[1] * (1.0 + over / max(edge.width, 1.0) * 1.12)
+            ax.set_xlim(0, x1)
+            for t, hi in placed:
+                t.set_x(hi + pad * x1)
+            fig.canvas.draw()
+            r = fig.canvas.get_renderer()
+
+
+def threshold(fig, ax, x, text):
+    """The reliability threshold of panels e and f: a red rule and its label, kept inside the panel.
+
+    Written to the right of the rule; where that would run past the edge of the panel — panel (e),
+    whose axis stops barely past the 30% mark — it is pulled back to the left of the rule instead,
+    which is where the stored plate prints it.
+    """
+    ax.axvline(x, color=RED, ls='--', lw=1.2)
+    t = ax.text(x, 0.99, ' ' + text, transform=ax.get_xaxis_transform(), fontsize=FS_LEGEND,
+                color=RED, va='top', ha='left')
+    fig.canvas.draw()
+    r = fig.canvas.get_renderer()
+    if t.get_window_extent(r).x1 > ax.get_window_extent(r).x1:
+        t.set_text(text + ' ')
+        t.set_ha('right')
+
+
+def domains(t):
+    """The ten `Domain total` rows — the domain level that panels d–f summarise."""
+    d = t[t.Subgroup == 'Domain total'].copy()
+    d['short'] = d.Domain.map(TINY)
+    assert d.short.notna().all() and len(d) == 10, 'unexpected domain totals in E23'
+    return d
+
+
+def bars(ax, d, values):
+    """A ranked horizontal bar of one domain statistic: ascending, drawn from the bottom up."""
+    y = np.arange(len(d))
+    ax.barh(y, values, height=0.7, color=[BLUE if v else DIM for v in d.reliable])
+    ax.set_yticks(y)
+    ax.set_yticklabels(list(d.short), fontsize=FS_TINY)
+    return y
+
+
+def draw_figE23_surveys_detail():
+    style()
+    plt.rcParams.update({'axes.labelsize': FS_BASE, 'xtick.labelsize': FS_TICK,
+                         'ytick.labelsize': FS_TICK, 'lines.linewidth': 1.3, 'axes.linewidth': 0.7,
+                         'xtick.major.size': 2.4, 'ytick.major.size': 2.4,
+                         'xtick.major.pad': 1.8, 'ytick.major.pad': 1.8, 'axes.labelpad': 2.2})
+    t = load()
+    fig = plt.figure(figsize=(FIG_W_IN, FIG_H_IN))
+
+    # --- a, b, c: the three estimation domains, by sex and age group -------------------------------
+    forests, notes = [], []
+    for k, (heading, domain, note, colour) in enumerate(FOREST):
+        ax = _panel(fig, k // 2, k % 2)
+        rows = t[t.Domain == domain].reset_index(drop=True)
+        placed = forest(fig, ax, rows, heading, 'abcdef'[k])
+        forests.append((ax, placed))
+        if note:
+            notes.append((f'({"abcdef"[k]}) ' + note, colour))
+    fit_labels(fig, forests)
+
+    d = domains(t)
+
+    # --- d: design effect by domain, against the DEFF = 1 reference ---------------------------------
+    ax = _panel(fig, 1, 1)
+    # Two ENDIDE child domains tie at DEFF 1.54 and, as in the stored plate, keep the table's order.
+    dd = d.sort_values('deff', kind='stable')
+    bars(ax, dd, dd.deff)
+    ax.axvline(1.0, color=INK, ls='--', lw=0.9)
+    ax.set_xlabel('DEFF', fontsize=FS_BASE)
+    _dec(ax, 1)
+    clean(ax, grid='both')
+    _heading(fig, ax, 'd', 'Design effect (DEFF) by domain')
+
+    # --- e: relative standard error by domain, against the 30% threshold ---------------------------
+    ax = _panel(fig, 2, 0)
+    # `RSE` is printed to one decimal and the two ENCAVI domains tie at 17.9%, as do the two ENDIDE
+    # treatment domains at 9.2%. DEFF breaks the tie the way the unrounded error would: at the same
+    # cases and the same domain size the relative error rises with the design effect.
+    de = d.sort_values(['rse', 'deff'], kind='stable')
+    bars(ax, de, de.rse)
+    ax.set_xlim(0, RSE_THRESHOLD * 1.05)
+    ax.set_xlabel('Relative standard error (%)', fontsize=FS_BASE)
+    _dec(ax, 0)
+    clean(ax, grid='both')
+    threshold(fig, ax, RSE_THRESHOLD, '30% threshold')
+    _heading(fig, ax, 'e', 'Relative standard error by domain')
+
+    # --- f: unweighted cases and domain size, against the 30-case threshold ------------------------
+    ax = _panel(fig, 2, 1)
+    # Cases are exact integers: the three domains at 139 and the two at 80 keep the table's order.
+    df = d.sort_values('cases', kind='stable')
+    y = bars(ax, df, df.cases)
+    for yi, r in zip(y, df.itertuples()):
+        ax.text(r.cases * 1.10, yi, f'n={num(r.n_dom, "en", 0)}', fontsize=FS_ROW, va='center',
+                color=MUTED)
+    log_axis(ax, axis='x')
+    ax.set_xlim(0.8, float(df.cases.max()) * 9)
+    ax.set_ylim(-0.8, float(y.max()) + 2.4)     # a free band at the top for the threshold label
+    ax.set_xlabel('Unweighted cases', fontsize=FS_BASE)
+    clean(ax, grid='both')
+    threshold(fig, ax, CASE_THRESHOLD, '30-case threshold')
+    _heading(fig, ax, 'f', 'Unweighted cases and domain size')
+
+    # --- the plate foot: the panel notes, greys first, the red note last ----------------------------
+    line = FS_TINY * FOOT_LINE / (FIG_H_IN * 72.0)
+    y0 = 0.004
+    for text, colour in reversed(notes):
+        fig.text(0.008, y0, text, fontsize=FS_TINY, color=colour, ha='left', va='bottom',
+                 linespacing=FOOT_LINE)
+        y0 += line + 0.35 * line
+    return fig
+
+
+draw_figE23_surveys_detail()
+```
 
 ### Figure S39. Figure E24. Educational recognition of autism: PIE, SINACES and special schools, 2019–2025
 
-::: {.callout-note collapse="true"}
-## Stored image — this plate has no drawing code here
+```{python}
+#| label: lamina-fige24_education_detail
+#| fig-cap: "Figure S39. Redrawn here from the published tables by the code above."
+import re
+import sys
+from pathlib import Path
 
-Its series are not fully carried by any published table, so it cannot be redrawn from a
-clone. The code that produced it is in `study/pipeline/`; what is missing is the microdata
-it reads.
-:::
+import numpy as np
+import pandas as pd
+import matplotlib.pyplot as plt
 
-![**Figure E24. Educational recognition of autism: PIE, SINACES and special schools, 2019–2025** (a) PIE series by definition and source: strict autism and autism-Asperger (Apuntes 60, 2019–2023), the Apuntes 60 harmonised series (rule: strict autism + autism-Asperger) and the harmonised total published by SINACES (2022–2025); the two harmonised series are drawn separately because they come from different reports. (b) The 2022 discrepancy: the SINACES total minus special schools gives 42,940, matching Apuntes 60, while the SINACES report writes 42,945; the five-case difference is documented and not corrected. (c) Harmonised PIE and strict autism as a share of PIE enrolment, and harmonised PIE as a share of SINACES applicants. (d) Autistic students in special schools and the SINACES total by year; special schools are not added to PIE. (e) The 2023 sex split, the only published year, with the male-to-female ratio and an exact binomial interval (log scale). (f) Regular and exceptional entry to PIE, with the share of exceptional entries annotated. Unit: students (annual school stock); coverage: schools with special-education funding that take part in PIE. These series are identical in both case-definition variants. Counts are administrative recognition, never prevalence or incidence. Sources are not person-linked: no ratio between sources is a cascade or an individual probability. Law 21.545 (March 2023) is policy context, not an intervention with an estimable effect. 2020–2021: pandemic reporting disruption.](study/corpus/figures/figE24_education_detail.jpg){fig-align="center" width="100%"}
+_STUDY = ROOT / "docs" / "study"          # docs/study, where figstyle lives
+if str(_STUDY) not in sys.path:
+    sys.path.insert(0, str(_STUDY))
+
+from figstyle import *   # noqa: F401,F403 — style, clean, num, thousands, log_axis, BLUE, ORANGE, …
+
+PLATE = "figE24_education_detail"
+SOURCES = [
+    "docs/study/corpus/tables/E76_education_pie_full.csv",
+    "docs/study/corpus/tables/E24_education_detail.csv",
+]
+NOTE = ("Redraws the six panels of figE24 — the four PIE series by definition and source, the "
+        "documented five-case discrepancy of 2022, the three share series, the SINACES total with "
+        "the special schools it contains, the 2023 sex split on a log axis and the regular against "
+        "exceptional entry — from the published PIE/SINACES series table E76 and, for the 2023 "
+        "male-to-female ratios with their exact binomial intervals, from the plate's own table E24.")
+
+TABLE_E76 = BASE / "corpus" / "tables" / "E76_education_pie_full.csv"
+TABLE_E24 = BASE / "corpus" / "tables" / "E24_education_detail.csv"
+
+# --------------------------------------------------------------------------------------------------
+# The plate norm of study/pipeline: 180 × 245 mm, three rows by two columns, 9 pt bold panel titles
+# over a 6 pt floor, DejaVu Sans throughout, seaborn's white grid with the ticks themselves hidden.
+# --------------------------------------------------------------------------------------------------
+PLATE_W_IN, PLATE_H_IN = 180.0 / 25.4, 245.0 / 25.4
+FS_TITLE, FS_BASE, FS_TICK, FS_LEG = 9.0, 8.0, 7.0, 7.0
+FS_MARK, FS_CELL = 6.2, 6.4          # context markers; the wrapped category labels of (b) and (e)
+FOOT_FS, FOOT_LINE = 6.4, 1.30
+DARK, GLOSS, RED = "#333333", "#555555", "#c0392b"
+#: The two white haloes the original's engine adds just before saving: a firm one under a context
+#: note written in axis coordinates, a lighter one under a value label that falls on its own bar.
+NOTE_HALO = dict(facecolor="white", edgecolor="none", alpha=0.92, pad=1.4)
+VALUE_HALO = dict(facecolor="white", edgecolor="none", alpha=0.78, pad=0.9)
+LIGHT_BLUE = "#9ecae1"               # the SINACES total of panel (d), as in the original
+LAW_X = 2023 - 0.30                  # March 2023 on an axis of centred years (study/config LAW_YEAR)
+PANDEMIC = [2020, 2021]
+
+PLATE_RC = {
+    "font.family": "DejaVu Sans", "font.size": FS_BASE,
+    "axes.titlesize": FS_TITLE, "axes.titleweight": "bold", "axes.labelsize": FS_BASE,
+    "xtick.labelsize": FS_TICK, "ytick.labelsize": FS_TICK,
+    "legend.fontsize": FS_LEG, "legend.title_fontsize": FS_LEG,
+    # The plate's own legend settings: a translucent white box with no edge, and matplotlib's own
+    # spacing for everything the plate style does not override (only the inner pad is tightened).
+    "legend.frameon": True, "legend.framealpha": 0.82, "legend.facecolor": "white",
+    "legend.edgecolor": "none", "legend.borderpad": 0.25,
+    "axes.facecolor": "white", "axes.edgecolor": DARK, "axes.linewidth": 0.7,
+    "axes.spines.top": False, "axes.spines.right": False,
+    "axes.grid": True, "axes.axisbelow": True,
+    "grid.color": "#cccccc", "grid.alpha": 0.35, "grid.linewidth": 0.8,
+    "xtick.bottom": False, "ytick.left": False,           # seaborn's white grid: no tick marks
+    "xtick.major.pad": 2.6, "ytick.major.pad": 2.6,
+    "lines.linewidth": 1.3, "lines.markersize": 4.0,
+    "axes.labelpad": 2.2, "axes.titlepad": 3.5,
+    "figure.facecolor": "white", "savefig.facecolor": "white",
+}
+
+# Panel geometry, read off the stored plate (1000 × 1361 px) and kept as fractions of the canvas.
+_W, _H = 1000.0, 1361.0
+
+
+def _rect(left, top, right, bottom):
+    return [left / _W, (_H - bottom) / _H, (right - left) / _W, (bottom - top) / _H]
+
+
+BOXES = {
+    "a": _rect(75, 32, 492, 272),
+    "b": _rect(568, 31, 985, 359),
+    "c": _rect(75, 493, 492, 754),
+    "d": _rect(568, 493, 985, 820),
+    "e": _rect(75, 909, 492, 1236),
+    "f": _rect(568, 909, 985, 1236),
+}
+#: Left edge of each column of panel titles, in figure fractions: the stored plate anchors the title
+#: to the visible left edge of the column (the rotated y-axis label), not to the axes box.
+TITLE_X = {"a": 0.0105, "c": 0.0105, "e": 0.0105, "b": 0.5180, "d": 0.5180, "f": 0.5180}
+
+TITLES = {
+    "a": "PIE series by definition and source",
+    "b": "The 2022 discrepancy in harmonised PIE",
+    "c": "PIE autism as a share of PIE enrolment and\nof applicants",
+    "d": "Special schools and SINACES total",
+    "e": "Sex split, 2023 (the only published year)",
+    "f": "Regular and exceptional entry to PIE",
+}
+
+Y_STUDENTS = "Students (thousands)"
+Y_SHARE = "Share (%)"
+X_YEAR = "Year"
+LAW_MARK = "Law 21.545 (2023)"
+PANDEMIC_MARK = "2020–2021 (pandemic)"
+
+FOOT_GREY = ("(a) Harmonisation rule: strict autism + autism-Asperger (Apuntes 60, 2019–2023); "
+             "SINACES publishes the harmonised total for 2022–2025. (e) the figure\n"
+             "under each category is the male-to-female ratio with its 95% CI.")
+FOOT_RED = ("(b) Documented discrepancy: {gap} cases between the published total and the "
+            "subtraction.")
+
+#: Where the bold end label of a series goes, relative to its last point. The plate writes every one
+#: of them five points right and two up; the two series that run to 2025 would then hang over the
+#: neighbouring cell, and the original's de-overlap pass pulls them back inside before saving — the
+#: 2025 count to the left of its diamond, the 2025 share squarely above its triangle, clear of the
+#: line that climbs into it. Those two placements are measured off the stored plate.
+END_LABEL = dict(xytext=(5, 2), ha="left")
+END_LABEL_PULLED_LEFT = dict(xytext=(0, 2), ha="right")
+END_LABEL_LIFTED = dict(xytext=(0, 10), ha="center")
+
+#: (a) the four series of the first panel: E76 row, colour, marker, line style, label, end label.
+SERIES_A = [
+    ("pie_tea_strict", BLUE, "o", "-", "PIE strict autism (Apuntes 60)", END_LABEL),
+    ("pie_tea_asperger", ORANGE, "s", "-", "PIE autism-Asperger (Apuntes 60)", END_LABEL),
+    ("pie_harmonised_apuntes60", GREEN, "^", "-", "Harmonised PIE (Apuntes 60, 2019–2023)",
+     END_LABEL),
+    ("pie_harmonised_sinaces", PINK, "D", "--", "Harmonised PIE (SINACES, 2022–2025)",
+     END_LABEL_PULLED_LEFT),
+]
+#: (c) the three share series: E76 row, colour, marker, legend label, end label.
+SERIES_C = [
+    ("pie_harmonised_share_of_pie_pct", BLUE, "o", "Harmonised PIE / PIE enrolment", END_LABEL),
+    ("pie_tea_strict_share_of_pie_pct", ORANGE, "s", "Strict autism / PIE enrolment", END_LABEL),
+    ("pie_tea_share_of_applicants_pct", GREEN, "^", "Harmonised PIE / SINACES applicants",
+     END_LABEL_LIFTED),
+]
+#: (b) the five bars of the discrepancy panel: E76 row, wrapped label, colour.
+BARS_B = [
+    ("sinaces_total_autistic_students", "SINACES\ntotal 2022", GOLD),
+    ("special_schools_autism", "Special\nschools", ORANGE),
+    ("sinaces_total_minus_special", "Total −\nspecial\nschools", BLUE),
+    ("pie_harmonised_sinaces", "Published\nharmonised\nPIE\n(SINACES)", PINK),
+    ("pie_harmonised_apuntes60", "Harmonised\nPIE\n(Apuntes\n60)", GREEN),
+]
+#: (e) the three categories of the sex panel: E76 male row, E76 female row, E24 ratio row, label.
+SEX_E = [
+    ("pie_tea_strict_male", "pie_tea_strict_female", "Strict autism 2023 by sex", "Strict\nautism"),
+    ("pie_tea_asperger_male", "pie_tea_asperger_female", "Autism-Asperger 2023 by sex",
+     "Autism-\nAsperger"),
+    ("pie_total_enrolment_male", "pie_total_enrolment_female", "PIE enrolment 2023 by sex",
+     "Total PIE\nenrolment"),
+]
+
+YEARS = [2019, 2020, 2021, 2022, 2023, 2024, 2025]
+DISCREPANCY_YEAR = 2022
+
+
+# --------------------------------------------------------------------------------------------------
+# Reading the two tracked tables
+# --------------------------------------------------------------------------------------------------
+def _value(cell):
+    """A year cell of E76: '106,786' or '13.46' to a float, 'not reported' to NaN."""
+    s = str(cell).strip()
+    if not s or s.lower() in {"not reported", "n/e", "nan", "-", "—"}:
+        return np.nan
+    return float(s.replace(",", ""))
+
+
+def read_series():
+    """Every E76 row as {year: value}, keyed by the row's own `Series` name."""
+    raw = pd.read_csv(TABLE_E76, dtype=str, encoding="utf-8-sig").fillna("")
+    raw.columns = [c.strip() for c in raw.columns]
+    out = {}
+    for _, row in raw.iterrows():
+        out[row["Series"].strip()] = {y: _value(row[str(y)]) for y in YEARS}
+    return out
+
+
+_RATIO = re.compile(r"ratio:\s*([\d.]+)\s*\(\s*([\d.]+)\s*[–-]\s*([\d.]+)\s*\)")
+_GAP = re.compile(r"gap\s+(\d+)")
+
+
+def read_published():
+    """The presentation table E24, keyed by its first column.
+
+    Returns (ratios, gap): the three 2023 male-to-female ratio strings already split into
+    (point, low, high), and the documented number of cases of the 2022 discrepancy.
+    """
+    raw = pd.read_csv(TABLE_E24, dtype=str, encoding="utf-8-sig").fillna("")
+    raw.columns = [c.strip() for c in raw.columns]
+    key = raw.columns[0]
+    rows = {str(r[key]).strip(): r for _, r in raw.iterrows()}
+
+    ratios = {}
+    for label, row in rows.items():
+        if not label.endswith("by sex"):
+            continue
+        m = _RATIO.search(" ".join(str(v) for v in row.values))
+        if m:
+            ratios[label] = tuple(float(g) for g in m.groups())
+
+    gap_row = " ".join(str(v) for v in rows["2022 discrepancy"].values)
+    gap = int(_GAP.search(gap_row).group(1))
+    return ratios, gap
+
+
+def _points(series, key):
+    """The (years, values) actually reported for one E76 row, NaN years dropped."""
+    pairs = [(y, v) for y, v in sorted(series[key].items()) if np.isfinite(v)]
+    return np.array([p[0] for p in pairs], dtype=float), np.array([p[1] for p in pairs], dtype=float)
+
+
+# --------------------------------------------------------------------------------------------------
+# Small drawing helpers, in the plate's own conventions
+# --------------------------------------------------------------------------------------------------
+def _n(x, dec=0):
+    return num(x, "en", dec)
+
+
+def _pct(x, dec=1):
+    return _n(x, dec) + "%"
+
+
+def _context_markers(ax):
+    """The pandemic band and the Law 21.545 marker, both labels in a reserved band at the top.
+
+    The plate reserves 16% of the panel height above the series, shades each pandemic year and
+    writes the two labels inside that band — never over the data. The law label is right-aligned
+    against its dotted line and sits one line lower than the pandemic label, which is where the
+    original's de-overlap pass leaves it: centred over 2020–2021, the two labels would touch.
+    """
+    lo, hi = ax.get_ylim()
+    ax.set_ylim(lo, lo + (hi - lo) * 1.16)
+    for year in PANDEMIC:
+        ax.axvspan(year - 0.5, year + 0.5, color="grey", alpha=0.12, lw=0, zorder=0)
+    ax.annotate(PANDEMIC_MARK, (float(np.mean(PANDEMIC)), 0.988),
+                xycoords=ax.get_xaxis_transform(), xytext=(0, 0), textcoords="offset points",
+                fontsize=FS_MARK, color=GLOSS, ha="center", va="top", zorder=6,
+                bbox=dict(NOTE_HALO))
+    ax.axvline(LAW_X, color=DARK, ls=":", lw=1.1, zorder=0)
+    ax.annotate(LAW_MARK + " ", (LAW_X, 0.988), xycoords=ax.get_xaxis_transform(),
+                xytext=(0, -8), textcoords="offset points", fontsize=FS_MARK, color=DARK,
+                ha="right", va="top", zorder=6, bbox=dict(NOTE_HALO))
+
+
+def _below_legend(ax, y):
+    """The legend of a time panel, centred under its x-axis label as the stored plate places it."""
+    leg = ax.legend(loc="upper center", bbox_to_anchor=(0.5, y), fontsize=FS_LEG,
+                    labelspacing=0.27)
+    leg.set_in_layout(False)
+    return leg
+
+
+def _title(ax, ch):
+    """Panel title: the parenthesised lowercase letter, then the title, both bold and left-aligned
+    on the visible left edge of the column rather than on the axes box."""
+    pos = ax.get_position()
+    x = (TITLE_X[ch] - pos.x0) / pos.width
+    ax.set_title(f"({ch}) {TITLES[ch]}", loc="left", x=x, fontsize=FS_TITLE, fontweight="bold",
+                 pad=3.5, linespacing=1.15)
+
+
+def _foot(fig, gap):
+    """The plate's foot: the grey panel notes of (a) and (e), and the red note of (b) under them."""
+    lh = FOOT_FS * FOOT_LINE / (PLATE_H_IN * 72.0)
+    space = 0.35 * lh
+    y = 0.004
+    for block, colour in ((FOOT_RED.format(gap=_n(gap)), RED), (FOOT_GREY, GLOSS)):
+        fig.text(0.008, y, block, fontsize=FOOT_FS, color=colour, va="bottom", ha="left",
+                 linespacing=FOOT_LINE)
+        y += (block.count("\n") + 1) * lh + space
+
+
+# --------------------------------------------------------------------------------------------------
+# The six panels
+# --------------------------------------------------------------------------------------------------
+def _panel_a(ax, series):
+    """(a) the four PIE series, in thousands of students, with the last value of each labelled."""
+    top = 0.0
+    for key, colour, marker, ls, label, place in SERIES_A:
+        x, v = _points(series, key)
+        ax.plot(x, v / 1e3, marker + ls, color=colour, lw=2, markersize=6, label=label, zorder=3)
+        ax.annotate(_n(v[-1]), (x[-1], v[-1] / 1e3), textcoords="offset points", fontsize=7,
+                    color=colour, fontweight="bold", zorder=5, **place)
+        top = max(top, float(v.max()))
+    ax.set_xticks(YEARS)
+    ax.set_xlabel(X_YEAR)
+    ax.set_ylabel(Y_STUDENTS)
+    ax.yaxis.set_major_formatter(thousands("en"))
+    ax.set_ylim(0, top / 1e3 * 1.35)
+    _context_markers(ax)
+    clean(ax, grid="both")
+    _below_legend(ax, -0.156)
+
+
+def _panel_b(ax, series, year=DISCREPANCY_YEAR):
+    """(b) the five figures of the 2022 discrepancy, each printed over its bar."""
+    values = [series[key][year] for key, _, _ in BARS_B]
+    x = np.arange(len(BARS_B))
+    ax.bar(x, [v / 1e3 for v in values], width=0.62, color=[c for _, _, c in BARS_B], zorder=3)
+    for xi, v in zip(x, values):
+        ax.text(xi, v / 1e3 + 0.6, _n(v), ha="center", va="bottom", fontsize=7.5, color=DARK,
+                fontweight="bold", zorder=5)
+    ax.set_xticks(x)
+    ax.set_xticklabels([lab for _, lab, _ in BARS_B], fontsize=FS_MARK, linespacing=1.15)
+    ax.set_ylabel(Y_STUDENTS)
+    ax.yaxis.set_major_formatter(thousands("en"))
+    ax.set_ylim(0, max(values) / 1e3 * 1.28)
+    clean(ax, grid="both")
+
+
+def _panel_c(ax, series):
+    """(c) the two shares of PIE enrolment and the share of SINACES applicants."""
+    for key, colour, marker, label, place in SERIES_C:
+        x, v = _points(series, key)
+        ax.plot(x, v, marker + "-", color=colour, lw=2, markersize=6, label=label, zorder=3)
+        ax.annotate(_pct(v[-1]), (x[-1], v[-1]), textcoords="offset points", fontsize=7,
+                    color=colour, fontweight="bold", zorder=5, **place)
+    ax.set_xticks(YEARS)
+    ax.set_xlabel(X_YEAR)
+    ax.set_ylabel(Y_SHARE)
+    ax.set_ylim(0, ax.get_ylim()[1])
+    _context_markers(ax)
+    clean(ax, grid="both")
+    _below_legend(ax, -0.141)
+
+
+def _panel_d(ax, series):
+    """(d) the SINACES total with, at the foot of the same bar, the special schools it contains.
+
+    The special-school count is drawn INSIDE the total, never stacked on top of it: SINACES
+    publishes 'total = special autism school + PIE', so adding the two would double-count.
+    """
+    xt, total = _points(series, "sinaces_total_autistic_students")
+    xs, special = _points(series, "special_schools_autism")
+    ax.bar(xt, total / 1e3, width=0.6, color=LIGHT_BLUE, label="SINACES total autistic students",
+           zorder=3)
+    ax.bar(xs, special / 1e3, width=0.6, color=ORANGE, label="Special schools (autism)", zorder=4)
+    for xi, v in zip(xs, special):
+        ax.text(xi, v / 1e3 + 1.5, _n(v), ha="center", va="bottom", fontsize=7, color=ORANGE,
+                zorder=5, bbox=dict(VALUE_HALO))   # the label falls on its own bar, so it is haloed
+    ax.set_xticks(sorted(set(xt) | set(xs)))
+    ax.set_xlabel(X_YEAR)
+    ax.set_ylabel(Y_STUDENTS)
+    ax.yaxis.set_major_formatter(thousands("en"))
+    clean(ax, grid="both")
+    leg = ax.legend(loc="upper left", fontsize=7.5)
+    leg.set_in_layout(False)
+
+
+def _panel_e(ax, series, ratios):
+    """(e) the 2023 sex split on a log axis, the ratio and its interval under each category."""
+    x = np.arange(len(SEX_E))
+    male = np.array([series[m][2023] for m, _, _, _ in SEX_E])
+    female = np.array([series[f][2023] for _, f, _, _ in SEX_E])
+    ax.bar(x - 0.2, male / 1e3, width=0.38, color=BLUE, label="Males", zorder=3)
+    ax.bar(x + 0.2, female / 1e3, width=0.38, color=ORANGE, label="Females", zorder=3)
+    log_axis(ax, "y", "en")
+    both = np.concatenate([male, female]) / 1e3
+    ax.set_ylim(max(0.5, float(both.min()) * 0.35), float(both.max()) * 8)
+    ax.set_xticks(x)
+    ax.set_xticklabels([f"{lab}\n{_n(ratios[row][0], 2)} "
+                        f"({_n(ratios[row][1], 2)}–{_n(ratios[row][2], 2)})"
+                        for _, _, row, lab in SEX_E], fontsize=FS_CELL, linespacing=1.15)
+    ax.set_ylabel(Y_STUDENTS)
+    clean(ax, grid="both")
+    leg = ax.legend(loc="upper left", fontsize=7.5)
+    leg.set_in_layout(False)
+
+
+def _panel_f(ax, series):
+    """(f) regular against exceptional entry, with the exceptional share over its own bar."""
+    xr, regular = _points(series, "pie_tea_regular_entry")
+    xe, exceptional = _points(series, "pie_tea_exceptional_entry")
+    ax.bar(xr - 0.19, regular / 1e3, width=0.36, color=BLUE, label="Regular entry", zorder=3)
+    ax.bar(xe + 0.19, exceptional / 1e3, width=0.36, color=ORANGE, label="Exceptional entry",
+           zorder=3)
+    share = {y: 100 * e / (r + e) for y, r, e in zip(xe, regular, exceptional)}
+    for xi, v in zip(xe, exceptional):
+        ax.text(xi + 0.19, v / 1e3 + 1.2, _pct(share[xi], 0), ha="center", va="bottom",
+                fontsize=6.8, color=DARK, zorder=5)
+    ax.set_xticks(sorted(set(xr) | set(xe)))
+    ax.set_xlabel(X_YEAR)
+    ax.set_ylabel(Y_STUDENTS)
+    ax.yaxis.set_major_formatter(thousands("en"))
+    clean(ax, grid="both")
+    leg = ax.legend(loc="upper left", fontsize=7.5)
+    leg.set_in_layout(False)
+
+
+# --------------------------------------------------------------------------------------------------
+def draw_figE24_education_detail():
+    series = read_series()
+    ratios, gap = read_published()
+
+    style()
+    plt.rcParams.update(PLATE_RC)
+    fig = plt.figure(figsize=(PLATE_W_IN, PLATE_H_IN))
+    ax = {ch: fig.add_axes(BOXES[ch]) for ch in "abcdef"}
+
+    _panel_a(ax["a"], series)
+    _panel_b(ax["b"], series)
+    _panel_c(ax["c"], series)
+    _panel_d(ax["d"], series)
+    _panel_e(ax["e"], series, ratios)
+    _panel_f(ax["f"], series)
+    for ch in "abcdef":
+        _title(ax[ch], ch)
+    _foot(fig, gap)
+    return fig
+
+
+# --------------------------------------------------------------------------------------------------
+# Verification: every drawn figure against the plate's own presentation table, E24
+# --------------------------------------------------------------------------------------------------
+def _check():
+    """Compare what the panels draw, read from E76, with what E24 prints for the same cell."""
+    series = read_series()
+    raw = pd.read_csv(TABLE_E24, dtype=str, encoding="utf-8-sig").fillna("")
+    raw.columns = [c.strip() for c in raw.columns]
+    by_year = {int(r[raw.columns[0]]): r for _, r in raw.iterrows()
+               if str(r[raw.columns[0]]).strip().isdigit()}
+    out = []
+
+    columns = [("Strict autism", "pie_tea_strict"),
+               ("Autism-Asperger", "pie_tea_asperger"),
+               ("Harmonised (Apuntes 60)", "pie_harmonised_apuntes60"),
+               ("Harmonised (SINACES)", "pie_harmonised_sinaces"),
+               ("Special schools", "special_schools_autism"),
+               ("Regular entry", "pie_tea_regular_entry"),
+               ("Exceptional entry", "pie_tea_exceptional_entry")]
+    for column, key in columns:
+        for year, row in by_year.items():
+            printed, drawn = _value(row[column]), series[key][year]
+            if np.isnan(printed) and np.isnan(drawn):
+                continue
+            out.append((f"{column} {year}", drawn, printed,
+                        bool(np.isfinite(drawn) and np.isfinite(printed) and drawn == printed)))
+
+    # (c): the one-decimal shares E24 prints must be the two-decimal E76 shares this module draws
+    for column, key in (("% of PIE enrolment", "pie_harmonised_share_of_pie_pct"),
+                        ("% of SINACES applicants", "pie_tea_share_of_applicants_pct")):
+        for year, row in by_year.items():
+            cell = str(row[column]).strip()
+            if not cell.endswith("%"):
+                continue
+            drawn, printed = series[key][year], float(cell.rstrip("%"))
+            out.append((f"{column} {year}", round(drawn, 1), printed, round(drawn, 1) == printed))
+
+    # (b): the SINACES total, the subtraction and the published harmonised figure of 2022
+    total = series["sinaces_total_autistic_students"][DISCREPANCY_YEAR]
+    special = series["special_schools_autism"][DISCREPANCY_YEAR]
+    derived = series["sinaces_total_minus_special"][DISCREPANCY_YEAR]
+    published = series["pie_harmonised_sinaces"][DISCREPANCY_YEAR]
+    _ratios, gap = read_published()
+    out += [("(b) total − special = derived", total - special, derived, total - special == derived),
+            ("(b) documented gap", published - derived, float(gap), published - derived == gap),
+            ("(b) Apuntes 60 equals the subtraction",
+             series["pie_harmonised_apuntes60"][DISCREPANCY_YEAR], derived,
+             series["pie_harmonised_apuntes60"][DISCREPANCY_YEAR] == derived)]
+
+    # (e): the parsed ratios and their intervals against male / female of the same year. The
+    # interval E24 publishes is an exact binomial on the male share, so Clopper–Pearson limits
+    # turned back into a ratio must reproduce the printed pair; they are checked, never substituted.
+    from scipy import stats
+    ratios, _gap = read_published()
+    for male, female, row, label in SEX_E:
+        m, f = series[male][2023], series[female][2023]
+        n = m + f
+        lo = stats.beta.ppf(0.025, m, n - m + 1)
+        hi = stats.beta.ppf(0.975, m + 1, n - m)
+        drawn = [round(m / f, 2), round(float(lo / (1 - lo)), 2), round(float(hi / (1 - hi)), 2)]
+        printed = [round(v, 2) for v in ratios[row]]
+        out.append((f"(e) {label.replace(chr(10), ' ')} ratio (95% CI)", drawn, printed,
+                    drawn == printed))
+
+    # (f): the annotated share of exceptional entries
+    for year in (2022, 2023, 2024, 2025):
+        regular = series["pie_tea_regular_entry"][year]
+        exceptional = series["pie_tea_exceptional_entry"][year]
+        total_entry = series["pie_harmonised_sinaces"][year]
+        out.append((f"(f) entries sum to the harmonised total {year}", regular + exceptional,
+                    total_entry, regular + exceptional == total_entry))
+    return out
+
+
+draw_figE24_education_detail()
+```
 
 ### Figure S40. Figure E25. JUNAEB EVE: caregiver-reported autism in selected school cohorts, 2019–2025
 
-::: {.callout-note collapse="true"}
-## Stored image — this plate has no drawing code here
+```{python}
+#| label: lamina-fige25_junaeb_detail
+#| fig-cap: "Figure S40. Redrawn here from the published tables by the code above."
+import sys
+import textwrap
+from pathlib import Path
 
-Its series are not fully carried by any published table, so it cannot be redrawn from a
-clone. The code that produced it is in `study/pipeline/`; what is missing is the microdata
-it reads.
-:::
+import numpy as np
+import pandas as pd
+import matplotlib.pyplot as plt
+from matplotlib.ticker import FuncFormatter, MultipleLocator
 
-![**Figure E25. JUNAEB EVE: caregiver-reported autism in selected school cohorts, 2019–2025** (a) Weighted percentage of students with reported autism by level and year, with 95% CI; crosses mark the years that are not estimable as a weighted percentage. (b) Percentage by sex, level and year; the asterisk marks cells without a published weight, where the unweighted percentage is shown. (c) Students in the estimation domain (bars, left axis) and unweighted autism cases (dots and dotted line, right axis). (d) Weighted versus unweighted percentage, with the identity diagonal. (e) Male-to-female ratio by level and year, with the 3:1 and 4:1 clinical-literature references. (f) Availability of the autism item and of the weight by year and level. The questionnaire has no autism category in 2019–2022; the item appears in 2023 with no published weight; the published weight is EXP_REG in 2024 and EXP in 2025; in 2024 the grade-9 variable is completely empty and is reported as &#x27;not estimable&#x27;, never as zero. Unit: surveyed students (caregiver report); denominator: students in the estimation domain. JUNAEB represents selected school cohorts and is NOT national prevalence. Counts are administrative recognition, never prevalence or incidence. Sources are not person-linked: no ratio between sources is a cascade or an individual probability. Law 21.545 (March 2023) is policy context, not an intervention with an estimable effect. 2020–2021: pandemic reporting disruption.](study/corpus/figures/figE25_junaeb_detail.jpg){fig-align="center" width="100%"}
+sys.path.insert(0, str(ROOT / "docs" / "study"))   # docs/study, so `figstyle` resolves
+from figstyle import *                                          # noqa: F401,F403  (house style)
+
+PLATE = "figE25_junaeb_detail"
+SOURCES = [
+    "docs/study/corpus/tables/E25_junaeb_detail.csv",
+    "docs/study/corpus/tables/E77_education_junaeb_full.csv",
+    "docs/study/corpus/tables/ST6_junaeb_items.csv",
+]
+E25, E77, ST6 = SOURCES
+NOTE = ("Redraws the six panels of E25 — weighted percentage by level and year with its not-estimable "
+        "years, percentage by sex, students and unweighted cases, weighted against unweighted, the "
+        "male-to-female ratio and the item/weight availability grid — from the published JUNAEB EVE "
+        "tables E25, E77 and ST6, keeping the weighted/unweighted distinction of the original.")
+
+ROOT = BASE.parent.parent          # docs/study -> docs -> repository root
+
+YEARS = [2019, 2020, 2021, 2022, 2023, 2024, 2025]
+#: Levels in the plate's own order, with the colour each one carries in every panel.
+LEVELS = [("Pre-school", BLUE, "Pre"), ("Grade 1", ORANGE, "G1"),
+          ("Grade 5", GREEN, "G5"), ("Grade 9", PINK, "G9")]
+LEVEL_COLOUR = {name: colour for name, colour, _ in LEVELS}
+LEVEL_SHORT = {name: short for name, _, short in LEVELS}
+ORDER = [name for name, _, _ in LEVELS]
+
+RED = '#c0392b'                    # the clinical-literature reference lines of panel (e)
+LAW_X = 2023 - 0.30                # Law 21.545, published 10 March 2023, on an axis of whole years
+PANDEMIC = (2020, 2021)
+PCT_AXIS = 'Weighted percentage (%)'
+NE = 'n/e'                         # how the tables spell a cell that is not estimable
+
+#: Foot of the plate: one note per panel, printed under the six panels as the original prints them.
+FOOT = [
+    ('a', "the last year of each level is labelled; the full series is in the companion table. "
+          "× = not estimable as a weighted percentage (no autism item 2019–2022; no published "
+          "weight in 2023; grade 9 in 2024 has a completely empty variable: 'not estimable', never "
+          "zero)."),
+    ('b', "* unweighted percentage (2023 has no published weight); grade 9 in 2024 is not estimable."),
+    ('c', "unweighted autism cases: 2023–2025 only, and no grade 9 in 2024."),
+    ('d', "JUNAEB is not national prevalence: selected school cohorts with caregiver report."),
+    ('e', "* ratio of unweighted percentages (2023 has no published weight)."),
+    ('f', "the autism item appears in 2023; the published weight changes from EXP_REG (2024) to EXP "
+          "(2025). In 2024 the grade-9 autism variable is completely empty: 'not estimable', never "
+          "zero."),
+]
+FOOT_FS, FOOT_W_PT, FOOT_LINE = 6.4, 493.2, 1.28   # 6.4 pt over 180 mm less a 3 mm margin each side
+FOOT_X, FOOT_Y = 0.0087, 0.06878                   # where the stored plate starts its foot block
+
+#: Panel (f): the three availability states, their symbol and their cell fill.
+STATUS = {'yes': ('✓', '#d9ead3'), 'unweighted_only': ('~', '#fce5cd'), 'no': ('×', '#f4cccc')}
+KEY = ("✓ = weighted % · ~ = unweighted only · × = not estimable. Levels: "
+       + " · ".join(f'{short} = {name}' for name, _, short in LEVELS) + '.')
+
+
+# ------------------------------------------------------------------ tracked tables and their parsing
+def _read(rel):
+    """Read one tracked table by its repository-relative path (the paths listed in SOURCES)."""
+    return pd.read_csv(ROOT/rel, encoding='utf-8-sig')
+
+
+def _int(s):
+    """'217,506' -> 217506 ; the presentation tables store counts as formatted strings."""
+    s = str(s).strip()
+    return np.nan if s.startswith(NE) else float(s.replace(',', '').replace('%', ''))
+
+
+def _value_ci(s):
+    """'6.60 (6.48–6.73)' -> (6.60, 6.48, 6.73) ; 'n/e' -> three NaN."""
+    s = str(s).strip()
+    if s.startswith(NE):
+        return np.nan, np.nan, np.nan
+    head, _, tail = s.partition('(')
+    lo, _, hi = tail.rstrip(')').partition('–')
+    return float(head.strip()), float(lo), float(hi)
+
+
+def _pct(s):
+    """'4.17%' -> 4.17 ; 'n/e' -> NaN. Panel (b) and (d) read the unweighted column this way."""
+    s = str(s).strip()
+    return np.nan if s.startswith(NE) else float(s.rstrip('%'))
+
+
+def _wilson(x, n, z=1.959963984540054):
+    """The 95% Wilson interval for x successes out of n, as a percentage.
+
+    E77 publishes no interval for the 2023 columns because no weight was published that year; its
+    'Weight and design' column states the rule the original followed — 'unweighted proportions with
+    Wilson CI' — and this is that interval, computed from the two counts the table does print.
+    """
+    if not np.isfinite(x) or not np.isfinite(n) or n <= 0:
+        return np.nan, np.nan
+    p, d = x/n, 1 + z*z/n
+    centre = (p + z*z/(2*n))/d
+    half = z*np.sqrt(p*(1 - p)/n + z*z/(4*n*n))/d
+    return 100*(centre - half), 100*(centre + half)
+
+
+def junaeb():
+    """E25, one row per level and year: students, cases, the two percentages, the ratio, the state."""
+    t = _read(E25)
+    v = t['% Weighted (95% CI)'].map(_value_ci)
+    r = t['Male-to-female ratio (95% CI)'].map(_value_ci)
+    return pd.DataFrame({
+        'year': t.Year.astype(int),
+        'level': t.Level.astype(str),
+        'students': t['Students in domain'].map(_int),
+        'cases': t['Autism cases (unweighted)'].map(_int),
+        'weighted': [a for a, _, _ in v], 'lo': [b for _, b, _ in v], 'hi': [c for _, _, c in v],
+        'unweighted': t['% unweighted'].map(_pct),
+        'ratio': [a for a, _, _ in r], 'ratio_lo': [b for _, b, _ in r],
+        'ratio_hi': [c for _, _, c in r],
+        'estimable': t.Estimable.astype(str),
+    })
+
+
+def by_sex():
+    """E77 restricted to the two sex rows, with the interval each cell is entitled to.
+
+    Where a weighted percentage is published the value and its design-based interval are used; where
+    it is not — 2023, and grade 9 in 2024 — the unweighted percentage is used with a Wilson interval
+    from the same row's counts, which is what the original plots behind the asterisk.
+    """
+    t = _read(E77)
+    t = t[t.Sex.isin(['Males', 'Females'])].copy()
+    t['level'] = t.Level.replace({'Year 9': 'Grade 9'})       # E77 spells grade 9 'Year 9'
+    counts = t['Students; ASD cases'].str.split(';', expand=True)
+    t['students'], t['cases'] = counts[0].map(_int), counts[1].map(_int)
+    w = t['Weighted % (95% CI)'].map(_value_ci)
+    t['weighted'] = [a for a, _, _ in w]
+    t['w_lo'] = [b for _, b, _ in w]
+    t['w_hi'] = [c for _, _, c in w]
+    t['unweighted'] = t['Unweighted %'].map(_pct)
+    t['value'] = t.weighted.fillna(t.unweighted)
+    wilson = [_wilson(x, n) for x, n in zip(t.cases, t.students)]
+    t['lo'] = [w_ if np.isfinite(w_) else u for w_, (u, _) in zip(t.w_lo, wilson)]
+    t['hi'] = [w_ if np.isfinite(w_) else u for w_, (_, u) in zip(t.w_hi, wilson)]
+    return t[['Year', 'level', 'Sex', 'students', 'cases', 'weighted', 'value', 'lo', 'hi']] \
+        .rename(columns={'Year': 'year', 'Sex': 'sex'})
+
+
+def availability():
+    """ST6, one row per year: the state of each level, the autism item and the published weight."""
+    t = _read(ST6)
+    t = t.assign(level=t.Level.str.split(' (', regex=False).str[0],
+                 state=t.Estimability.map(lambda s: 'yes' if str(s).startswith('estimable')
+                                          else ('unweighted_only' if str(s).startswith('unweighted')
+                                                else 'no')),
+                 weight=t['Auxiliary variables (weight · sex · grade)']
+                 .str.split(' · ').str[0]
+                 .map(lambda s: 'absent' if s.strip() == 'not published' else s.strip()))
+    rows = []
+    for year in YEARS:
+        s = t[t.Year == year].set_index('level')
+        rows.append({'year': year,
+                     'states': {name: s.at[name, 'state'] for name in ORDER},
+                     # the plate names the item of the first level, which is the pre-school variable
+                     'item': str(s.at['Pre-school', 'ASD variable']),
+                     'weight': ', '.join(sorted(set(s.weight)))})
+    return pd.DataFrame(rows)
+
+
+def _check_published(j, s, av):
+    """Assert that every value about to be drawn is the one the tracked tables print.
+
+    It re-reads the three tables as text and compares the parsed series cell by cell, so a change of
+    parsing, of level naming or of the case the plate selects fails here rather than on the page.
+    """
+    bad = []
+    e25 = _read(E25)
+    e25 = e25.set_index([e25.Year.astype(int), e25.Level.astype(str)])
+    for r in j.itertuples():
+        cell = e25.loc[(r.year, r.level)]
+        want = str(cell['% Weighted (95% CI)']).strip()
+        got = NE if not np.isfinite(r.weighted) else f'{r.weighted:.2f} ({r.lo:.2f}–{r.hi:.2f})'
+        if want != got:
+            bad.append(f'(a) {r.level} {r.year}: weighted {got!r} vs published {want!r}')
+        want = str(cell['Male-to-female ratio (95% CI)']).strip()
+        got = NE if not np.isfinite(r.ratio) else \
+            f'{r.ratio:.2f} ({r.ratio_lo:.2f}–{r.ratio_hi:.2f})'
+        if want != got:
+            bad.append(f'(e) {r.level} {r.year}: ratio {got!r} vs published {want!r}')
+        want = str(cell['Students in domain']).strip()
+        if f'{int(r.students):,}' != want:
+            bad.append(f'(c) {r.level} {r.year}: students {r.students} vs published {want!r}')
+        want = str(cell['Autism cases (unweighted)']).strip()
+        got = NE if not np.isfinite(r.cases) else f'{int(r.cases):,}'
+        if want != got:
+            bad.append(f'(c) {r.level} {r.year}: cases {got!r} vs published {want!r}')
+
+    # grade 9 in 2024 must reach the panels as absent, never as a zero
+    g9 = j[(j.year == 2024) & (j.level == 'Grade 9')].iloc[0]
+    if np.isfinite(g9.weighted) or np.isfinite(g9.cases) or np.isfinite(g9.ratio):
+        bad.append('grade 9 2024 must be not estimable in (a), (c) and (e)')
+
+    e77 = _read(E77)
+    e77 = e77.assign(level=e77.Level.replace({'Year 9': 'Grade 9'})).set_index(['Year', 'level', 'Sex'])
+    for r in s.itertuples():
+        cell = e77.loc[(r.year, r.level, r.sex)]
+        want = str(cell['Weighted % (95% CI)']).strip()
+        if want.startswith(NE):
+            if str(cell['Unweighted %']).strip().startswith(NE):
+                if np.isfinite(r.value):
+                    bad.append(f'(b) {r.level} {r.year} {r.sex}: drawn {r.value} but published n/e')
+            elif f'{r.value:.2f}' != f'{float(cell["Unweighted %"]):.2f}':
+                bad.append(f'(b) {r.level} {r.year} {r.sex}: {r.value} vs unweighted {cell["Unweighted %"]}')
+        elif want != f'{r.value:.2f} ({r.lo:.2f}–{r.hi:.2f})':
+            bad.append(f'(b) {r.level} {r.year} {r.sex}: weighted vs published {want!r}')
+
+    st6 = _read(ST6)
+    for _, r in av.iterrows():
+        for name in ORDER:
+            rows = st6[(st6.Year == r['year']) & (st6.Level.str.startswith(name))]
+            want = str(rows.Estimability.iloc[0])
+            got = r['states'][name]
+            if (got == 'yes') != want.startswith('estimable'):
+                bad.append(f'(f) {name} {r["year"]}: state {got!r} vs published {want!r}')
+        want_item = str(st6[(st6.Year == r['year'])
+                            & (st6.Level.str.startswith('Pre-school'))]['ASD variable'].iloc[0])
+        if r['item'] != want_item:
+            bad.append(f'(f) {r["year"]}: item {r["item"]!r} vs published {want_item!r}')
+
+    if bad:
+        raise AssertionError('redraw disagrees with the published tables:\n  ' + '\n  '.join(bad))
+
+
+# ---------------------------------------------------------------------------------- shared drawing
+def _fmt(ax, which='y', dec=0):
+    """Tick labels in the house number format, as the stored plate writes them."""
+    axis = ax.yaxis if which == 'y' else ax.xaxis
+    axis.set_major_formatter(FuncFormatter(lambda v, p: num(v, 'en', dec)))
+
+
+def _panel_title(fig, x, y, ch, title):
+    """Bold '(x) Title' anchored to the left margin of the grid cell, not to the axes."""
+    fig.text(x, y, f'({ch}) {title}', fontweight='bold', fontsize=9, ha='left', va='bottom')
+
+
+def _halo(alpha=0.75):
+    return dict(facecolor='white', edgecolor='none', alpha=alpha, pad=0.8)
+
+
+# ------------------------------------------------------------------------------------------ panels
+def _panel_a(ax, j):
+    """(a) weighted percentage by level and year, with the not-estimable years marked on the floor."""
+    for level, colour, _ in LEVELS:
+        d = j[(j.level == level) & j.weighted.notna()].sort_values('year')
+        ax.errorbar(d.year.to_numpy(), d.weighted.to_numpy(),
+                    yerr=[(d.weighted - d.lo).to_numpy(), (d.hi - d.weighted).to_numpy()],
+                    fmt='o-', color=colour, lw=2, markersize=6, capsize=3, label=level, zorder=3)
+    # one cross per year that has no weighted percentage at all; the levels of a year sit on top of
+    # one another exactly as in the stored plate, so 2019-2024 show six crosses between them
+    for _, r in j[j.estimable != 'yes (weighted)'].iterrows():
+        ax.plot([r.year], [0.25], marker='x', color=GREY, markersize=6, zorder=3)
+
+    for x in PANDEMIC:
+        ax.axvspan(x - 0.5, x + 0.5, color='grey', alpha=0.12, lw=0, zorder=0)
+    ax.text(np.mean(PANDEMIC), 0.988, '2020–2021 (pandemic)', transform=ax.get_xaxis_transform(),
+            fontsize=6.2, color='#555555', ha='center', va='top', zorder=6, bbox=_halo(0.85))
+    ax.axvline(LAW_X, color='#333333', ls=':', lw=1.1, zorder=1)
+    ax.text(LAW_X, 0.932, 'Law 21.545 (2023) ', transform=ax.get_xaxis_transform(), fontsize=6.2,
+            color='#333333', ha='right', va='top', zorder=6, bbox=_halo(0.85))
+
+    ax.set_xticks(YEARS)
+    ax.set_xlim(min(YEARS) - 0.45, max(YEARS) + 1.15)
+    ax.set_ylim(0, 13 * 1.16)          # the plate reserves the top sixth of the panel for its marks
+    ax.set_yticks(np.arange(0, 15, 2))
+    ax.set_xlabel('Year')
+    ax.set_ylabel(PCT_AXIS)
+    _fmt(ax)
+    # the last year of each level, labelled where the stored plate puts it
+    place = {'Grade 1': (3.8, 3.0, 'left', 'bottom'), 'Pre-school': (0, -5, 'center', 'top'),
+             'Grade 5': (7, 3, 'left', 'center'), 'Grade 9': (0, -5, 'center', 'top')}
+    for level, colour, _ in LEVELS:
+        d = j[(j.level == level) & j.weighted.notna()].sort_values('year')
+        last = d.iloc[-1]
+        dx, dy, ha, va = place[level]
+        ax.annotate(num(last.weighted, 'en', 2), (last.year, last.weighted), xytext=(dx, dy),
+                    textcoords='offset points', ha=ha, va=va, fontsize=6.4, color=colour, zorder=6)
+    ax.legend(loc='upper right', fontsize=7.5, frameon=True, facecolor='white', edgecolor='none',
+              framealpha=0.82, borderpad=0.25)
+    clean(ax, 'both')
+
+
+def _panel_b(ax, s):
+    """(b) percentage by sex, level and year; 2023 and grade 9 2024 carry the asterisk."""
+    keys = [(y, l) for y in (2023, 2024, 2025) for l in ORDER]
+    x = np.arange(len(keys))
+    for off, sex, colour in ((-0.2, 'Males', BLUE), (0.2, 'Females', ORANGE)):
+        v, lo, hi = [], [], []
+        for year, level in keys:
+            r = s[(s.year == year) & (s.level == level) & (s.sex == sex)]
+            value = float(r.value.iloc[0]) if len(r) else np.nan
+            v.append(value)
+            lo.append(max(value - float(r.lo.iloc[0]), 0) if len(r) and np.isfinite(value) else 0)
+            hi.append(max(float(r.hi.iloc[0]) - value, 0) if len(r) and np.isfinite(value) else 0)
+        ax.bar(x + off, [0 if not np.isfinite(q) else q for q in v], width=0.38, color=colour,
+               label=sex, zorder=3)
+        ax.errorbar(x + off, v, yerr=[lo, hi], fmt='none', ecolor='#333333', elinewidth=0.8,
+                    capsize=2, zorder=4)
+    # a cell is asterisked when no weighted percentage is published for either sex
+    star = {(y, l) for y, l in keys
+            if not s[(s.year == y) & (s.level == l)].weighted.notna().any()}
+    ax.set_xticks(x)
+    ax.set_xticklabels([f'{l} {y}' + (' *' if (y, l) in star else '') for y, l in keys],
+                       fontsize=6.2, rotation=45, ha='right')
+    ax.set_ylim(0, float(np.nanmax(s.value)) * 1.25)
+    ax.set_yticks(np.arange(0, 15, 2))
+    ax.set_ylabel(PCT_AXIS)
+    _fmt(ax)
+    ax.legend(loc='upper left', fontsize=7.5, frameon=True, facecolor='white', edgecolor='none',
+              framealpha=0.82, borderpad=0.25)
+    clean(ax, 'both')
+
+
+def _panel_c(ax, j):
+    """(c) students in the estimation domain (bars) and unweighted autism cases (dots, right axis)."""
+    x = np.arange(len(YEARS))
+    for i, (level, colour, _) in enumerate(LEVELS):
+        d = j[j.level == level].set_index('year').reindex(YEARS)
+        ax.bar(x + (i - 1.5) * 0.2, d.students/1e3, width=0.19, color=colour, label=level, zorder=3)
+    ax.set_xticks(x)
+    ax.set_xticklabels([str(y) for y in YEARS])
+    ax.set_xlabel('Year')
+    ax.set_ylabel('Students (thousands)')
+    ax.set_ylim(0, float(j.students.max())/1e3 * 1.40)
+    ax.yaxis.set_major_locator(MultipleLocator(100))
+    _fmt(ax)
+    ax.legend(loc='upper center', fontsize=6.2, frameon=True, facecolor='white', edgecolor='none',
+              framealpha=0.95, borderpad=0.25)
+    clean(ax, 'both')
+
+    right = ax.twinx()
+    for level, colour, _ in LEVELS:
+        d = j[j.level == level].set_index('year').reindex(YEARS)
+        # grade 9 2024 is NaN, so its dotted line breaks there instead of dropping to zero
+        right.plot(x, d.cases/1e3, 'o:', color=colour, lw=1.4, markersize=4, zorder=4)
+    right.set_ylabel('Unweighted autism cases (thousands)')
+    right.yaxis.set_major_locator(MultipleLocator(2))
+    _fmt(right, dec=1)
+    right.grid(False)
+    right.spines['top'].set_visible(False)
+    right.spines['right'].set_visible(True)
+
+
+def _panel_d(ax, j):
+    """(d) weighted against unweighted percentage, with the identity diagonal."""
+    d = j[j.weighted.notna()]
+    ax.scatter(d.unweighted, d.weighted, c=[LEVEL_COLOUR[l] for l in d.level], s=60,
+               edgecolor='white', linewidth=0.6, zorder=3)
+    lim = float(max(d.unweighted.max(), d.weighted.max())) * 1.18
+    ax.plot([0, lim], [0, lim], '--', color=GREY, lw=1.0, zorder=2)
+    # the stored plate puts every label up and to the right of its point, and flips only G1 2024,
+    # which would otherwise sit on top of Pre 2024
+    for r in d.itertuples():
+        left = (r.level, r.year) == ('Grade 1', 2024)
+        ax.annotate(f'{LEVEL_SHORT[r.level]} {r.year}', (r.unweighted, r.weighted),
+                    xytext=(-4.1 if left else 4.0, 5.9), textcoords='offset points',
+                    ha='right' if left else 'left', va='center', fontsize=6.2, zorder=6,
+                    bbox=_halo())
+    ax.set_xlim(0, lim * 1.30)
+    ax.set_ylim(0, lim)
+    ax.set_xlabel('Unweighted percentage (%)')
+    ax.set_ylabel(PCT_AXIS)
+    _fmt(ax, 'x')
+    _fmt(ax, 'y')
+    clean(ax, 'both')
+
+
+def _panel_e(ax, j):
+    """(e) male-to-female ratio by level and year, against the 3:1 and 4:1 clinical references."""
+    # the plate orders the eleven points by level NAME and then year, which is why grade 9 comes
+    # before pre-school on the axis; grade 9 2024 has no ratio and simply is not there
+    d = j[j.ratio.notna()].sort_values(['level', 'year'])
+    x = np.arange(len(d))
+    ax.errorbar(x, d.ratio.to_numpy(),
+                yerr=[(d.ratio - d.ratio_lo).clip(lower=0).to_numpy(),
+                      (d.ratio_hi - d.ratio).clip(lower=0).to_numpy()],
+                fmt='o', color=BLUE, markersize=6, capsize=3, lw=1.6, zorder=3)
+    ax.scatter(x, d.ratio, c=[LEVEL_COLOUR[l] for l in d.level], s=55, edgecolor='white',
+               linewidth=0.6, zorder=4)
+    ax.axhline(3, color=RED, ls='--', lw=1.0, zorder=2)
+    ax.axhline(4, color=RED, ls=':', lw=1.0, zorder=2)
+    # '3:1' sits on its own line; the stored plate drops '4:1' clear of the 4.0 rule instead of
+    # writing it against the top of the panel, and it is placed here where the plate places it
+    for y, label in ((3.00, ' 3:1'), (3.39, ' 4:1')):
+        ax.text(len(d) - 0.5, y, label, fontsize=7, color=RED, va='bottom', ha='right', zorder=6,
+                bbox=_halo(0.8))
+    ax.set_xticks(x)
+    ax.set_xticklabels([f'{r.level} {r.year}' + ('' if r.estimable == 'yes (weighted)' else ' *')
+                        for r in d.itertuples()], fontsize=6.4, rotation=45, ha='right')
+    ax.set_xlim(-0.5, len(d) - 0.5)
+    ax.set_ylim(0, max(4.6, float(d.ratio_hi.max()) * 1.12))
+    ax.set_ylabel('Male-to-female ratio')
+    ax.yaxis.set_major_locator(MultipleLocator(1))
+    _fmt(ax, dec=1)
+    clean(ax, 'both')
+
+
+def _panel_f(ax, av):
+    """(f) availability of the autism item and of the published weight, year by level."""
+    ax.axis('off')
+    header = ['Year'] + [short for _, _, short in LEVELS] + ['Autism item', 'Weight']
+    cells, colours = [], []
+    for _, r in av.iterrows():
+        row, fill = [str(r['year'])], ['white']
+        for name in ORDER:
+            symbol, colour = STATUS[r['states'][name]]
+            row.append(symbol)
+            fill.append(colour)
+        cells.append(row + [r['item'], r['weight']])   # r.item is a Series method, not the column
+        colours.append(fill + ['white', 'white'])
+    table = ax.table(cellText=cells, colLabels=header, cellColours=colours, cellLoc='center',
+                     colWidths=[0.11, 0.095, 0.095, 0.095, 0.095, 0.26, 0.25],
+                     bbox=[0.0, 0.40, 1.0, 0.56])
+    table.auto_set_font_size(False)
+    table.set_fontsize(6.4)
+    for (row, _col), cell in table.get_celld().items():
+        cell.set_linewidth(0.4)
+        if row == 0:
+            cell.set_text_props(fontweight='bold')
+            cell.set_facecolor('#e8e8e8')
+    ax.text(0.0, 0.34, '\n'.join(textwrap.wrap(KEY, 62)), transform=ax.transAxes, fontsize=6.2,
+            color='#333333', va='top', linespacing=1.3)
+
+
+def _foot(fig):
+    """The plate's own foot: the six panel notes, wrapped to the width of the canvas."""
+    renderer = fig.canvas.get_renderer()
+    probe = fig.text(0, 0, '', fontsize=FOOT_FS)
+
+    def width(s):
+        probe.set_text(s)
+        return probe.get_window_extent(renderer).width/fig.dpi*72
+
+    text, line = [], ''
+    for word in ' '.join(f'({ch}) {note}' for ch, note in FOOT).split():
+        trial = f'{line} {word}'.strip()
+        if line and width(trial) > FOOT_W_PT:
+            text.append(line)
+            line = word
+        else:
+            line = trial
+    text.append(line)
+    probe.remove()
+    fig.text(FOOT_X, FOOT_Y, '\n'.join(text), fontsize=FOOT_FS, color='#555555', ha='left',
+             va='top', linespacing=FOOT_LINE)
+
+
+# -------------------------------------------------------------------------------------------- draw
+def draw_figE25_junaeb_detail():
+    """Draw the six panels of E25 and hand back the figure."""
+    j, s, av = junaeb(), by_sex(), availability()
+    _check_published(j, s, av)
+
+    style()
+    plt.rcParams.update({'xtick.labelsize': 7.0, 'ytick.labelsize': 7.0, 'legend.fontsize': 7.0,
+                         'axes.labelsize': 8.0})
+    fig = plt.figure(figsize=(180/25.4, 245/25.4))     # the plate is a 180 x 245 mm page, 3 x 2
+    # the axes rectangles of the stored plate, measured from it: two columns, three rows of equal size
+    cols = [(0.0616, 0.3997), (0.5857, 0.3994)]
+    rows = [(0.7681, 0.2088), (0.4417, 0.2089), (0.1686, 0.2090)]
+    axes = [fig.add_axes([cols[i % 2][0], rows[i//2][0], cols[i % 2][1], rows[i//2][1]])
+            for i in range(6)]
+
+    _panel_a(axes[0], j)
+    _panel_b(axes[1], s)
+    _panel_c(axes[2], j)
+    _panel_d(axes[3], j)
+    _panel_e(axes[4], j)
+    _panel_f(axes[5], av)
+
+    titles = ['Weighted percentage by level and year', 'Percentage by sex, level and year',
+              'Students in the domain and autism cases', 'Weighted versus unweighted',
+              'Male-to-female ratio by level and year', 'Item and weight availability by year']
+    # the titles hang from the left margin of the grid CELL, not from the axes, which is why the
+    # three of the left column line up although their y-tick labels are of very different widths
+    title_x = [0.0111, 0.5436]
+    title_y = [0.97944, 0.65288, 0.37982]
+    for i, title in enumerate(titles):
+        _panel_title(fig, title_x[i % 2], title_y[i//2], 'abcdef'[i], title)
+    _foot(fig)
+    return fig
+
+
+draw_figE25_junaeb_detail()
+```
 
 
 ## Sex ratio across sources
 
 ### Figure S41. Figure E26. Comparison across administrative systems: index, raw value, population rate and value per reporting unit, with their denominators, 2019–2025 — F84 family excluding Rett syndrome
 
-::: {.callout-note collapse="true"}
-## Stored image — this plate has no drawing code here
+```{python}
+#| label: lamina-fige26_cross_source
+#| fig-cap: "Figure S41. Redrawn here from the published tables by the code above."
+from pathlib import Path
+import re
+import sys
 
-Its series are not fully carried by any published table, so it cannot be redrawn from a
-clone. The code that produced it is in `study/pipeline/`; what is missing is the microdata
-it reads.
-:::
+import numpy as np
+import pandas as pd
+import matplotlib.pyplot as plt
+from matplotlib.ticker import FuncFormatter, MultipleLocator
 
-![**Figure E26. Comparison across administrative systems: index, raw value, population rate and value per reporting unit, with their denominators, 2019–2025 — F84 family excluding Rett syndrome** (a) Annual value of each system indexed to the base year stated on the axis (the first year common to all series, because the REM strict-autism codes start in 2021), on a log scale: indices compare trajectories, never levels; each legend entry carries the value of the last year of that series. (b) Raw annual value of each source in its own unit, on a log scale, before any normalisation. (c) Annual value per 100,000 residents using the INE Censo 2017-base population at 30 June as a common denominator, and (d) that population denominator year by year. (e) Value per reporting unit: GRD episodes per hospital of the observed panel, DEIS discharges per 100,000 discharges, REM A05 entries and REM P2 persons under control per reporting establishment, and PIE students per 1,000 applicants (the number of schools is not published in the sources used); (f) the denominators of that panel: reporting GRD hospitals, reporting REM establishments, total DEIS discharges and PIE applicants. UNITS DIFFER: episodes, discharges, entries, persons under control and students are not interchangeable; the panels have separate axes and the sources are NOT person-linked, so no comparison can be read as a cascade or an individual probability. Counts are administrative recognition, never prevalence or incidence. Sources are not person-linked: no ratio between sources is a cascade or an individual probability. Law 21.545 (March 2023) is policy context, not an intervention with an estimable effect. 2020–2021: pandemic reporting disruption.](study/corpus/figures/figE26_cross_source.jpg){fig-align="center" width="100%"}
+HERE = ROOT / "docs" / "study" / "plates"          # docs/study/plates
+STUDY = HERE.parent                             # docs/study
+ROOT = STUDY.parent.parent                      # repository root
+if str(STUDY) not in sys.path:                  # import figstyle the way the figure scripts do
+    sys.path.insert(0, str(STUDY))
+from figstyle import *                          # noqa: E402,F401,F403  (house style)
+
+PLATE = "figE26_cross_source"
+SOURCES = [
+    "docs/study/corpus/tables/E26_cross_source.csv",
+    "docs/study/corpus/tables/E60_grd_annual_full.csv",
+    "docs/study/corpus/tables/ST11a_deis_annual.csv",
+    "docs/study/corpus/tables/E17_rem_establishment_distribution.csv",
+    "docs/study/corpus/tables/E76_education_pie_full.csv",
+    "docs/study/corpus/tables/T4_denominators_coverage.csv",
+]
+CROSS, GRD_ANNUAL, DEIS_ANNUAL, REM_ESTABLISHMENTS, PIE_FULL, DENOMINATORS = SOURCES
+NOTE = ("Redraws the six panels of E26 — index to the 2021 base, raw value, value per 100,000 "
+        "residents and its INE denominator, value per reporting unit and its denominators — from "
+        "the published E26 triples, the GRD annual table (whose activity rate is what the index of "
+        "the GRD series is built on), the DEIS annual table, the REM establishment table and the "
+        "PIE applicant table.")
+
+YEARS = list(range(2019, 2026))
+BASE_YEAR = 2021                # first year common to all five series: the REM codes start in 2021
+GRD_ROW = ('F84 family excluding Rett syndrome',   # the four keys that select the GRD series in E60
+           'Observed annual panel', 'All activities', 'Any position')
+# Law 21.545 was published on 10 March 2023 (day 69). Each year is plotted at its own midpoint, so
+# the marker sits a little before the 2023 position. Context only: no estimate depends on it.
+LAW_X = 2023 + 69 / 365 - 0.5
+PANDEMIC = (2019.5, 2021.5)
+XLIM = (2018.4, 2025.6)
+
+#: One row per source: the E26 column, the colour, and the short label panels (b) and (c) use.
+SERIES = [
+    ('GRD: episodes with documented F84', BLUE, 'GRD (episodes)'),
+    ('DEIS: discharges with principal F84', SKY, 'DEIS (discharges)'),
+    ('REM A05: strict-autism entries', ORANGE, 'REM A05 (entries)'),
+    ('REM P2: December population under control', GREEN, 'REM P2 (persons under control)'),
+    ('Education: harmonised PIE', PINK, 'PIE (students)'),
+]
+#: Panel (f): the denominator of each series and the label of its line.
+DENOMINATOR_LABELS = ['GRD — reporting GRD hospitals', 'DEIS — total DEIS discharges',
+                      'REM A05 — reporting REM establishments',
+                      'REM P2 — reporting REM establishments', 'PIE — PIE applicants']
+
+BAR = '#9ecae1'                 # panel (d): the light blue of the population bars
+LAW_GREY = '#444444'            # the law marker and its label
+BAND_GREY = '#666666'           # the pandemic band label
+FOOT_GREY = '#595959'           # the first footnote
+FOOT_RED = '#b22222'            # the units-differ footnote
+ANNOTATION = 6.2                # in-axes annotations and the footnotes
+LEGEND = 6.2                    # the five-entry legend under each panel
+TITLE = 8.7                     # the bold heading above each panel
+
+# The stored plate is 1000 x 1361 px for a 6.89 x 9.38 in figure (145.1 dpi). The axes rectangles,
+# read off the spines of that image, are kept in those pixels and converted once: panel (d) is
+# taller than panel (c) because it is the only panel without a legend underneath it.
+PX_W, PX_H = 1000, 1361
+AXES_PX = {'a': (83.5, 437.5, 53, 280), 'b': (630.5, 984.5, 53, 280),
+           'c': (83.5, 437.5, 487, 714.5), 'd': (630.5, 984.5, 487, 811.5),
+           'e': (83.5, 437.5, 921.5, 1149), 'f': (630.5, 984.5, 921.5, 1149)}
+#: Log limits read off the stored plate, so the decade ticks land where the original put them.
+YLIM = {'a': (29.6, 13800.0), 'b': (190.0, 414000.0), 'c': (1.0, 10600.0),
+        'e': (2.01, 9720.0), 'f': (40.3, 1.668e7)}
+TITLES = {'a': '(a) Annual value indexed to the stated base\nyear',
+          'b': '(b) Raw annual value of each source',
+          'c': '(c) Value per 100,000 residents (INE, 2017\nbase)',
+          'd': '(d) Denominator of panel (c): INE population\n(2017 base, 30 Jun)',
+          'e': '(e) Value per reporting unit',
+          'f': '(f) Denominator of panel (e): reporting units\nby year'}
+YLABELS = {'a': 'Index (base year = 100) — 2021 = 100', 'b': 'Annual value (log scale)',
+           'c': 'Per 100,000 residents', 'd': 'Population (millions)',
+           'e': 'Value per reporting unit', 'f': 'Units or base (log scale)'}
+FOOTNOTES = [
+    (FOOT_GREY, '(e) The number of schools is not published in the sources used; the education '
+                'denominator is PIE applicants.'),
+    (FOOT_RED, 'UNITS DIFFER: episodes, entries, persons under control and students are not '
+               'interchangeable; axes are separate and there is no person-level linkage\n'
+               'across sources.'),
+]
+
+
+# ---------------------------------------------------------------- tracked tables and their parsing
+def _read(rel):
+    """Read one tracked table by its repository-relative path (the paths listed in SOURCES)."""
+    return pd.read_csv(ROOT/rel, encoding='utf-8-sig')
+
+
+def _n(cell):
+    """A presentation number such as '1,667,180', '19.11' or '—' as a float, or NaN when absent."""
+    s = str(cell).strip().replace(',', '')
+    try:
+        return float(s)
+    except ValueError:
+        return float('nan')
+
+
+#: A cell of E26: raw value and its unit, the rate per 100,000 residents, and the value per
+#: reporting unit with the name of that unit. Any of the three numbers may be 'n/e'.
+CELL = re.compile(r'^(?P<raw>[\d,]+|n/e)\s+(?P<unit>[^;]+);\s*'
+                  r'(?P<rate>[\d.]+|n/e)\s*/100,000;\s*'
+                  r'(?P<per>[\d.]+|n/e)\s+(?P<per_unit>per .+)$')
+
+
+def _cell(text):
+    """The three estimators packed into one E26 cell, as a dict; None when the year is not reported.
+
+    They are three different quantities — a count, a rate per 100,000 residents and a value per
+    reporting unit — and each panel of the plate uses a different one, so they are kept apart here
+    rather than derived from one another.
+    """
+    s = str(text).strip()
+    if s in ('n/e', 'nan', ''):
+        return None
+    m = CELL.match(s)
+    if not m:
+        raise ValueError(f'E26 cell not in the expected format: {text!r}')
+    return {'raw': _n(m['raw']), 'unit': m['unit'].strip(), 'rate': _n(m['rate']),
+            'per': _n(m['per']), 'per_unit': m['per_unit'].strip()}
+
+
+def cross_source():
+    """E26 parsed into {column: {year: cell}}, one entry per source and year actually reported."""
+    t = _read(CROSS).set_index('Year')
+    out = {}
+    for c, _, _ in SERIES:
+        parsed = {y: _cell(t.loc[y, c]) for y in YEARS}
+        out[c] = {y: cell for y, cell in parsed.items() if cell is not None}
+    return out
+
+
+def grd_activity_rate():
+    """The GRD row of E60: episodes per 100,000 panel episodes, by year, and the hospital panel.
+
+    The row is selected on all four keys of the table. E60 also holds the fixed-panel-of-65,
+    F84-principal, strict-hospitalisation and strict-F84.0 variants; their numbers differ
+    substantially, so selecting by file name or by position would silently change the estimator.
+    """
+    t = _read(GRD_ANNUAL)
+    series, panel, activity, position = GRD_ROW
+    row = t[(t.Series == series) & (t.Panel.str.startswith(panel))
+            & (t.Activity == activity) & (t['Code position'] == position)]
+    if len(row) != 1:
+        raise ValueError(f'E60 does not hold exactly one {GRD_ROW} row (found {len(row)})')
+    row = row.iloc[0]
+    years = [y for y in YEARS if str(y) in t.columns]
+    # each cell is 'count; rate (low–high)' — the rate is the second field
+    rate = {y: _n(str(row[str(y)]).split(';')[1].split('(')[0]) for y in years}
+    # the panel label states the hospitals that reported each year: '(65, 65, 65, 65, 68 and 72)'
+    hospitals = [int(v) for v in re.findall(r'\d+', row.Panel.split('(')[1])]
+    if len(hospitals) != len(years):
+        raise ValueError(f'E60 panel label {row.Panel!r} does not name one count per year')
+    return rate, dict(zip(years, hospitals))
+
+
+def deis_discharges():
+    """Total DEIS discharges of the canonical file layout, by year (the denominator of panel f)."""
+    t = _read(DEIS_ANNUAL)
+    t = t[t['File layout'] == 'canonical']
+    return {int(y): _n(v) for y, v in zip(t.Year, t['DEIS discharges (all establishments)'])}
+
+
+def rem_establishments(series):
+    """Reporting REM establishments of one module ('A05 strict autism (entries)' or 'P2 ASD ...')."""
+    t = _read(REM_ESTABLISHMENTS)
+    row = t[(t.Series == series) & (t.Value == 'Reporting establishments')].iloc[0]
+    out = {}
+    for y in YEARS:
+        v = _n(row[str(y)])                      # 'outside the era' before the module existed
+        if not np.isnan(v):
+            out[y] = v
+    return out
+
+
+def pie_applicants():
+    """Total PIE applicants (all special educational needs), the education denominator of panel (f)."""
+    t = _read(PIE_FULL)
+    row = t[t.Series == 'pie_total_applicants_sinaces'].iloc[0]
+    return {y: _n(row[str(y)]) for y in YEARS if not np.isnan(_n(row[str(y)]))}
+
+
+def ine_population():
+    """The INE Censo 2017-base projection at 30 June, the denominator of panel (c)."""
+    t = _read(DENOMINATORS)
+    row = t[t.Indicator == 'INE projection, Census 2017 base (primary denominator)'].iloc[0]
+    return {y: _n(row[str(y)]) for y in YEARS}
+
+
+# ------------------------------------------------------------------------------ the plotted series
+def denominators(rate_panel, pie):
+    """Panel (f): the denominator of every series, in the order of SERIES."""
+    return [rate_panel,                                         # reporting GRD hospitals
+            deis_discharges(),                                  # total DEIS discharges
+            rem_establishments('A05 strict autism (entries)'),
+            rem_establishments('P2 ASD (December)'),
+            pie]                                                # PIE applicants
+
+
+def indexed(cells, grd_rate, deis_rate):
+    """Panel (a): each series indexed to BASE_YEAR = 100, each on its own published estimator.
+
+    GRD and DEIS are indexed on their activity rates (per 100,000 panel episodes and per 100,000
+    DEIS discharges); REM A05, REM P2 and PIE on their raw counts. The two are different series and
+    indexing all five the same way is the trap this panel sets.
+    """
+    out = []
+    for i, (col, _, _) in enumerate(SERIES):
+        if i == 0:
+            values = dict(grd_rate)
+        elif i == 1:
+            values = dict(deis_rate)
+        else:
+            values = {y: c['raw'] for y, c in cells[col].items()}
+        base = values[BASE_YEAR]
+        out.append({y: 100 * v / base for y, v in values.items()})
+    return out
+
+
+# --------------------------------------------------------------------------------- self-validation
+def _check_published(cells, grd_hospitals, pop):
+    """Rebuild the published values from the denominators before drawing a single point.
+
+    Panel (e) against panel (f): value per reporting unit = raw value / denominator, with the DEIS
+    and PIE series scaled as their own labels state (per 100,000 discharges, per 1,000 applicants).
+    Panel (c) against panel (d): rate per 100,000 residents = raw value / INE population.
+    Both are compared with the cell E26 publishes, at the one decimal the table prints.
+    """
+    scale = [1, 1e5, 1, 1, 1e3]
+    dens = denominators(grd_hospitals, pie_applicants())
+    bad = []
+    for (col, _, _), den, k in zip(SERIES, dens, scale):
+        for y, c in cells[col].items():
+            if not np.isnan(c['per']) and y in den:
+                got = k * c['raw'] / den[y]
+                if abs(got - c['per']) > 0.051:       # the table prints one decimal
+                    bad.append(f'(e) {col} {y}: rebuilt {got:.3f} vs published {c["per"]}')
+            got = 1e5 * c['raw'] / pop[y]
+            if abs(got - c['rate']) > 0.051:
+                bad.append(f'(c) {col} {y}: rebuilt {got:.3f} vs published {c["rate"]}')
+    if bad:
+        raise ValueError('E26 does not reproduce from its denominators:\n  ' + '\n  '.join(bad))
+
+
+# ------------------------------------------------------------------------------------- the drawing
+def _rect(key):
+    """One axes rectangle of the stored plate, in figure coordinates."""
+    x0, x1, y0, y1 = AXES_PX[key]
+    return [x0/PX_W, 1 - y1/PX_H, (x1 - x0)/PX_W, (y1 - y0)/PX_H]
+
+
+def _frame(ax, key, law=True):
+    """The furniture every panel shares: years, pandemic band, law marker, grid and labels."""
+    ax.set_xlim(*XLIM)
+    year_ticks(ax, YEARS)
+    shade_pandemic(ax, *PANDEMIC)      # the house band, tagged so the overlap QA ignores it
+    ax.text(sum(PANDEMIC)/2, 0.985, '2020–2021 (pandemic)', transform=ax.get_xaxis_transform(),
+            ha='center', va='top', fontsize=ANNOTATION, color=BAND_GREY)
+    if law:
+        ax.axvline(LAW_X, color=LAW_GREY, ls=(0, (1, 1.8)), lw=1.0, zorder=1)
+        ax.text(LAW_X + 0.11, 0.985, 'Law 21.545 (2023)', transform=ax.get_xaxis_transform(),
+                ha='left', va='top', fontsize=ANNOTATION, color=LAW_GREY)
+    clean(ax, grid='both')
+    ax.tick_params(axis='both', which='both', length=0)
+    ax.set_xlabel('Year')
+    # (a) carries the longest label of the plate and the original sets it smaller and tighter
+    # against the tick labels so that it still spans only the height of its own panel.
+    ax.set_ylabel(YLABELS[key], fontsize=5.85 if key == 'a' else 8, labelpad=0 if key == 'a' else 3)
+
+
+def _line(ax, values, colour, label):
+    """One source as the plate draws it: a marked line over the years it actually reports."""
+    years = sorted(values)
+    ax.plot(years, [values[y] for y in years], '-o', color=colour, label=label,
+            lw=1.6, ms=5.4, mew=0, zorder=3)
+
+
+def _legend(ax):
+    """The five-entry legend the plate centres under each panel."""
+    ax.legend(loc='upper center', bbox_to_anchor=(0.5, -0.207), fontsize=LEGEND, handlelength=1.2,
+              handletextpad=0.5, labelspacing=0.25, borderpad=0.0, borderaxespad=0.0)
+
+
+def _heading(fig, key):
+    """The bold heading the plate prints above each panel, wrapped where the original wraps it."""
+    x0, _, y0, _ = AXES_PX[key]
+    fig.text(0.010 if x0 < PX_W/2 else 0.528, 1 - (y0 - 2)/PX_H, TITLES[key],
+             fontweight='bold', fontsize=TITLE, ha='left', va='bottom', linespacing=1.2)
+
+
+def draw_figE26_cross_source():
+    style()
+    cells = cross_source()
+    grd_rate, grd_hospitals = grd_activity_rate()
+    pop = ine_population()
+    _check_published(cells, grd_hospitals, pop)
+
+    deis_col = SERIES[1][0]
+    deis_rate = {y: c['per'] for y, c in cells[deis_col].items()}     # per 100,000 DEIS discharges
+    index = indexed(cells, grd_rate, deis_rate)
+    dens = denominators(grd_hospitals, pie_applicants())
+
+    fig = plt.figure(figsize=(PX_W/145.14, PX_H/145.14))
+    ax = {k: fig.add_axes(_rect(k)) for k in 'abcdef'}
+
+    # (a) index to the 2021 base — GRD and DEIS on their activity rates, the rest on raw counts
+    for (col, colour, _), values in zip(SERIES, index):
+        last = max(values)
+        _line(ax['a'], values, colour, f'{col} — {num(values[last], "en", 0)} ({last})')
+    ax['a'].axhline(100, color=BLACK, ls='--', lw=0.9, zorder=2)
+
+    # (b) raw annual value, (c) value per 100,000 residents
+    for col, colour, short in SERIES:
+        _line(ax['b'], {y: c['raw'] for y, c in cells[col].items()}, colour, short)
+        _line(ax['c'], {y: c['rate'] for y, c in cells[col].items()}, colour, short)
+
+    # (d) the INE denominator of panel (c), in millions, with the printed bar labels
+    millions = [pop[y]/1e6 for y in YEARS]
+    ax['d'].bar(YEARS, millions, width=0.55, color=BAR, zorder=2)
+    for y, v in zip(YEARS, millions):
+        ax['d'].annotate(num(v, 'en', 2), (y, v), xytext=(0, 1), textcoords='offset points',
+                         ha='center', va='bottom', fontsize=7.0, color=BLACK)
+
+    # (e) value per reporting unit, labelled with the unit E26 names in the cell itself
+    for col, colour, _ in SERIES:
+        reported = {y: c['per'] for y, c in cells[col].items() if not np.isnan(c['per'])}
+        unit = next(c['per_unit'] for c in cells[col].values())
+        _line(ax['e'], reported, colour, f'{col.split(":")[0].replace("Education", "PIE")} — {unit}')
+
+    # (f) the denominators of panel (e)
+    for (_, colour, _), values, label in zip(SERIES, dens, DENOMINATOR_LABELS):
+        _line(ax['f'], values, colour, label)
+
+    for key in 'abcdef':
+        _frame(ax[key], key, law=key not in ('d', 'f'))
+        _heading(fig, key)
+    for key in ('a', 'b', 'c', 'e', 'f'):
+        log_axis(ax[key], 'y', 'en')
+        ax[key].set_ylim(*YLIM[key])
+        _legend(ax[key])
+    ax['d'].set_ylim(0, 1.31 * max(millions))   # the headroom the stored plate leaves for the labels
+    ax['d'].yaxis.set_major_locator(MultipleLocator(5))
+    ax['d'].yaxis.set_major_formatter(FuncFormatter(lambda v, p: num(v, 'en', 1)))
+
+    for y_px, (colour, text) in zip((1303, 1327), FOOTNOTES):
+        fig.text(0.009, 1 - y_px/PX_H, text, fontsize=ANNOTATION, color=colour, ha='left', va='top',
+                 linespacing=1.25)
+    return fig
+
+
+draw_figE26_cross_source()
+```
 
 ### Figure S42. Figure E26b. Male-to-female ratio of administrative autism recognition in every source that reports sex, 2019–2025 — F84 family excluding Rett syndrome
 
@@ -158,12 +1773,217 @@ it reads.
 
 ### Figure S44. Figure E28. Sensitivity of every series to the case-definition variant: full F84 (with Rett syndrome) versus F84 without Rett, 2019–2025
 
-::: {.callout-note collapse="true"}
-## Stored image — this plate has no drawing code here
+```{python}
+#| label: lamina-fige28_variant_sensitivity
+#| fig-cap: "Figure S44. Redrawn here from the published tables by the code above."
+import numpy as np
+import pandas as pd
+from matplotlib.ticker import FuncFormatter
+from figstyle import *
 
-Its series are not fully carried by any published table, so it cannot be redrawn from a
-clone. The code that produced it is in `study/pipeline/`; what is missing is the microdata
-it reads.
-:::
+PLATE = "figE28_variant_sensitivity"
+SOURCES = ["docs/study/corpus/tables/E28_variant_sensitivity.csv"]
+NOTE = ("Redraws the six panels of figE28 — the GRD, REM A05, REM P6 and DEIS counts under the two "
+        "case-definition variants with the Rett contribution printed over each pair, and the "
+        "absolute and relative difference of all seven series — from the published E28 variant "
+        "table, in each series' own unit and with no rate, weighting or standardisation.")
 
-![**Figure E28. Sensitivity of every series to the case-definition variant: full F84 (with Rett syndrome) versus F84 without Rett, 2019–2025** (a) GRD episodes with documented F84 in any position and with principal F84, observed panel. (b) REM A05 entries for the pervasive developmental disorder family, 2021–2025. (c) REM P6 population under control in December, in primary and specialty care. (d) DEIS discharges with principal F84. In all four panels the annotation above each pair gives the number of cases contributed by Rett syndrome. (e) Absolute difference con_rett − sin_rett by series and year. (f) Relative difference, with the without-Rett value as denominator. The education, survey, A03/A27/A28, P2 and strict-autism series are identical in both variants and appear with a zero difference. Unit: that of each series (episodes, discharges, entries, persons under control or students). Counts are administrative recognition, never prevalence or incidence. Sources are not person-linked: no ratio between sources is a cascade or an individual probability. Law 21.545 (March 2023) is policy context, not an intervention with an estimable effect. 2020–2021: pandemic reporting disruption.](study/corpus/figures/figE28_variant_sensitivity.jpg){fig-align="center" width="100%"}
+TABLE = BASE / "corpus" / "tables" / "E28_variant_sensitivity.csv"
+
+# --- the seven series of the table, in the order of the plate's legend ----------------------------
+GRD_ANY = "GRD · documented F84 (any position)"
+GRD_PRI = "GRD · principal F84"
+A05 = "REM A05 · PDD-family entries"
+P6_PRIMARY = "REM P6 · primary care, December"
+P6_SPECIALTY = "REM P6 · specialty care, December"
+DEIS = "DEIS · principal F84"
+EDUCATION = "Education · harmonised PIE (identical)"
+SERIES = [GRD_ANY, GRD_PRI, A05, P6_PRIMARY, P6_SPECIALTY, DEIS, EDUCATION]
+COLOUR = dict(zip(SERIES, [BLUE, ORANGE, GREEN, PINK, GOLD, SKY, YELLOW]))
+
+# --- the two case-definition variants, wording verbatim from the plate's legend --------------------
+CON_RETT = "with Rett (full F84)"            # column 'with Rett (full F84)'      — full F84
+SIN_RETT = "without Rett (F84 except F84.2)"  # column 'without Rett (F84 except F84.2)'
+
+#: (a)-(d): the series drawn as bar pairs, the short name the plate puts under each group, and the
+#: panel heading. Panels (a) and (c) carry two series side by side in one panel.
+BAR_PANELS = {
+    "a": ("GRD: episodes with documented F84",
+          [(GRD_ANY, "GRD F84 any"), (GRD_PRI, "GRD F84 principal")]),
+    "b": ("REM A05: PDD-family entries", [(A05, None)]),
+    "c": ("REM P6: December population under\ncontrol",
+          [(P6_PRIMARY, "P6 primary"), (P6_SPECIALTY, "P6 specialty")]),
+    "d": ("DEIS: discharges with principal F84", [(DEIS, None)]),
+}
+LINE_PANELS = {"e": "Absolute difference con_rett − sin_rett",
+               "f": "Relative difference (%)"}
+Y_LABEL = {"a": "Cases (annual count)", "b": "Cases (annual count)",
+           "c": "Cases (annual count)", "d": "Cases (annual count)",
+           "e": "Absolute difference (cases)", "f": "Relative difference (%)"}
+FOOTNOTE = ("(f) Series identical in both variants: education, surveys, A03/A27/A28, P2 and strict "
+            "autism.")
+
+# --- geometry and marks measured off the stored plate (figure fractions of its 1000x1361 canvas) ---
+FIG_W_IN, FIG_H_IN = 8.27, 11.25             # 210 x 286 mm, the stored plate's proportions
+AXES_X = {"a": 0.084, "c": 0.084, "e": 0.084, "b": 0.584, "d": 0.584, "f": 0.584}
+AXES_BOX = {"a": (0.7414, 0.2351), "b": (0.7414, 0.2351),     # (bottom, height) per row
+            "c": (0.3857, 0.2355), "d": (0.3857, 0.2355),
+            "e": (0.1543, 0.1374), "f": (0.1543, 0.1374)}
+AXES_W = 0.3995
+TITLE_Y = {"a": 0.9780, "b": 0.9780, "c": 0.6223, "d": 0.6223, "e": 0.2939, "f": 0.2939}
+TITLE_X = {"a": 0.010, "c": 0.010, "e": 0.010, "b": 0.510, "d": 0.510, "f": 0.510}
+
+WIDTH, OFFSET = 0.32, 0.19    # bar width and the offset of each variant from the group centre
+HEADROOM = 1.220              # top of (a)-(d): the tallest bar leaves room for the legend
+LABEL_PAD = 0                 # points between the taller bar and its Rett label
+BOX = dict(facecolor="white", edgecolor="none", alpha=0.75, pad=0.5)   # behind the Rett label
+# type sizes, each measured off the stored plate: the bar panels label their axis larger than they
+# tick it, the rotated group labels of (a) and (c) are set smaller than the plain year labels of
+# (b) and (d), and (e) and (f) tick larger but label their y axis smaller than the bar panels
+TITLE_SIZE, RETT_SIZE, LEGEND_SIZE = 10.5, 7.5, 8
+AXIS_LABEL_SIZE = 9.3         # 'Cases (annual count)' and 'Year'
+BAR_TICK_SIZE, ROTATED_TICK_SIZE = 7.5, 7.0
+LINE_TICK_SIZE, LINE_YLABEL_SIZE, LINE_LEGEND_SIZE = 8.5, 7.5, 7.0
+Y_TICK_PAD = 5.5              # the stored plate sets the y labels further off the axis than the x
+MARKER = 6.6                  # (e) and (f): marker diameter in points, measured off the plate
+FOOT_GREY = "#555555"
+
+
+# ------------------------------------------------------------------ the tracked table and parsing
+def _count(cell):
+    """'15,685' -> 15685; the presentation table stores every count as a separated string."""
+    return int(str(cell).replace(",", "").strip())
+
+
+def _percent(cell):
+    """'7.15%' -> 7.15, the published relative difference, without recomputing it."""
+    return float(str(cell).strip().rstrip("%"))
+
+
+def load():
+    """The E28 table with its four numeric columns parsed, indexed by series and year."""
+    t = pd.read_csv(TABLE, encoding="utf-8-sig")
+    t.columns = [c.strip() for c in t.columns]
+    con = next(c for c in t.columns if c.startswith("with Rett"))
+    sin = next(c for c in t.columns if c.startswith("without Rett"))
+    absolute = next(c for c in t.columns if c.startswith("Absolute difference"))
+    relative = next(c for c in t.columns if c.startswith("Relative difference"))
+    out = t.assign(series=t["Series"].str.strip(), year=t["Year"].astype(int),
+                   con=t[con].map(_count), sin=t[sin].map(_count),
+                   absolute=t[absolute].map(_count), relative=t[relative].map(_percent))
+    missing = set(SERIES) - set(out.series)
+    assert not missing, f"{TABLE.name} is missing {sorted(missing)}"
+    # the difference the table publishes is the one the plate prints; check it against the counts
+    assert (out.absolute == out.con - out.sin).all(), "absolute difference != con_rett - sin_rett"
+    return out.sort_values(["series", "year"], kind="stable")
+
+
+def _rows(t, series):
+    """The years of one series, in order, as (year, con_rett, sin_rett, difference) tuples."""
+    d = t[t.series == series]
+    return list(zip(d.year, d.con, d.sin, d.absolute))
+
+
+# ------------------------------------------------------------------------------ drawing the panels
+def _bar_panel(ax, t, key):
+    """(a)-(d): the two case definitions side by side, one pair per year of each series."""
+    heading, members = BAR_PANELS[key]
+    ticks, con, sin, diff = [], [], [], []
+    for series, short in members:
+        for year, c, s, d in _rows(t, series):
+            ticks.append(f"{short}\n{year}" if short else str(year))
+            con.append(c); sin.append(s); diff.append(d)
+
+    rotated = any(short for _, short in members)
+    x = np.arange(len(ticks))
+    ax.bar(x - OFFSET, con, width=WIDTH, color=BLUE, label=CON_RETT, zorder=3)
+    ax.bar(x + OFFSET, sin, width=WIDTH, color=ORANGE, label=SIN_RETT, zorder=3)
+
+    top = HEADROOM * max(max(con), max(sin))
+    ax.set_ylim(0, top)
+    ax.yaxis.set_major_formatter(thousands("en"))
+    ax.set_xticks(x)
+    ax.set_xticklabels(ticks, rotation=90 if rotated else 0)
+    ax.set_ylabel(Y_LABEL[key], fontsize=AXIS_LABEL_SIZE)
+    clean(ax, "both")
+    ax.tick_params(axis="x", length=0, pad=3.5,
+                   labelsize=ROTATED_TICK_SIZE if rotated else BAR_TICK_SIZE)
+    ax.tick_params(axis="y", length=0, pad=Y_TICK_PAD, labelsize=BAR_TICK_SIZE)
+    ax.legend(loc="upper left", fontsize=LEGEND_SIZE, handlelength=2.0, labelspacing=0.5)
+
+    # the count Rett syndrome contributes, over the taller bar of each pair and written as the loss
+    # that removing it produces; the box is translucent, as the stored plate draws it
+    labels = []
+    for xi, c, s, d in zip(x, con, sin, diff):
+        labels.append(ax.annotate(f"−{num(d, 'en')}", (xi, max(c, s)), xytext=(0, LABEL_PAD),
+                                  textcoords="offset points", ha="center", va="bottom",
+                                  fontsize=RETT_SIZE, bbox=BOX, zorder=5))
+    return labels
+
+
+def _clear_legend(fig, ax, labels):
+    """Drop a Rett label onto the top of its bar where it would otherwise run into the legend.
+
+    Two labels of the stored plate sit inside the bar instead of above it — the 2024 pair of panel
+    (a) and the 2025 pair of panel (c), the tallest pair of each panel, both under the legend. The
+    rule is the plate's own: a label that collides with the legend is pinned to the bar top instead.
+    """
+    renderer = fig.canvas.get_renderer()
+    box = ax.get_legend().get_window_extent(renderer)
+    for text in labels:
+        if text.get_window_extent(renderer).overlaps(box):
+            text.set_va("top")
+            text.xyann = (0, -LABEL_PAD)
+
+
+def _line_panel(ax, t, key):
+    """(e) and (f): the difference of all seven series, in cases and as a percentage."""
+    field = "absolute" if key == "e" else "relative"
+    for series in SERIES:
+        d = t[t.series == series]
+        ax.plot(d.year, d[field], marker="o", markersize=MARKER, lw=2.2, color=COLOUR[series],
+                label=series, zorder=3)
+    ax.axhline(0, color=BLACK, lw=1.0, zorder=4)     # the education series sits on it
+
+    ax.set_xlabel("Year", fontsize=AXIS_LABEL_SIZE)
+    ax.set_ylabel(Y_LABEL[key], fontsize=LINE_YLABEL_SIZE)
+    year_ticks(ax, range(int(t.year.min()), int(t.year.max()) + 1))
+    if key == "e":
+        ax.yaxis.set_major_formatter(thousands("en"))
+    else:
+        ax.yaxis.set_major_formatter(FuncFormatter(lambda v, p: f"{v:.1f}"))
+    clean(ax, "both")
+    ax.tick_params(axis="x", length=0, pad=3.5, labelsize=LINE_TICK_SIZE)
+    ax.tick_params(axis="y", length=0, pad=Y_TICK_PAD, labelsize=LINE_TICK_SIZE)
+    ax.legend(loc="upper center", bbox_to_anchor=(0.5, -0.194), fontsize=LINE_LEGEND_SIZE,
+              labelspacing=0.19, handlelength=1.6, handletextpad=0.5, borderpad=0.2)
+
+
+# ---------------------------------------------------------------------------------------------- draw
+def draw_figE28_variant_sensitivity():
+    """Draw the six panels of figE28 and hand back the figure."""
+    t = load()
+
+    style()
+    fig = plt.figure(figsize=(FIG_W_IN, FIG_H_IN))
+    axes = {k: fig.add_axes([AXES_X[k], AXES_BOX[k][0], AXES_W, AXES_BOX[k][1]])
+            for k in "abcdef"}
+
+    bar_labels = {k: _bar_panel(axes[k], t, k) for k in "abcd"}
+    for k in "ef":
+        _line_panel(axes[k], t, k)
+
+    for k in "abcdef":
+        heading = BAR_PANELS[k][0] if k in BAR_PANELS else LINE_PANELS[k]
+        fig.text(TITLE_X[k], TITLE_Y[k], f"({k}) {heading}", fontweight="bold",
+                 fontsize=TITLE_SIZE, ha="left", va="bottom", linespacing=1.16)
+    fig.text(0.009, 0.0037, FOOTNOTE, fontsize=7.5, color=FOOT_GREY, ha="left", va="bottom")
+
+    fig.draw_without_rendering()                    # so the legend boxes can be measured
+    for k in "abcd":
+        _clear_legend(fig, axes[k], bar_labels[k])
+    return fig
+
+
+draw_figE28_variant_sensitivity()
+```
