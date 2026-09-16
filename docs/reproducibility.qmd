@@ -23,13 +23,15 @@ kpis([
     (str(len(tidy)), "Result tables versioned in git"),
     (str(len(aggregates)), "Analytical aggregates versioned in git"),
     (str(sum(1 for f in tracked if f.endswith(".py"))), "Python files in the repository"),
-    ("0", "Numbers in this report that were typed by hand"),
+    (str(len(list((ROOT / "docs").glob("*.qmd")))), "Chapters, every one recalculated at render time"),
 ])
 ```
 
-Every table and figure in this report is recalculated when the report is rendered. None is pasted in.
-This chapter states exactly what a clone contains, what it does not, and what each of those two facts
-means for what you can reproduce.
+Every table and figure in this report is recalculated when the report is rendered. None is pasted in,
+and every quantity is read from a table rather than typed into the prose. A handful of fixed labels are
+written out — the year a code set changed, the field periods of the surveys, the age at which the
+network screens — and they are labels, not results. This chapter states exactly what a clone contains,
+what it does not, and what each of those two facts means for what you can reproduce.
 
 ## What ships with the repository
 
@@ -63,10 +65,12 @@ show_table(inventory, "What a clone contains and what it does not")
 
 Two things need data that is not in the repository.
 
-**The extended plates.** The 61 plates in [extended material](plates.qmd) were drawn by
-`study/pipeline/`, which reads the hospital and community microdata. That code *is* versioned — what is
-missing is its input. Where a plate's series survives in a published table, this report redraws it from
-that table and shows the code; where it does not, the stored image is shown and labelled as such.
+**The extended plates.** The 61 plates in the extended chapters — [principal](plates_core.qmd),
+[hospital](plates_hospital.qmd), [community](plates_community.qmd), [territory](plates_territory.qmd)
+and [context](plates_context.qmd) — were drawn by `study/pipeline/`, which reads the hospital and
+community microdata. That code *is* versioned; what is missing is its input. Forty of them are redrawn
+here from published tables with their code on show; the remaining twenty-one keep the stored image and
+say so.
 
 **The territorial maps.** Commune polygons live in `data/comunas.shp`, which is excluded from git for
 its size. The maps in this report therefore need that file locally. Everything else about the

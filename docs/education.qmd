@@ -1,0 +1,1135 @@
+---
+title: "Education: autism in the school integration programme, special schools and the applications register"
+subtitle: "PIE, SINACES and the JUNAEB school survey · 2019–2025 · annual school stocks, two definitions, one source switch and a survey whose weights arrive late"
+---
+
+```{python}
+#| label: cargar-educacion
+from pathlib import Path
+import json
+import sys
+import numpy as np
+import pandas as pd
+import matplotlib.pyplot as plt
+from scipy import stats
+
+ROOT = Path.cwd().parent if Path.cwd().name == "docs" else Path.cwd()
+sys.path.insert(0, str(ROOT / "scripts"))
+from report_helpers import (show_table, kpis, note, number, ci, plot_style,
+                            SEX_COLORS, COLORS)
+from epi_helpers import count_ratio
+
+# The education chapter reads only tracked tables: the tidy result tables in docs/study/data/ and
+# the published corpus tables in docs/study/corpus/tables/. There is no shapefile dependency here,
+# because no tracked education table carries a region or a commune.
+DATA = ROOT / "docs" / "study" / "data"
+CORPUS = ROOT / "docs" / "study" / "corpus" / "tables"
+
+
+def read_data(name, **kwargs):
+    return pd.read_csv(DATA / name, **kwargs)
+
+
+def read_corpus(name, **kwargs):
+    return pd.read_csv(CORPUS / name, **kwargs)
+
+
+# Only the tables this chapter actually computes from are read. pie_enriched_context_verified.csv and
+# fig3a_pie.csv are tracked restatements of education_summary_year.csv and of the provenance pivot built
+# below; nothing on this page is derived from either, so neither is loaded or claimed as an input.
+education = read_data("education_summary_year.csv")
+provenance = read_data("pie_source_provenance.csv")
+audit = read_data("junaeb_denominator_audit.csv")
+coverage = read_data("coverage_layers_year.csv")
+models = read_data("models_summary.csv", low_memory=False)
+items = read_corpus("ST6_junaeb_items.csv")
+pie_full = read_corpus("E76_education_pie_full.csv")
+sex_levels = read_corpus("S12_junaeb_sex_level.csv")
+controls = read_corpus("E79_reproduction_controls_by_family.csv")
+plot_style()
+
+# One wide frame of the provenance table: every published PIE/SINACES series by year, with the
+# source document that carries it. Nothing below is typed in; each value is looked up here.
+series = provenance.pivot_table(index="year", columns="series", values="value", aggfunc="first")
+YEARS = [int(y) for y in education.year]
+FIRST, LAST = min(YEARS), max(YEARS)
+# OVERLAP_START: the first year the later document publishes a value at all.
+# HANDOVER: the first year in which only the later document publishes it, so the series changes hands.
+OVERLAP_START = int(provenance.loc[provenance.series.eq("pie_harmonised_sinaces"), "year"].min())
+LAST_APUNTES = int(provenance.loc[provenance.series.eq("pie_harmonised_apuntes60"), "year"].max())
+HANDOVER = LAST_APUNTES + 1
+edu = education.set_index("year")
+pop = coverage.set_index("year").ine_population_base2017_30jun
+
+# JUNAEB, from wide to long: one row per school level and year.
+LEVELS = {"parvularia": "Pre-school (NT1–NT2)", "basico1": "Grade 1 (1º básico)",
+          "basico5": "Grade 5 (5º básico)", "medio1": "Grade 9 (1º medio)"}
+LEVEL_ORDER = list(LEVELS.values())
+ESTIMABLE = {"no": "No", "unweighted_only": "Unweighted only", "yes": "Yes, weighted"}
+parts = []
+for key, label in LEVELS.items():
+    columns = {f"junaeb_{key}_n_students": "Students in the file",
+               f"junaeb_{key}_tea_n": "Reported ASD (n)",
+               f"junaeb_{key}_pct_weighted": "Weighted %",
+               f"junaeb_{key}_pct_weighted_lo": "lo",
+               f"junaeb_{key}_pct_weighted_hi": "hi",
+               f"junaeb_{key}_pct_unweighted": "Unweighted %",
+               f"junaeb_{key}_estimable": "Estimable"}
+    part = education[["year"] + list(columns)].rename(columns=columns)
+    part.insert(1, "Level", label)
+    parts.append(part)
+junaeb = pd.concat(parts, ignore_index=True).rename(columns={"year": "Year"})
+junaeb["Estimable"] = junaeb.Estimable.map(ESTIMABLE)
+LEVEL_KEYS = {label: key for key, label in LEVELS.items()}
+
+# The survey's three timing facts — the first year the item exists at all, the year whose files carry no
+# expansion weight, and the years in which a weighted estimate is possible — are read once from the
+# tracked tables and reused wherever the chapter states them, so no year is typed into prose or caveat.
+absent = items.loc[items["ASD variable"].eq("absent")]
+ITEM_FIRST_YEAR = int(absent.Year.max()) + 1
+unweighted_rows = np.isclose(audit.weighted_denominator_full, audit.n_total_raw)
+NO_WEIGHT_YEAR = int(audit.loc[unweighted_rows, "year"].max())
+WEIGHT_FIRST_YEAR = int(audit.loc[~unweighted_rows, "year"].min())
+WEIGHTED_YEARS = sorted({int(y) for y in audit.loc[~unweighted_rows, "year"]})
+
+
+def observed_codes(rows):
+    """The ASD values actually present in the files of a survey year, blanks excluded."""
+    codes = sorted({key for value in rows.item_observed_values for key in json.loads(value) if key != ""})
+    return " and ".join(f"'{code}'" for code in codes) if codes else "none"
+
+
+# Both PIE denominators move, and one of them collapses. The movements are computed once here so that
+# every place the chapter prints a share can also print what the denominator of that share was doing.
+enrolment = series["pie_total_enrolment"].dropna()
+applicants = series["pie_total_applicants_sinaces"].dropna()
+enrolment_change = 100 * enrolment.diff() / enrolment.shift()
+applicants_change = 100 * applicants.diff() / applicants.shift()
+DROP_YEAR = int(enrolment_change.idxmin())
+REBOUND_YEAR = int(enrolment_change.idxmax())
+share_of_enrolment = 100 * series["pie_harmonised"] / series["pie_total_enrolment"]
+SHARE_RISE = float(share_of_enrolment[DROP_YEAR] - share_of_enrolment[DROP_YEAR - 1])
+# Denominator contribution: the numerator held at its earlier value, divided by the new denominator.
+SHARE_RISE_DENOMINATOR = float(100 * series.loc[DROP_YEAR - 1, "pie_harmonised"] / enrolment[DROP_YEAR]
+                               - share_of_enrolment[DROP_YEAR - 1])
+share_of_applicants = 100 * series["pie_harmonised"] / series["pie_total_applicants_sinaces"]
+APPLICANT_DROP = float(applicants_change[LAST])
+APPLICANT_SHARE_LAST = float(share_of_applicants[LAST])
+# What the last share would read if its denominator had stayed where it was the year before.
+APPLICANT_SHARE_HELD = float(100 * series.loc[LAST, "pie_harmonised"] / applicants[LAST - 1])
+
+survey_tile = audit.loc[audit.year.eq(LAST) & audit.level.eq("parvularia")].iloc[0]
+kpis([
+    (number(series.loc[LAST, "pie_harmonised"]),
+     f"Students with an autism category in the PIE register · {LAST} · annual stock of registrations, not persons"),
+    (number(APPLICANT_SHARE_LAST, 1) + "%",
+     f"Of the {number(series.loc[LAST, 'pie_total_applicants_sinaces'])} PIE applicants of every special educational "
+     f"need · {LAST} · a denominator that fell {number(abs(APPLICANT_DROP), 1)}% from {LAST - 1}"),
+    (number(series.loc[LAST, "special_schools_autism"]), f"Students in special autism schools · {LAST}"),
+    (number(series.loc[LAST, "pie_tea_exceptional_entry"]), f"Autistic applicants entering by exceptional authorisation · {LAST}"),
+    (number(edu.loc[LAST, "junaeb_parvularia_pct_weighted"], 1) + "%",
+     f"Caregiver-reported ASD, pre-school school survey · {LAST} · weighted % of the "
+     f"{number(survey_tile.n_total_raw)} records in the file "
+     f"({ci(edu.loc[LAST, 'junaeb_parvularia_pct_weighted_lo'], edu.loc[LAST, 'junaeb_parvularia_pct_weighted_hi'], 1)}"
+     ") · design inference not defensible; not central evidence"),
+])
+note(f"The first, third and fourth tiles are counts of school registrations in {LAST}: annual stocks of a register, "
+     "not persons and not new cases. The second is a share whose denominator moves — total PIE applicants fell "
+     f"{number(abs(APPLICANT_DROP), 1)}% between {LAST - 1} and {LAST} while the autism count rose, and "
+     f"{number(APPLICANT_SHARE_LAST - APPLICANT_SHARE_HELD, 2)} of its {number(APPLICANT_SHARE_LAST, 1)} points is "
+     "that fall rather than the numerator. The fifth is neither a count nor a rate: it is the weighted percentage of "
+     f"the {number(survey_tile.n_total_raw)} pre-school records the JUNAEB school survey collected in {LAST}, "
+     f"expanded by the published weight to {number(survey_tile.weighted_denominator_full)} and covering only the "
+     "pre-school cohorts the survey reaches. The audit marks that exact cell design inference not defensible and not "
+     "admissible as central evidence, because the file publishes no stratum, no primary sampling unit and no school "
+     "identifier. A survey estimate and a register count are different quantities: they are not ordered against each "
+     "other anywhere on this page, and none of the five tiles is a prevalence.")
+```
+
+## What the education records count
+
+The education sources count **school registrations, not people diagnosed and not persons in the
+population**. A student appears in the Programa de Integración Escolar (PIE, the school integration
+programme) when a state-funded establishment registers that student under a permanent special
+educational need and receives the associated subsidy; a student appears in the special-school series
+when enrolled in an Escuela Especial de Autismo. Both are **annual stocks** of the school register:
+one row per school year, never a count of new cases, never a count of unique persons across years,
+and never a denominator-bearing rate. The JUNAEB school survey counts something different again — a
+caregiver's answer to a checklist item in selected school cohorts. Nothing on this page is prevalence
+or incidence; what rises here is administrative and educational recognition inside the school system.
+
+```{python}
+#| label: tabla-educacion-registros
+# The caveats that carry a year are read from the tracked tables, not typed: the first year the item
+# exists, the first year a weight is published, and the years in which the PIE denominator moves.
+records = pd.DataFrame([
+    {"Record": "PIE register (Apuntes 60)", "Unit of observation": "Student registered in PIE, by year",
+     "What it counts": "Students with the permanent need \"Trastorno del Espectro Autista (P)\" and, separately, "
+                       "\"Trastorno del Espectro Autista — Asperger (P)\"",
+     "Caveat": "Published only as an aggregate; establishments in operation; no region, age or school breakdown. "
+               f"Its denominator, total PIE enrolment, falls {number(abs(enrolment_change[DROP_YEAR]), 1)}% in "
+               f"{DROP_YEAR} and rises {number(enrolment_change[REBOUND_YEAR], 1)}% in {REBOUND_YEAR}"},
+    {"Record": "SINACES report (Law 21.545)", "Unit of observation": "Autistic student in the education system, by year",
+     "What it counts": "PIE students, special-school students, their total, and PIE applicants by entry route",
+     "Caveat": "Publishes the harmonised category only; no strict/Asperger split. Its denominator, total PIE "
+               f"applicants, falls {number(abs(APPLICANT_DROP), 1)}% in {LAST}"},
+    {"Record": "Special autism schools", "Unit of observation": "Student enrolled in a special school, by year",
+     "What it counts": "Students in Escuelas Especiales de Autismo",
+     "Caveat": "A separate provision, outside PIE, and included in the SINACES total"},
+    {"Record": "JUNAEB EVE (school survey)", "Unit of observation": "Student record in selected cohorts",
+     "What it counts": "Caregiver report of an ASD diagnosis, as one category of a prolonged-condition checklist",
+     "Caveat": f"The item exists only from {ITEM_FIRST_YEAR}; expansion weights only from {WEIGHT_FIRST_YEAR}; "
+               "strata, cluster and school identifier are never published"},
+])
+show_table(records, "What each education record counts, the unit it counts it in, and the caveat that travels with "
+                    "every number taken from it")
+```
+
+The reading rules that follow from this are the ones the chapter applies throughout: the strict and
+harmonised definitions are never mixed within a series; the Apuntes 60 and SINACES sources are
+labelled wherever both exist; percentages are always accompanied by the denominator they were
+divided by; and a cell that the source does not publish is reported as not published, never as zero.
+
+## The programme: two definitions of the same spectrum
+
+### The annual series
+
+```{python}
+#| label: tabla-pie-definiciones
+table = pd.DataFrame({"Year": YEARS})
+table["Strict autism (P)"] = table.Year.map(series["pie_tea_strict"])
+table["Autism–Asperger (P)"] = table.Year.map(series["pie_tea_asperger"])
+table["Harmonised (adopted)"] = table.Year.map(series["pie_harmonised"])
+table["Harmonised, as printed by SINACES"] = table.Year.map(series["pie_harmonised_sinaces"])
+table["Strict − harmonised check"] = (table["Strict autism (P)"] + table["Autism–Asperger (P)"]
+                                      - table["Harmonised (adopted)"])
+table["Total PIE enrolment (Apuntes 60)"] = table.Year.map(series["pie_total_enrolment"])
+table["Total PIE applicants (SINACES)"] = table.Year.map(series["pie_total_applicants_sinaces"])
+table["Strict as % of PIE enrolment"] = 100 * table["Strict autism (P)"] / table["Total PIE enrolment (Apuntes 60)"]
+table["Harmonised as % of PIE enrolment"] = 100 * table["Harmonised (adopted)"] / table["Total PIE enrolment (Apuntes 60)"]
+table["Harmonised as % of PIE applicants"] = 100 * table["Harmonised (adopted)"] / table["Total PIE applicants (SINACES)"]
+show_table(table, "PIE students with an autism category, by definition and by the denominator each share is taken over "
+                  f"· {FIRST}–{LAST}. Counts are annual school-register stocks, not persons and not new cases",
+           {c: 1 for c in table.columns if c.startswith(("Strict as", "Harmonised as"))})
+note("The strict and Asperger categories sum exactly to the harmonised series in every year the split is published, "
+     "which is what the check column shows. From "
+     f"{HANDOVER} onward the split is not published at all, so the strict series simply stops: the harmonised "
+     "series is the only one that runs the whole period. "
+     "The three share columns carry a second warning, which belongs here and not in a closing list: their "
+     f"denominators are not stable. Total PIE enrolment falls {number(abs(enrolment_change[DROP_YEAR]), 1)}% in "
+     f"{DROP_YEAR} — from {number(enrolment[DROP_YEAR - 1])} to {number(enrolment[DROP_YEAR])} students of every "
+     f"special educational need — and rises {number(enrolment_change[REBOUND_YEAR], 1)}% again in {REBOUND_YEAR}. Of "
+     f"the {number(SHARE_RISE, 2)} percentage-point rise in the harmonised share between {DROP_YEAR - 1} and "
+     f"{DROP_YEAR}, {number(SHARE_RISE_DENOMINATOR, 2)} points — {number(100 * SHARE_RISE_DENOMINATOR / SHARE_RISE)}% "
+     "of it — is the denominator contracting, with the numerator held at its earlier value. Total PIE applicants "
+     f"then falls {number(abs(APPLICANT_DROP), 1)}% in {LAST}. Every share on this page is read with the movement of "
+     "its own denominator beside it.")
+```
+
+Two definitions coexist because the register itself carries two categories. **Strict autism** is the
+permanent need labelled `Trastorno del Espectro Autista (P)`; **Autism–Asperger** is a separate
+permanent need kept from the pre-DSM-5 nomenclature. Reporting only the strict category would drop
+every student registered under the older label; reporting only their sum would hide that the two
+categories behave very differently. Both are therefore reported, and the harmonised series — their
+sum — is the one used wherever a single number is needed, because it is the only definition the
+later source publishes.
+
+```{python}
+#| label: fig-pie-definiciones
+#| fig-cap: "PIE students with an autism category: the two published categories and their harmonised sum (left, students per school year); each category as a percentage of total PIE enrolment (centre); and the harmonised series against the two denominators the sources provide (right). All counts are annual school-register stocks. The dotted line marks the year the categorical split stops being published; the dash-dotted lines mark the years in which the denominator of the share itself moves sharply."
+#| fig-width: 13
+#| fig-height: 4.2
+fig, axes = plt.subplots(1, 3, figsize=(13, 4.2), layout="constrained")
+strict = series["pie_tea_strict"].dropna()
+asperger = series["pie_tea_asperger"].dropna()
+harmonised = series["pie_harmonised"].dropna()
+axes[0].plot(harmonised.index, harmonised.values, "o-", color=COLORS[0], label="Harmonised (strict + Asperger)")
+axes[0].plot(strict.index, strict.values, "s--", color=COLORS[1], label="Strict autism (P)")
+axes[0].plot(asperger.index, asperger.values, "^--", color=COLORS[2], label="Autism–Asperger (P)")
+axes[0].axvline(HANDOVER - 0.5, color="#999999", linestyle=":", linewidth=1)
+axes[0].annotate("split no longer\npublished", (HANDOVER - 0.45, axes[0].get_ylim()[1] * 0.35), fontsize=7, color="#555555")
+axes[0].set(title="Students registered, by definition", xlabel="School year", ylabel="Students", xticks=YEARS)
+axes[0].legend(fontsize=8)
+shares = pd.DataFrame({
+    "Strict autism": 100 * series["pie_tea_strict"] / series["pie_total_enrolment"],
+    "Autism–Asperger": 100 * series["pie_tea_asperger"] / series["pie_total_enrolment"],
+}).dropna(how="all")
+axes[1].plot(shares.index, shares["Strict autism"], "s-", color=COLORS[1], label="Strict autism (P)")
+axes[1].plot(shares.index, shares["Autism–Asperger"], "^-", color=COLORS[2], label="Autism–Asperger (P)")
+# The denominator of this panel is not a fixed base: it collapses in DROP_YEAR and rebounds the year
+# after, so the break is drawn on the figure rather than left to the caption or to a limitations list.
+axes[1].axvline(DROP_YEAR, color="#b3271e", linestyle="-.", linewidth=1.1)
+axes[1].annotate(f"denominator break: PIE enrolment\n{number(enrolment_change[DROP_YEAR], 1)}% in {DROP_YEAR}, "
+                 f"+{number(enrolment_change[REBOUND_YEAR], 1)}% in {REBOUND_YEAR}",
+                 (DROP_YEAR + 0.08, 0.72), fontsize=6.5, color="#b3271e",
+                 xycoords=axes[1].get_xaxis_transform())
+axes[1].set(title="Share of total PIE enrolment", xlabel="School year", ylabel="% of PIE students",
+            xticks=[y for y in YEARS if y <= LAST_APUNTES])
+axes[1].legend(fontsize=8)
+denominators = pd.DataFrame({
+    "% of PIE enrolment (Apuntes 60)": 100 * series["pie_harmonised"] / series["pie_total_enrolment"],
+    "% of PIE applicants (SINACES)": 100 * series["pie_harmonised"] / series["pie_total_applicants_sinaces"],
+})
+axes[2].plot(denominators.index, denominators["% of PIE enrolment (Apuntes 60)"], "o-", color=COLORS[0],
+             label="÷ PIE enrolment (Apuntes 60)")
+axes[2].plot(denominators.index, denominators["% of PIE applicants (SINACES)"], "D--", color=COLORS[4],
+             label="÷ PIE applicants (SINACES)")
+# Both denominators of this panel move against the numerator: enrolment collapses in DROP_YEAR, and
+# applicants fall in the final year. Both are marked here, beside the shares they move.
+axes[2].axvline(DROP_YEAR, color="#b3271e", linestyle="-.", linewidth=1.1)
+axes[2].annotate(f"PIE enrolment {number(enrolment_change[DROP_YEAR], 1)}%", (DROP_YEAR + 0.08, 0.80), fontsize=6.5,
+                 color="#b3271e", xycoords=axes[2].get_xaxis_transform())
+axes[2].axvline(LAST, color="#b3271e", linestyle="-.", linewidth=1.1)
+axes[2].annotate(f"PIE applicants {number(APPLICANT_DROP, 1)}%", (LAST - 0.08, 0.80), ha="right", fontsize=6.5,
+                 color="#b3271e", xycoords=axes[2].get_xaxis_transform())
+axes[2].set(title="Harmonised series, two denominators", xlabel="School year", ylabel="% of the denominator", xticks=YEARS)
+axes[2].legend(fontsize=8)
+plt.show()
+```
+
+```{python}
+#| label: tabla-pie-definiciones-crecimiento
+pie_models = models.loc[models.estimand == "est_pie"].copy()
+LABELS = {"pie_harmonised": "Harmonised (strict + Asperger)", "pie_tea_strict_n": "Strict autism (P)",
+          "pie_tea_asperger_n": "Autism–Asperger (P)"}
+COVARIATES = {"none": "none", "disruption": "2020–2021 reporting-disruption indicator"}
+pie_models["Series"] = pie_models.model_id.str.split(":").str[0].map(LABELS)
+pie_models["Adjustment"] = pie_models.model_id.str.split(":").str[1].map(COVARIATES)
+pie_models["95% CI"] = [ci(lo, hi, 1) for lo, hi in zip(pie_models.apc_lo, pie_models.apc_hi)]
+show_table(pie_models[["Series", "years", "Adjustment", "n_obs", "df_resid", "apc", "95% CI", "p_value",
+                       "dispersion", "durbin_watson"]].rename(columns={
+    "years": "Years", "n_obs": "Points", "df_resid": "Residual df", "apc": "AAPC (%)", "p_value": "p value",
+    "dispersion": "Dispersion", "durbin_watson": "Durbin–Watson"}),
+    "Average annual percent change of the PIE series (log-linear quasi-Poisson on the annual stock, as computed in "
+    "models_summary.csv). The dispersion and Durbin–Watson columns are the reason these intervals are read as "
+    "descriptive: with fewer than eight points the autocorrelation statistic is indicative only",
+    {"AAPC (%)": 1, "p value": 4, "Dispersion": 1, "Durbin–Watson": 2})
+strict_model = pie_models.loc[pie_models.model_id.eq(f"pie_tea_strict_n:none:{FIRST}-{LAST_APUNTES}")].iloc[0]
+asperger_model = pie_models.loc[pie_models.model_id.eq(f"pie_tea_asperger_n:none:{FIRST}-{LAST_APUNTES}")].iloc[0]
+note(f"Over {FIRST}–{LAST_APUNTES}, the years in which both categories are published, strict autism grows at "
+     f"{number(strict_model.apc, 1)}% a year ({ci(strict_model.apc_lo, strict_model.apc_hi)}) and Autism–Asperger at "
+     f"{number(asperger_model.apc, 1)}% ({ci(asperger_model.apc_lo, asperger_model.apc_hi)}). "
+     "The two definitions therefore do not merely differ in level: they move at different speeds, which is why a "
+     "series built from one of them cannot be spliced onto a series built from the other. None of these models "
+     "estimates an effect of any policy; they are descriptive log-linear slopes on an administrative stock.")
+```
+
+The strict category multiplies several times over while the Asperger category grows slowly, so the
+composition of the harmonised series changes from year to year. In practice this is a coding
+migration inside the register: establishments increasingly register students under the DSM-5-aligned
+label rather than the older one. Reading the strict series alone would overstate the change in
+recognition; reading the Asperger series alone would understate it.
+
+## The source switch, and what it does to comparability
+
+### What the provenance table records
+
+```{python}
+#| label: tabla-pie-procedencia
+# The provenance file records each definition in the language of the source document; the published
+# corpus table E76 carries the English definition of the same series, and is used for display.
+# E76 carries one English definition per published series, but `pie_harmonised` is published by two
+# documents under two different definitions, so the definition has to be resolved per (series, document)
+# and not per series: mapping by series alone printed the Apuntes 60 definition against the SINACES years.
+# When a series' own E76 row cites more than one document, the definition is taken from the source-specific
+# sibling row — the shortest series name extending it whose Source cites this document and no other.
+def english_definition(series_name, source_file):
+    exact = pie_full.loc[pie_full.Series.eq(series_name)]
+    if len(exact) and exact.Source.iloc[0].count(".pdf") == 1:
+        return exact.Definition.iloc[0]
+    siblings = pie_full.loc[pie_full.Series.str.startswith(series_name + "_")
+                            & pie_full.Source.str.contains(source_file, regex=False)
+                            & pie_full.Source.str.count(r"\.pdf").eq(1)]
+    if len(siblings):
+        return siblings.loc[siblings.Series.str.len().idxmin(), "Definition"]
+    return exact.Definition.iloc[0] if len(exact) else np.nan
+
+prov = provenance.groupby(["series", "source_file", "pdf_page", "table_or_figure_caption", "derived"],
+                          dropna=False).agg(**{
+    "First year": ("year", "min"), "Last year": ("year", "max"), "Years": ("year", "size"),
+    "SHA-256 (first 12)": ("source_sha256", lambda s: s.iloc[0][:12])}).reset_index()
+prov["Definition"] = [english_definition(s, f) for s, f in zip(prov.series, prov.source_file)]
+prov["Derived"] = np.where(prov.derived, "computed from published cells", "printed in the document")
+prov = prov.sort_values(["source_file", "series"])
+# "First year"/"Last year" are years, not quantities: kept as text so they print 2019, not 2,019.
+for column in ("First year", "Last year"):
+    prov[column] = prov[column].astype(int).astype(str)
+show_table(prov[["series", "source_file", "pdf_page", "table_or_figure_caption", "Definition",
+                 "First year", "Last year", "Years", "Derived", "SHA-256 (first 12)"]].rename(columns={
+    "series": "Series", "source_file": "Source document", "pdf_page": "Page",
+    "table_or_figure_caption": "Table in the document (caption verbatim)"}),
+    "Provenance of every published PIE, SINACES and special-school value: the document, the page, the table whose "
+    "caption is quoted as printed, the definition of the series, and whether the value is printed in the document or "
+    "computed from cells that are")
+documents = provenance.groupby("source_file").agg(
+    n_series=("series", "nunique"), n_values=("value", "size"),
+    first=("year", "min"), last=("year", "max")).reset_index()
+note("Three documents carry the whole education series: " + "; ".join(
+    f"{row.source_file} ({row.n_series} series, {row.n_values} values, {int(row.first)}–{int(row.last)})"
+    for row in documents.itertuples()) + ". Each value keeps its page, its table caption and the SHA-256 of the "
+    "file it was read from, so any figure on this page can be traced back to a page of a specific document.")
+```
+
+### Where the series changes hands
+
+```{python}
+#| label: tabla-pie-cambio-fuente
+both = series[["pie_harmonised_apuntes60", "pie_harmonised_sinaces"]].dropna(how="all").copy()
+both["Difference (SINACES − Apuntes 60)"] = both.pie_harmonised_sinaces - both.pie_harmonised_apuntes60
+both["Relative difference (%)"] = 100 * both["Difference (SINACES − Apuntes 60)"] / both.pie_harmonised_apuntes60
+both["Adopted value"] = both.index.map(series["pie_harmonised"])
+both["Source adopted"] = both.index.map(education.set_index("year").pie_harmonised_source)
+show_table(both.reset_index().rename(columns={
+    "year": "Year", "pie_harmonised_apuntes60": "Apuntes 60 (sum of the two categories)",
+    "pie_harmonised_sinaces": "SINACES (as printed)"}),
+    "The years in which both sources publish the harmonised series, the years in which only one does, and the value "
+    "the study adopts in each", {"Relative difference (%)": 3})
+overlap = both.dropna(subset=["pie_harmonised_apuntes60", "pie_harmonised_sinaces"])
+gap_years = overlap.loc[overlap["Difference (SINACES − Apuntes 60)"] != 0]
+note(f"The two sources overlap in {len(overlap)} years. They agree exactly in "
+     f"{len(overlap) - len(gap_years)} of them. In "
+     + ", ".join(f"{int(y)} they differ by {number(abs(v))} students ({number(abs(p), 2)}% of the Apuntes 60 value)"
+                 for y, v, p in zip(gap_years.index, gap_years["Difference (SINACES − Apuntes 60)"],
+                                    gap_years["Relative difference (%)"])) + ". "
+     "The study adopts the Apuntes 60 value in the overlap because it is the disaggregated source — it publishes the "
+     "two categories that make up the sum — and because the SINACES total minus its own special-school count "
+     "reproduces it exactly. The printed SINACES figure is kept in its own series rather than discarded.")
+```
+
+```{python}
+#| label: fig-pie-cambio-fuente
+#| fig-cap: "The harmonised PIE series across the source switch (left): the Apuntes 60 years, the overlap in which both documents publish a value, and the SINACES-only years. Right: the SINACES arithmetic — the published total of autistic students in the education system, the special-school students it contains, and the PIE remainder that should equal the harmonised series."
+#| fig-width: 12
+#| fig-height: 4.4
+fig, axes = plt.subplots(1, 2, figsize=(12, 4.4), layout="constrained")
+apuntes = series["pie_harmonised_apuntes60"].dropna()
+sinaces = series["pie_harmonised_sinaces"].dropna()
+axes[0].axvspan(OVERLAP_START - 0.5, LAST_APUNTES + 0.5, color=COLORS[3], alpha=.12)
+axes[0].plot(apuntes.index, apuntes.values, "s-", color=COLORS[1], label="Apuntes 60 (category sum)")
+axes[0].plot(sinaces.index, sinaces.values, "D--", color=COLORS[4], label="SINACES (as printed)")
+axes[0].plot(harmonised.index, harmonised.values, "o", color=COLORS[0], markersize=4, label="Adopted value")
+axes[0].annotate("both documents\npublish a value", (OVERLAP_START - 0.4, 0.06), fontsize=7, color="#555555",
+                 xycoords=axes[0].get_xaxis_transform())
+axes[0].axvline(LAST_APUNTES + 0.5, color="#999999", linestyle=":", linewidth=1)
+axes[0].annotate("SINACES only", (LAST_APUNTES + 0.6, apuntes.max() * 0.9), fontsize=7, color="#555555")
+axes[0].set(title="Harmonised series across the source switch", xlabel="School year", ylabel="Students", xticks=YEARS)
+axes[0].legend(fontsize=8, loc="upper left")
+arith = series[["sinaces_total_autistic_students", "special_schools_autism", "pie_harmonised_sinaces"]].dropna(how="all")
+x = np.arange(len(arith))
+axes[1].bar(x, arith.pie_harmonised_sinaces, color=COLORS[0], label="PIE (harmonised, SINACES)")
+axes[1].bar(x, arith.special_schools_autism, bottom=arith.pie_harmonised_sinaces, color=COLORS[2],
+            label="Special autism schools")
+axes[1].plot(x, arith.sinaces_total_autistic_students, "k_", markersize=26, label="Published total")
+axes[1].set(title="SINACES total = PIE + special schools", xlabel="School year", ylabel="Students",
+            xticks=x, xticklabels=[str(int(y)) for y in arith.index])
+axes[1].legend(fontsize=8)
+plt.show()
+```
+
+The series changes hands between the two documents, and that is a break in the record, not in the
+phenomenon. Apuntes 60 publishes the two categories separately for the earlier years and stops;
+SINACES publishes only the harmonised category and only from the later years. The overlap is what
+makes the splice defensible: in the years both documents cover, they agree to within a handful of
+students out of tens of thousands. But three things still change at the switch, and they should be
+carried with every number after it. The categorical split disappears, so the strict and Asperger
+series cannot be continued. The denominator changes from **total PIE enrolment** to **total PIE
+applicants**. And the documents' rounding conventions differ from the computed shares, which is why
+the published percentages and the ones recomputed here are not identical to the last digit.
+
+```{python}
+#| label: tabla-pie-porcentajes-publicados
+published = pd.DataFrame({"Year": YEARS})
+published["Strict, % published"] = published.Year.map(series["pie_tea_strict_share_of_pie_pct_published"])
+published["Strict, % recomputed"] = published.Year.map(series["pie_tea_strict_share_of_pie_pct"])
+published["Asperger, % published"] = published.Year.map(series["pie_tea_asperger_share_of_pie_pct_published"])
+published["Autism applicants, % published"] = published.Year.map(series["pie_tea_share_of_applicants_published_pct"])
+published["Autism applicants, % recomputed"] = published.Year.map(series["pie_tea_share_of_applicants_pct"])
+published["Largest absolute gap (pp)"] = np.nanmax(np.abs(np.c_[
+    published["Strict, % published"] - published["Strict, % recomputed"],
+    published["Autism applicants, % published"] - published["Autism applicants, % recomputed"]]), axis=1)
+show_table(published, "Percentages as printed in the documents and as recomputed from the counts they publish; the "
+                      "gaps are rounding in the printed tables, not a disagreement about the counts",
+           {c: 3 for c in published.columns if c != "Year"})
+edu_controls = controls.loc[controls.Module.eq("05_education")]
+note(f"The education module carries {int(pd.to_numeric(edu_controls.Checks).sum())} reproduction controls across "
+     f"{len(edu_controls)} families; {int(pd.to_numeric(edu_controls.Reproduced).sum())} reproduce and "
+     f"{int(edu_controls.Differ.sum())} differ. The largest relative difference in any of them, "
+     f"{number(pd.to_numeric(edu_controls['Max |relative difference|'], errors='coerce').max(), 4)}, comes from the "
+     "published-versus-recomputed percentage families above and reflects the documents' rounding.")
+```
+
+## Denominators: enrolment, applicants, and the population behind neither
+
+```{python}
+#| label: tabla-pie-denominadores
+den = pd.DataFrame({"Year": YEARS})
+den["Total PIE enrolment (Apuntes 60)"] = den.Year.map(series["pie_total_enrolment"])
+den["Enrolment, change on the year (%)"] = den.Year.map(enrolment_change)
+den["Total PIE applicants (SINACES)"] = den.Year.map(series["pie_total_applicants_sinaces"])
+den["Applicants, change on the year (%)"] = den.Year.map(applicants_change)
+den["Applicants − enrolment"] = den["Total PIE applicants (SINACES)"] - den["Total PIE enrolment (Apuntes 60)"]
+den["Harmonised autism students"] = den.Year.map(series["pie_harmonised"])
+den["INE resident population (30 June)"] = den.Year.map(pop)
+den["Per 100 000 residents of all ages"] = 1e5 * den["Harmonised autism students"] / den["INE resident population (30 June)"]
+show_table(den, "The denominators the education series can be divided by, and the one it cannot. The last column is a "
+                "context ratio only: its numerator is a school registration and its denominator is the whole "
+                "resident population of every age, so it is not a rate of anything",
+           {"Per 100 000 residents of all ages": 1, "Enrolment, change on the year (%)": 1,
+            "Applicants, change on the year (%)": 1})
+common = den.dropna(subset=["Total PIE enrolment (Apuntes 60)", "Total PIE applicants (SINACES)"])
+note(f"Neither denominator is a fixed base. Total PIE enrolment falls {number(abs(enrolment_change[DROP_YEAR]), 1)}% "
+     f"in {DROP_YEAR} and rebounds {number(enrolment_change[REBOUND_YEAR], 1)}% in {REBOUND_YEAR}, which is why the "
+     f"share of PIE enrolment rises {number(SHARE_RISE, 2)} points in {DROP_YEAR} with "
+     f"{number(SHARE_RISE_DENOMINATOR, 2)} of those points coming from the denominator alone; total PIE applicants "
+     f"falls {number(abs(APPLICANT_DROP), 1)}% in {LAST} while the autism count rises. The "
+     f"{FIRST + 1}–{FIRST + 2} reporting-disruption indicator used in the growth models above is applied to the "
+     "counts, not to these shares: a share whose denominator moved cannot be repaired by an indicator on the "
+     "numerator's trend.")
+note("In the years both are published, SINACES's total of PIE applicants and Apuntes 60's total of PIE enrolment "
+     "differ by " + ", ".join(f"{number(abs(d))} in {int(y)}" for y, d in
+                              zip(common.Year, common["Applicants − enrolment"])) + ". "
+     "The same is true of the autism numerator: SINACES's count of autistic PIE applicants equals its own count of "
+     "autistic students in PIE in every year it publishes both. In this source, therefore, applying and being "
+     "registered are not distinguished; the applicants table is a re-presentation of the enrolment table, not an "
+     "independent measure of demand.")
+```
+
+The third denominator, the resident population, is shown once and then left alone. A school
+registration divided by the population of every age is not an educational rate, not a prevalence and
+not comparable with the health-record rates elsewhere in this report, which have residents as both
+unit and denominator. It appears here only so that the order of magnitude of the school series can be
+placed beside the other sources, and it carries the same warning wherever it is used.
+
+## Applications: regular and exceptional entry
+
+```{python}
+#| label: tabla-pie-postulaciones
+entry = pd.DataFrame({"Year": [y for y in YEARS if not np.isnan(series["pie_tea_applicants_sinaces"].get(y, np.nan))]})
+entry["Autistic applicants"] = entry.Year.map(series["pie_tea_applicants_sinaces"])
+entry["Regular entry (Decree 170 places)"] = entry.Year.map(series["pie_tea_regular_entry"])
+entry["Exceptional entry (Seremi authorisation)"] = entry.Year.map(series["pie_tea_exceptional_entry"])
+entry["Regular + exceptional check"] = (entry["Regular entry (Decree 170 places)"]
+                                        + entry["Exceptional entry (Seremi authorisation)"]
+                                        - entry["Autistic applicants"])
+entry["% by exceptional entry"] = 100 * entry["Exceptional entry (Seremi authorisation)"] / entry["Autistic applicants"]
+entry["All PIE applicants"] = entry.Year.map(series["pie_total_applicants_sinaces"])
+entry["Autistic applicants as % of all"] = 100 * entry["Autistic applicants"] / entry["All PIE applicants"]
+show_table(entry, "Autistic PIE applicants by entry route. The check column confirms that the two routes exhaust the "
+                  "total in every year; percentages are of the autistic applicants and of all applicants respectively",
+           {"% by exceptional entry": 1, "Autistic applicants as % of all": 1})
+first_entry, last_entry = entry.iloc[0], entry.iloc[-1]
+previous_entry = entry.iloc[-2]
+# What the final share would read if its denominator had stayed at the previous year's value.
+share_held = 100 * last_entry["Autistic applicants"] / previous_entry["All PIE applicants"]
+denominator_fall = 100 * (last_entry["All PIE applicants"] / previous_entry["All PIE applicants"] - 1)
+numerator_rise = 100 * (last_entry["Autistic applicants"] / previous_entry["Autistic applicants"] - 1)
+note(f"Exceptional entry — the route requiring a regional authorisation because the establishment's Decree 170 "
+     f"places are already taken — rises from {number(first_entry['% by exceptional entry'], 1)}% of autistic "
+     f"applicants in {int(first_entry.Year)} to {number(last_entry['% by exceptional entry'], 1)}% in "
+     f"{int(last_entry.Year)}. Over the same years the total of all PIE applicants moves from "
+     f"{number(first_entry['All PIE applicants'])} to {number(last_entry['All PIE applicants'])}, and it does not "
+     f"move in one direction: between {int(previous_entry.Year)} and {int(last_entry.Year)} it falls "
+     f"{number(abs(denominator_fall), 1)}%, from {number(previous_entry['All PIE applicants'])} to "
+     f"{number(last_entry['All PIE applicants'])}, while the autistic numerator rises {number(numerator_rise, 1)}%. "
+     f"Of the {number(last_entry['Autistic applicants as % of all'], 1)}% the autism share reaches in "
+     f"{int(last_entry.Year)}, {number(last_entry['Autistic applicants as % of all'] - share_held, 2)} points are "
+     f"the denominator shrinking: the same numerator over the {int(previous_entry.Year)} denominator would read "
+     f"{number(share_held, 1)}%. Part of the rise in the share is a numerator effect, and part is a denominator "
+     "that shrinks beneath it.")
+```
+
+```{python}
+#| label: fig-pie-postulaciones
+#| fig-cap: "Autistic PIE applicants by entry route (left, students per school year, stacked), the share entering by exceptional authorisation (centre, % of autistic applicants), and the autism share of all PIE applicants set against the size of that denominator (right)."
+#| fig-width: 13
+#| fig-height: 4.2
+fig, axes = plt.subplots(1, 3, figsize=(13, 4.2), layout="constrained")
+x = np.arange(len(entry))
+labels = [str(int(y)) for y in entry.Year]
+axes[0].bar(x, entry["Regular entry (Decree 170 places)"], color=COLORS[0], label="Regular entry (Decree 170)")
+axes[0].bar(x, entry["Exceptional entry (Seremi authorisation)"], bottom=entry["Regular entry (Decree 170 places)"],
+            color=COLORS[2], label="Exceptional entry (Seremi)")
+axes[0].set(title="Autistic applicants by route", xlabel="School year", ylabel="Students", xticks=x, xticklabels=labels)
+axes[0].legend(fontsize=8)
+axes[1].plot(x, entry["% by exceptional entry"], "o-", color=COLORS[2])
+axes[1].set(title="Exceptional entry", xlabel="School year", ylabel="% of autistic applicants",
+            xticks=x, xticklabels=labels, ylim=(0, max(30, entry["% by exceptional entry"].max() * 1.25)))
+axis_right = axes[2].twinx()
+axis_right.bar(x, entry["All PIE applicants"], color="#dddddd", label="All PIE applicants (right axis)")
+axis_right.set_ylabel("All PIE applicants")
+axis_right.grid(False)
+axes[2].plot(x, entry["Autistic applicants as % of all"], "o-", color=COLORS[0], label="Autism share (left axis)")
+# The grey bars are the denominator of the line drawn over them, and they fall in the last year; the
+# break is marked on the figure rather than described in the caption.
+axes[2].axvline(len(entry) - 1.5, color="#b3271e", linestyle="-.", linewidth=1.1)
+axes[2].annotate(f"denominator falls\n{number(denominator_fall, 1)}%", (len(entry) - 1.42, 0.06), fontsize=6.5,
+                 color="#b3271e", xycoords=axes[2].get_xaxis_transform())
+axes[2].set(title="Autism share of PIE applications", xlabel="School year", ylabel="% of all PIE applicants",
+            xticks=x, xticklabels=labels)
+axes[2].set_zorder(axis_right.get_zorder() + 1)
+axes[2].patch.set_visible(False)
+handles = axes[2].get_legend_handles_labels()[0] + axis_right.get_legend_handles_labels()[0]
+axes[2].legend(handles, ["Autism share (left axis)", "All PIE applicants (right axis)"], fontsize=8, loc="upper left")
+plt.show()
+```
+
+## Special schools, and the total the report should not double-count
+
+```{python}
+#| label: tabla-escuelas-especiales
+special = series[["sinaces_total_autistic_students", "special_schools_autism", "pie_harmonised_sinaces",
+                  "sinaces_total_minus_special"]].dropna(how="all").copy()
+special["Total − special schools, derived"] = special.sinaces_total_minus_special
+special["Check against the printed PIE figure"] = special["Total − special schools, derived"] - special.pie_harmonised_sinaces
+special["Special schools as % of the total"] = 100 * special.special_schools_autism / special.sinaces_total_autistic_students
+show_table(special.reset_index()[["year", "sinaces_total_autistic_students", "pie_harmonised_sinaces",
+                                  "special_schools_autism", "Total − special schools, derived",
+                                  "Check against the printed PIE figure", "Special schools as % of the total"]].rename(columns={
+    "year": "Year", "sinaces_total_autistic_students": "Total autistic students in the education system",
+    "pie_harmonised_sinaces": "In PIE (as printed)", "special_schools_autism": "In special autism schools"}),
+    "The SINACES total and its two components. Special-school students are inside the total and outside PIE, so the "
+    "two counts are never added to each other", {"Special schools as % of the total": 1})
+special_first, special_last = special.index.min(), special.index.max()
+note(f"Special autism schools hold {number(special.loc[special_first, 'special_schools_autism'])} students in "
+     f"{int(special_first)} and {number(special.loc[special_last, 'special_schools_autism'])} in {int(special_last)}: "
+     "a provision that grows slowly while PIE registration multiplies, so its share of all autistic students in the "
+     f"education system falls from {number(special.loc[special_first, 'Special schools as % of the total'], 1)}% to "
+     f"{number(special.loc[special_last, 'Special schools as % of the total'], 1)}%. Nothing in the tracked tables "
+     "says whether the number of such schools, their places or their geography changed; only the enrolment is "
+     "published.")
+```
+
+## Sex: one published year
+
+```{python}
+#| label: tabla-pie-sexo
+SEX_SERIES = [("pie_tea_strict", "Strict autism (P)"), ("pie_tea_asperger", "Autism–Asperger (P)"),
+              ("pie_total_enrolment", "All PIE students, every special educational need")]
+SEX_YEAR = int(provenance.loc[provenance.series.eq("pie_tea_strict_male"), "year"].iloc[0])
+rows = []
+for key, label in SEX_SERIES:
+    male = series.loc[SEX_YEAR, f"{key}_male"]
+    female = series.loc[SEX_YEAR, f"{key}_female"]
+    ratio, lo, hi = count_ratio(male, female)
+    rows.append({"Series": label, "Males": male, "Females": female, "Total": male + female,
+                 "% female": 100 * female / (male + female), "Male-to-female ratio": ratio,
+                 "95% CI": ci(lo, hi, 2), "_lo": lo, "_hi": hi})
+sexes = pd.DataFrame(rows)
+show_table(sexes.drop(columns=["_lo", "_hi"]),
+           f"PIE students by recorded sex · {SEX_YEAR}, the only year the register publishes the split. The interval "
+           "is the exact binomial interval on the ratio of the two counts; it describes sampling variation in a "
+           "census-like register and nothing else", {"% female": 1, "Male-to-female ratio": 2})
+note(f"The sex split is published for {SEX_YEAR} alone, in a separate document from the trend report. "
+     "With one year there is no trend to read: the falling male-to-female ratio that the hospital and community "
+     "records show over time cannot be checked here, and the education series cannot say whether the growth in "
+     "registration is differently distributed between girls and boys.")
+```
+
+```{python}
+#| label: fig-pie-sexo
+#| fig-cap: "PIE students by recorded sex in the one published year: counts by series (left, students) and the male-to-female ratio with its exact binomial 95% interval (right). The dashed line marks the ratio for PIE as a whole, the comparison that matters — autism categories are far more male than the programme they sit inside."
+#| fig-width: 11
+#| fig-height: 4.2
+fig, axes = plt.subplots(1, 2, figsize=(11, 4.2), layout="constrained",
+                         gridspec_kw={"width_ratios": [1.1, 1]})
+y = np.arange(len(sexes))
+axes[0].barh(y - 0.2, sexes.Males, height=0.4, left=1, color=SEX_COLORS["HOMBRE"], label="Males")
+axes[0].barh(y + 0.2, sexes.Females, height=0.4, left=1, color=SEX_COLORS["MUJER"], label="Females")
+axes[0].set_yticks(y)
+axes[0].set_yticklabels([s.replace(", every special educational need", "\n(all needs)") for s in sexes.Series])
+axes[0].invert_yaxis()
+axes[0].set(title=f"Students by recorded sex · {SEX_YEAR}", xlabel="Students", xscale="log",
+            xlim=(1, sexes.Males.max() * 3))
+axes[0].legend(fontsize=8)
+axes[1].errorbar(sexes["Male-to-female ratio"], y,
+                 xerr=[sexes["Male-to-female ratio"] - sexes["_lo"], sexes["_hi"] - sexes["Male-to-female ratio"]],
+                 fmt="o", color=COLORS[0], capsize=3)
+axes[1].axvline(sexes["Male-to-female ratio"].iloc[-1], color="#999999", linestyle="--", linewidth=1)
+axes[1].set_yticks(y)
+axes[1].set_yticklabels(["" for _ in y])
+axes[1].invert_yaxis()
+axes[1].set(title="Male-to-female ratio, with 95% interval", xlabel="Ratio", xlim=(0, 5.5))
+plt.show()
+```
+
+## The school survey: what a caregiver checklist can carry
+
+The Encuesta de Vulnerabilidad Estudiantil (EVE), the annual school-feeding and vulnerability survey
+run by JUNAEB, is the only education source in this study with a student-level record. It is also the
+one whose weaknesses need stating most carefully, because it is the only one that looks like it could
+produce a prevalence estimate — and it cannot.
+
+### The item, and the years it did not exist
+
+```{python}
+#| label: tabla-junaeb-items
+item_table = items[["Year", "Level", "ASD variable", "Observed ASD codes", "Filter variable",
+                    "Auxiliary variables (weight · sex · grade)", "Other item categories (n)", "Estimability"]].copy()
+item_table["Weight column"] = item_table["Auxiliary variables (weight · sex · grade)"].str.split(" · ").str[0]
+show_table(item_table[["Year", "Level", "ASD variable", "Observed ASD codes", "Filter variable", "Weight column",
+                       "Other item categories (n)", "Estimability"]],
+           "The ASD item in the school survey, year by year and level by level: the variable that carries it, the "
+           "values actually observed in the file, the filter question that gates it, and the weight column the file "
+           "publishes. Variable names, response codes and question wording change every year")
+note(f"In {absent.Year.min()}–{absent.Year.max()} the questionnaire has no autism category at all: "
+     f"{len(absent)} level-years in which the prolonged-condition checklist lists asthma, epilepsy, obesity, coeliac "
+     "disease and the rest but not autism. Those years are not zeros and not low values; the question was never "
+     "asked. The variable name changes in every year it does exist, the response codes change from a single letter "
+     "to a word to a 0/1 pair, and the filter question is reworded more than once. There is no single extraction "
+     "rule that works across years.")
+```
+
+### Weights, and the year they were missing
+
+```{python}
+#| label: tabla-junaeb-pesos
+weights = audit[["year", "level", "n_total_raw", "n_weight_present_positive", "n_weight_missing",
+                 "weighted_denominator_full", "design_inference_defensible", "include_in_central_evidence"]].copy()
+weights["Level"] = weights.level.map({k: v for k, v in LEVELS.items()})
+weights["Expansion factor (weighted ÷ raw)"] = weights.weighted_denominator_full / weights.n_total_raw
+weights["Rows with no usable weight"] = weights.n_weight_missing
+weights["Design inference defensible"] = np.where(weights.design_inference_defensible, "yes", "no")
+weights["Used as central evidence"] = np.where(weights.include_in_central_evidence, "yes", "no")
+show_table(weights.sort_values(["year", "Level"])[[
+    "year", "Level", "n_total_raw", "weighted_denominator_full", "Expansion factor (weighted ÷ raw)",
+    "Rows with no usable weight", "Design inference defensible", "Used as central evidence"]].rename(columns={
+    "year": "Year", "n_total_raw": "Records in the file", "weighted_denominator_full": "Weighted denominator"}),
+    "Weights in the survey files. An expansion factor of exactly 1 means no weight was published and the audit used "
+    "unit weights for arithmetic only", {"Weighted denominator": 0, "Expansion factor (weighted ÷ raw)": 3})
+weighted_factors = weights.loc[~unweighted_rows, "Expansion factor (weighted ÷ raw)"]
+note(f"In {NO_WEIGHT_YEAR} the files carry no expansion factor, so no national figure can be produced from that "
+     "year at all: what is reported is an unweighted proportion of the records in the file, with a Wilson interval, "
+     "and it is not comparable with the weighted years that follow. From "
+     f"{WEIGHT_FIRST_YEAR} the weight column exists and is verified, and the weighted denominator exceeds the raw "
+     f"record count by a factor of {number(weighted_factors.min(), 3)} to {number(weighted_factors.max(), 3)}. "
+     "But the audit marks design inference as not defensible in every single level-year, including the weighted "
+     "ones, because the published files contain no stratum, no primary sampling unit and no school identifier: the "
+     "standard errors below treat students as independent, which ignores clustering within schools and is therefore "
+     "optimistic. None of these level-years is used as central evidence anywhere in the study.")
+```
+
+### Missingness, and the three denominators it creates
+
+```{python}
+#| label: tabla-junaeb-denominadores
+den_audit = audit.copy()
+den_audit["Level"] = den_audit.level.map(LEVELS)
+den_audit["Answered the filter"] = den_audit.n_filter_yesno_all
+den_audit["Said yes, left the checklist blank"] = den_audit.n_item_blank_filter_yes
+den_audit["Complete case"] = den_audit.n_explicit_outcome_complete_case
+den_audit["% of filter answers lost to the complete case"] = 100 * (
+    den_audit.n_filter_yesno_all - den_audit.n_explicit_outcome_complete_case) / den_audit.n_filter_yesno_all
+den_audit["Full-file %"] = den_audit.weighted_pct_full
+den_audit["Filter-valid %"] = den_audit.weighted_pct_filter_valid
+den_audit["Complete-case %"] = den_audit.weighted_pct_complete_case
+den_audit["Spread, full to complete case (pp)"] = den_audit["Complete-case %"] - den_audit["Full-file %"]
+show_table(den_audit.sort_values(["year", "Level"])[[
+    "year", "Level", "n_total_raw", "Answered the filter", "Said yes, left the checklist blank", "Complete case",
+    "% of filter answers lost to the complete case", "Full-file %", "Filter-valid %", "Complete-case %",
+    "Spread, full to complete case (pp)"]].rename(columns={
+    "year": "Year", "n_total_raw": "Records in the file"}),
+    "One numerator, three defensible denominators. The published estimate uses the full file; restricting to the "
+    "students whose caregiver answered the filter raises it; restricting further to students with an explicit answer "
+    "on the checklist raises it much more",
+    {c: 2 for c in ["% of filter answers lost to the complete case", "Full-file %", "Filter-valid %",
+                    "Complete-case %", "Spread, full to complete case (pp)"]})
+estimable_rows = den_audit.dropna(subset=["Full-file %"])
+worst = estimable_rows.loc[estimable_rows["Spread, full to complete case (pp)"].idxmax()]
+interval_width = float(edu.loc[int(worst.year), f"junaeb_{worst.level}_pct_weighted_hi"]
+                       - edu.loc[int(worst.year), f"junaeb_{worst.level}_pct_weighted_lo"]) \
+    if not pd.isna(edu.loc[int(worst.year), f"junaeb_{worst.level}_pct_weighted"]) else float("nan")
+note(f"The widest case is {worst.Level} in {int(worst.year)}: "
+     f"{number(worst['Said yes, left the checklist blank'])} students whose caregiver reported a prolonged condition "
+     "left every checklist category blank, which is "
+     f"{number(worst['% of filter answers lost to the complete case'], 1)}% of everyone who answered the filter. "
+     f"Moving from the full file to the complete case shifts the estimate by "
+     f"{number(worst['Spread, full to complete case (pp)'], 2)} percentage points"
+     + (f", against a 95% interval {number(interval_width, 2)} points wide." if np.isfinite(interval_width) else ".")
+     + " In that year the choice of denominator moves the answer by far more than sampling error does, and no "
+       "assumption about those blank checklists is testable from the file.")
+final_rows = den_audit.loc[den_audit.year.eq(LAST)]
+previous_rows = den_audit.loc[den_audit.year.eq(LAST - 1)]
+# "Coded 0/1 for every respondent" would be wrong: the checklist is coded for everyone who reaches it,
+# and most records never reach it because their caregiver did not answer yes at the filter question.
+reached = int(final_rows.n_item_nonempty.sum())
+never_reached = int((final_rows.n_total_raw - final_rows.n_item_nonempty).sum())
+note(f"The instrument changes in {LAST}, but not as far as it first appears. The checklist categories carry an "
+     f"explicit 0 or 1 for every respondent who reaches them — every caregiver who answered yes at the filter — so "
+     f"the students who reported a prolonged condition and then left the checklist blank fall from "
+     f"{number(previous_rows['Said yes, left the checklist blank'].sum())} in {LAST - 1} to "
+     f"{number(final_rows['Said yes, left the checklist blank'].sum())}, and the filter-valid and complete-case "
+     f"denominators coincide exactly. The item itself is still empty in most records: of the "
+     f"{number(int(final_rows.n_total_raw.sum()))} records collected in {LAST}, only {number(reached)} carry a 0 or "
+     f"a 1 and {number(never_reached)} are blank, because their caregiver never answered yes at the filter and was "
+     "never shown the list. The full file "
+     "therefore remains a third and different denominator even in the year the instrument was fixed, and the fix "
+     "arrives only for the last year of the series.")
+```
+
+```{python}
+#| label: fig-junaeb-denominadores
+#| fig-cap: "The denominator problem in the school survey. Left: the same numerator divided by three denominators — the whole file, the students who answered the filter question, and the students with an explicit answer on the checklist — for every estimable level-year. Right: the share of filter answers that the complete-case denominator discards, by year and level."
+#| fig-width: 12
+#| fig-height: 4.6
+fig, axes = plt.subplots(1, 2, figsize=(12, 4.6), layout="constrained")
+plot_frame = den_audit.dropna(subset=["Full-file %"]).sort_values(["year", "Level"]).copy()
+plot_frame["tag"] = [f"{int(r.year)}\n{r.Level.split(' (')[0]}" for r in plot_frame.itertuples()]
+x = np.arange(len(plot_frame))
+width = 0.26
+for offset, column, color, label in [(-width, "Full-file %", COLORS[0], "Whole file"),
+                                     (0.0, "Filter-valid %", COLORS[2], "Answered the filter"),
+                                     (width, "Complete-case %", COLORS[4], "Explicit checklist answer")]:
+    axes[0].bar(x + offset, plot_frame[column], width=width, color=color, label=label)
+axes[0].set(title="One numerator, three denominators", xlabel="Year and school level",
+            ylabel="Caregiver-reported ASD (%)", xticks=x)
+axes[0].set_xticklabels(plot_frame.tag, fontsize=6.5)
+axes[0].legend(fontsize=8, title="Denominator", title_fontsize=8)
+loss = den_audit.pivot_table(index="year", columns="Level", values="% of filter answers lost to the complete case")
+loss = loss.reindex(columns=[c for c in LEVEL_ORDER if c in loss.columns])
+positions = np.arange(len(loss))
+for i, (column, color) in enumerate(zip(loss.columns, COLORS)):
+    axes[1].bar(positions + (i - (len(loss.columns) - 1) / 2) * 0.2, loss[column], width=0.2, color=color, label=column)
+axes[1].set(title="Records the complete case discards", xlabel="Year", ylabel="% of filter answers",
+            xticks=positions, xticklabels=[str(int(y)) for y in loss.index])
+zero_years = [i for i, y in enumerate(loss.index) if float(loss.loc[y].max()) == 0]
+for i in zero_years:
+    axes[1].annotate("0%: every filter-yes respondent\ncarries an explicit 0/1", (i, 0.06), ha="center", fontsize=7,
+                     color="#555555", xycoords=axes[1].get_xaxis_transform())
+axes[1].legend(fontsize=7)
+plt.show()
+```
+
+### What the survey does say, by level and by sex
+
+```{python}
+#| label: tabla-junaeb-niveles
+table = junaeb.copy()
+table["95% CI, weighted"] = [ci(lo, hi, 2) for lo, hi in zip(table.lo, table.hi)]
+table["Reported ASD as % of the file"] = 100 * table["Reported ASD (n)"] / table["Students in the file"]
+table["Level"] = pd.Categorical(table.Level, LEVEL_ORDER, ordered=True)
+show_table(table.sort_values(["Year", "Level"])[[
+    "Year", "Level", "Students in the file", "Reported ASD (n)", "Reported ASD as % of the file", "Unweighted %",
+    "Weighted %", "95% CI, weighted", "Estimable"]],
+    "Caregiver-reported ASD in the school survey, by year and level. The percentages are of the students in the "
+    "file, which is not a sample of Chilean children and not the school population: it is the set of records the "
+    "survey collected in those cohorts",
+    {"Reported ASD as % of the file": 2, "Unweighted %": 2, "Weighted %": 2})
+# Year, level and record count all come from the same audit row: a hardcoded level key would print the
+# label of one row beside the count of another if the empty cell ever moved.
+blank_row = audit.loc[audit.item_observed_values.str.count(":").eq(1) & audit.n_positive_all.eq(0)].iloc[0]
+blank_year, blank_level = int(blank_row.year), LEVELS[blank_row.level]
+note(f"One cell is deliberately empty rather than zero: {blank_level} in {blank_year}, where the ASD variable exists "
+     f"in the file but is blank for all {number(blank_row.n_total_raw)} records. A zero there would assert that not "
+     f"one caregiver of a {blank_level.split(' (')[0]} student reported an autism diagnosis, which the neighbouring "
+     "years contradict. It is reported as not estimable.")
+```
+
+```{python}
+#| label: fig-junaeb-niveles
+#| fig-cap: "Caregiver-reported ASD in the school survey: the unweighted percentage of records in each file, the only measure available in every year the item exists (left); the weighted percentage with its 95% interval in the years a weight is published (centre); and the number of records in each file, which falls across the period (right, thousands of students)."
+#| fig-width: 13
+#| fig-height: 4.4
+fig, axes = plt.subplots(1, 3, figsize=(13, 4.4), layout="constrained")
+for level, color in zip(LEVEL_ORDER, COLORS):
+    frame = junaeb.loc[junaeb.Level.eq(level)].sort_values("Year")
+    unweighted = frame.dropna(subset=["Unweighted %"])
+    axes[0].plot(unweighted.Year.to_numpy(), unweighted["Unweighted %"].to_numpy(), "o-", color=color, label=level)
+    # A level with a single weighted year gives one-element columns; matplotlib wants arrays, not Series.
+    weighted = frame.dropna(subset=["Weighted %"])
+    value = weighted["Weighted %"].to_numpy()
+    axes[1].errorbar(weighted.Year.to_numpy(), value,
+                     yerr=[value - weighted.lo.to_numpy(), weighted.hi.to_numpy() - value],
+                     fmt="o-", color=color, capsize=3, label=level)
+    axes[2].plot(frame.Year.to_numpy(), (frame["Students in the file"] / 1000).to_numpy(), "o-", color=color, label=level)
+item_years = sorted(junaeb.dropna(subset=["Unweighted %"]).Year.unique())
+axes[0].set(title="Unweighted, all years with the item", xlabel="School year", ylabel="% of records in the file",
+            xticks=item_years)
+axes[0].legend(fontsize=7)
+weight_years = sorted(junaeb.dropna(subset=["Weighted %"]).Year.unique())
+axes[1].set(title="Weighted, with 95% interval", xlabel="School year", ylabel="% (weighted)", xticks=weight_years)
+axes[1].legend(fontsize=7)
+axes[2].set(title="Records in the file", xlabel="School year", ylabel="Thousands of students", xticks=YEARS)
+axes[2].legend(fontsize=7)
+plt.show()
+```
+
+```{python}
+#| label: tabla-junaeb-sexo
+counts = sex_levels.copy()
+for source, target in [("Students with a response (n)", "n"), ("Reported ASD (n)", "x")]:
+    counts[target] = pd.to_numeric(counts[source].astype(str).str.replace(",", "", regex=False), errors="coerce")
+wide = counts.pivot_table(index=["Year", "Level"], columns="Sex", values=["n", "x"])
+rows = []
+z = stats.norm.ppf(0.975)
+for (year, level), row in wide.iterrows():
+    n_m, n_f = row.get(("n", "Males"), np.nan), row.get(("n", "Females"), np.nan)
+    x_m, x_f = row.get(("x", "Males"), np.nan), row.get(("x", "Females"), np.nan)
+    if not np.isfinite([n_m, n_f, x_m, x_f]).all() or min(x_m, x_f) <= 0:
+        continue
+    p_m, p_f = x_m / n_m, x_f / n_f
+    se = np.sqrt((1 - p_m) / x_m + (1 - p_f) / x_f)
+    ratio = p_m / p_f
+    rows.append({"Year": year, "Level": level, "Males with a response": n_m, "Reported ASD, males": x_m,
+                 "% males": 100 * p_m, "Females with a response": n_f, "Reported ASD, females": x_f,
+                 "% females": 100 * p_f, "Ratio of the two percentages": ratio,
+                 "95% CI": ci(ratio * np.exp(-z * se), ratio * np.exp(z * se), 2)})
+by_sex = pd.DataFrame(rows)
+by_sex["Level"] = pd.Categorical(by_sex.Level, LEVEL_ORDER, ordered=True)
+show_table(by_sex.sort_values(["Year", "Level"]),
+           "Caregiver-reported ASD by recorded sex, level and year: unweighted percentages of the records in each "
+           "file, and the ratio between them with a log-delta 95% interval that assumes independent students",
+           {"% males": 2, "% females": 2, "Ratio of the two percentages": 2})
+ratios = by_sex.pivot_table(index="Level", columns="Year", values="Ratio of the two percentages", observed=True)
+ratio_first, ratio_last = int(ratios.columns.min()), int(ratios.columns.max())
+falling = int((ratios[ratio_last] < ratios[ratio_first]).sum())
+# The item is not the same instrument in those years, so the direction is read against that, not past it.
+names_per_year = items.loc[items.Year.isin(ratios.columns)].groupby("Year")["ASD variable"].nunique()
+codes_per_year = {int(y): observed_codes(audit.loc[audit.year.eq(y)]) for y in ratios.columns}
+note(f"The ratio of the two percentages falls between {ratio_first} and {ratio_last} in {falling} of the "
+     f"{len(ratios)} levels, and is lowest in {ratios[ratio_last].idxmin().split(' (')[0]}, the oldest cohort. That "
+     "direction cannot be separated from the instrument, which changes in every one of those years: the ASD item "
+     "is carried by "
+     + ", ".join(f"{int(n)} variable name" + ("s" if n > 1 else "") + f" in {int(y)}"
+                 for y, n in names_per_year.items())
+     + "; the values observed in the files are "
+     + "; ".join(f"{codes} in {year}" for year, codes in codes_per_year.items())
+     + f"; the filter question is reworded more than once; and {NO_WEIGHT_YEAR} publishes no expansion weight at "
+       "all. The percentages here are unweighted in every year for that reason, which keeps them comparable in "
+       "construction but not in wording. Read carefully, this is a statement about who a caregiver reports as "
+       "diagnosed in a school survey, in cohorts that are not followed over time; it is not a change in any "
+       "individual child and it is not comparable with the sex ratios of hospital episodes or programme entries, "
+       "which count different events.")
+```
+
+## Quality and comparability
+
+```{python}
+#| label: tabla-educacion-calidad
+breaks = pd.DataFrame([
+    {"Record": "PIE (Apuntes 60)", "Year": DROP_YEAR, "Kind": "Denominator collapses and rebounds",
+     "What changes": "Total PIE enrolment, the denominator of every share published before "
+                     f"{HANDOVER}, falls {number(abs(enrolment_change[DROP_YEAR]), 1)}% — from "
+                     f"{number(enrolment[DROP_YEAR - 1])} to {number(enrolment[DROP_YEAR])} students of every "
+                     f"special educational need — and rises {number(enrolment_change[REBOUND_YEAR], 1)}% in "
+                     f"{REBOUND_YEAR}",
+     "Effect on comparability": f"{number(SHARE_RISE_DENOMINATOR, 2)} of the {number(SHARE_RISE, 2)} pp rise in the "
+                                f"harmonised share between {DROP_YEAR - 1} and {DROP_YEAR} is the denominator, not "
+                                f"the numerator; the {FIRST + 1}–{FIRST + 2} disruption indicator in the growth "
+                                "models applies to the counts and not to any share"},
+    {"Record": "PIE / SINACES", "Year": OVERLAP_START, "Kind": "Second source begins",
+     "What changes": "The SINACES report starts publishing the harmonised series, the special-school series and the "
+                     "applicants series, while Apuntes 60 continues",
+     "Effect on comparability": "Two published values exist for the same year and must be reconciled by an "
+                                "explicit rule"},
+    {"Record": "PIE / SINACES", "Year": HANDOVER, "Kind": "Source change",
+     "What changes": "The harmonised series passes from Apuntes 60 to the SINACES report; the strict and Asperger "
+                     "split stops being published",
+     "Effect on comparability": "Counts remain comparable in the overlap; the categorical split cannot be continued"},
+    {"Record": "PIE / SINACES", "Year": HANDOVER, "Kind": "Denominator change",
+     "What changes": "The available denominator passes from total PIE enrolment to total PIE applicants",
+     "Effect on comparability": "Shares before and after the switch are taken over different bases"},
+    {"Record": "SINACES", "Year": LAST, "Kind": "Denominator falls",
+     "What changes": f"Total PIE applicants falls {number(abs(APPLICANT_DROP), 1)}%, from "
+                     f"{number(applicants[LAST - 1])} to {number(applicants[LAST])}, while the autism count rises",
+     "Effect on comparability": f"{number(APPLICANT_SHARE_LAST - APPLICANT_SHARE_HELD, 2)} of the "
+                                f"{number(APPLICANT_SHARE_LAST, 1)}% autism share in {LAST} is the denominator "
+                                "shrinking rather than the numerator growing"},
+    {"Record": "PIE / SINACES", "Year": int(gap_years.index[0]), "Kind": "Arithmetic discrepancy",
+     "What changes": "The printed PIE figure and the total minus special schools differ by "
+                     f"{number(abs(gap_years['Difference (SINACES − Apuntes 60)'].iloc[0]))} students",
+     "Effect on comparability": "Resolved by an explicit rule; both values are kept in separate series"},
+    {"Record": "PIE / SINACES", "Year": SEX_YEAR, "Kind": "Single-year breakdown",
+     "What changes": "Sex is published for one year only, in a third document",
+     "Effect on comparability": "No sex trend can be constructed"},
+    {"Record": "JUNAEB EVE", "Year": ITEM_FIRST_YEAR, "Kind": "Item appears",
+     "What changes": "An autism category is added to the prolonged-condition checklist",
+     "Effect on comparability": "Earlier years are not zeros; no series exists before this year"},
+    {"Record": "JUNAEB EVE", "Year": NO_WEIGHT_YEAR, "Kind": "No published weight",
+     "What changes": "The files carry no expansion factor",
+     "Effect on comparability": "Unweighted proportions only; not comparable with later weighted years"},
+    {"Record": "JUNAEB EVE", "Year": blank_year, "Kind": "Empty variable",
+     "What changes": f"The ASD variable in {blank_level} is blank for every record",
+     "Effect on comparability": "Reported as not estimable, never as zero"},
+    {"Record": "JUNAEB EVE", "Year": int(junaeb.Year.max()), "Kind": "Response coding change",
+     "What changes": "The checklist is coded 0/1 for every respondent who answers yes at the filter, instead of "
+                     f"being left blank; it stays blank for the {number(never_reached)} records whose caregiver "
+                     "never reached it",
+     "Effect on comparability": "Missingness among filter answers disappears, so the filter-valid and complete-case "
+                                "denominators converge in this year only; the full file remains a third base"},
+])
+show_table(breaks, "Every break in the education record over the period, what it changes, and what it costs in "
+                   "comparability")
+```
+
+Five weaknesses are worth naming plainly, because every number above inherits at least one of them.
+
+**The unit is a registration, not a person.** A student registered in PIE in two consecutive years is
+two rows in two annual stocks. Nothing in the published aggregates permits following an individual,
+and no figure here is a count of distinct persons over the period.
+
+**The register measures eligibility and provision as much as recognition.** A registration requires a
+diagnosis, but it also requires an establishment with a PIE, a professional to complete the
+assessment, and either an available Decree 170 place or an exceptional authorisation. The rising
+share of exceptional entries is direct evidence that the supply constraint binds. Growth in this
+series therefore mixes clinical recognition, administrative capacity and the financial incentive
+attached to the subsidy, in proportions the data cannot separate.
+
+**The denominators do not match the numerators.** Total PIE enrolment counts students with any
+special educational need in state-funded establishments; the population denominator counts residents
+of all ages; the survey denominators count records in a file. None of them is the population of
+school-age children in Chile, so none of the percentages on this page is a prevalence, and the shares
+across the source switch are not taken over the same base.
+
+```{python}
+#| label: debilidad-missingness
+#| output: asis
+# The missingness weakness is not the same weakness in the two weighted years — it is large in the first
+# and gone in the second — so it is stated year by year, from the audit rather than from memory.
+blank_share = 100 * audit.n_item_blank_filter_yes / audit.n_filter_yesno_all
+spread = audit.weighted_pct_complete_case - audit.weighted_pct_full
+widths = pd.Series([float(edu.loc[row.year, f"junaeb_{row.level}_pct_weighted_hi"]
+                          - edu.loc[row.year, f"junaeb_{row.level}_pct_weighted_lo"])
+                    for row in audit.itertuples()], index=audit.index)
+clauses = []
+for survey_year in WEIGHTED_YEARS:
+    in_year = audit.year.eq(survey_year)
+    estimable = in_year & audit.weighted_pct_full.notna()
+    exceeding = int((spread[estimable] > widths[estimable]).sum())
+    # blank_share is taken over the ESTIMABLE levels only. A level whose item is empty for every record
+    # is a defect of the file, not caregivers declining to answer, and pooling the two would attribute
+    # a missing variable to respondent behaviour and inflate the upper bound.
+    empty_levels = in_year & audit.n_item_nonempty.eq(0)
+    if blank_share[estimable].max() > 0:
+        opening = (f"In {survey_year} between {number(blank_share[estimable].min(), 1)}% and "
+                   f"{number(blank_share[estimable].max(), 1)}% of the students whose caregiver reported a prolonged "
+                   "condition left every checklist category blank")
+        if empty_levels.any():
+            named = ", ".join(LEVELS.get(l, l) for l in audit.level[empty_levels])
+            opening += (f" (the {named} item is excluded from that range: it is empty for every record that "
+                        "year, which is a defect of the file rather than a caregiver not answering)")
+    else:
+        opening = (f"In {survey_year} no student who answered the filter was left blank, because the checklist "
+                   "carries an explicit 0 or 1 for everyone who reaches it")
+    clauses.append(f"{opening}, and moving from the full file to the complete case moves the estimate by "
+                   f"{number(spread[estimable].min(), 2)} to {number(spread[estimable].max(), 2)} percentage points "
+                   f"against 95% intervals {number(widths[estimable].min(), 2)} to "
+                   f"{number(widths[estimable].max(), 2)} points wide, with {exceeding} of the "
+                   f"{int(estimable.sum())} moving by more than its own interval")
+print(f"**The survey's missingness was larger than its uncertainty in {WEIGHTED_YEARS[0]}, and is gone by "
+      f"{WEIGHTED_YEARS[-1]}.** " + ". ".join(clauses) + ". The two weighted years therefore carry different "
+      "denominator risks and are not interchangeable. In both of them the interval itself is computed as though "
+      "students were sampled independently, which they were not, so the comparison between the two flatters the "
+      "interval in every year.")
+```
+
+**There is no geography, no age and no school.** No tracked education table carries a region, a
+commune, an age, a grade within level or an establishment. The territorial analysis this report
+performs on the hospital and community records cannot be repeated here, and the study's own
+reproduction controls record the commune-level education check as unavailable rather than as passed.
+
+# Synthesis
+
+```{python}
+#| label: sintesis
+#| output: asis
+first_h, last_h = harmonised.index.min(), harmonised.index.max()
+main = pie_models.loc[pie_models.model_id.eq(f"pie_harmonised:none:{FIRST}-{LAST}")].iloc[0]
+disruption = pie_models.loc[pie_models.model_id.eq(f"pie_harmonised:disruption:{FIRST}-{LAST}")].iloc[0]
+last_junaeb = junaeb.loc[junaeb.Year.eq(junaeb.dropna(subset=["Weighted %"]).Year.max())].dropna(subset=["Weighted %"])
+# How far each of the last year's estimates moves when the denominator changes, against how wide its own
+# interval is. Both quantities come from the tables above; neither is asserted in the prose.
+last_survey_year = int(last_junaeb.Year.iloc[0])
+survey_audit = audit.loc[audit.year.eq(last_survey_year)].set_index("level")
+denominator_shift = {}
+for _, survey_row in last_junaeb.iterrows():
+    audit_row = survey_audit.loc[LEVEL_KEYS[survey_row["Level"]]]
+    denominator_shift[survey_row["Level"].split(" (")[0]] = (
+        float(audit_row.weighted_pct_complete_case - audit_row.weighted_pct_full),
+        float(survey_row["hi"] - survey_row["lo"]))
+shift_values = [move for move, _ in denominator_shift.values()]
+shift_widths = [width for _, width in denominator_shift.values()]
+exceeding_levels = [name for name, (move, width) in denominator_shift.items() if move > width]
+first_weighted = audit.loc[audit.year.eq(WEIGHT_FIRST_YEAR) & audit.weighted_pct_full.notna()]
+first_shift = first_weighted.weighted_pct_complete_case - first_weighted.weighted_pct_full
+first_widths = pd.Series([float(edu.loc[row.year, f"junaeb_{row.level}_pct_weighted_hi"]
+                                - edu.loc[row.year, f"junaeb_{row.level}_pct_weighted_lo"])
+                          for row in first_weighted.itertuples()], index=first_weighted.index)
+first_multiple = first_shift / first_widths
+bullets = [
+    f"Students registered in PIE under an autism category rose from {number(harmonised.loc[first_h])} in "
+    f"{int(first_h)} to {number(harmonised.loc[last_h])} in {int(last_h)}, a factor of "
+    f"{number(harmonised.loc[last_h] / harmonised.loc[first_h], 1)}, with an average annual change of "
+    f"{number(main.apc, 1)}% ({ci(main.apc_lo, main.apc_hi)}); adding an indicator for the disrupted "
+    f"{FIRST + 1}–{FIRST + 2} school years leaves it at {number(disruption.apc, 1)}% "
+    f"({ci(disruption.apc_lo, disruption.apc_hi)}). These are annual school-register stocks: what grew is "
+    "recognition and registration inside the school system, not the occurrence of autism.",
+    f"The two published definitions diverge: over {FIRST}–{LAST_APUNTES} the strict autism category grows at "
+    f"{number(strict_model.apc, 1)}% a year against {number(asperger_model.apc, 1)}% for Autism–Asperger, so the "
+    "harmonised sum is the only series that can be carried across the whole period, and a strict-only series would "
+    "describe a coding migration as much as a change in recognition.",
+    f"The series changes documents in {HANDOVER}. In the {len(overlap)} overlapping years the two sources agree to "
+    f"within {number(abs(gap_years['Difference (SINACES − Apuntes 60)']).max())} students, but after the switch the "
+    "categorical split is gone and the denominator becomes PIE applicants rather than PIE enrolment; in that source "
+    "the count of autistic applicants equals the count of autistic students exactly, so demand and registration are "
+    "not distinguished.",
+    f"Autism reaches {number(APPLICANT_SHARE_LAST, 1)}% of all PIE applicants by {LAST}, over a denominator that "
+    f"fell {number(abs(APPLICANT_DROP), 1)}% that year: {number(APPLICANT_SHARE_LAST - APPLICANT_SHARE_HELD, 2)} of "
+    f"those {number(APPLICANT_SHARE_LAST, 1)} points are the denominator shrinking rather than the numerator "
+    f"growing. {number(last_entry['% by exceptional entry'], 1)}% of autistic applicants "
+    "enter by exceptional authorisation rather than through the programme's ordinary places — a supply constraint "
+    "visible in the register itself. Special autism schools grow from "
+    f"{number(special.loc[special_first, 'special_schools_autism'])} to "
+    f"{number(special.loc[special_last, 'special_schools_autism'])} students and fall as a share of all autistic "
+    "students in the education system.",
+    f"The school survey supports a weighted estimate in only {len(WEIGHTED_YEARS)} of the {len(YEARS)} years and "
+    "only for the levels in which the item was both asked and answered: "
+    + "; ".join(f"{r['Level'].split(' (')[0]} {number(r['Weighted %'], 1)}% ({ci(r['lo'], r['hi'], 1)})"
+                for _, r in last_junaeb.sort_values("Level").iterrows())
+    + f" in {last_survey_year}. Every one of these is a percentage of the records in a school file, computed without "
+      "strata, cluster or school identifier. Changing the denominator from the whole file to the complete case moves "
+      f"them by {number(min(shift_values), 2)} to {number(max(shift_values), 2)} percentage points, against "
+      f"intervals {number(min(shift_widths), 2)} to {number(max(shift_widths), 2)} points wide: "
+    + (", ".join(exceeding_levels) + (" moves" if len(exceeding_levels) == 1 else " move")
+       + " by more than its own interval and the rest do not"
+       if exceeding_levels else "none moves by more than its own interval")
+    + f". In {WEIGHT_FIRST_YEAR}, the other weighted year, the same change moved the estimate by "
+      f"{number(first_shift.min(), 2)} to {number(first_shift.max(), 2)} points, "
+      f"{number(first_multiple.min())} to {number(first_multiple.max())} times the width of the interval published "
+      "beside it. None of these numbers is a prevalence.",
+    "The education record has no geography, no age and no school, and publishes sex for a single year. It can say "
+    "how many school registrations carry an autism category and under which rule; it cannot say where, at what age, "
+    "to whom, or how many distinct children.",
+]
+for bullet in bullets:
+    print(f"- {bullet}")
+    print()
+```
+
+## Reproducibility
+
+Every figure and table on this page is computed in the chunk that displays it, from tables tracked in
+git: `docs/study/data/education_summary_year.csv`, `pie_source_provenance.csv`,
+`junaeb_denominator_audit.csv`, `coverage_layers_year.csv` and `models_summary.csv`, together with the
+published corpus tables `ST6_junaeb_items.csv`, `E76_education_pie_full.csv`,
+`S12_junaeb_sex_level.csv` and `E79_reproduction_controls_by_family.csv`. That is the whole input list:
+the chapter reads nothing it does not use, so `pie_enriched_context_verified.csv` and `fig3a_pie.csv`,
+which restate the same PIE series in other shapes, are not loaded here and are not claimed as sources
+of anything on the page. No value is transcribed by hand and nothing is read from a geospatial file,
+because no tracked education table carries a region or a commune.
+
+The prior extraction is documented in the provenance table itself: each published PIE, SINACES or
+special-school value keeps the document it was read from, the physical page, the caption of the table
+on that page, the definition recorded beside it and the SHA-256 of the file, and is flagged as
+printed or as computed from printed cells. The survey side keeps the microdata file, its encoding,
+its dictionary and questionnaire, the exact variable that carries the ASD item, the values observed
+in it and the weight column, for every level and year. The growth models are read from
+`models_summary.csv` with their residual degrees of freedom, dispersion and Durbin–Watson statistic
+attached, so the weakness of a log-linear fit on seven points stays visible beside its interval.
+
+The extension this source most needs is not more years but more columns: a regional and age breakdown
+of the PIE register, a sex split published every year rather than once, an establishment count for
+the special schools, and a survey file that publishes the sampling design alongside the weight. Until
+then the education record can be counted accurately and cannot be disaggregated at all.
+
+::: {.report-nav}
+:::

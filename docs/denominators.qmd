@@ -1,0 +1,1123 @@
+---
+title: "Denominators, coverage and an independent discharge register"
+subtitle: "The layers every rate in this report divides by · 2017–2025 · and DEIS, a separate national count of the same hospital events"
+---
+
+```{python}
+#| label: cargar-denominadores
+from pathlib import Path
+import sys
+import numpy as np
+import pandas as pd
+import matplotlib.pyplot as plt
+
+ROOT = Path.cwd().parent if Path.cwd().name == "docs" else Path.cwd()
+sys.path.insert(0, str(ROOT / "scripts"))
+from report_helpers import (read_result, show_table, kpis, note, number, ci, plot_style, load_regions, choropleth,
+                            AGE_GROUPS, SEX_COLORS, REGION_NAMES, REGION_ORDER, COLORS)
+from epi_helpers import crude_rate, rate_ratio
+
+STUDY = ROOT / "docs" / "study"
+MISSING = {"", "—", "-", "–", "n/e", "nan", "none", "variable absent"}
+
+
+def read_study(name: str) -> pd.DataFrame:
+    """Result tables published with the study, in docs/study/data/."""
+    return pd.read_csv(STUDY / "data" / name)
+
+
+def read_corpus(name: str) -> pd.DataFrame:
+    """Extended-material tables, in docs/study/corpus/tables/. They are written for print, so they carry
+    thousands separators, per cent signs and the placeholders '—', 'n/e' and 'variable absent'."""
+    frame = pd.read_csv(STUDY / "corpus" / "tables" / name, encoding="utf-8-sig")
+    frame.columns = [str(c).strip() for c in frame.columns]
+    return frame
+
+
+def as_number(value):
+    text = str(value).replace(",", "").replace("%", "").strip()
+    if text.lower() in MISSING:
+        return np.nan
+    try:
+        return float(text)
+    except ValueError:
+        return np.nan
+
+
+def numeric(frame: pd.DataFrame, columns) -> pd.DataFrame:
+    out = frame.copy()
+    for column in columns:
+        out[column] = out[column].map(as_number)
+    return out
+
+
+# Tracked inputs of this chapter.
+coverage = read_study("coverage_layers_year.csv")                  # coverage layers, one row per year
+deis = read_study("expanded_deis_principal_comparison.csv")        # DEIS against GRD, principal position
+model_rates = read_study("models_population_rates.csv")            # the published GRD population rates
+population = read_result("population_regional.csv")                # INE base 2017 by region, age group and sex
+population_young = read_result("population_regional_young.csv")    # INE base 2017 by region and single year 0–5
+layers = read_corpus("M4_denominator_layers.csv")                  # what each layer may and may not denominate
+layers_full = read_corpus("E73_denominator_layers_full.csv")       # each layer by region, age group and sex
+coverage_age = read_corpus("S11_coverage_age_sex.csv")             # coverage by age band and sex, latest year
+deis_annual = read_corpus("ST11a_deis_annual.csv")                 # DEIS file layout, masking and F84 positions
+deis_variants = read_corpus("ST11b_deis_vs_grd.csv")               # DEIS against GRD under two case definitions
+deis_age_sex = read_corpus("S14_deis_sex_age.csv")                 # DEIS discharges and F84 by sex and age band
+bases = read_corpus("S10_denominator_sensitivity.csv")             # the population bases side by side
+bases = numeric(bases, [c for c in bases.columns if c != "Year"])
+bases["Year"] = bases["Year"].astype(int)
+plot_style()
+
+BASE_2017 = "INE base Census 2017, 30 June (primary)"
+BASE_2024 = "INE base 2024, 30 June (sensitivity)"
+BASE_2024_JAN = "INE base 2024, 1 January (sensitivity)"
+CENSUS_2024 = "Census 2024, enumerated population"
+base_by_year = bases.set_index("Year")
+
+first_population_year, last_population_year = int(population.year.min()), int(population.year.max())
+first_coverage_year, last_coverage_year = int(coverage.year.min()), int(coverage.year.max())
+first_deis_year, last_deis_year = int(deis.year.min()), int(deis.year.max())
+coverage_last = coverage.loc[coverage.year == last_coverage_year].iloc[0]
+deis_last = deis.loc[deis.year == last_deis_year].iloc[0]
+census_ratio = float(base_by_year.loc[2024, CENSUS_2024] / base_by_year.loc[2024, BASE_2017])
+
+# The DEIS annual table publishes one non-canonical row (a re-read of 2021 under a 15-column layout);
+# every DEIS figure in this chapter uses the canonical files only.
+deis_canonical = deis_annual.loc[deis_annual["File layout"] == "canonical"].copy()
+f84_external_cause = float(deis_canonical["F84 in DIAG2 (external cause)"].map(as_number).sum())
+
+kpis([
+    (number(coverage_last.ine_population_base2017_30jun), f"INE resident population, 2017 census base · {last_coverage_year}"),
+    (number(census_ratio, 3), "Census 2024 enumerated ÷ 2017-base projection, 2024"),
+    (number(100 * coverage_last.share_fonasa_plus_isapre_ine, 1) + "%", f"FONASA + ISAPRE December stock ÷ INE · {last_coverage_year}"),
+    (number(coverage_last.aps_enrolled_dec), f"Persons enrolled in primary care, 31 December {last_coverage_year}"),
+    (number(deis_last.deis_f84_principal), f"DEIS discharges with F84 as principal diagnosis · {last_deis_year}"),
+])
+```
+
+## What this chapter is for
+
+Every rate in this report is a count of recorded events divided by a layer of population. The counts are
+described in the source chapters; this chapter describes the layers. None of them is a count of autism, and
+none of them turns a count of autism into a prevalence: they answer *how many people were living in the
+territory*, *how many people were insured in December* and *how many people were enrolled in a primary-care
+centre*, and those are three different questions with three different units.
+
+Two things are set out here. The first is the set of denominators: the INE (national statistics institute)
+resident population under its two census bases, by region, age group and single year of age, together with
+the coverage layers of FONASA (the public insurer), ISAPRE (the private insurers) and primary-care
+enrolment. The second is DEIS (Department of Health Statistics and Information), the national hospital
+discharge register, which counts the same hospital events as the GRD (Grupos Relacionados por el
+Diagnóstico) database used in the [hospital chapter](hospital.html), but with a different scope, a different
+diagnostic field and a suppression rule of its own. It is read here as an independent check on those counts,
+never as a second estimate of how many people are autistic.
+
+Three things run through the chapter and are made visible wherever they bite:
+
+- **The population base changed.** INE publishes projections on the 2017 census base and, since 2024, on a
+  2024 base, and the 2024 census enumerated a smaller country than either projection. A rate computed with
+  one base and compared with a rate computed with another is not a comparison of recognition.
+- **Numerator and denominator are often located differently.** The health records locate an event where it
+  was recorded — the facility, the hospital — while the population locates a person where they live. Rates
+  built across that difference rank territories; they do not measure the risk of residents.
+- **Insurance and primary-care coverage count enrolment, not need.** A person enters these layers by an
+  administrative act, at a moment that has nothing to do with their health, and a 31 December stock is not
+  the population of the year.
+
+## The layers and what each one can denominate
+
+```{python}
+#| label: tabla-capas-definicion
+show_table(layers[["Layer", "Unit of observation", "Question it answers", "Compatible numerators", "Uses not permitted"]],
+           "The denominator layers of the study: unit of observation, the question each one answers, the numerators it may carry and the uses it does not admit")
+```
+
+The last column is the operative one. An establishment count is never a population; an insurance stock is
+never a residence denominator; primary-care enrolment is the denominator of the centre that reports, not of
+the people who live around it. The layers are not interchangeable, and a rate is readable only when the
+layer it divides by is named.
+
+## The resident population and its two census bases
+
+### The bases side by side
+
+```{python}
+#| label: tabla-bases
+base_table = pd.DataFrame({"Year": bases.Year})
+base_table["INE, 2017 census base (30 June)"] = bases[BASE_2017]
+base_table["INE, 2024 base (30 June)"] = bases[BASE_2024]
+base_table["INE, 2024 base (1 January)"] = bases[BASE_2024_JAN]
+base_table["Census 2024, enumerated"] = bases[CENSUS_2024]
+base_table["2024 base ÷ 2017 base"] = bases[BASE_2024] / bases[BASE_2017]
+base_table["Census 2024 ÷ 2017 base"] = bases[CENSUS_2024] / bases[BASE_2017]
+base_table["Difference, 2017 base − 2024 base"] = bases[BASE_2017] - bases[BASE_2024]
+base_gap = 100 * (bases[BASE_2017] / bases[BASE_2024] - 1)
+base_gap_max = float(base_gap.max())
+base_gap_year = int(bases.Year[base_gap.idxmax()])
+show_table(base_table, "National resident population under each base and enumeration: the 2017-base projection is the primary denominator of the study and the others are sensitivity layers",
+           {"2024 base ÷ 2017 base": 4, "Census 2024 ÷ 2017 base": 4})
+note("The three INE series are projections at a stated date; the 2024 figure in the census column is an enumeration, not a projection, "
+     f"and it exists for one year only. The two projections are never more than {number(base_gap_max, 2)}% apart, and the widest gap between them "
+     f"falls in {base_gap_year}; the enumeration sits {number(100 * (1 - census_ratio), 1)}% below the 2017-base projection of its own year. "
+     "The bases are never merged inside one series: a change of base between two years of the same "
+     "table would move the rate without any change in the records.")
+```
+
+```{python}
+#| label: fig-bases
+#| fig-cap: "The population bases. Left: national totals under the 2017 census base, under the 2024 base at two reference dates, and the 2024 census enumeration. Centre: the ratio of each alternative to the primary base, year by year. Right: the same published GRD episode count divided by each of the three denominators. The records are identical in the three series of the right panel; only the divisor changes."
+#| fig-width: 13
+#| fig-height: 4.4
+grd_rate = model_rates.loc[(model_rates.variant == "sin_rett") & (model_rates.position == "any") & (model_rates.sex == "TOTAL")].sort_values("year").copy()
+grd_rate["population_base2024"] = grd_rate.year.map(base_by_year[BASE_2024])
+grd_rate["population_census2024"] = grd_rate.year.map(base_by_year[CENSUS_2024])
+grd_rate["crude_base2024"] = 1e5 * grd_rate["count"] / grd_rate.population_base2024
+grd_rate["crude_census2024"] = 1e5 * grd_rate["count"] / grd_rate.population_census2024
+
+fig, axes = plt.subplots(1, 3, figsize=(13, 4.4), layout="constrained")
+axes[0].plot(bases.Year, bases[BASE_2017] / 1e6, "o-", color=COLORS[0], label="2017 census base, 30 June")
+axes[0].plot(bases.Year, bases[BASE_2024] / 1e6, "s--", color=COLORS[1], label="2024 base, 30 June")
+axes[0].plot(bases.Year, bases[BASE_2024_JAN] / 1e6, "^:", color=COLORS[3], label="2024 base, 1 January")
+axes[0].scatter(bases.Year, bases[CENSUS_2024] / 1e6, marker="D", s=55, color=COLORS[4], zorder=5, label="Census 2024, enumerated")
+axes[0].set(title="National resident population", xlabel="Year", ylabel="Million persons", xticks=bases.Year)
+axes[0].legend(fontsize=7.5)
+axes[1].plot(bases.Year, bases[BASE_2024] / bases[BASE_2017], "s--", color=COLORS[1], label="2024 base ÷ 2017 base")
+axes[1].scatter(bases.Year, bases[CENSUS_2024] / bases[BASE_2017], marker="D", s=55, color=COLORS[4], zorder=5, label="Census 2024 ÷ 2017 base")
+axes[1].axhline(1, color="#555555", linewidth=1, linestyle="--")
+axes[1].set(title="Ratio to the primary base", xlabel="Year", ylabel="Ratio of denominators", xticks=bases.Year, ylim=(.90, 1.02))
+axes[1].legend(fontsize=7.5)
+axes[2].plot(grd_rate.year, grd_rate.crude, "o-", color=COLORS[0], label="÷ 2017 census base")
+axes[2].plot(grd_rate.year, grd_rate.crude_base2024, "s--", color=COLORS[1], label="÷ 2024 base")
+axes[2].scatter(grd_rate.year, grd_rate.crude_census2024, marker="D", s=55, color=COLORS[4], zorder=5, label="÷ Census 2024 enumerated")
+axes[2].set(title="The same episodes, three denominators", xlabel="Year", ylabel="GRD episodes per 100 000 population",
+            xticks=grd_rate.year.astype(int))
+axes[2].legend(fontsize=7.5)
+plt.show()
+```
+
+### What a change of base does to a published rate
+
+```{python}
+#| label: tabla-bases-efecto
+effect = pd.DataFrame({
+    "Year": grd_rate.year.astype(int).values,
+    "GRD episodes with F84": grd_rate["count"].values,
+    "Rate ÷ 2017 base": grd_rate.crude.values,
+    "Rate ÷ 2024 base": grd_rate.crude_base2024.values,
+    "Rate ÷ Census 2024": grd_rate.crude_census2024.values,
+})
+effect["% change if the 2024 base were used"] = 100 * (effect["Rate ÷ 2024 base"] / effect["Rate ÷ 2017 base"] - 1)
+effect["% change if Census 2024 were used"] = 100 * (effect["Rate ÷ Census 2024"] / effect["Rate ÷ 2017 base"] - 1)
+show_table(effect, "Published GRD episode rates (F84 excluding Rett syndrome, any diagnostic position, all activity of the observed panel) recomputed under each denominator: the numerator never changes",
+           {"Rate ÷ 2017 base": 2, "Rate ÷ 2024 base": 2, "Rate ÷ Census 2024": 2,
+            "% change if the 2024 base were used": 2, "% change if Census 2024 were used": 2})
+
+first_row, last_row = effect.iloc[0], effect.iloc[-1]
+consistent = last_row["Rate ÷ 2017 base"] / first_row["Rate ÷ 2017 base"]
+spliced_base = last_row["Rate ÷ 2024 base"] / first_row["Rate ÷ 2017 base"]
+spliced_census = last_row["Rate ÷ Census 2024"] / first_row["Rate ÷ 2017 base"]
+note(f"Read across one base, the rate multiplies by {number(consistent, 2)} between {int(first_row.Year)} and {int(last_row.Year)}. "
+     f"Spliced — {int(first_row.Year)} on the 2017 base and {int(last_row.Year)} on the 2024 base — it appears to multiply by {number(spliced_base, 2)}; "
+     f"with the 2024 census enumeration in the final year, by {number(spliced_census, 2)}. "
+     f"The extra movement, {number(100 * (spliced_census / consistent - 1), 1)}% in the second case, comes from the divisor and from nothing else.")
+```
+
+The two projections differ by at most `{python} number(base_gap_max, 2)`% — the widest gap falls in
+`{python} str(base_gap_year)` — so a series computed entirely on either base tells the same story. The 2024 enumeration is a different matter: it counts about
+`{python} number(100 * (1 - census_ratio), 1)`% fewer residents than the 2017-base projection for the same
+year, and would therefore inflate every 2024 rate by about
+`{python} number(100 * (1 / census_ratio - 1), 1)`% against a series built on the projection. That is why
+the study keeps the 2017 base as the single primary denominator for the whole period and treats the others
+as sensitivity layers, never spliced into a series. The difference is not a correction to the records; the
+records are the same either way.
+
+## The resident population in detail
+
+The published regional population table covers `{python} f"{first_population_year}–{last_population_year}"`
+by region, seventeen age groups and recorded sex, and a companion table covers single years of age 0 to 5.
+Both are the 2017-base projection at 30 June. Their span is shorter than that of the coverage layers below,
+which run to `{python} str(last_coverage_year)`: any indicator that needs both stops at the earlier of the
+two.
+
+```{python}
+#| label: tabla-poblacion-regiones
+wide = population.pivot_table(index="cut_region", columns="year", values="population", aggfunc="sum")
+regions = pd.DataFrame({
+    "Region": [REGION_NAMES[r] for r in REGION_ORDER],
+    f"Population {first_population_year}": wide[first_population_year].reindex(REGION_ORDER).values,
+    f"Population {last_population_year}": wide[last_population_year].reindex(REGION_ORDER).values,
+})
+regions["% change"] = 100 * (regions[f"Population {last_population_year}"] / regions[f"Population {first_population_year}"] - 1)
+regions[f"% of national {last_population_year}"] = 100 * regions[f"Population {last_population_year}"] / regions[f"Population {last_population_year}"].sum()
+aged = population.loc[population.age_group.isin(["0-4", "5-9", "10-14", "15-19"])].pivot_table(index="cut_region", columns="year", values="population", aggfunc="sum")
+regions["Population aged 0–19"] = aged[last_population_year].reindex(REGION_ORDER).values
+regions["% aged 0–19"] = 100 * regions["Population aged 0–19"] / regions[f"Population {last_population_year}"]
+females = population.loc[population.sex == "MUJER"].pivot_table(index="cut_region", columns="year", values="population", aggfunc="sum")
+regions["% female"] = 100 * females[last_population_year].reindex(REGION_ORDER).values / regions[f"Population {last_population_year}"]
+show_table(regions, f"Resident population by region, {first_population_year} and {last_population_year} (INE projection, 2017 census base, 30 June): totals, change, share of the country, young population and recorded sex",
+           {"% change": 1, f"% of national {last_population_year}": 1, "% aged 0–19": 1, "% female": 1})
+region_change = 100 * (wide[last_population_year] / wide[first_population_year] - 1)
+national_change = 100 * (wide[last_population_year].sum() / wide[first_population_year].sum() - 1)
+faster_regions = int((region_change > national_change).sum())
+slower_regions = int((region_change < national_change).sum())
+fastest_region = REGION_NAMES[region_change.idxmax()]
+slowest_region = REGION_NAMES[region_change.idxmin()]
+note(f"The national total of this table in {last_population_year} is {number(wide[last_population_year].sum())}, the same figure the coverage layers carry for that year. "
+     f"It grows {number(national_change, 1)}% between {first_population_year} and {last_population_year}, and so does every one of the {len(REGION_ORDER)} regions, though at very different speeds: "
+     f"{slowest_region} by {number(region_change.min(), 1)}% and {fastest_region} by {number(region_change.max(), 1)}%, with {faster_regions} regions growing faster than the country "
+     f"and {slower_regions} more slowly. No region loses population over the span, so what separates them is the speed of growth and not its direction. "
+     "Recorded sex has two categories in this projection, while the health and insurance sources carry a third for records whose sex is not determined, "
+     "so the categories do not map one to one.")
+```
+
+```{python}
+#| label: fig-estructura
+#| fig-cap: "The resident population behind the rates. Left: national age and sex structure in the last published year as a percentage of the population of that year, with the first published year drawn as an outline. Centre: population by region in both years on a logarithmic scale, with the percentage change beside each pair. Right: single years of age 0 to 5, the denominators the well-child indicators divide by. INE projection, 2017 census base, at 30 June."
+#| fig-width: 13
+#| fig-height: 5.4
+pyramid = population.pivot_table(index=["year", "age_group"], columns="sex", values="population", aggfunc="sum")
+last_frame = pyramid.loc[last_population_year].reindex(AGE_GROUPS)
+first_frame = pyramid.loc[first_population_year].reindex(AGE_GROUPS)
+last_total, first_total = last_frame.sum().sum(), first_frame.sum().sum()
+y = np.arange(len(AGE_GROUPS))
+
+fig, axes = plt.subplots(1, 3, figsize=(13, 5.4), layout="constrained")
+axes[0].barh(y, -100 * last_frame.HOMBRE / last_total, color=SEX_COLORS["HOMBRE"], label=f"Males {last_population_year}")
+axes[0].barh(y, 100 * last_frame.MUJER / last_total, color=SEX_COLORS["MUJER"], label=f"Females {last_population_year}")
+axes[0].plot(-100 * first_frame.HOMBRE / first_total, y, color="#333333", linewidth=1.2, label=f"{first_population_year} outline")
+axes[0].plot(100 * first_frame.MUJER / first_total, y, color="#333333", linewidth=1.2)
+axes[0].set_yticks(y)
+axes[0].set_yticklabels(AGE_GROUPS, fontsize=7.5)
+axes[0].xaxis.set_major_formatter(lambda value, _: f"{abs(value):.0f}")
+axes[0].set(title="Age and sex structure", xlabel="% of the population of the year", ylabel="Age group (years)")
+axes[0].legend(fontsize=7)
+yr = np.arange(len(REGION_ORDER))
+axes[1].barh(yr - .2, wide[first_population_year].reindex(REGION_ORDER) / 1e3, height=.4, color=COLORS[3], label=str(first_population_year))
+axes[1].barh(yr + .2, wide[last_population_year].reindex(REGION_ORDER) / 1e3, height=.4, color=COLORS[0], label=str(last_population_year))
+for i, region in enumerate(REGION_ORDER):
+    change = 100 * (wide.loc[region, last_population_year] / wide.loc[region, first_population_year] - 1)
+    axes[1].annotate(f"{change:+.1f}%", (wide.loc[region, last_population_year] / 1e3, i), fontsize=6.5,
+                     xytext=(4, 0), textcoords="offset points", va="center")
+axes[1].set_yticks(yr)
+axes[1].set_yticklabels([REGION_NAMES[r] for r in REGION_ORDER], fontsize=7.5)
+axes[1].invert_yaxis()
+axes[1].set(title="Population by region", xlabel="Thousands of persons (log scale)", xscale="log")
+axes[1].legend(fontsize=7.5, loc="lower right")
+young = population_young.pivot_table(index="year", columns="age", values="population", aggfunc="sum")
+for age, color in zip(sorted(young.columns), COLORS):
+    axes[2].plot(young.index, young[age] / 1e3, "o-", color=color, markersize=3.5, label=f"Age {age}")
+axes[2].set(title="Single years of age 0 to 5", xlabel="Year", ylabel="Thousands of persons",
+            xticks=range(first_population_year, last_population_year + 1))
+axes[2].legend(fontsize=7, ncols=2)
+plt.show()
+```
+
+```{python}
+#| label: tabla-poblacion-joven
+young_table = young.reset_index().rename(columns={"year": "Year", **{age: f"Age {age}" for age in young.columns}})
+young_table["Total aged 0–5"] = young.sum(axis=1).values
+show_table(young_table, "Resident population by single year of age 0 to 5 and year (INE projection, 2017 census base, 30 June)")
+age_one = young[1]
+note(f"The population aged 1, the layer the community chapter divides its 18-month check-ups by, moves from {number(age_one.loc[first_population_year])} "
+     f"in {first_population_year} to {number(age_one.loc[last_population_year])} in {last_population_year}, a change of "
+     f"{number(100 * (age_one.loc[last_population_year] / age_one.loc[first_population_year] - 1), 1)}%. A check-up count that held steady across those years "
+     "would show a rising ratio for that reason alone. The ratio also mixes units: the check-ups are events recorded by public facilities and the denominator "
+     "is resident persons of every insurer, so it ranks regions and does not measure coverage of a birth cohort.")
+```
+
+The age structure moves slowly and in one direction: the base of the pyramid narrows while the groups above
+60 widen. The regional totals move in one direction too — every region gains population over the published
+span — but at very different speeds: the country grows
+`{python} number(national_change, 1)`%, `{python} str(slowest_region)` grows
+`{python} number(region_change.min(), 1)`% and `{python} str(fastest_region)`
+`{python} number(region_change.max(), 1)`%, the fastest region running
+`{python} number(region_change.max() / national_change, 1)` times the national rate and the slowest
+`{python} number(region_change.min() / national_change, 2)` times it. Most regions —
+`{python} str(slower_regions)` of `{python} str(len(REGION_ORDER))` — grow more slowly than the country, so
+the national figure is not a summary of them. Rates by region therefore change when nothing in the records
+changes, and a series of counts by region says less than the same series divided by its own population.
+
+## Insurance and operational coverage
+
+```{python}
+#| label: tabla-cobertura
+layers_year = pd.DataFrame({"Year": coverage.year.astype(int)})
+layers_year["INE population (2017 base, 30 Jun)"] = coverage.ine_population_base2017_30jun.values
+layers_year["FONASA beneficiaries (31 Dec)"] = coverage.fonasa_beneficiaries_dec.values
+layers_year["ISAPRE beneficiaries (31 Dec)"] = coverage.isapre_beneficiaries_dec.values
+layers_year["FONASA + ISAPRE"] = coverage.fonasa_plus_isapre.values
+layers_year["FONASA ÷ INE (%)"] = 100 * coverage.share_fonasa_ine.values
+layers_year["ISAPRE ÷ INE (%)"] = 100 * coverage.share_isapre_ine.values
+layers_year["(FONASA + ISAPRE) ÷ INE (%)"] = 100 * coverage.share_fonasa_plus_isapre_ine.values
+layers_year["Enrolled in primary care (31 Dec)"] = coverage.aps_enrolled_dec.values
+layers_year["Enrolled, FONASA tramos A–D"] = coverage.aps_enrolled_tramo_AD_dec.values
+layers_year["Primary-care centres"] = coverage.aps_centres.values
+layers_year["Enrolment in the continuous panel (%)"] = 100 * coverage.aps_panel_1871_retention.values
+show_table(layers_year, "Coverage layers by year: resident population, insurance stocks at 31 December and primary-care enrolment, with each stock expressed against the population of the same year",
+           {"FONASA ÷ INE (%)": 1, "ISAPRE ÷ INE (%)": 1, "(FONASA + ISAPRE) ÷ INE (%)": 1, "Enrolment in the continuous panel (%)": 2})
+note(str(coverage.caveat.iloc[0]))
+```
+
+```{python}
+#| label: fig-cobertura
+#| fig-cap: "Coverage layers, 2019–2025. Left: the stocks against the resident population. Centre: each stock as a percentage of the population of the same year, with the sum of the two insurers shown against both projection bases. Right: the reporting infrastructure behind the primary-care layer — centres with enrolled persons, and the share of enrolment retained by the continuous panel of 1 871 centres."
+#| fig-width: 13
+#| fig-height: 4.4
+fig, axes = plt.subplots(1, 3, figsize=(13, 4.4), layout="constrained")
+axes[0].plot(coverage.year, coverage.ine_population_base2017_30jun / 1e6, "o-", color=COLORS[0], label="INE population (30 Jun)")
+axes[0].plot(coverage.year, coverage.fonasa_plus_isapre / 1e6, "d-", color=COLORS[6], label="FONASA + ISAPRE (31 Dec)")
+axes[0].plot(coverage.year, coverage.fonasa_beneficiaries_dec / 1e6, "s-", color=COLORS[1], label="FONASA (31 Dec)")
+axes[0].plot(coverage.year, coverage.aps_enrolled_dec / 1e6, "^-", color=COLORS[5], label="Enrolled in primary care (31 Dec)")
+axes[0].plot(coverage.year, coverage.isapre_beneficiaries_dec / 1e6, "v-", color=COLORS[2], label="ISAPRE (31 Dec)")
+axes[0].set(title="Stocks and the population", xlabel="Year", ylabel="Million persons", xticks=coverage.year)
+axes[0].legend(fontsize=7)
+axes[1].plot(coverage.year, 100 * coverage.share_fonasa_ine, "s-", color=COLORS[1], label="FONASA ÷ INE 2017 base")
+axes[1].plot(coverage.year, 100 * coverage.share_isapre_ine, "v-", color=COLORS[2], label="ISAPRE ÷ INE 2017 base")
+axes[1].plot(coverage.year, 100 * coverage.share_fonasa_plus_isapre_ine, "d-", color=COLORS[6], label="Both ÷ INE 2017 base")
+axes[1].plot(coverage.year, 100 * coverage.share_fonasa_plus_isapre_ine_base2024, "d--", color=COLORS[4], label="Both ÷ INE 2024 base")
+axes[1].axhline(100, color="#555555", linewidth=1, linestyle="--")
+axes[1].set(title="Stock as a percentage of the population", xlabel="Year", ylabel="% of INE population",
+            xticks=coverage.year, ylim=(0, 112))
+axes[1].legend(fontsize=7)
+axes[2].bar(coverage.year, coverage.aps_centres, color=COLORS[3], label="Centres with enrolled persons (left axis)")
+axes[2].set(title="Primary-care reporting infrastructure", xlabel="Year", ylabel="Centres with enrolled persons",
+            xticks=coverage.year, ylim=(0, coverage.aps_centres.max() * 1.45))
+twin = axes[2].twinx()
+twin.plot(coverage.year, 100 * coverage.aps_panel_1871_retention, "o-", color=COLORS[0],
+          label="Enrolment in the continuous panel (right axis)")
+twin.set_ylabel("% of enrolment in the continuous panel")
+twin.set_ylim(95, 100.5)
+twin.grid(False)
+handles = axes[2].get_legend_handles_labels()[0] + twin.get_legend_handles_labels()[0]
+axes[2].legend(handles=handles, fontsize=7, loc="upper left")
+plt.show()
+centres_change = 100 * (coverage.aps_centres.iloc[-1] / coverage.aps_centres.iloc[0] - 1)
+aps_change = 100 * (coverage.aps_enrolled_dec.iloc[-1] / coverage.aps_enrolled_dec.iloc[0] - 1)
+population_change = 100 * (coverage.ine_population_base2017_30jun.iloc[-1] / coverage.ine_population_base2017_30jun.iloc[0] - 1)
+aps_crosscheck_last = int(coverage.loc[coverage.fonasa_inscritos_aps_dec.notna(), "year"].max())
+note(f"The right panel is a coverage break inside a denominator layer. The number of centres with enrolled persons rises from {number(coverage.aps_centres.iloc[0])} in "
+     f"{first_coverage_year} to {number(coverage.aps_centres.iloc[-1])} in {last_coverage_year}, {number(centres_change, 1)}%, while enrolment rises {number(aps_change, 1)}% against "
+     f"{number(population_change, 1)}% of population growth. Part of the growth of this layer is therefore more centres reporting into it, not more people enrolling, and the share of "
+     f"enrolment held by the continuous panel of 1 871 centres falls from {number(100 * coverage.aps_panel_1871_retention.iloc[0], 1)}% to "
+     f"{number(100 * coverage.aps_panel_1871_retention.iloc[-1], 1)}%. The layer also loses its own cross-check partway through: FONASA publishes the count of its beneficiaries enrolled in "
+     f"primary care only to {aps_crosscheck_last}, so for the last {last_coverage_year - aps_crosscheck_last} years primary-care enrolment cannot be checked against the insurer's own "
+     "record of the same people, and the primary-care count published by the insurer stops being reported after\n     that year, so no ratio between the two can be carried forward.")
+```
+
+The public insurer's share of the population rises from
+`{python} number(100 * coverage.share_fonasa_ine.iloc[0], 1)`% to
+`{python} number(100 * coverage.share_fonasa_ine.iloc[-1], 1)`% across the period while the private
+insurers' share falls from `{python} number(100 * coverage.share_isapre_ine.iloc[0], 1)`% to
+`{python} number(100 * coverage.share_isapre_ine.iloc[-1], 1)`%. That movement changes who appears in the
+records the health sources read, and it does so for reasons — contribution prices, employment, affiliates
+moving between insurers — that have nothing to do with autism. A rise in public-system counts in a year when
+the public insurer gained several hundred thousand beneficiaries is partly a change in the population that
+the public system records.
+
+The sum of the two insurers sits close to but not at the population, and it is **not** an insurance-coverage
+rate: it puts a 31 December stock over a 30 June projection, omits the armed-forces and other regimes, and
+carries whatever double counting and classification differences the two registers hold. In
+`{python} str(last_coverage_year)` the sum reaches
+`{python} number(100 * coverage_last.share_fonasa_plus_isapre_ine, 1)`% of the 2017-base projection and
+`{python} number(100 * coverage_last.share_fonasa_plus_isapre_ine_base2024, 1)`% of the 2024-base one — the
+same two stocks, two denominators.
+
+### Enrolment is not need
+
+```{python}
+#| label: tabla-cobertura-edad
+VALUE_COLUMNS = ["FONASA beneficiaries", "APS enrolled (place of enrolment)", "ISAPRE beneficiaries", "INE resident population (base 2017)"]
+bands = numeric(coverage_age.loc[coverage_age["Sex"] == "Both sexes"], VALUE_COLUMNS)
+coverage_bands = pd.DataFrame({
+    "Age band (years)": bands["Age band (years)"].values,
+    "INE resident population": bands["INE resident population (base 2017)"].values,
+    "FONASA beneficiaries": bands["FONASA beneficiaries"].values,
+    "ISAPRE beneficiaries": bands["ISAPRE beneficiaries"].values,
+    "Enrolled in primary care": bands["APS enrolled (place of enrolment)"].values,
+})
+coverage_bands["FONASA ÷ INE (%)"] = 100 * coverage_bands["FONASA beneficiaries"] / coverage_bands["INE resident population"]
+coverage_bands["ISAPRE ÷ INE (%)"] = 100 * coverage_bands["ISAPRE beneficiaries"] / coverage_bands["INE resident population"]
+coverage_bands["(FONASA + ISAPRE) ÷ INE (%)"] = coverage_bands["FONASA ÷ INE (%)"] + coverage_bands["ISAPRE ÷ INE (%)"]
+coverage_bands["Primary-care enrolment ÷ INE (%)"] = 100 * coverage_bands["Enrolled in primary care"] / coverage_bands["INE resident population"]
+show_table(coverage_bands, f"Coverage layers by age band against the resident population of the same year · {last_coverage_year}: the same December stocks, band by band",
+           {c: 1 for c in coverage_bands.columns if c.endswith("(%)")})
+youngest_band = coverage_bands.iloc[0]
+next_band = coverage_bands.iloc[1]
+widest_band = coverage_bands.loc[coverage_bands["(FONASA + ISAPRE) ÷ INE (%)"].idxmax()]
+lowest_band = coverage_bands.loc[coverage_bands["(FONASA + ISAPRE) ÷ INE (%)"].idxmin()]
+# The age breakdown is published without the records whose age is not reported, so it is short of the
+# December stock of the same layer; every percentage in this table is understated by that margin.
+BAND_STOCKS = {"FONASA beneficiaries": "fonasa_beneficiaries_dec",
+               "ISAPRE beneficiaries": "isapre_beneficiaries_dec",
+               "Enrolled in primary care": "aps_enrolled_dec"}
+band_shortfall = pd.DataFrame([
+    {"Layer": label, "Sum of the age bands": coverage_bands[label].sum(), "December stock of the year": float(coverage_last[column])}
+    for label, column in BAND_STOCKS.items()])
+band_shortfall["Records without an age band"] = band_shortfall["December stock of the year"] - band_shortfall["Sum of the age bands"]
+band_shortfall["% of the layer"] = 100 * band_shortfall["Records without an age band"] / band_shortfall["December stock of the year"]
+worst_shortfall = band_shortfall.loc[band_shortfall["% of the layer"].idxmax()]
+population_band_sum = coverage_bands["INE resident population"].sum()
+note(f"In the {youngest_band['Age band (years)']} band the two insurers together account for {number(youngest_band['(FONASA + ISAPRE) ÷ INE (%)'], 1)}% of the resident population, "
+     f"while in the {widest_band['Age band (years)']} band they account for {number(widest_band['(FONASA + ISAPRE) ÷ INE (%)'], 1)}%. "
+     "Neither number measures how many people in the band are insured: enrolment is an administrative act with its own timing, newborns and young children "
+     "enter the registers late, and one person may appear in more than one register in the same December. "
+     "The bands also do not carry the whole layer. The published age breakdown drops the records whose age is not reported, so the bands of this table sum to "
+     f"{number(band_shortfall.loc[0, 'Sum of the age bands'])} FONASA beneficiaries against a December stock of {number(band_shortfall.loc[0, 'December stock of the year'])}, "
+     f"{number(band_shortfall.loc[1, 'Sum of the age bands'])} ISAPRE against {number(band_shortfall.loc[1, 'December stock of the year'])} and "
+     f"{number(band_shortfall.loc[2, 'Sum of the age bands'])} primary-care enrolments against {number(band_shortfall.loc[2, 'December stock of the year'])}. "
+     f"Every percentage in this table is therefore understated, by at most {number(worst_shortfall['% of the layer'], 2)}% of the layer — the {worst_shortfall['Layer']} column. "
+     f"The resident-population column carries no such residue: its bands sum to {number(population_band_sum)}, the national projection of the year exactly.")
+```
+
+```{python}
+#| label: fig-inscripcion
+#| fig-cap: "Coverage is enrolment, not need. Left: each layer as a percentage of the resident population of the same age band in the latest year of the coverage table, with the population line at 100%. Centre and right: the insurance stocks as a percentage of each region's resident population in the last year for which both the regional population and the regional stocks are published, as a ranked plot and as a map of the public insurer's share. The stocks are located by the beneficiary's administrative record and the population by residence, so the ratio ranks regions and is not a regional insurance rate. The map reads the regional boundary file data/Regional.shp, the same file the hospital chapter uses."
+#| fig-width: 13
+#| fig-height: 5.8
+REGION_KEYS = {"Arica y Parinacota": 15, "Tarapacá": 1, "Antofagasta": 2, "Atacama": 3, "Coquimbo": 4, "Valparaíso": 5,
+               "Metropolitana": 13, "O'Higgins": 6, "Maule": 7, "Ñuble": 16, "Biobío": 8, "La Araucanía": 9,
+               "Los Ríos": 14, "Los Lagos": 10, "Aysén": 11, "Magallanes": 12}
+MAP_YEAR = last_population_year
+regional_layers = layers_full.loc[layers_full.Dimension == "Region"].copy()
+regional_layers["cut_region"] = regional_layers.Category.map(REGION_KEYS)
+regional_layers["value"] = regional_layers[str(MAP_YEAR)].map(as_number)
+located = regional_layers.dropna(subset=["cut_region"])
+fonasa_region = located.loc[located["Denominator layer"].str.startswith("FONASA")].set_index("cut_region").value
+isapre_region = located.loc[located["Denominator layer"].str.startswith("ISAPRE")].set_index("cut_region").value
+population_region = population.loc[population.year == MAP_YEAR].groupby("cut_region").population.sum()
+shares = pd.DataFrame({"fonasa": 100 * fonasa_region / population_region,
+                       "isapre": 100 * isapre_region / population_region}).reindex(REGION_ORDER)
+
+fig, axes = plt.subplots(1, 3, figsize=(13, 5.8), layout="constrained", gridspec_kw={"width_ratios": [1.15, 1, .8]})
+x = np.arange(len(coverage_bands))
+axes[0].plot(x, coverage_bands["FONASA ÷ INE (%)"], "s-", color=COLORS[1], label="FONASA")
+axes[0].plot(x, coverage_bands["ISAPRE ÷ INE (%)"], "v-", color=COLORS[2], label="ISAPRE")
+axes[0].plot(x, coverage_bands["(FONASA + ISAPRE) ÷ INE (%)"], "d-", color=COLORS[6], label="FONASA + ISAPRE")
+axes[0].plot(x, coverage_bands["Primary-care enrolment ÷ INE (%)"], "^-", color=COLORS[5], label="Enrolled in primary care")
+axes[0].axhline(100, color="#555555", linewidth=1, linestyle="--")
+axes[0].set(title=f"Coverage by age band · {last_coverage_year}", xlabel="Age band (years)",
+            ylabel="% of the resident population of the band", xticks=x,
+            xticklabels=coverage_bands["Age band (years)"], ylim=(0, 118))
+axes[0].legend(fontsize=7.5)
+yr = np.arange(len(REGION_ORDER))
+axes[1].barh(yr, shares.fonasa, color=COLORS[1], label="FONASA")
+axes[1].barh(yr, shares.isapre, left=shares.fonasa, color=COLORS[2], label="ISAPRE")
+axes[1].axvline(100, color="#555555", linewidth=1, linestyle="--")
+axes[1].set_yticks(yr)
+axes[1].set_yticklabels([REGION_NAMES[r] for r in REGION_ORDER], fontsize=7.5)
+axes[1].invert_yaxis()
+axes[1].set(title=f"Insurance stocks by region · {MAP_YEAR}", xlabel="% of the region's resident population", xlim=(0, 118))
+axes[1].legend(fontsize=7.5, loc="upper center", bbox_to_anchor=(.5, -.09), ncols=2)
+regions_shp = load_regions().merge(shares[["fonasa"]], left_on="cut_region", right_index=True, how="left")
+choropleth(axes[2], regions_shp, "fonasa", f"FONASA ÷ population · {MAP_YEAR}", legend_label="% of the region's resident population")
+plt.show()
+unlinked = as_number(layers_full.loc[layers_full["Denominator layer"].str.startswith("FONASA") & (layers_full.Category == "Comuna not linked"), str(MAP_YEAR)].iloc[0])
+fonasa_total = float(coverage.loc[coverage.year == MAP_YEAR, "fonasa_beneficiaries_dec"].iloc[0])
+isapre_unlinked_cell = str(layers_full.loc[layers_full["Denominator layer"].str.startswith("ISAPRE") & (layers_full.Category == "Comuna not linked"), str(MAP_YEAR)].iloc[0]).strip()
+isapre_total = float(coverage.loc[coverage.year == MAP_YEAR, "isapre_beneficiaries_dec"].iloc[0])
+isapre_located = float(isapre_region.sum())
+note(f"{number(unlinked)} FONASA beneficiaries in {MAP_YEAR} carry no commune and therefore no region: {number(100 * unlinked / fonasa_total, 2)}% of the layer, "
+     "excluded from every regional figure above, which is why the regional percentages fall slightly below the national one. "
+     f"The two insurance layers are not symmetric on this point: the private insurers publish no unlinked beneficiaries at all — the cell reads '{isapre_unlinked_cell}' — and their sixteen regional "
+     f"cells add to {number(isapre_located)} against a national stock of {number(isapre_total)}, so the ISAPRE bars leave {number(isapre_total - isapre_located)} beneficiaries out "
+     f"while the FONASA bars leave {number(unlinked)} out. The FONASA segment of every bar is short by that {number(100 * unlinked / fonasa_total, 2)}% for a reason that has nothing to do "
+     "with the region it is drawn in. The three geographies are not the "
+     "same either: the public insurer mixes the commune of primary-care enrolment with the domicile, primary-care enrolment locates the centre, the private "
+     "insurers use the beneficiary's administrative commune, and the population locates the resident.")
+```
+
+The age profile is the clearest statement that these layers count enrolment, and the gap is narrower than
+the usual summary allows. Of the bands the numerators of this report come from, only the youngest sits well
+below its resident population: `{python} str(youngest_band["Age band (years)"])` reaches about
+`{python} number(youngest_band["(FONASA + ISAPRE) ÷ INE (%)"], 0)`% — the lowest of the
+`{python} str(len(coverage_bands))` bands — while the next band up,
+`{python} str(next_band["Age band (years)"])`, is already at about
+`{python} number(next_band["(FONASA + ISAPRE) ÷ INE (%)"], 0)`% and the
+`{python} str(widest_band["Age band (years)"])` band, where the two registers together exceed the
+population, at about `{python} number(widest_band["(FONASA + ISAPRE) ÷ INE (%)"], 0)`%. The shortfall is
+concentrated in the children too young to have been enrolled yet, not in children and adolescents at large.
+Neither figure describes need, and neither can turn a count of recognised autism into a share of the
+children who have it.
+
+### Do the published breakdowns add back?
+
+```{python}
+#| label: tabla-reconciliacion
+SHORT_LAYERS = {
+    "INE population (2017-census-based projection, 30 June)": "INE population (2017 base, 30 June)",
+    "FONASA beneficiaries (December stock)": "FONASA beneficiaries (31 December)",
+    "ISAPRE beneficiaries (December stock)": "ISAPRE beneficiaries (31 December)",
+    "APS enrolled (December stock)": "Primary-care enrolment (31 December)",
+}
+CHECK_YEAR = last_population_year
+rows = []
+for layer, group in layers_full.groupby("Denominator layer", sort=False):
+    national = as_number(group.loc[group.Dimension == "National total", str(CHECK_YEAR)].iloc[0])
+    for dimension in ["Region", "Age group", "Sex"]:
+        part = group.loc[(group.Dimension == dimension) & (group.Category != "TOTAL")]
+        if part.empty:
+            continue
+        total = part[str(CHECK_YEAR)].map(as_number).sum(min_count=1)
+        rows.append({"Layer": SHORT_LAYERS.get(layer, layer), "Breakdown": dimension, "Categories published": len(part),
+                     "Sum of the categories": total, "Published national total": national,
+                     "Sum ÷ national total": total / national})
+reconciliation = pd.DataFrame(rows)
+show_table(reconciliation, f"Internal check on the published layer breakdowns · {CHECK_YEAR}: does each set of categories add back to the national total of its own layer?",
+           {"Sum ÷ national total": 3})
+broken = reconciliation.loc[reconciliation["Sum ÷ national total"].round(3) != 1]
+note("The insurance and primary-care breakdowns in this table reconcile exactly, and they do so because each of them publishes its residue as a category of its own — beneficiaries "
+     "whose commune is not linked, records whose age or whose sex is not reported — which the sum above includes. The region and sex breakdowns of the population layer do not reconcile: they sum to "
+     f"{number(broken['Sum ÷ national total'].max(), 1)} times the national total published in the same table, in both breakdowns and in every year, "
+     "while the age-group breakdown of that same layer reconciles. Every regional and sex population figure in this chapter is therefore taken from the "
+     "consolidated regional population table, whose regional totals are exactly half the figures in the breakdown table and whose national total matches the "
+     f"coverage layers. The resident population by age band is the one exception: the coverage-by-age table above reads it from S11_coverage_age_sex.csv, the only tracked source that reaches "
+     f"{last_coverage_year}, because the consolidated regional table stops at {last_population_year}. The breakdown table is used here only for the insurance and primary-care layers. "
+     "A published total that has not been added back is a total, not a check.")
+```
+
+## Care and residence
+
+The health sources of this report count where care was given. GRD records the hospital; the monthly returns
+of the public network record the facility; primary-care enrolment records the centre. The population counts
+where a person lives. Dividing one by the other is legitimate and is what the report does, but it produces a
+figure about a territory's activity, not about its residents' risk:
+
+- A commune with a referral hospital absorbs episodes from residents of neighbouring communes, and its rate
+  rises for that reason.
+- A commune with no facility reporting a code has no numerator at all, whatever its residents' contact with
+  the system elsewhere. The [community chapter](community.html) measures how far that goes at commune scale.
+- The public insurer's own geography is mixed — the commune of primary-care enrolment for those enrolled,
+  the domicile for the rest — so even inside a single coverage layer the territorial unit is not uniform.
+
+The hospital chapter's territorial rates are the exception that shows the rule: GRD carries the commune of
+residence, so its numerator and its denominator sit in the same unit. Wherever a rate in this report does
+not, the figure is labelled a rate by place of care.
+
+## DEIS: an independent count of the same hospital events
+
+### What DEIS is, and what it can be compared with
+
+DEIS publishes the national hospital discharge register: every establishment in the country, public and
+private, one row per discharge. GRD covers the public hospitals that operate the diagnosis-related-group
+system and records up to thirty-five diagnostic positions per episode. The two registers are not linked, by
+person or by episode, and they do not measure the same quantity:
+
+| | DEIS discharge register | GRD episode database |
+|---|---|---|
+| Scope | All establishments in the country | Public hospitals operating GRD, a panel that grows mid-series |
+| Unit | Hospital discharge | Episode, including day surgery and other modalities |
+| Diagnostic fields read | The principal diagnosis; the second field is the external cause | Up to thirty-five positions |
+| Autism visible in | The principal position only | Any position |
+| Suppression | Rows with establishment and sex masked, and in most years their age as well | No masking; identifier audit published separately |
+
+Exactly one series is therefore comparable: **F84 as the principal diagnosis**. DEIS has no equivalent of a
+secondary-position diagnosis, because its second field is reserved for the external cause of injury — across
+the six published years the count of F84 in that field is
+`{python} number(f84_external_cause)`. Everything the hospital chapter says about autism documented
+alongside another reason for admission is invisible in DEIS by construction.
+
+### The comparable series, year by year
+
+```{python}
+#| label: tabla-deis
+panel = deis.set_index(deis.year.astype(int)).grd_hospitals_observed.astype(int)
+panel_break = int(panel.index[panel.diff().fillna(0) != 0][0])
+panel_first, panel_last = int(panel.iloc[0]), int(panel.iloc[-1])
+FIXED_PRINCIPAL = f"GRD principal F84, fixed {panel_first}-hospital panel"
+FIXED_ANY = f"GRD F84 any position, fixed {panel_first}-hospital panel"
+comparison = pd.DataFrame({
+    "Year": deis.year.astype(int).values,
+    "DEIS discharges, all establishments": deis.deis_discharges_total.values,
+    "DEIS discharges, public network": deis.deis_discharges_snss.values,
+    "DEIS principal F84": deis.deis_f84_principal.values,
+    "per 100 000 discharges": deis.deis_rate_f84_principal_per_100k_discharges.values,
+    "95% CI": [ci(lo, hi) for lo, hi in zip(deis.deis_rate_lo95, deis.deis_rate_hi95)],
+    "GRD episodes": deis.grd_records_total.values,
+    "GRD principal F84": deis.grd_f84_principal.values,
+    "per 100 000 episodes": deis.grd_rate_f84_principal_per_100k_episodes.values,
+    "GRD F84 any position": deis.grd_f84_any.values,
+    "GRD hospitals in the panel": deis.grd_hospitals_observed.values,
+    FIXED_PRINCIPAL: deis.grd_f84_principal_fixed65.values,
+    FIXED_ANY: deis.grd_f84_any_fixed65.values,
+    "DEIS ÷ GRD, all records": deis.ratio_deis_total_to_grd_total.values,
+    "DEIS ÷ GRD, principal F84": deis.ratio_deis_f84_principal_to_grd_f84_principal.values,
+    "GRD any position ÷ DEIS principal": deis.ratio_grd_f84_any_to_deis_f84_principal.values,
+})
+show_table(comparison, "DEIS and GRD on the one comparable series: discharges and episodes with F84 as the principal diagnosis, excluding Rett syndrome, with the GRD panel size and the same GRD counts restricted to the hospitals observed in every year. The rates are shares of recorded hospital activity, not population rates",
+           {"per 100 000 discharges": 1, "per 100 000 episodes": 1, "DEIS ÷ GRD, all records": 2,
+            "DEIS ÷ GRD, principal F84": 2, "GRD any position ÷ DEIS principal": 1})
+any_gap = float(deis.grd_f84_any.iloc[-1] - deis.grd_f84_any_fixed65.iloc[-1])
+principal_gap = float(deis.grd_f84_principal.iloc[-1] - deis.grd_f84_principal_fixed65.iloc[-1])
+note("Each rate divides the records with F84 in the principal position by the total records of the same register and year. It answers what share of recorded "
+     "hospital activity documents autism as the reason for the episode; it is not a rate per person and not a prevalence. The last column compares a count taken "
+     "in any of thirty-five positions with a count taken in one position, in two registers of different scope: it is a ratio of records, not a probability. "
+     f"GRD is also not a fixed panel: it observes {panel_first} hospitals from {first_deis_year} until {panel_break - 1}, then {panel_break} brings the first new ones and by {last_deis_year} the panel holds "
+     f"{panel_last}. The two fixed-panel columns hold the same counts restricted to the {panel_first} hospitals present in every year, and in {last_deis_year} they are lower by "
+     f"{number(any_gap)} any-position episodes ({number(100 * any_gap / float(deis.grd_f84_any.iloc[-1]), 1)}% of that year's count) and {number(principal_gap)} principal-position records "
+     f"({number(100 * principal_gap / float(deis.grd_f84_principal.iloc[-1]), 1)}%). Every other GRD figure in this chapter, and the series the hospital chapter reports, is the observed panel, "
+     "so a small part of its growth is hospitals entering the panel rather than episodes being coded.")
+```
+
+```{python}
+#| label: fig-deis-grd
+#| fig-cap: "DEIS against GRD on the comparable series. Left: discharges and episodes with F84 as the principal diagnosis in each register, with the public-network subset of DEIS shown separately and GRD's any-position count on the right axis. Centre: each register's count as a share of its own recorded activity, with the exact 95% interval on the DEIS rate. Right: the ratios between the registers, year by year, with equality marked. The dotted vertical rule in every panel marks the year the GRD panel stops being fixed; the GRD side of each panel crosses a coverage break there, the DEIS side does not."
+#| fig-width: 13
+#| fig-height: 4.4
+fig, axes = plt.subplots(1, 3, figsize=(13, 4.4), layout="constrained")
+axes[0].plot(deis.year, deis.deis_f84_principal, "o-", color=COLORS[0], label="DEIS principal, all establishments")
+axes[0].plot(deis.year, deis.deis_f84_principal_snss, "s--", color=COLORS[1], label="DEIS principal, public network")
+axes[0].plot(deis.year, deis.grd_f84_principal, "^-", color=COLORS[2], label="GRD principal")
+axes[0].set(title="Principal-position counts", xlabel="Year", ylabel="Records with F84 as principal diagnosis",
+            xticks=deis.year.astype(int), ylim=(0, deis.deis_f84_principal.max() * 1.35))
+twin = axes[0].twinx()
+twin.plot(deis.year, deis.grd_f84_any, ":", color=COLORS[4], linewidth=2, label="GRD any position (right axis)")
+twin.set_ylabel("GRD episodes with F84 in any position")
+twin.set_ylim(0, deis.grd_f84_any.max() * 1.35)
+twin.grid(False)
+handles = axes[0].get_legend_handles_labels()[0] + twin.get_legend_handles_labels()[0]
+axes[0].legend(handles=handles, fontsize=7, loc="upper left")
+axes[1].plot(deis.year, deis.deis_rate_f84_principal_per_100k_discharges, "o-", color=COLORS[0], label="DEIS per 100 000 discharges")
+axes[1].fill_between(deis.year, deis.deis_rate_lo95, deis.deis_rate_hi95, color=COLORS[0], alpha=.15)
+axes[1].plot(deis.year, deis.grd_rate_f84_principal_per_100k_episodes, "^-", color=COLORS[2], label="GRD per 100 000 episodes")
+axes[1].set(title="Share of recorded activity", xlabel="Year", ylabel="Principal F84 per 100 000 records of the same register",
+            xticks=deis.year.astype(int))
+axes[1].legend(fontsize=7.5)
+axes[2].plot(deis.year, deis.ratio_deis_total_to_grd_total, "d-", color=COLORS[3], label="All records: DEIS ÷ GRD")
+axes[2].plot(deis.year, deis.ratio_deis_f84_principal_to_grd_f84_principal, "o-", color=COLORS[0], label="Principal F84: DEIS ÷ GRD")
+axes[2].plot(deis.year, deis.ratio_deis_f84_principal_snss_to_grd_f84_principal, "s--", color=COLORS[1], label="Principal F84: DEIS public network ÷ GRD")
+axes[2].axhline(1, color="#555555", linewidth=1, linestyle="--")
+axes[2].set(title="Ratios between the registers", xlabel="Year", ylabel="Ratio", xticks=deis.year.astype(int), ylim=(0, 2.1))
+axes[2].legend(fontsize=7.5)
+for ax in axes:
+    ax.axvline(panel_break - .5, color="#555555", linestyle=":", linewidth=1.3, zorder=1)
+axes[0].annotate(f"GRD panel grows\n{panel_first} → {panel_last} hospitals", (panel_break - .45, axes[0].get_ylim()[1] * .97),
+                 fontsize=6.5, ha="left", va="top", color="#444444")
+for ax in (axes[1], axes[2]):
+    ax.annotate("GRD panel grows", (panel_break - .45, ax.get_ylim()[1] * .97), fontsize=6.5, ha="left", va="top", color="#444444")
+plt.show()
+```
+
+```{python}
+#| label: calculo-corroboracion
+first_deis, last_deis = deis.iloc[0], deis.iloc[-1]
+growth_deis_principal = last_deis.deis_f84_principal / first_deis.deis_f84_principal
+growth_grd_principal = last_deis.grd_f84_principal / first_deis.grd_f84_principal
+growth_grd_any = last_deis.grd_f84_any / first_deis.grd_f84_any
+growth_grd_secondary = last_deis.grd_f84_secondary_only / first_deis.grd_f84_secondary_only
+secondary_share_first = 100 * first_deis.grd_f84_secondary_only / first_deis.grd_f84_any
+secondary_share_last = 100 * last_deis.grd_f84_secondary_only / last_deis.grd_f84_any
+corroborated_share_last = 100 - secondary_share_last
+snss_ratio = deis.ratio_deis_f84_principal_snss_to_grd_f84_principal
+snss_rises_every_year = bool((snss_ratio.diff().dropna() > 0).all())
+snss_drift = 100 * (snss_ratio.iloc[-1] / snss_ratio.iloc[0] - 1)
+```
+
+The check is reassuring about one position and silent about the rest. On the comparable series both
+registers move in the same direction and by a similar amount: the share of recorded hospital activity
+carrying F84 in the principal position roughly doubles in DEIS and in GRD across the six years, the DEIS
+principal count multiplying by `{python} number(growth_deis_principal, 2)` and the GRD principal count by
+`{python} number(growth_grd_principal, 2)`. Two registers built by different offices, from different files,
+with different scope, record the same rise **in the principal position**. That is the strongest available
+evidence that the rise in principal-position autism coding in GRD is not an artefact of the GRD extraction.
+
+It is not evidence about the series the report headlines. That series counts F84 in any of thirty-five
+positions, and in `{python} str(last_deis_year)`
+`{python} number(last_deis.grd_f84_secondary_only)` of its
+`{python} number(last_deis.grd_f84_any)` episodes —
+`{python} number(secondary_share_last, 1)`%, up from
+`{python} number(secondary_share_first, 1)`% in `{python} str(first_deis_year)` — carry the code in a
+secondary position only, where DEIS cannot see them at all. The externally corroborated part of the
+numerator is the `{python} number(corroborated_share_last, 1)`% that sits in the principal field. The
+secondary-position component multiplies by `{python} number(growth_grd_secondary, 2)` over the same six
+years, against `{python} number(growth_grd_principal, 2)` for the principal one, and it has no external
+corroboration whatever. The headline any-position count multiplies by
+`{python} number(growth_grd_any, 2)` and the published crude rate by `{python} number(consistent, 2)`;
+neither of those multipliers has been checked against a second register, and nothing in this section can
+check them.
+
+The agreement also drifts. The ratio of the two principal counts does not sit still inside its range: it
+moves from `{python} number(deis.ratio_deis_f84_principal_to_grd_f84_principal.iloc[0], 2)` in
+`{python} str(first_deis_year)` to
+`{python} number(deis.ratio_deis_f84_principal_to_grd_f84_principal.iloc[-1], 2)` in
+`{python} str(last_deis_year)`, and the tighter comparison — DEIS's own public-hospital subset against GRD,
+two files covering substantially the same episodes — rises
+`{python} "in every year of the series" if snss_rises_every_year else "across the series"`, from
+`{python} number(snss_ratio.iloc[0], 3)` to `{python} number(snss_ratio.iloc[-1], 3)`, a divergence of
+`{python} number(snss_drift, 0)`%. Two registers that counted the same public-hospital discharges to within
+`{python} number(100 * (snss_ratio.iloc[0] - 1), 1)`% of each other at the start of the period differ by
+`{python} number(100 * (snss_ratio.iloc[-1] - 1), 1)`% at the end. Whatever the two registers agree about,
+they are not agreeing more closely over time, and part of the GRD side of that drift is the panel growing
+from `{python} str(panel_first)` hospitals to `{python} str(panel_last)`.
+
+The instructive part is the size of the numbers. DEIS counts
+`{python} number(deis_last.deis_f84_principal)` discharges in the whole country in
+`{python} str(last_deis_year)` with autism as the principal diagnosis, while GRD counts
+`{python} number(deis_last.grd_f84_any)` public-hospital episodes with an F84 code somewhere in the record.
+Autism is overwhelmingly documented in patients admitted for something else, and a register that reads only
+the principal field cannot see that. Neither number is a count of autistic people, and the ratio between
+them — `{python} number(deis_last.ratio_grd_f84_any_to_deis_f84_principal, 1)` in the last year — is a ratio
+of records in two different registers, not a multiplier to apply to anything.
+
+### What the suppression rule does
+
+```{python}
+#| label: tabla-deis-supresion
+MASK_COLUMNS = ["DEIS discharges (all establishments)", "SNSS discharges", "Non-SNSS discharges",
+                "Discharges with masked affiliation", "F84 in DIAG1 (principal)", "F84 in SNSS", "F84 non-SNSS",
+                "F84 with masked affiliation", "F84.2 (Rett) in DIAG1 (excluded from this variant)", "Columns in file"]
+masking = numeric(deis_canonical, MASK_COLUMNS)
+suppression = pd.DataFrame({
+    "Year": masking["Year"].astype(int).values,
+    "All discharges": masking["DEIS discharges (all establishments)"].values,
+    "Public network": masking["SNSS discharges"].values,
+    "Outside the public network": masking["Non-SNSS discharges"].values,
+    "Masked rows": masking["Discharges with masked affiliation"].values,
+})
+suppression["Masked rows (%)"] = 100 * suppression["Masked rows"] / suppression["All discharges"]
+suppression["Principal F84"] = masking["F84 in DIAG1 (principal)"].values
+suppression["Principal F84, public network"] = masking["F84 in SNSS"].values
+suppression["Principal F84, outside"] = masking["F84 non-SNSS"].values
+suppression["Principal F84, masked"] = masking["F84 with masked affiliation"].values
+suppression["Masked share of principal F84 (%)"] = 100 * suppression["Principal F84, masked"] / suppression["Principal F84"]
+suppression["F84.2 Rett in principal position, excluded"] = masking["F84.2 (Rett) in DIAG1 (excluded from this variant)"].values
+COLUMNS_COL = "Columns in the year's file"
+suppression[COLUMNS_COL] = masking["Columns in file"].values
+suppression["Age scheme of the file"] = masking["Age scheme"].values
+show_table(suppression, "The DEIS suppression rule and the file layout, year by year: rows whose establishment and sex are masked — and, in the years marked below, their age as well — and the records with principal F84 inside them",
+           {"Masked rows (%)": 2, "Masked share of principal F84 (%)": 2})
+worst = suppression.loc[suppression["Masked rows (%)"].idxmax()]
+# Which years hide the age of the masked rows: the ones that publish a SUPRIMIDO age band.
+age_band_years = sorted(int(y) for y in deis_age_sex.Year.unique())
+age_masked_years = sorted(int(y) for y in deis_age_sex.loc[deis_age_sex["Age band (years)"] == "SUPRIMIDO", "Year"].unique())
+age_complete_years = [y for y in age_band_years if y not in age_masked_years]
+def year_span(years: list[int]) -> str:
+    """'2019–2023' when the years run without a gap, otherwise the years listed."""
+    if len(years) > 2 and years == list(range(years[0], years[-1] + 1)):
+        return f"{years[0]}–{years[-1]}"
+    return ", ".join(str(y) for y in years)
+def age_band_total(year: int) -> float:
+    part = deis_age_sex.loc[(deis_age_sex.Year == year) & (deis_age_sex["Sex"] == "Both sexes")
+                            & (~deis_age_sex["Age band (years)"].isin(["TOTAL", "SUPRIMIDO"]))]
+    return float(numeric(part, ["DEIS discharges"])["DEIS discharges"].sum())
+def year_total(year: int) -> float:
+    part = deis_age_sex.loc[(deis_age_sex.Year == year) & (deis_age_sex["Sex"] == "Both sexes")
+                            & (deis_age_sex["Age band (years)"] == "TOTAL")]
+    return float(numeric(part, ["DEIS discharges"])["DEIS discharges"].iloc[0])
+note(f"Masking is normally close to {number(suppression['Masked rows (%)'].median(), 1)}% of discharges, but in {int(worst.Year)} it reaches {number(worst['Masked rows (%)'], 1)}% — "
+     f"{number(worst['Masked rows'])} rows — and carries {number(worst['Principal F84, masked'])} records with principal F84, "
+     f"{number(worst['Masked share of principal F84 (%)'], 1)}% of that year's count. What the rule hides is not the same in every year. In "
+     f"{year_span(age_masked_years)} those rows carry no establishment, no sex and no age. In "
+     f"{year_span(age_complete_years)} the file changes layout — {int(suppression[COLUMNS_COL].iloc[-1])} columns and a "
+     f"{str(suppression['Age scheme of the file'].iloc[-1])} age scheme — and publishes an age for every discharge: its age bands add to "
+     f"{number(age_band_total(age_complete_years[-1]))} discharges, which is the whole of that year's published {number(year_total(age_complete_years[-1]))}, so only affiliation and sex are masked. "
+     f"Splits of the DEIS series by affiliation and by sex therefore rest on an incomplete file in every year, and splits by age in "
+     f"{year_span(age_masked_years)} but not in {year_span(age_complete_years)}. "
+     "The number of columns and the age scheme of the file also change between years, so a breakdown available in one year is not guaranteed in the next.")
+```
+
+```{python}
+#| label: fig-deis-supresion
+#| fig-cap: "What the suppression rule and the small cells do to the DEIS series. Left: rows whose establishment and sex are masked, as a percentage of all discharges of the year, with the median marked and the years the file changes layout ruled off; the hatched bars are the years in which the masked rows also carry no age. Centre: records with F84 as the principal diagnosis split by affiliation, with the masked group stacked on top and its share annotated. Right: records with principal F84 per 100 000 discharges of the same age band in the latest year — a share of that band's recorded hospital activity, not a rate per resident — with exact 95% intervals and the number of records above each bar; the bands above 40 years rest on a handful of records and their intervals are wide enough to be uninformative."
+#| fig-width: 13
+#| fig-height: 4.8
+from matplotlib.patches import Patch
+fig, axes = plt.subplots(1, 3, figsize=(13, 4.8), layout="constrained")
+axes[0].bar(suppression.Year, suppression["Masked rows (%)"], color=COLORS[3],
+            hatch=["//" if int(year) in age_masked_years else "" for year in suppression.Year],
+            edgecolor="white", linewidth=0)
+axes[0].axhline(suppression["Masked rows (%)"].median(), color="#555555", linewidth=1, linestyle="--")
+for year, value in zip(suppression.Year, suppression["Masked rows (%)"]):
+    axes[0].annotate(number(value, 1) + "%", (year, value), ha="center", fontsize=7, xytext=(0, 3), textcoords="offset points")
+layout_breaks = [int(y) for y, changed in zip(suppression.Year, suppression[COLUMNS_COL].diff().fillna(0) != 0) if changed]
+for i, year in enumerate(layout_breaks):
+    columns_here = int(suppression.loc[suppression.Year == year, COLUMNS_COL].iloc[0])
+    axes[0].axvline(year - .5, color="#555555", linestyle=":", linewidth=1.3)
+    left_of_rule = i == 0                       # keep consecutive labels off each other's rule
+    label = f"{columns_here}-column file →" if left_of_rule else f"← {columns_here}-column file"
+    axes[0].annotate(label,
+                     (year - (.56 if left_of_rule else .44), suppression["Masked rows (%)"].max() * (1.30 - .15 * i)),
+                     fontsize=6, ha="right" if left_of_rule else "left", va="top", color="#444444")
+axes[0].legend(handles=[Patch(facecolor=COLORS[3], hatch="//", edgecolor="white", label="masked rows carry no age"),
+                        Patch(facecolor=COLORS[3], label="masked rows carry an age")], fontsize=6.5, loc="upper left")
+axes[0].set(title="Rows masked by DEIS", xlabel="Year", ylabel="% of all discharges of the year",
+            xticks=suppression.Year, ylim=(0, suppression["Masked rows (%)"].max() * 1.40))
+bottom = np.zeros(len(suppression))
+for column, color, label in [("Principal F84, public network", COLORS[1], "Public network"),
+                             ("Principal F84, outside", COLORS[2], "Outside the public network"),
+                             ("Principal F84, masked", COLORS[4], "Masked affiliation")]:
+    axes[1].bar(suppression.Year, suppression[column], bottom=bottom, color=color, label=label)
+    bottom += suppression[column].values
+for year, total, masked in zip(suppression.Year, suppression["Principal F84"], suppression["Masked share of principal F84 (%)"]):
+    axes[1].annotate(number(masked, 1) + "% masked", (year, total), ha="center", fontsize=6.5, xytext=(0, 4), textcoords="offset points")
+axes[1].set(title="Principal F84 by affiliation", xlabel="Year", ylabel="Discharges with principal F84",
+            xticks=suppression.Year, ylim=(0, suppression["Principal F84"].max() * 1.25))
+axes[1].legend(fontsize=7.5, loc="upper left")
+AGE_ORDER = ["<1", "1–9", "10–19", "20–29", "30–39", "40–49", "50–59", "60–69", "70–79", "80+", "SUPRIMIDO"]
+age_rows = deis_age_sex.loc[(deis_age_sex.Year == last_deis_year) & (deis_age_sex["Sex"] == "Both sexes")
+                            & (deis_age_sex["Age band (years)"] != "TOTAL")].copy()
+age_rows = numeric(age_rows, ["DEIS discharges", "F84 in DIAG1"])
+age_rows["order"] = age_rows["Age band (years)"].map({band: i for i, band in enumerate(AGE_ORDER)})
+age_rows = age_rows.sort_values("order").reset_index(drop=True)
+age_limits = crude_rate(age_rows["F84 in DIAG1"], age_rows["DEIS discharges"])
+x = np.arange(len(age_rows))
+axes[2].bar(x, age_limits.rate, color=COLORS[0])
+axes[2].errorbar(x, age_limits.rate, yerr=[age_limits.rate - age_limits.rate_lo, age_limits.rate_hi - age_limits.rate],
+                 fmt="none", ecolor="#444444", capsize=3, linewidth=1)
+for i, count in enumerate(age_rows["F84 in DIAG1"].values):
+    axes[2].annotate(f"n={int(count)}", (i, age_limits.rate_hi.iloc[i]), ha="center", fontsize=6.5,
+                     xytext=(0, 2), textcoords="offset points")
+axes[2].set(title=f"Principal F84 by age band · {last_deis_year}", xlabel="Age band (years)",
+            ylabel="Principal F84 per 100 000 discharges of the band", xticks=x, xticklabels=age_rows["Age band (years)"])
+axes[2].tick_params(axis="x", labelrotation=45)
+plt.show()
+```
+
+```{python}
+#| label: tabla-deis-sexo-edad
+rows = numeric(deis_age_sex.loc[deis_age_sex.Year == last_deis_year], ["DEIS discharges", "F84 in DIAG1"]).reset_index(drop=True)
+limits = crude_rate(rows["F84 in DIAG1"], rows["DEIS discharges"])
+is_age = rows["Sex"] == "Both sexes"
+is_total = is_age & (rows["Age band (years)"] == "TOTAL")
+detail = pd.DataFrame({
+    "Breakdown": np.where(is_total, "Whole year", np.where(is_age, "Age band", "Recorded sex")),
+    "Category": np.where(is_age, rows["Age band (years)"], rows["Sex"]),
+    "DEIS discharges": rows["DEIS discharges"].values,
+    "Principal F84": rows["F84 in DIAG1"].values,
+    "per 100 000 discharges": limits.rate.values,
+    "95% CI": [ci(lo, hi, 1) for lo, hi in zip(limits.rate_lo, limits.rate_hi)],
+    "Width of the interval": (limits.rate_hi - limits.rate_lo).values,
+})
+show_table(detail, f"DEIS discharges and records with F84 as the principal diagnosis by age band and by recorded sex · {last_deis_year}, with exact Poisson intervals computed from the published cells",
+           {"per 100 000 discharges": 1, "Width of the interval": 1})
+age_part = detail.loc[(detail.Breakdown == "Age band")]
+sex_part = detail.loc[(detail.Breakdown == "Recorded sex")]
+published_total = float(detail.loc[detail.Breakdown == "Whole year", "DEIS discharges"].iloc[0])
+suppressed_among_ages = "SUPRIMIDO" in set(age_part.Category)
+note("The category SUPRIMIDO is the suppression rule itself: discharges whose establishment and sex — and, in the earlier files, whose age — were masked before publication. It is neither an age "
+     "nor a sex, and it is carried as a pseudo-category of whichever breakdown it affects, so both breakdowns add back to the year in full: the age bands sum to "
+     f"{number(age_part['DEIS discharges'].sum())} discharges and the recorded-sex categories to {number(sex_part['DEIS discharges'].sum())}, against a published year total of "
+     f"{number(published_total)}. In {last_deis_year} SUPRIMIDO appears "
+     f"{'in both breakdowns' if suppressed_among_ages else 'among the sex categories only, because the file of that year publishes an age for every discharge'}. "
+     "What is missing from the table is therefore the identity of those rows, not their discharges. Cells with fewer than about ten "
+     "records carry intervals several times wider than the estimate; the study reports those as counts rather than as rates.")
+```
+
+### The total and its public subset
+
+```{python}
+#| label: tabla-deis-publico
+public = crude_rate(masking["F84 in SNSS"], masking["SNSS discharges"])
+outside = crude_rate(masking["F84 non-SNSS"], masking["Non-SNSS discharges"])
+split = pd.DataFrame({
+    "Year": masking["Year"].astype(int).values,
+    "Public-network discharges": masking["SNSS discharges"].values,
+    "Principal F84, public network": masking["F84 in SNSS"].values,
+    "per 100 000 public discharges": public.rate.values,
+    "95% CI, public": [ci(lo, hi, 1) for lo, hi in zip(public.rate_lo, public.rate_hi)],
+    "Discharges outside the public network": masking["Non-SNSS discharges"].values,
+    "Principal F84, outside": masking["F84 non-SNSS"].values,
+    "per 100 000 discharges outside": outside.rate.values,
+    "95% CI, outside": [ci(lo, hi, 1) for lo, hi in zip(outside.rate_lo, outside.rate_hi)],
+})
+split["Public ÷ outside"] = split["per 100 000 public discharges"] / split["per 100 000 discharges outside"]
+split["Public share of all discharges (%)"] = 100 * masking["SNSS discharges"].values / masking["DEIS discharges (all establishments)"].values
+split["Public share of principal F84 (%)"] = 100 * masking["F84 in SNSS"].values / masking["F84 in DIAG1 (principal)"].values
+show_table(split, "DEIS split by affiliation: the public network against everything else, each with its own denominator. Rows with masked affiliation belong to neither column",
+           {"per 100 000 public discharges": 1, "per 100 000 discharges outside": 1, "Public ÷ outside": 2,
+            "Public share of all discharges (%)": 1, "Public share of principal F84 (%)": 1})
+public_count, outside_count = float(masking["F84 in SNSS"].iloc[-1]), float(masking["F84 non-SNSS"].iloc[-1])
+public_base, outside_base = float(masking["SNSS discharges"].iloc[-1]), float(masking["Non-SNSS discharges"].iloc[-1])
+public_last, outside_last = float(public.rate.iloc[-1]), float(outside.rate.iloc[-1])
+# Rate ratio: each count over its own denominator, log-normal limits. The raw quotient of the two counts is
+# not that quantity — the two counts sit on different bases — so it is named for what it is and not used.
+ratio, ratio_lo, ratio_hi = rate_ratio(public_last, public_last ** 2 / public_count, outside_last, outside_last ** 2 / outside_count)
+raw_count_quotient = public_count / outside_count
+note(f"In {int(split['Year'].iloc[-1])} the public network accounts for {number(split['Public share of all discharges (%)'].iloc[-1], 1)}% of all discharges and "
+     f"{number(split['Public share of principal F84 (%)'].iloc[-1], 1)}% of the discharges with principal F84. The quantity behind that gap is the ratio of the two intensities — "
+     f"{number(public_last, 1)} principal-F84 records per 100 000 public discharges against {number(outside_last, 1)} per 100 000 outside, a rate ratio of {number(ratio, 2)} "
+     f"(95% CI {ci(ratio_lo, ratio_hi, 2)}) — because it puts each count over its own denominator. The raw counts, {number(public_count)} against {number(outside_count)}, sit on "
+     f"{number(public_base)} and {number(outside_base)} discharges; their quotient, {number(raw_count_quotient, 2)}, is a count ratio between two different bases, it is not the "
+     "intensity comparison and it is not used here. The gap is not evidence that autism is more common among public patients. It reflects who is "
+     "admitted where, what each sector admits for, and how each sector codes the principal diagnosis — and it is the reason the GRD series, which covers only "
+     "public hospitals, cannot be read as a national count.")
+```
+
+The public network carries between `{python} number(split["Public share of all discharges (%)"].min(), 1)`%
+and `{python} number(split["Public share of all discharges (%)"].max(), 1)`% of all discharges across the
+published years, and between `{python} number(split["Public share of principal F84 (%)"].min(), 1)`% and
+`{python} number(split["Public share of principal F84 (%)"].max(), 1)`% of the discharges with autism as the
+principal diagnosis — under eight in ten in
+`{python} str(int((split["Public share of principal F84 (%)"] < 80).sum()))` of the
+`{python} str(len(split))` years, including both opening years, and never as high as nine in ten. The share of activity documenting principal F84 is
+higher inside the public network than outside it in every year, but by a factor that itself moves: it is
+`{python} number(split["Public ÷ outside"].iloc[0], 2)` in
+`{python} str(int(split["Year"].iloc[0]))`, reaches
+`{python} number(split["Public ÷ outside"].max(), 2)` at its widest and stands at
+`{python} number(split["Public ÷ outside"].iloc[-1], 2)` in
+`{python} str(int(split["Year"].iloc[-1]))`, so the difference roughly doubles across the period rather than
+being a fixed multiple. That gap sets the boundary of the hospital chapter: GRD is a public-hospital
+database, its counts are public-hospital counts, and DEIS shows what falls outside them — a small but not
+negligible group whose rate moves differently.
+
+### The case definition, checked
+
+```{python}
+#| label: tabla-deis-variantes
+VARIANT_COLUMNS = ["DEIS principal F84 (all)", "GRD principal F84", "GRD F84 any position (no DEIS equivalent)",
+                   "Ratio principal F84 DEIS / GRD"]
+variants = numeric(deis_variants, VARIANT_COLUMNS)
+definitions = pd.DataFrame({
+    "Year": variants["Year"].astype(int).values,
+    "Case definition": variants["Series"].values,
+    "DEIS principal F84": variants["DEIS principal F84 (all)"].values,
+    "GRD principal F84": variants["GRD principal F84"].values,
+    "GRD F84 any position": variants["GRD F84 any position (no DEIS equivalent)"].values,
+    "DEIS ÷ GRD, principal": variants["Ratio principal F84 DEIS / GRD"].values,
+})
+show_table(definitions.sort_values(["Case definition", "Year"]), "The same comparison under two case definitions: the F84 family excluding Rett syndrome, and F84.0 childhood autism alone",
+           {"DEIS ÷ GRD, principal": 2})
+family_last = definitions.loc[definitions["Case definition"].str.startswith("F84 family") & (definitions.Year == last_deis_year), "DEIS principal F84"].iloc[0]
+narrow_last = definitions.loc[definitions["Case definition"].str.startswith("F84.0") & (definitions.Year == last_deis_year), "DEIS principal F84"].iloc[0]
+note(f"Narrowing the definition to F84.0 alone removes {number(100 * (1 - narrow_last / family_last), 1)}% of the DEIS count in {last_deis_year} "
+     f"({number(family_last)} records against {number(narrow_last)}) and leaves the direction and the shape of the series unchanged. "
+     "The choice of definition moves the level; it does not create the rise.")
+```
+
+## What these sources cannot support
+
+- **No layer here is a denominator for autism.** The population layers answer how many people live in a
+  territory; the coverage layers answer how many were enrolled on 31 December. Dividing a count of
+  recognised autism by any of them gives a rate of recorded events per 100 000 population — never a
+  prevalence, never an incidence, never a share of the people who have autism.
+- **The bases are not interchangeable.** A rate computed on the 2017 base and a rate computed on the 2024
+  base differ by up to `{python} number(base_gap_max, 2)`% for the same records, the widest gap falling in
+  `{python} str(base_gap_year)`; against the 2024 census enumeration the difference is about
+  `{python} number(100 * (1 / census_ratio - 1), 1)`%. No series in this report crosses that break.
+- **The spans differ.** The regional population runs
+  `{python} f"{first_population_year}–{last_population_year}"`, the coverage layers
+  `{python} f"{first_coverage_year}–{last_coverage_year}"` and the DEIS comparison
+  `{python} f"{first_deis_year}–{last_deis_year}"`. Any indicator combining two of them stops where the
+  shorter one stops.
+- **The stocks are December; the population is 30 June.** Every coverage percentage in this chapter mixes
+  those two dates. It is indicative, and it is not an insurance-coverage rate.
+- **The geographies do not match.** Residence, domicile, commune of primary-care enrolment, administrative
+  commune of the beneficiary and commune of the facility are five different things that appear in these
+  tables under regional headings. Regional percentages that mix them rank regions; they do not measure them.
+- **One published breakdown does not add back.** The region and sex rows of the population layer in the
+  extended tables sum to twice their own national total. The consolidated regional table is used instead,
+  and the discrepancy is stated rather than silently corrected.
+- **DEIS sees the principal position only, so it corroborates only that part.** Its second diagnostic field
+  is the external cause of injury, so the register cannot reproduce anything the hospital chapter reports
+  about autism documented alongside another reason for admission. In
+  `{python} str(last_deis_year)` that is `{python} number(secondary_share_last, 1)`% of the GRD any-position
+  numerator: the external check reaches the remaining
+  `{python} number(corroborated_share_last, 1)`%. The secondary-position component, which multiplies by
+  `{python} number(growth_grd_secondary, 2)` across the period, is corroborated by nothing in this report.
+- **DEIS masks rows, and masks different things in different years.** Between
+  `{python} number((100 * masking["Discharges with masked affiliation"] / masking["DEIS discharges (all establishments)"]).min(), 1)`%
+  and
+  `{python} number((100 * masking["Discharges with masked affiliation"] / masking["DEIS discharges (all establishments)"]).max(), 1)`%
+  of discharges per year carry no establishment and no sex, and they contain records with principal F84, so
+  every split by affiliation and by sex is a split of an incomplete file. Their age is masked in
+  `{python} year_span(age_masked_years)` but not in
+  `{python} year_span(age_complete_years)`, where the age bands add to the year total
+  exactly; the age split the chapter draws is therefore complete, and the earlier ones are not. The file
+  layout itself changes between years.
+- **The GRD panel is not fixed.** GRD observes `{python} str(panel_first)` hospitals at the start of the
+  comparison and `{python} str(panel_last)` at the end, the first new ones entering
+  in `{python} str(panel_break)`. On the fixed `{python} str(panel_first)`-hospital panel the
+  `{python} str(last_deis_year)` any-position count is lower by `{python} number(any_gap)` episodes, so a
+  part of the growth of the series this report headlines is coverage rather than coding. The published
+  series is the observed panel.
+- **The coverage layers lose their age-not-reported records.** The published age breakdown of the insurance
+  and primary-care stocks omits the records with no age, so it falls short of the December stock of the same
+  layer by up to `{python} number(worst_shortfall["% of the layer"], 2)`% and every coverage-by-age
+  percentage in this chapter is understated by that margin.
+- **The primary-care layer's reporting base grows with it.** Centres with enrolled persons rise
+  `{python} number(centres_change, 1)`% across the period while enrolment rises
+  `{python} number(aps_change, 1)`% and the population `{python} number(population_change, 1)`%, and
+  FONASA's own count of beneficiaries enrolled in primary care — the only available cross-check — stops
+  in `{python} str(aps_crosscheck_last)`.
+- **The DEIS age cells are small.** Above 40 years the annual counts of principal F84 are in single digits
+  and their exact intervals span an order of magnitude. Those cells are reported as counts.
+- **Neither register is linked to the other.** No ratio between DEIS and GRD in this chapter is a
+  probability, a completeness estimate or a capture–recapture quantity. They are ratios of records produced
+  by two offices from two files.
+
+# Synthesis
+
+- The study divides by one primary denominator throughout: the INE resident population on the 2017 census
+  base at 30 June, which reaches `{python} number(coverage_last.ine_population_base2017_30jun)` persons in
+  the last published year. The 2024-base projection differs from it by at most
+  `{python} number(base_gap_max, 2)`% in any year and the
+  2024 census enumeration by about `{python} number(100 * (1 - census_ratio), 1)`%; splicing bases inside
+  one series would move a rate by up to
+  `{python} number(100 * (1 / census_ratio - 1), 1)`% with no change in the records at all.
+- Every region gains population over the published span and none loses it, but the speeds differ widely:
+  the country grows `{python} number(national_change, 1)`% while the regions run from
+  `{python} number(region_change.min(), 1)`% to `{python} number(region_change.max(), 1)`% — the fastest
+  `{python} number(region_change.max() / national_change, 1)` times the national rate, the slowest
+  `{python} number(region_change.min() / national_change, 2)` times it, and
+  `{python} str(slower_regions)` of the `{python} str(len(REGION_ORDER))` below the national rate. Territorial
+  counts and territorial rates therefore tell different stories.
+- Insurance and primary-care layers are December stocks of enrolment. The public insurer's share of the
+  population rises by about
+  `{python} number(100 * (coverage.share_fonasa_ine.iloc[-1] - coverage.share_fonasa_ine.iloc[0]), 1)`
+  percentage points across the period while the private insurers' share falls by about
+  `{python} number(100 * (coverage.share_isapre_ine.iloc[0] - coverage.share_isapre_ine.iloc[-1]), 1)`, and
+  in the youngest age band the two together reach only about
+  `{python} number(youngest_band["(FONASA + ISAPRE) ÷ INE (%)"], 0)`% of the resident population against
+  about `{python} number(widest_band["(FONASA + ISAPRE) ÷ INE (%)"], 0)`% in the band where they exceed it.
+  None of this measures need.
+- DEIS, an independent national register with wider scope and a narrower diagnostic field, records the same
+  rise as GRD **in the principal position**: the share of recorded hospital activity with autism as the
+  principal diagnosis goes from
+  `{python} number(deis.deis_rate_f84_principal_per_100k_discharges.iloc[0], 1)` to
+  `{python} number(deis.deis_rate_f84_principal_per_100k_discharges.iloc[-1], 1)` per 100 000 discharges.
+  The corroboration stops there. It covers the
+  `{python} number(corroborated_share_last, 1)`% of the GRD any-position numerator that sits in the
+  principal field; the other `{python} number(secondary_share_last, 1)`% is invisible to DEIS, and the
+  any-position count that the report headlines multiplies by
+  `{python} number(growth_grd_any, 2)` against `{python} number(growth_grd_principal, 2)` for the
+  corroborated part. The two registers are also drifting apart rather than converging: their principal-count
+  ratio moves from `{python} number(deis.ratio_deis_f84_principal_to_grd_f84_principal.iloc[0], 2)` to
+  `{python} number(deis.ratio_deis_f84_principal_to_grd_f84_principal.iloc[-1], 2)`, and on the
+  public-hospital subset from `{python} number(snss_ratio.iloc[0], 3)` to
+  `{python} number(snss_ratio.iloc[-1], 3)`. The agreement is about recognition in records, not about how
+  many people are autistic.
+- The two registers disagree about magnitude for a structural reason: DEIS counts
+  `{python} number(deis_last.deis_f84_principal)` principal-position discharges nationally in
+  `{python} str(last_deis_year)` against `{python} number(deis_last.grd_f84_any)` public-hospital episodes
+  with an F84 code in any position. Reading only the principal field hides most of what the hospital chapter
+  describes.
+- Between
+  `{python} number((100 * masking["Discharges with masked affiliation"] / masking["DEIS discharges (all establishments)"]).min(), 1)`%
+  and
+  `{python} number((100 * masking["Discharges with masked affiliation"] / masking["DEIS discharges (all establishments)"]).max(), 1)`%
+  of DEIS discharges are published with establishment and sex masked — and, in
+  `{python} year_span(age_masked_years)`, age as well — and the public network carries
+  about `{python} number(split["Public share of principal F84 (%)"].iloc[-1], 0)`% of the principal-F84
+  records against about `{python} number(split["Public share of all discharges (%)"].iloc[-1], 0)`% of all
+  discharges — the gap that bounds what a public-hospital database can say about the country.
+
+## Reproducibility
+
+Every table and figure above is computed in its own chunk from tracked tables. The population layers come
+from `output_files/consolidacion/population_regional.csv` and `population_regional_young.csv`; the coverage
+layers, the published population rates and the DEIS comparison from
+`docs/study/data/coverage_layers_year.csv`, `models_population_rates.csv` and
+`expanded_deis_principal_comparison.csv`; the base sensitivity, the layer definitions, the layer
+breakdowns, the coverage by age band and the DEIS detail from
+`docs/study/corpus/tables/S10_denominator_sensitivity.csv`, `M4_denominator_layers.csv`,
+`E73_denominator_layers_full.csv`, `S11_coverage_age_sex.csv`, `ST11a_deis_annual.csv`,
+`ST11b_deis_vs_grd.csv` and `S14_deis_sex_age.csv`. The regional map reads `data/Regional.shp`, the
+boundary file the hospital chapter also uses. Exact Poisson limits are computed with `crude_rate` and the
+public-against-outside comparison with `rate_ratio`, both from `scripts/epi_helpers.py`; `count_ratio` is
+not used here, because the only pair of counts it would have been applied to sits on two different
+denominators. The presentation helpers come from `scripts/report_helpers.py`. The extended-material tables
+are written for print, so the setup chunk parses their thousands separators and their `—`, `n/e` and
+`variable absent` placeholders before any arithmetic. No quantity on this page is typed in by hand: every
+number in the prose is an inline expression evaluated against the table it comes from.
+
+::: {.report-nav}
+:::

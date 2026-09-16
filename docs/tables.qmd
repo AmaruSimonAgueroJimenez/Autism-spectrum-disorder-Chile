@@ -138,5 +138,6 @@ for path in sorted(EARLY.glob("tabla*.csv")):
 
 The [Results](results.qmd) chapter draws its figures from these tables; [Hospital
 recognition](hospital.qmd) and [Community care](community.qmd) work through them source by source. The
-[extended plates](plates.qmd) add the material produced by the full pipeline, and
+[extended plates](plates_core.qmd) and [extended tables](extended_tables.qmd) add the material
+produced by the full pipeline, and
 [Reproducibility](reproducibility.qmd) explains how to regenerate any of it.

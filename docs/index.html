@@ -211,6 +211,24 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
  <span class="menu-text"><span class="chapter-number">5</span>&nbsp; <span class="chapter-title">REM: autism in outpatient care, screening and rehabilitation</span></span></a>
   </div>
 </li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="./education.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text"><span class="chapter-number">6</span>&nbsp; <span class="chapter-title">Education: autism in the school integration programme, special schools and the applications register</span></span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="./surveys.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text"><span class="chapter-number">7</span>&nbsp; <span class="chapter-title">Population surveys: what people report about themselves and their children</span></span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="./denominators.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text"><span class="chapter-number">8</span>&nbsp; <span class="chapter-title">Denominators, coverage and an independent discharge register</span></span></a>
+  </div>
+</li>
       </ul>
   </li>
         <li class="sidebar-item sidebar-item-section">
@@ -225,49 +243,49 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
           <li class="sidebar-item">
   <div class="sidebar-item-container"> 
   <a href="./tables.html" class="sidebar-item-text sidebar-link">
- <span class="menu-text"><span class="chapter-number">6</span>&nbsp; <span class="chapter-title">Result tables</span></span></a>
+ <span class="menu-text"><span class="chapter-number">9</span>&nbsp; <span class="chapter-title">Result tables</span></span></a>
   </div>
 </li>
           <li class="sidebar-item">
   <div class="sidebar-item-container"> 
   <a href="./plates_core.html" class="sidebar-item-text sidebar-link">
- <span class="menu-text"><span class="chapter-number">7</span>&nbsp; <span class="chapter-title">Principal plates</span></span></a>
+ <span class="menu-text"><span class="chapter-number">10</span>&nbsp; <span class="chapter-title">Principal plates</span></span></a>
   </div>
 </li>
           <li class="sidebar-item">
   <div class="sidebar-item-container"> 
   <a href="./plates_hospital.html" class="sidebar-item-text sidebar-link">
- <span class="menu-text"><span class="chapter-number">8</span>&nbsp; <span class="chapter-title">Hospital episodes in detail</span></span></a>
+ <span class="menu-text"><span class="chapter-number">11</span>&nbsp; <span class="chapter-title">Hospital episodes in detail</span></span></a>
   </div>
 </li>
           <li class="sidebar-item">
   <div class="sidebar-item-container"> 
   <a href="./plates_community.html" class="sidebar-item-text sidebar-link">
- <span class="menu-text"><span class="chapter-number">9</span>&nbsp; <span class="chapter-title">Community pathway in detail</span></span></a>
+ <span class="menu-text"><span class="chapter-number">12</span>&nbsp; <span class="chapter-title">Community pathway in detail</span></span></a>
   </div>
 </li>
           <li class="sidebar-item">
   <div class="sidebar-item-container"> 
   <a href="./plates_territory.html" class="sidebar-item-text sidebar-link">
- <span class="menu-text"><span class="chapter-number">10</span>&nbsp; <span class="chapter-title">Territory and spatial structure</span></span></a>
+ <span class="menu-text"><span class="chapter-number">13</span>&nbsp; <span class="chapter-title">Territory and spatial structure</span></span></a>
   </div>
 </li>
           <li class="sidebar-item">
   <div class="sidebar-item-container"> 
   <a href="./plates_context.html" class="sidebar-item-text sidebar-link">
- <span class="menu-text"><span class="chapter-number">11</span>&nbsp; <span class="chapter-title">Denominators, surveys and education</span></span></a>
+ <span class="menu-text"><span class="chapter-number">14</span>&nbsp; <span class="chapter-title">Denominators, surveys and education</span></span></a>
   </div>
 </li>
           <li class="sidebar-item">
   <div class="sidebar-item-container"> 
   <a href="./extended_tables.html" class="sidebar-item-text sidebar-link">
- <span class="menu-text"><span class="chapter-number">12</span>&nbsp; <span class="chapter-title">Extended tables</span></span></a>
+ <span class="menu-text"><span class="chapter-number">15</span>&nbsp; <span class="chapter-title">Extended tables</span></span></a>
   </div>
 </li>
           <li class="sidebar-item">
   <div class="sidebar-item-container"> 
   <a href="./reproducibility.html" class="sidebar-item-text sidebar-link">
- <span class="menu-text"><span class="chapter-number">13</span>&nbsp; <span class="chapter-title">Reproducibility</span></span></a>
+ <span class="menu-text"><span class="chapter-number">16</span>&nbsp; <span class="chapter-title">Reproducibility</span></span></a>
   </div>
 </li>
       </ul>
@@ -343,26 +361,37 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
 <span id="cb1-15"><a href="#cb1-15" aria-hidden="true" tabindex="-1"></a>grd_summary <span class="op">=</span> read_result(<span class="st">"grd_cohort_summary.csv"</span>)</span>
 <span id="cb1-16"><a href="#cb1-16" aria-hidden="true" tabindex="-1"></a>cohort <span class="op">=</span> grd_summary.query(<span class="st">"era == '2021-2024' and definition == 'TEA_operacional'"</span>).iloc[<span class="dv">0</span>]</span>
 <span id="cb1-17"><a href="#cb1-17" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb1-18"><a href="#cb1-18" aria-hidden="true" tabindex="-1"></a>kpis([</span>
-<span id="cb1-19"><a href="#cb1-19" aria-hidden="true" tabindex="-1"></a>    (number(grd_sources.records.<span class="bu">sum</span>()), <span class="st">"Hospital records read · 2019–2024"</span>),</span>
-<span id="cb1-20"><a href="#cb1-20" aria-hidden="true" tabindex="-1"></a>    (number(epi_quality.records_kept.<span class="bu">sum</span>()), <span class="st">"Records with an F84 code"</span>),</span>
-<span id="cb1-21"><a href="#cb1-21" aria-hidden="true" tabindex="-1"></a>    (number(rem_quality.records.<span class="bu">sum</span>()), <span class="st">"Community programme rows · 2017–2024"</span>),</span>
-<span id="cb1-22"><a href="#cb1-22" aria-hidden="true" tabindex="-1"></a>    (number(cohort.patients), <span class="st">"Identifiers in the trajectory cohort · 2021–2024"</span>),</span>
-<span id="cb1-23"><a href="#cb1-23" aria-hidden="true" tabindex="-1"></a>])</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+<span id="cb1-18"><a href="#cb1-18" aria-hidden="true" tabindex="-1"></a><span class="co"># The opening figures name every source the report reads, not only the two health ones.</span></span>
+<span id="cb1-19"><a href="#cb1-19" aria-hidden="true" tabindex="-1"></a>education <span class="op">=</span> pd.read_csv(ROOT <span class="op">/</span> <span class="st">"docs"</span> <span class="op">/</span> <span class="st">"study"</span> <span class="op">/</span> <span class="st">"data"</span> <span class="op">/</span> <span class="st">"education_summary_year.csv"</span>)</span>
+<span id="cb1-20"><a href="#cb1-20" aria-hidden="true" tabindex="-1"></a>surveys <span class="op">=</span> pd.read_csv(ROOT <span class="op">/</span> <span class="st">"docs"</span> <span class="op">/</span> <span class="st">"study"</span> <span class="op">/</span> <span class="st">"data"</span> <span class="op">/</span> <span class="st">"survey_estimates_verified.csv"</span>)</span>
+<span id="cb1-21"><a href="#cb1-21" aria-hidden="true" tabindex="-1"></a>last_edu <span class="op">=</span> education.sort_values(<span class="st">"year"</span>).iloc[<span class="op">-</span><span class="dv">1</span>]</span>
+<span id="cb1-22"><a href="#cb1-22" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb1-23"><a href="#cb1-23" aria-hidden="true" tabindex="-1"></a>kpis([</span>
+<span id="cb1-24"><a href="#cb1-24" aria-hidden="true" tabindex="-1"></a>    (number(grd_sources.records.<span class="bu">sum</span>()), <span class="st">"Hospital records read · 2019–2024"</span>),</span>
+<span id="cb1-25"><a href="#cb1-25" aria-hidden="true" tabindex="-1"></a>    (number(epi_quality.records_kept.<span class="bu">sum</span>()), <span class="st">"Of them, with an autism code"</span>),</span>
+<span id="cb1-26"><a href="#cb1-26" aria-hidden="true" tabindex="-1"></a>    (number(rem_quality.records.<span class="bu">sum</span>()), <span class="st">"Community programme rows · 2017–2024"</span>),</span>
+<span id="cb1-27"><a href="#cb1-27" aria-hidden="true" tabindex="-1"></a>    (number(last_edu.pie_harmonised_n), <span class="ss">f"School support enrolments with autism · </span><span class="sc">{</span><span class="bu">int</span>(last_edu.year)<span class="sc">}</span><span class="ss">"</span>),</span>
+<span id="cb1-28"><a href="#cb1-28" aria-hidden="true" tabindex="-1"></a>    (<span class="bu">str</span>(surveys.survey.nunique()), <span class="st">"Household surveys, the only sampled source"</span>),</span>
+<span id="cb1-29"><a href="#cb1-29" aria-hidden="true" tabindex="-1"></a>    (number(cohort.patients), <span class="st">"Identifiers in the trajectory cohort · 2021–2024"</span>),</span>
+<span id="cb1-30"><a href="#cb1-30" aria-hidden="true" tabindex="-1"></a>])</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
 </details>
 <div id="cargar-resumen" class="cell-output cell-output-display">
-<div class="metrics"><div class="metric"><strong>5,808,535</strong><span>Hospital records read · 2019–2024</span></div><div class="metric"><strong>25,620</strong><span>Records with an F84 code</span></div><div class="metric"><strong>40,678,929</strong><span>Community programme rows · 2017–2024</span></div><div class="metric"><strong>15,493</strong><span>Identifiers in the trajectory cohort · 2021–2024</span></div></div>
+<div class="metrics"><div class="metric"><strong>5,808,535</strong><span>Hospital records read · 2019–2024</span></div><div class="metric"><strong>25,620</strong><span>Of them, with an autism code</span></div><div class="metric"><strong>40,678,929</strong><span>Community programme rows · 2017–2024</span></div><div class="metric"><strong>106,786</strong><span>School support enrolments with autism · 2025</span></div><div class="metric"><strong>2</strong><span>Household surveys, the only sampled source</span></div><div class="metric"><strong>15,493</strong><span>Identifiers in the trajectory cohort · 2021–2024</span></div></div>
 </div>
 </div>
 <p>This report describes how autism is recognised in the routine administrative records of Chile’s public health and education systems. It brings together every result the study produced, organised by what the result is about rather than by when it was computed.</p>
+<p><strong>It reads five kinds of source, and they answer different questions.</strong> Two count health events: the hospital discharge records and the monthly statistical returns of the public network. One counts education services: the school integration programme, the special schools and the applications register. One estimates from a sample rather than counting: the household surveys, the only source here that says anything about a population. And one supplies the layers the others divide by: the population projections, insurance coverage and primary-care enrolment. A count of records and a survey estimate are not the same quantity, and the report never plots them as one series.</p>
 <p><strong>Nothing here is prevalence or incidence.</strong> Every number is a count of hospital episodes, community programme entries, follow-up stocks or school enrolments, presented with its unit, its denominator and its coverage. The rise these records show is consistent with greater detection, greater demand and changes in coding during the period of Law 21.545; it does not demonstrate a change in how often autism occurs.</p>
 <section id="what-the-report-contains" class="level2" data-number="0.1">
 <h2 data-number="0.1" class="anchored" data-anchor-id="what-the-report-contains"><span class="header-section-number">0.1</span> What the report contains</h2>
 <p><strong><a href="./methods.html">Methods</a>.</strong> Sources, case definitions, units, denominators, standardisation, intervals, trends, spatial analysis, the rules for reading the monthly returns, quality controls, biases and limitations. It is the common reference for everything that follows.</p>
 <p><strong><a href="./results.html">Results</a>.</strong> The principal findings: four panel figures and the nine supplementary figures that support them, each drawn at render time by the code printed with it.</p>
 <p><strong><a href="./hospital.html">Hospital recognition</a>.</strong> The hospital discharge records in depth: magnitude and trend, age-standardised rates, sex and age, F84 subcategories, the diagnostic position of the code, episode characteristics, co-diagnoses, readmission, territory and spatial autocorrelation, and the reconstruction of which diagnoses precede the first observed autism record.</p>
-<p><strong><a href="./community.html">Community care</a>.</strong> The monthly statistical returns of the public network: entries to and discharges from mental-health programmes with an autism code, their population rates, age, sex, regions, communes and facilities, screening in well-child check-ups, rehabilitation entries, and the ecological comparison between the two sources.</p>
-<p><strong><a href="./tables.html">Result tables</a></strong> and <strong><a href="plates.qmd">extended plates</a></strong> hold the complete material, including the results that the main chapters summarise. <strong><a href="./reproducibility.html">Reproducibility</a></strong> explains how to rebuild every number in this report from the repository.</p>
+<p><strong><a href="./community.html">Community care</a>.</strong> The monthly statistical returns of the public network: entries to and discharges from mental-health programmes with an autism code, their population rates, age, sex, regions, communes and facilities, screening in well-child check-ups, rehabilitation entries, and the ecological comparison between the two health sources.</p>
+<p><strong><a href="./education.html">Education records</a>.</strong> The school integration programme, the special schools and the applications register: what each one counts, how the strict and harmonised definitions differ, and what the change of source does to comparability across years.</p>
+<p><strong><a href="./surveys.html">Population surveys</a>.</strong> The two household surveys, the only source here that estimates rather than counts: their domains as the instruments define them, their design-weighted estimates and the precision of each.</p>
+<p><strong><a href="./denominators.html">Denominators and coverage</a>.</strong> The layers every rate divides by — population projections, insurance coverage, primary-care enrolment — and an independent national discharge register that counts the same hospital events by principal diagnosis, as a check on the hospital chapter.</p>
+<p><strong><a href="./tables.html">Result tables</a></strong>, the <strong>extended plates</strong> and <strong><a href="./extended_tables.html">extended tables</a></strong> hold the complete material, including the results the main chapters summarise. <strong><a href="./reproducibility.html">Reproducibility</a></strong> explains how to rebuild every number in this report.</p>
 </section>
 <section id="headline-results" class="level2" data-number="0.2">
 <h2 data-number="0.2" class="anchored" data-anchor-id="headline-results"><span class="header-section-number">0.2</span> Headline results</h2>
@@ -1073,133 +1102,160 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
 <span id="cb5-24"><a href="#cb5-24" aria-hidden="true" tabindex="-1"></a>grd_summary <span class="op">=</span> read_result(<span class="st">"grd_cohort_summary.csv"</span>)</span>
 <span id="cb5-25"><a href="#cb5-25" aria-hidden="true" tabindex="-1"></a>cohort <span class="op">=</span> grd_summary.query(<span class="st">"era == '2021-2024' and definition == 'TEA_operacional'"</span>).iloc[<span class="dv">0</span>]</span>
 <span id="cb5-26"><a href="#cb5-26" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb5-27"><a href="#cb5-27" aria-hidden="true" tabindex="-1"></a>kpis([</span>
-<span id="cb5-28"><a href="#cb5-28" aria-hidden="true" tabindex="-1"></a>    (number(grd_sources.records.<span class="bu">sum</span>()), <span class="st">"Hospital records read · 2019–2024"</span>),</span>
-<span id="cb5-29"><a href="#cb5-29" aria-hidden="true" tabindex="-1"></a>    (number(epi_quality.records_kept.<span class="bu">sum</span>()), <span class="st">"Records with an F84 code"</span>),</span>
-<span id="cb5-30"><a href="#cb5-30" aria-hidden="true" tabindex="-1"></a>    (number(rem_quality.records.<span class="bu">sum</span>()), <span class="st">"Community programme rows · 2017–2024"</span>),</span>
-<span id="cb5-31"><a href="#cb5-31" aria-hidden="true" tabindex="-1"></a>    (number(cohort.patients), <span class="st">"Identifiers in the trajectory cohort · 2021–2024"</span>),</span>
-<span id="cb5-32"><a href="#cb5-32" aria-hidden="true" tabindex="-1"></a>])</span>
-<span id="cb5-33"><a href="#cb5-33" aria-hidden="true" tabindex="-1"></a><span class="in">```</span></span>
-<span id="cb5-34"><a href="#cb5-34" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb5-35"><a href="#cb5-35" aria-hidden="true" tabindex="-1"></a>This report describes how autism is recognised in the routine administrative records of Chile's public</span>
-<span id="cb5-36"><a href="#cb5-36" aria-hidden="true" tabindex="-1"></a>health and education systems. It brings together every result the study produced, organised by what the</span>
-<span id="cb5-37"><a href="#cb5-37" aria-hidden="true" tabindex="-1"></a>result is about rather than by when it was computed.</span>
-<span id="cb5-38"><a href="#cb5-38" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb5-39"><a href="#cb5-39" aria-hidden="true" tabindex="-1"></a>**Nothing here is prevalence or incidence.** Every number is a count of hospital episodes, community</span>
-<span id="cb5-40"><a href="#cb5-40" aria-hidden="true" tabindex="-1"></a>programme entries, follow-up stocks or school enrolments, presented with its unit, its denominator and</span>
-<span id="cb5-41"><a href="#cb5-41" aria-hidden="true" tabindex="-1"></a>its coverage. The rise these records show is consistent with greater detection, greater demand and</span>
-<span id="cb5-42"><a href="#cb5-42" aria-hidden="true" tabindex="-1"></a>changes in coding during the period of Law 21.545; it does not demonstrate a change in how often autism</span>
-<span id="cb5-43"><a href="#cb5-43" aria-hidden="true" tabindex="-1"></a>occurs.</span>
-<span id="cb5-44"><a href="#cb5-44" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb5-45"><a href="#cb5-45" aria-hidden="true" tabindex="-1"></a><span class="fu">## What the report contains</span></span>
-<span id="cb5-46"><a href="#cb5-46" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb5-47"><a href="#cb5-47" aria-hidden="true" tabindex="-1"></a>**[Methods](methods.qmd).** Sources, case definitions, units, denominators, standardisation, intervals,</span>
-<span id="cb5-48"><a href="#cb5-48" aria-hidden="true" tabindex="-1"></a>trends, spatial analysis, the rules for reading the monthly returns, quality controls, biases and</span>
-<span id="cb5-49"><a href="#cb5-49" aria-hidden="true" tabindex="-1"></a>limitations. It is the common reference for everything that follows.</span>
-<span id="cb5-50"><a href="#cb5-50" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb5-51"><a href="#cb5-51" aria-hidden="true" tabindex="-1"></a>**[Results](results.qmd).** The principal findings: four panel figures and the nine supplementary</span>
-<span id="cb5-52"><a href="#cb5-52" aria-hidden="true" tabindex="-1"></a>figures that support them, each drawn at render time by the code printed with it.</span>
+<span id="cb5-27"><a href="#cb5-27" aria-hidden="true" tabindex="-1"></a><span class="co"># The opening figures name every source the report reads, not only the two health ones.</span></span>
+<span id="cb5-28"><a href="#cb5-28" aria-hidden="true" tabindex="-1"></a>education <span class="op">=</span> pd.read_csv(ROOT <span class="op">/</span> <span class="st">"docs"</span> <span class="op">/</span> <span class="st">"study"</span> <span class="op">/</span> <span class="st">"data"</span> <span class="op">/</span> <span class="st">"education_summary_year.csv"</span>)</span>
+<span id="cb5-29"><a href="#cb5-29" aria-hidden="true" tabindex="-1"></a>surveys <span class="op">=</span> pd.read_csv(ROOT <span class="op">/</span> <span class="st">"docs"</span> <span class="op">/</span> <span class="st">"study"</span> <span class="op">/</span> <span class="st">"data"</span> <span class="op">/</span> <span class="st">"survey_estimates_verified.csv"</span>)</span>
+<span id="cb5-30"><a href="#cb5-30" aria-hidden="true" tabindex="-1"></a>last_edu <span class="op">=</span> education.sort_values(<span class="st">"year"</span>).iloc[<span class="op">-</span><span class="dv">1</span>]</span>
+<span id="cb5-31"><a href="#cb5-31" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb5-32"><a href="#cb5-32" aria-hidden="true" tabindex="-1"></a>kpis([</span>
+<span id="cb5-33"><a href="#cb5-33" aria-hidden="true" tabindex="-1"></a>    (number(grd_sources.records.<span class="bu">sum</span>()), <span class="st">"Hospital records read · 2019–2024"</span>),</span>
+<span id="cb5-34"><a href="#cb5-34" aria-hidden="true" tabindex="-1"></a>    (number(epi_quality.records_kept.<span class="bu">sum</span>()), <span class="st">"Of them, with an autism code"</span>),</span>
+<span id="cb5-35"><a href="#cb5-35" aria-hidden="true" tabindex="-1"></a>    (number(rem_quality.records.<span class="bu">sum</span>()), <span class="st">"Community programme rows · 2017–2024"</span>),</span>
+<span id="cb5-36"><a href="#cb5-36" aria-hidden="true" tabindex="-1"></a>    (number(last_edu.pie_harmonised_n), <span class="ss">f"School support enrolments with autism · </span><span class="sc">{</span><span class="bu">int</span>(last_edu.year)<span class="sc">}</span><span class="ss">"</span>),</span>
+<span id="cb5-37"><a href="#cb5-37" aria-hidden="true" tabindex="-1"></a>    (<span class="bu">str</span>(surveys.survey.nunique()), <span class="st">"Household surveys, the only sampled source"</span>),</span>
+<span id="cb5-38"><a href="#cb5-38" aria-hidden="true" tabindex="-1"></a>    (number(cohort.patients), <span class="st">"Identifiers in the trajectory cohort · 2021–2024"</span>),</span>
+<span id="cb5-39"><a href="#cb5-39" aria-hidden="true" tabindex="-1"></a>])</span>
+<span id="cb5-40"><a href="#cb5-40" aria-hidden="true" tabindex="-1"></a><span class="in">```</span></span>
+<span id="cb5-41"><a href="#cb5-41" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb5-42"><a href="#cb5-42" aria-hidden="true" tabindex="-1"></a>This report describes how autism is recognised in the routine administrative records of Chile's public</span>
+<span id="cb5-43"><a href="#cb5-43" aria-hidden="true" tabindex="-1"></a>health and education systems. It brings together every result the study produced, organised by what the</span>
+<span id="cb5-44"><a href="#cb5-44" aria-hidden="true" tabindex="-1"></a>result is about rather than by when it was computed.</span>
+<span id="cb5-45"><a href="#cb5-45" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb5-46"><a href="#cb5-46" aria-hidden="true" tabindex="-1"></a>**It reads five kinds of source, and they answer different questions.** Two count health events: the</span>
+<span id="cb5-47"><a href="#cb5-47" aria-hidden="true" tabindex="-1"></a>hospital discharge records and the monthly statistical returns of the public network. One counts</span>
+<span id="cb5-48"><a href="#cb5-48" aria-hidden="true" tabindex="-1"></a>education services: the school integration programme, the special schools and the applications</span>
+<span id="cb5-49"><a href="#cb5-49" aria-hidden="true" tabindex="-1"></a>register. One estimates from a sample rather than counting: the household surveys, the only source here</span>
+<span id="cb5-50"><a href="#cb5-50" aria-hidden="true" tabindex="-1"></a>that says anything about a population. And one supplies the layers the others divide by: the population</span>
+<span id="cb5-51"><a href="#cb5-51" aria-hidden="true" tabindex="-1"></a>projections, insurance coverage and primary-care enrolment. A count of records and a survey estimate are</span>
+<span id="cb5-52"><a href="#cb5-52" aria-hidden="true" tabindex="-1"></a>not the same quantity, and the report never plots them as one series.</span>
 <span id="cb5-53"><a href="#cb5-53" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb5-54"><a href="#cb5-54" aria-hidden="true" tabindex="-1"></a>**[Hospital recognition](hospital.qmd).** The hospital discharge records in depth: magnitude and trend,</span>
-<span id="cb5-55"><a href="#cb5-55" aria-hidden="true" tabindex="-1"></a>age-standardised rates, sex and age, F84 subcategories, the diagnostic position of the code, episode</span>
-<span id="cb5-56"><a href="#cb5-56" aria-hidden="true" tabindex="-1"></a>characteristics, co-diagnoses, readmission, territory and spatial autocorrelation, and the</span>
-<span id="cb5-57"><a href="#cb5-57" aria-hidden="true" tabindex="-1"></a>reconstruction of which diagnoses precede the first observed autism record.</span>
-<span id="cb5-58"><a href="#cb5-58" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb5-59"><a href="#cb5-59" aria-hidden="true" tabindex="-1"></a>**[Community care](community.qmd).** The monthly statistical returns of the public network: entries to</span>
-<span id="cb5-60"><a href="#cb5-60" aria-hidden="true" tabindex="-1"></a>and discharges from mental-health programmes with an autism code, their population rates, age, sex,</span>
-<span id="cb5-61"><a href="#cb5-61" aria-hidden="true" tabindex="-1"></a>regions, communes and facilities, screening in well-child check-ups, rehabilitation entries, and the</span>
-<span id="cb5-62"><a href="#cb5-62" aria-hidden="true" tabindex="-1"></a>ecological comparison between the two sources.</span>
-<span id="cb5-63"><a href="#cb5-63" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb5-64"><a href="#cb5-64" aria-hidden="true" tabindex="-1"></a>**[Result tables](tables.qmd)** and **[extended plates](plates.qmd)** hold the complete material,</span>
-<span id="cb5-65"><a href="#cb5-65" aria-hidden="true" tabindex="-1"></a>including the results that the main chapters summarise. **[Reproducibility](reproducibility.qmd)**</span>
-<span id="cb5-66"><a href="#cb5-66" aria-hidden="true" tabindex="-1"></a>explains how to rebuild every number in this report from the repository.</span>
-<span id="cb5-67"><a href="#cb5-67" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb5-68"><a href="#cb5-68" aria-hidden="true" tabindex="-1"></a><span class="fu">## Headline results</span></span>
-<span id="cb5-69"><a href="#cb5-69" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb5-72"><a href="#cb5-72" aria-hidden="true" tabindex="-1"></a><span class="in">```{python}</span></span>
-<span id="cb5-73"><a href="#cb5-73" aria-hidden="true" tabindex="-1"></a><span class="co">#| label: hallazgos-principales</span></span>
-<span id="cb5-74"><a href="#cb5-74" aria-hidden="true" tabindex="-1"></a>rates <span class="op">=</span> read_result(<span class="st">"grd_rates_national.csv"</span>)</span>
-<span id="cb5-75"><a href="#cb5-75" aria-hidden="true" tabindex="-1"></a>trends <span class="op">=</span> read_result(<span class="st">"grd_trends_apc.csv"</span>)</span>
-<span id="cb5-76"><a href="#cb5-76" aria-hidden="true" tabindex="-1"></a>sex_ratio <span class="op">=</span> read_result(<span class="st">"grd_sex_ratio.csv"</span>)</span>
-<span id="cb5-77"><a href="#cb5-77" aria-hidden="true" tabindex="-1"></a>rem_rates <span class="op">=</span> read_result(<span class="st">"rem_rates_national.csv"</span>)</span>
-<span id="cb5-78"><a href="#cb5-78" aria-hidden="true" tabindex="-1"></a>rem_annual <span class="op">=</span> read_result(<span class="st">"rem_annual_by_code.csv"</span>)</span>
-<span id="cb5-79"><a href="#cb5-79" aria-hidden="true" tabindex="-1"></a>moran <span class="op">=</span> read_result(<span class="st">"grd_spatial_moran.csv"</span>)</span>
-<span id="cb5-80"><a href="#cb5-80" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb5-81"><a href="#cb5-81" aria-hidden="true" tabindex="-1"></a>main <span class="op">=</span> rates.loc[(rates.definition <span class="op">==</span> <span class="st">"TEA_operacional"</span>) <span class="op">&amp;</span> (rates.role <span class="op">==</span> <span class="st">"cualquiera"</span>) <span class="op">&amp;</span> (rates.sex <span class="op">==</span> <span class="st">"TOTAL"</span>)]</span>
-<span id="cb5-82"><a href="#cb5-82" aria-hidden="true" tabindex="-1"></a>records <span class="op">=</span> main.loc[main.unit <span class="op">==</span> <span class="st">"records"</span>].set_index(<span class="st">"year"</span>)</span>
-<span id="cb5-83"><a href="#cb5-83" aria-hidden="true" tabindex="-1"></a>persons <span class="op">=</span> main.loc[main.unit <span class="op">==</span> <span class="st">"persons"</span>].set_index(<span class="st">"year"</span>)</span>
-<span id="cb5-84"><a href="#cb5-84" aria-hidden="true" tabindex="-1"></a>last_year <span class="op">=</span> <span class="bu">int</span>(records.index.<span class="bu">max</span>())</span>
-<span id="cb5-85"><a href="#cb5-85" aria-hidden="true" tabindex="-1"></a>apc <span class="op">=</span> trends.query(<span class="st">"definition == 'TEA_operacional' and unit == 'records' and role == 'cualquiera' "</span></span>
-<span id="cb5-86"><a href="#cb5-86" aria-hidden="true" tabindex="-1"></a>                   <span class="st">"and sex == 'TOTAL' and period == '2021-2024'"</span>).iloc[<span class="dv">0</span>]</span>
-<span id="cb5-87"><a href="#cb5-87" aria-hidden="true" tabindex="-1"></a>ratio <span class="op">=</span> sex_ratio.query(<span class="st">"definition == 'TEA_operacional' and unit == 'records' and role == 'cualquiera'"</span>).set_index(<span class="st">"year"</span>)</span>
-<span id="cb5-88"><a href="#cb5-88" aria-hidden="true" tabindex="-1"></a>rem_last <span class="op">=</span> rem_rates.loc[(rem_rates.series <span class="op">==</span> <span class="st">"05990022"</span>) <span class="op">&amp;</span> (rem_rates.sex <span class="op">==</span> <span class="st">"TOTAL"</span>)].set_index(<span class="st">"year"</span>)</span>
-<span id="cb5-89"><a href="#cb5-89" aria-hidden="true" tabindex="-1"></a>rem_ingresos <span class="op">=</span> rem_annual.loc[rem_annual.code <span class="op">==</span> <span class="st">"05990022"</span>].set_index(<span class="st">"year"</span>).Col01</span>
-<span id="cb5-90"><a href="#cb5-90" aria-hidden="true" tabindex="-1"></a>moran_main <span class="op">=</span> moran.query(<span class="st">"unit == 'records' and variable == 'sir_eb'"</span>).iloc[<span class="dv">0</span>]</span>
-<span id="cb5-91"><a href="#cb5-91" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb5-92"><a href="#cb5-92" aria-hidden="true" tabindex="-1"></a>kpis([</span>
-<span id="cb5-93"><a href="#cb5-93" aria-hidden="true" tabindex="-1"></a>    (number(records.loc[last_year, <span class="st">"asr"</span>], <span class="dv">1</span>), <span class="ss">f"Hospitalisations with an autism code per 100 000 person-years, age-standardised · </span><span class="sc">{</span>last_year<span class="sc">}</span><span class="ss"> (was </span><span class="sc">{</span>number(records.asr.iloc[<span class="dv">0</span>], <span class="dv">1</span>)<span class="sc">}</span><span class="ss"> in </span><span class="sc">{</span><span class="bu">int</span>(records.index.<span class="bu">min</span>())<span class="sc">}</span><span class="ss">)"</span>),</span>
-<span id="cb5-94"><a href="#cb5-94" aria-hidden="true" tabindex="-1"></a>    (number(persons.loc[last_year, <span class="st">"asr"</span>], <span class="dv">1</span>), <span class="ss">f"Hospitalised persons with an autism code per 100 000 population · </span><span class="sc">{</span>last_year<span class="sc">}</span><span class="ss">"</span>),</span>
-<span id="cb5-95"><a href="#cb5-95" aria-hidden="true" tabindex="-1"></a>    (number(apc.apc, <span class="dv">1</span>) <span class="op">+</span> <span class="st">"%"</span>, <span class="ss">f"Average annual percent change · 2021–2024 (95% CI: </span><span class="sc">{</span>ci(apc.apc_lo, apc.apc_hi)<span class="sc">}</span><span class="ss">)"</span>),</span>
-<span id="cb5-96"><a href="#cb5-96" aria-hidden="true" tabindex="-1"></a>    (number(ratio.loc[last_year, <span class="st">"asr_ratio"</span>], <span class="dv">2</span>), <span class="ss">f"Male:female rate ratio · </span><span class="sc">{</span>last_year<span class="sc">}</span><span class="ss"> (was </span><span class="sc">{</span>number(ratio.asr_ratio.iloc[<span class="dv">0</span>], <span class="dv">2</span>)<span class="sc">}</span><span class="ss"> in </span><span class="sc">{</span><span class="bu">int</span>(ratio.index.<span class="bu">min</span>())<span class="sc">}</span><span class="ss">)"</span>),</span>
-<span id="cb5-97"><a href="#cb5-97" aria-hidden="true" tabindex="-1"></a>    (number(rem_last.loc[last_year, <span class="st">"asr"</span>], <span class="dv">1</span>), <span class="ss">f"Programme entries with an autism code per 100 000 population, age-standardised · </span><span class="sc">{</span>last_year<span class="sc">}</span><span class="ss"> (</span><span class="sc">{</span>number(rem_ingresos.loc[last_year])<span class="sc">}</span><span class="ss"> entries)"</span>),</span>
-<span id="cb5-98"><a href="#cb5-98" aria-hidden="true" tabindex="-1"></a>    (number(moran_main.moran_i, <span class="dv">2</span>), <span class="st">"Moran's I of the smoothed commune hospitalisation ratio (permutation p "</span> <span class="op">+</span> number(moran_main.p_sim, <span class="dv">3</span>) <span class="op">+</span> <span class="st">")"</span>),</span>
-<span id="cb5-99"><a href="#cb5-99" aria-hidden="true" tabindex="-1"></a>    (number(share(cohort.prior_hospitalization, cohort.patients), <span class="dv">1</span>) <span class="op">+</span> <span class="st">"%"</span>, <span class="st">"2021–2024 cohort with observable prior hospitalisations"</span>),</span>
-<span id="cb5-100"><a href="#cb5-100" aria-hidden="true" tabindex="-1"></a>])</span>
-<span id="cb5-101"><a href="#cb5-101" aria-hidden="true" tabindex="-1"></a><span class="in">```</span></span>
-<span id="cb5-102"><a href="#cb5-102" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb5-103"><a href="#cb5-103" aria-hidden="true" tabindex="-1"></a>Hospitalisations and community programme entries with an autism code have grown rapidly since 2021,</span>
-<span id="cb5-104"><a href="#cb5-104" aria-hidden="true" tabindex="-1"></a>more in females than in males, with the greatest intensity between 5 and 14 years of age and with</span>
-<span id="cb5-105"><a href="#cb5-105" aria-hidden="true" tabindex="-1"></a>strong territorial heterogeneity. In the 2021–2024 hospital trajectories, the first autism record almost</span>
-<span id="cb5-106"><a href="#cb5-106" aria-hidden="true" tabindex="-1"></a>always occurs with the code in a secondary position, and only a minority has observable prior</span>
-<span id="cb5-107"><a href="#cb5-107" aria-hidden="true" tabindex="-1"></a>hospitalisations. Those earlier codes do not show that they were ruled out as differential diagnoses:</span>
-<span id="cb5-108"><a href="#cb5-108" aria-hidden="true" tabindex="-1"></a>they may be comorbidities, symptoms or independent reasons for admission.</span>
-<span id="cb5-109"><a href="#cb5-109" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb5-112"><a href="#cb5-112" aria-hidden="true" tabindex="-1"></a><span class="in">```{python}</span></span>
-<span id="cb5-113"><a href="#cb5-113" aria-hidden="true" tabindex="-1"></a><span class="co">#| label: cifras-cabecera</span></span>
-<span id="cb5-114"><a href="#cb5-114" aria-hidden="true" tabindex="-1"></a>facts <span class="op">=</span> json.loads((ROOT <span class="op">/</span> <span class="st">"docs"</span> <span class="op">/</span> <span class="st">"study"</span> <span class="op">/</span> <span class="st">"data"</span> <span class="op">/</span> <span class="st">"facts_v10.json"</span>).read_text(encoding<span class="op">=</span><span class="st">"utf-8"</span>))[<span class="st">"facts"</span>]</span>
-<span id="cb5-115"><a href="#cb5-115" aria-hidden="true" tabindex="-1"></a>headline <span class="op">=</span> pd.DataFrame([</span>
-<span id="cb5-116"><a href="#cb5-116" aria-hidden="true" tabindex="-1"></a>    (<span class="st">"Eligible hospital episodes (F84 family without F84.2, any position)"</span>, <span class="dv">2019</span>, number(facts[<span class="st">"grd19n"</span>]), <span class="dv">2024</span>, number(facts[<span class="st">"grd24n"</span>])),</span>
-<span id="cb5-117"><a href="#cb5-117" aria-hidden="true" tabindex="-1"></a>    (<span class="st">"Eligible episodes per 100 000 hospital episodes of the same panel"</span>, <span class="dv">2019</span>, number(facts[<span class="st">"grd19r"</span>], <span class="dv">1</span>), <span class="dv">2024</span>, number(facts[<span class="st">"grd24r"</span>], <span class="dv">1</span>)),</span>
-<span id="cb5-118"><a href="#cb5-118" aria-hidden="true" tabindex="-1"></a>    (<span class="st">"Male:female ratio of eligible hospital episodes"</span>, <span class="dv">2019</span>, number(facts[<span class="st">"grdmf19"</span>], <span class="dv">2</span>), <span class="dv">2024</span>, number(facts[<span class="st">"grdmf24"</span>], <span class="dv">2</span>)),</span>
-<span id="cb5-119"><a href="#cb5-119" aria-hidden="true" tabindex="-1"></a>    (<span class="st">"Community programme entries, strict autism code"</span>, <span class="dv">2021</span>, number(facts[<span class="st">"a0521n"</span>]), <span class="dv">2025</span>, number(facts[<span class="st">"a0525n"</span>])),</span>
-<span id="cb5-120"><a href="#cb5-120" aria-hidden="true" tabindex="-1"></a>    (<span class="st">"December follow-up stock, ages 0–19"</span>, <span class="dv">2021</span>, number(facts[<span class="st">"p221"</span>]), <span class="dv">2025</span>, number(facts[<span class="st">"p225"</span>])),</span>
-<span id="cb5-121"><a href="#cb5-121" aria-hidden="true" tabindex="-1"></a>    (<span class="st">"School integration programme enrolments with autism"</span>, <span class="dv">2019</span>, number(facts[<span class="st">"pie19"</span>]), <span class="dv">2025</span>, number(facts[<span class="st">"pie25"</span>])),</span>
-<span id="cb5-122"><a href="#cb5-122" aria-hidden="true" tabindex="-1"></a>    (<span class="st">"Eligible episodes with the code only in a secondary position, 2024 (%)"</span>, np.nan, <span class="st">"—"</span>, <span class="dv">2024</span>, number(facts[<span class="st">"secondary24pct"</span>], <span class="dv">1</span>)),</span>
-<span id="cb5-123"><a href="#cb5-123" aria-hidden="true" tabindex="-1"></a>    (<span class="st">"Average annual percent change of the hospital indicator, 2019–2024 (%)"</span>, np.nan, <span class="st">"—"</span>, <span class="dv">2024</span>, number(facts[<span class="st">"apcmain"</span>], <span class="dv">1</span>)),</span>
-<span id="cb5-124"><a href="#cb5-124" aria-hidden="true" tabindex="-1"></a>], columns<span class="op">=</span>[<span class="st">"Indicator"</span>, <span class="st">"Start year"</span>, <span class="st">"Start value"</span>, <span class="st">"End year"</span>, <span class="st">"End value"</span>])</span>
-<span id="cb5-125"><a href="#cb5-125" aria-hidden="true" tabindex="-1"></a>show_table(headline, <span class="st">"Headline figures of the study, read from the verified facts file"</span>)</span>
-<span id="cb5-126"><a href="#cb5-126" aria-hidden="true" tabindex="-1"></a><span class="in">```</span></span>
-<span id="cb5-127"><a href="#cb5-127" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb5-128"><a href="#cb5-128" aria-hidden="true" tabindex="-1"></a><span class="fu">## How this report was built</span></span>
+<span id="cb5-54"><a href="#cb5-54" aria-hidden="true" tabindex="-1"></a>**Nothing here is prevalence or incidence.** Every number is a count of hospital episodes, community</span>
+<span id="cb5-55"><a href="#cb5-55" aria-hidden="true" tabindex="-1"></a>programme entries, follow-up stocks or school enrolments, presented with its unit, its denominator and</span>
+<span id="cb5-56"><a href="#cb5-56" aria-hidden="true" tabindex="-1"></a>its coverage. The rise these records show is consistent with greater detection, greater demand and</span>
+<span id="cb5-57"><a href="#cb5-57" aria-hidden="true" tabindex="-1"></a>changes in coding during the period of Law 21.545; it does not demonstrate a change in how often autism</span>
+<span id="cb5-58"><a href="#cb5-58" aria-hidden="true" tabindex="-1"></a>occurs.</span>
+<span id="cb5-59"><a href="#cb5-59" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb5-60"><a href="#cb5-60" aria-hidden="true" tabindex="-1"></a><span class="fu">## What the report contains</span></span>
+<span id="cb5-61"><a href="#cb5-61" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb5-62"><a href="#cb5-62" aria-hidden="true" tabindex="-1"></a>**[Methods](methods.qmd).** Sources, case definitions, units, denominators, standardisation, intervals,</span>
+<span id="cb5-63"><a href="#cb5-63" aria-hidden="true" tabindex="-1"></a>trends, spatial analysis, the rules for reading the monthly returns, quality controls, biases and</span>
+<span id="cb5-64"><a href="#cb5-64" aria-hidden="true" tabindex="-1"></a>limitations. It is the common reference for everything that follows.</span>
+<span id="cb5-65"><a href="#cb5-65" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb5-66"><a href="#cb5-66" aria-hidden="true" tabindex="-1"></a>**[Results](results.qmd).** The principal findings: four panel figures and the nine supplementary</span>
+<span id="cb5-67"><a href="#cb5-67" aria-hidden="true" tabindex="-1"></a>figures that support them, each drawn at render time by the code printed with it.</span>
+<span id="cb5-68"><a href="#cb5-68" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb5-69"><a href="#cb5-69" aria-hidden="true" tabindex="-1"></a>**[Hospital recognition](hospital.qmd).** The hospital discharge records in depth: magnitude and trend,</span>
+<span id="cb5-70"><a href="#cb5-70" aria-hidden="true" tabindex="-1"></a>age-standardised rates, sex and age, F84 subcategories, the diagnostic position of the code, episode</span>
+<span id="cb5-71"><a href="#cb5-71" aria-hidden="true" tabindex="-1"></a>characteristics, co-diagnoses, readmission, territory and spatial autocorrelation, and the</span>
+<span id="cb5-72"><a href="#cb5-72" aria-hidden="true" tabindex="-1"></a>reconstruction of which diagnoses precede the first observed autism record.</span>
+<span id="cb5-73"><a href="#cb5-73" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb5-74"><a href="#cb5-74" aria-hidden="true" tabindex="-1"></a>**[Community care](community.qmd).** The monthly statistical returns of the public network: entries to</span>
+<span id="cb5-75"><a href="#cb5-75" aria-hidden="true" tabindex="-1"></a>and discharges from mental-health programmes with an autism code, their population rates, age, sex,</span>
+<span id="cb5-76"><a href="#cb5-76" aria-hidden="true" tabindex="-1"></a>regions, communes and facilities, screening in well-child check-ups, rehabilitation entries, and the</span>
+<span id="cb5-77"><a href="#cb5-77" aria-hidden="true" tabindex="-1"></a>ecological comparison between the two health sources.</span>
+<span id="cb5-78"><a href="#cb5-78" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb5-79"><a href="#cb5-79" aria-hidden="true" tabindex="-1"></a>**[Education records](education.qmd).** The school integration programme, the special schools and the</span>
+<span id="cb5-80"><a href="#cb5-80" aria-hidden="true" tabindex="-1"></a>applications register: what each one counts, how the strict and harmonised definitions differ, and what</span>
+<span id="cb5-81"><a href="#cb5-81" aria-hidden="true" tabindex="-1"></a>the change of source does to comparability across years.</span>
+<span id="cb5-82"><a href="#cb5-82" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb5-83"><a href="#cb5-83" aria-hidden="true" tabindex="-1"></a>**[Population surveys](surveys.qmd).** The two household surveys, the only source here that estimates</span>
+<span id="cb5-84"><a href="#cb5-84" aria-hidden="true" tabindex="-1"></a>rather than counts: their domains as the instruments define them, their design-weighted estimates and</span>
+<span id="cb5-85"><a href="#cb5-85" aria-hidden="true" tabindex="-1"></a>the precision of each.</span>
+<span id="cb5-86"><a href="#cb5-86" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb5-87"><a href="#cb5-87" aria-hidden="true" tabindex="-1"></a>**[Denominators and coverage](denominators.qmd).** The layers every rate divides by — population</span>
+<span id="cb5-88"><a href="#cb5-88" aria-hidden="true" tabindex="-1"></a>projections, insurance coverage, primary-care enrolment — and an independent national discharge</span>
+<span id="cb5-89"><a href="#cb5-89" aria-hidden="true" tabindex="-1"></a>register that counts the same hospital events by principal diagnosis, as a check on the hospital chapter.</span>
+<span id="cb5-90"><a href="#cb5-90" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb5-91"><a href="#cb5-91" aria-hidden="true" tabindex="-1"></a>**[Result tables](tables.qmd)**, the **extended plates** and **[extended tables](extended_tables.qmd)**</span>
+<span id="cb5-92"><a href="#cb5-92" aria-hidden="true" tabindex="-1"></a>hold the complete material, including the results the main chapters summarise.</span>
+<span id="cb5-93"><a href="#cb5-93" aria-hidden="true" tabindex="-1"></a>**[Reproducibility](reproducibility.qmd)** explains how to rebuild every number in this report.</span>
+<span id="cb5-94"><a href="#cb5-94" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb5-95"><a href="#cb5-95" aria-hidden="true" tabindex="-1"></a><span class="fu">## Headline results</span></span>
+<span id="cb5-96"><a href="#cb5-96" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb5-99"><a href="#cb5-99" aria-hidden="true" tabindex="-1"></a><span class="in">```{python}</span></span>
+<span id="cb5-100"><a href="#cb5-100" aria-hidden="true" tabindex="-1"></a><span class="co">#| label: hallazgos-principales</span></span>
+<span id="cb5-101"><a href="#cb5-101" aria-hidden="true" tabindex="-1"></a>rates <span class="op">=</span> read_result(<span class="st">"grd_rates_national.csv"</span>)</span>
+<span id="cb5-102"><a href="#cb5-102" aria-hidden="true" tabindex="-1"></a>trends <span class="op">=</span> read_result(<span class="st">"grd_trends_apc.csv"</span>)</span>
+<span id="cb5-103"><a href="#cb5-103" aria-hidden="true" tabindex="-1"></a>sex_ratio <span class="op">=</span> read_result(<span class="st">"grd_sex_ratio.csv"</span>)</span>
+<span id="cb5-104"><a href="#cb5-104" aria-hidden="true" tabindex="-1"></a>rem_rates <span class="op">=</span> read_result(<span class="st">"rem_rates_national.csv"</span>)</span>
+<span id="cb5-105"><a href="#cb5-105" aria-hidden="true" tabindex="-1"></a>rem_annual <span class="op">=</span> read_result(<span class="st">"rem_annual_by_code.csv"</span>)</span>
+<span id="cb5-106"><a href="#cb5-106" aria-hidden="true" tabindex="-1"></a>moran <span class="op">=</span> read_result(<span class="st">"grd_spatial_moran.csv"</span>)</span>
+<span id="cb5-107"><a href="#cb5-107" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb5-108"><a href="#cb5-108" aria-hidden="true" tabindex="-1"></a>main <span class="op">=</span> rates.loc[(rates.definition <span class="op">==</span> <span class="st">"TEA_operacional"</span>) <span class="op">&amp;</span> (rates.role <span class="op">==</span> <span class="st">"cualquiera"</span>) <span class="op">&amp;</span> (rates.sex <span class="op">==</span> <span class="st">"TOTAL"</span>)]</span>
+<span id="cb5-109"><a href="#cb5-109" aria-hidden="true" tabindex="-1"></a>records <span class="op">=</span> main.loc[main.unit <span class="op">==</span> <span class="st">"records"</span>].set_index(<span class="st">"year"</span>)</span>
+<span id="cb5-110"><a href="#cb5-110" aria-hidden="true" tabindex="-1"></a>persons <span class="op">=</span> main.loc[main.unit <span class="op">==</span> <span class="st">"persons"</span>].set_index(<span class="st">"year"</span>)</span>
+<span id="cb5-111"><a href="#cb5-111" aria-hidden="true" tabindex="-1"></a>last_year <span class="op">=</span> <span class="bu">int</span>(records.index.<span class="bu">max</span>())</span>
+<span id="cb5-112"><a href="#cb5-112" aria-hidden="true" tabindex="-1"></a>apc <span class="op">=</span> trends.query(<span class="st">"definition == 'TEA_operacional' and unit == 'records' and role == 'cualquiera' "</span></span>
+<span id="cb5-113"><a href="#cb5-113" aria-hidden="true" tabindex="-1"></a>                   <span class="st">"and sex == 'TOTAL' and period == '2021-2024'"</span>).iloc[<span class="dv">0</span>]</span>
+<span id="cb5-114"><a href="#cb5-114" aria-hidden="true" tabindex="-1"></a>ratio <span class="op">=</span> sex_ratio.query(<span class="st">"definition == 'TEA_operacional' and unit == 'records' and role == 'cualquiera'"</span>).set_index(<span class="st">"year"</span>)</span>
+<span id="cb5-115"><a href="#cb5-115" aria-hidden="true" tabindex="-1"></a>rem_last <span class="op">=</span> rem_rates.loc[(rem_rates.series <span class="op">==</span> <span class="st">"05990022"</span>) <span class="op">&amp;</span> (rem_rates.sex <span class="op">==</span> <span class="st">"TOTAL"</span>)].set_index(<span class="st">"year"</span>)</span>
+<span id="cb5-116"><a href="#cb5-116" aria-hidden="true" tabindex="-1"></a>rem_ingresos <span class="op">=</span> rem_annual.loc[rem_annual.code <span class="op">==</span> <span class="st">"05990022"</span>].set_index(<span class="st">"year"</span>).Col01</span>
+<span id="cb5-117"><a href="#cb5-117" aria-hidden="true" tabindex="-1"></a>moran_main <span class="op">=</span> moran.query(<span class="st">"unit == 'records' and variable == 'sir_eb'"</span>).iloc[<span class="dv">0</span>]</span>
+<span id="cb5-118"><a href="#cb5-118" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb5-119"><a href="#cb5-119" aria-hidden="true" tabindex="-1"></a>kpis([</span>
+<span id="cb5-120"><a href="#cb5-120" aria-hidden="true" tabindex="-1"></a>    (number(records.loc[last_year, <span class="st">"asr"</span>], <span class="dv">1</span>), <span class="ss">f"Hospitalisations with an autism code per 100 000 person-years, age-standardised · </span><span class="sc">{</span>last_year<span class="sc">}</span><span class="ss"> (was </span><span class="sc">{</span>number(records.asr.iloc[<span class="dv">0</span>], <span class="dv">1</span>)<span class="sc">}</span><span class="ss"> in </span><span class="sc">{</span><span class="bu">int</span>(records.index.<span class="bu">min</span>())<span class="sc">}</span><span class="ss">)"</span>),</span>
+<span id="cb5-121"><a href="#cb5-121" aria-hidden="true" tabindex="-1"></a>    (number(persons.loc[last_year, <span class="st">"asr"</span>], <span class="dv">1</span>), <span class="ss">f"Hospitalised persons with an autism code per 100 000 population · </span><span class="sc">{</span>last_year<span class="sc">}</span><span class="ss">"</span>),</span>
+<span id="cb5-122"><a href="#cb5-122" aria-hidden="true" tabindex="-1"></a>    (number(apc.apc, <span class="dv">1</span>) <span class="op">+</span> <span class="st">"%"</span>, <span class="ss">f"Average annual percent change · 2021–2024 (95% CI: </span><span class="sc">{</span>ci(apc.apc_lo, apc.apc_hi)<span class="sc">}</span><span class="ss">)"</span>),</span>
+<span id="cb5-123"><a href="#cb5-123" aria-hidden="true" tabindex="-1"></a>    (number(ratio.loc[last_year, <span class="st">"asr_ratio"</span>], <span class="dv">2</span>), <span class="ss">f"Male:female rate ratio · </span><span class="sc">{</span>last_year<span class="sc">}</span><span class="ss"> (was </span><span class="sc">{</span>number(ratio.asr_ratio.iloc[<span class="dv">0</span>], <span class="dv">2</span>)<span class="sc">}</span><span class="ss"> in </span><span class="sc">{</span><span class="bu">int</span>(ratio.index.<span class="bu">min</span>())<span class="sc">}</span><span class="ss">)"</span>),</span>
+<span id="cb5-124"><a href="#cb5-124" aria-hidden="true" tabindex="-1"></a>    (number(rem_last.loc[last_year, <span class="st">"asr"</span>], <span class="dv">1</span>), <span class="ss">f"Programme entries with an autism code per 100 000 population, age-standardised · </span><span class="sc">{</span>last_year<span class="sc">}</span><span class="ss"> (</span><span class="sc">{</span>number(rem_ingresos.loc[last_year])<span class="sc">}</span><span class="ss"> entries)"</span>),</span>
+<span id="cb5-125"><a href="#cb5-125" aria-hidden="true" tabindex="-1"></a>    (number(moran_main.moran_i, <span class="dv">2</span>), <span class="st">"Moran's I of the smoothed commune hospitalisation ratio (permutation p "</span> <span class="op">+</span> number(moran_main.p_sim, <span class="dv">3</span>) <span class="op">+</span> <span class="st">")"</span>),</span>
+<span id="cb5-126"><a href="#cb5-126" aria-hidden="true" tabindex="-1"></a>    (number(share(cohort.prior_hospitalization, cohort.patients), <span class="dv">1</span>) <span class="op">+</span> <span class="st">"%"</span>, <span class="st">"2021–2024 cohort with observable prior hospitalisations"</span>),</span>
+<span id="cb5-127"><a href="#cb5-127" aria-hidden="true" tabindex="-1"></a>])</span>
+<span id="cb5-128"><a href="#cb5-128" aria-hidden="true" tabindex="-1"></a><span class="in">```</span></span>
 <span id="cb5-129"><a href="#cb5-129" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb5-130"><a href="#cb5-130" aria-hidden="true" tabindex="-1"></a>Every table and figure is recalculated when the report is rendered; none is pasted in. The chapters read</span>
-<span id="cb5-131"><a href="#cb5-131" aria-hidden="true" tabindex="-1"></a>the aggregated tables in <span class="in">`output_files/consolidacion/`</span> and <span class="in">`docs/study/data/`</span>, both versioned in git, so</span>
-<span id="cb5-132"><a href="#cb5-132" aria-hidden="true" tabindex="-1"></a>the whole report can be rebuilt from a clone without the source microdata. The extraction from the</span>
-<span id="cb5-133"><a href="#cb5-133" aria-hidden="true" tabindex="-1"></a>original microdata runs separately, through the scripts documented in</span>
-<span id="cb5-134"><a href="#cb5-134" aria-hidden="true" tabindex="-1"></a><span class="co">[</span><span class="ot">Reproducibility</span><span class="co">](reproducibility.qmd)</span>.</span>
-<span id="cb5-135"><a href="#cb5-135" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb5-136"><a href="#cb5-136" aria-hidden="true" tabindex="-1"></a>The study itself was written over several rounds of revision, which added results without ever changing</span>
-<span id="cb5-137"><a href="#cb5-137" aria-hidden="true" tabindex="-1"></a>one that had already been computed — a claim checked rather than asserted, by hashing every result table</span>
-<span id="cb5-138"><a href="#cb5-138" aria-hidden="true" tabindex="-1"></a>of every round and comparing them pairwise. This report presents the union of all of them as a single</span>
-<span id="cb5-139"><a href="#cb5-139" aria-hidden="true" tabindex="-1"></a>body of work. Where a result comes from a different observation window or an earlier case definition,</span>
-<span id="cb5-140"><a href="#cb5-140" aria-hidden="true" tabindex="-1"></a>the table says so on the spot.</span>
-<span id="cb5-141"><a href="#cb5-141" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb5-144"><a href="#cb5-144" aria-hidden="true" tabindex="-1"></a><span class="in">```{python}</span></span>
-<span id="cb5-145"><a href="#cb5-145" aria-hidden="true" tabindex="-1"></a><span class="co">#| label: tabla-organizacion</span></span>
-<span id="cb5-146"><a href="#cb5-146" aria-hidden="true" tabindex="-1"></a>organisation <span class="op">=</span> pd.DataFrame([</span>
-<span id="cb5-147"><a href="#cb5-147" aria-hidden="true" tabindex="-1"></a>    (<span class="st">"Hospital · universe"</span>, <span class="st">"Records read, F84 records kept, duplicates, exclusions and coding depth"</span>, <span class="st">"grd_epi_quality, grd_annual_positions"</span>),</span>
-<span id="cb5-148"><a href="#cb5-148" aria-hidden="true" tabindex="-1"></a>    (<span class="st">"Hospital · time"</span>, <span class="st">"Annual trend, crude and standardised rates, average annual percent change, seasonality"</span>, <span class="st">"grd_rates_national, grd_trends_apc, grd_epi_monthly"</span>),</span>
-<span id="cb5-149"><a href="#cb5-149" aria-hidden="true" tabindex="-1"></a>    (<span class="st">"Hospital · person"</span>, <span class="st">"Sex ratio, single year of age, age-specific rates"</span>, <span class="st">"grd_sex_ratio, grd_epi_age_single, grd_rates_age_specific"</span>),</span>
-<span id="cb5-150"><a href="#cb5-150" aria-hidden="true" tabindex="-1"></a>    (<span class="st">"Hospital · code"</span>, <span class="st">"F84 subcategories and diagnostic position"</span>, <span class="st">"grd_rates_subcodes, grd_epi_subcodes"</span>),</span>
-<span id="cb5-151"><a href="#cb5-151" aria-hidden="true" tabindex="-1"></a>    (<span class="st">"Hospital · episode"</span>, <span class="st">"Admission, activity, specialty, insurance, discharge, length of stay, severity, hospitals"</span>, <span class="st">"grd_epi_features, grd_epi_los_*, grd_epi_grd_weight"</span>),</span>
-<span id="cb5-152"><a href="#cb5-152" aria-hidden="true" tabindex="-1"></a>    (<span class="st">"Hospital · burden"</span>, <span class="st">"Readmission, multiplicity, co-diagnoses and principal diagnosis"</span>, <span class="st">"grd_epi_readmissions, grd_epi_multiplicity, grd_epi_codiagnoses"</span>),</span>
-<span id="cb5-153"><a href="#cb5-153" aria-hidden="true" tabindex="-1"></a>    (<span class="st">"Hospital · place"</span>, <span class="st">"Regions, communes, indirect standardisation, Moran and LISA"</span>, <span class="st">"grd_rates_regional, grd_rates_comunal, grd_spatial_*"</span>),</span>
-<span id="cb5-154"><a href="#cb5-154" aria-hidden="true" tabindex="-1"></a>    (<span class="st">"Hospital · trajectories"</span>, <span class="st">"Identifier continuity, first record, prior diagnoses, sequences, transitions"</span>, <span class="st">"grd_cohort_*, grd_first_*, grd_previous_*, grd_sequences"</span>),</span>
-<span id="cb5-155"><a href="#cb5-155" aria-hidden="true" tabindex="-1"></a>    (<span class="st">"Community"</span>, <span class="st">"Entries, rates, age and sex, subcategories, regions, communes, facility panel, screening, rehabilitation"</span>, <span class="st">"rem_*"</span>),</span>
-<span id="cb5-156"><a href="#cb5-156" aria-hidden="true" tabindex="-1"></a>    (<span class="st">"Results"</span>, <span class="st">"Panel figures and supplementary figures, drawn from the published tables"</span>, <span class="st">"docs/study/data/*.csv"</span>),</span>
-<span id="cb5-157"><a href="#cb5-157" aria-hidden="true" tabindex="-1"></a>], columns<span class="op">=</span>[<span class="st">"Section"</span>, <span class="st">"Content"</span>, <span class="st">"Inputs"</span>])</span>
-<span id="cb5-158"><a href="#cb5-158" aria-hidden="true" tabindex="-1"></a>show_table(organisation, <span class="st">"The report's sections and the tables that feed them"</span>)</span>
-<span id="cb5-159"><a href="#cb5-159" aria-hidden="true" tabindex="-1"></a><span class="in">```</span></span>
+<span id="cb5-130"><a href="#cb5-130" aria-hidden="true" tabindex="-1"></a>Hospitalisations and community programme entries with an autism code have grown rapidly since 2021,</span>
+<span id="cb5-131"><a href="#cb5-131" aria-hidden="true" tabindex="-1"></a>more in females than in males, with the greatest intensity between 5 and 14 years of age and with</span>
+<span id="cb5-132"><a href="#cb5-132" aria-hidden="true" tabindex="-1"></a>strong territorial heterogeneity. In the 2021–2024 hospital trajectories, the first autism record almost</span>
+<span id="cb5-133"><a href="#cb5-133" aria-hidden="true" tabindex="-1"></a>always occurs with the code in a secondary position, and only a minority has observable prior</span>
+<span id="cb5-134"><a href="#cb5-134" aria-hidden="true" tabindex="-1"></a>hospitalisations. Those earlier codes do not show that they were ruled out as differential diagnoses:</span>
+<span id="cb5-135"><a href="#cb5-135" aria-hidden="true" tabindex="-1"></a>they may be comorbidities, symptoms or independent reasons for admission.</span>
+<span id="cb5-136"><a href="#cb5-136" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb5-139"><a href="#cb5-139" aria-hidden="true" tabindex="-1"></a><span class="in">```{python}</span></span>
+<span id="cb5-140"><a href="#cb5-140" aria-hidden="true" tabindex="-1"></a><span class="co">#| label: cifras-cabecera</span></span>
+<span id="cb5-141"><a href="#cb5-141" aria-hidden="true" tabindex="-1"></a>facts <span class="op">=</span> json.loads((ROOT <span class="op">/</span> <span class="st">"docs"</span> <span class="op">/</span> <span class="st">"study"</span> <span class="op">/</span> <span class="st">"data"</span> <span class="op">/</span> <span class="st">"facts_v10.json"</span>).read_text(encoding<span class="op">=</span><span class="st">"utf-8"</span>))[<span class="st">"facts"</span>]</span>
+<span id="cb5-142"><a href="#cb5-142" aria-hidden="true" tabindex="-1"></a>headline <span class="op">=</span> pd.DataFrame([</span>
+<span id="cb5-143"><a href="#cb5-143" aria-hidden="true" tabindex="-1"></a>    (<span class="st">"Eligible hospital episodes (F84 family without F84.2, any position)"</span>, <span class="dv">2019</span>, number(facts[<span class="st">"grd19n"</span>]), <span class="dv">2024</span>, number(facts[<span class="st">"grd24n"</span>])),</span>
+<span id="cb5-144"><a href="#cb5-144" aria-hidden="true" tabindex="-1"></a>    (<span class="st">"Eligible episodes per 100 000 hospital episodes of the same panel"</span>, <span class="dv">2019</span>, number(facts[<span class="st">"grd19r"</span>], <span class="dv">1</span>), <span class="dv">2024</span>, number(facts[<span class="st">"grd24r"</span>], <span class="dv">1</span>)),</span>
+<span id="cb5-145"><a href="#cb5-145" aria-hidden="true" tabindex="-1"></a>    (<span class="st">"Male:female ratio of eligible hospital episodes"</span>, <span class="dv">2019</span>, number(facts[<span class="st">"grdmf19"</span>], <span class="dv">2</span>), <span class="dv">2024</span>, number(facts[<span class="st">"grdmf24"</span>], <span class="dv">2</span>)),</span>
+<span id="cb5-146"><a href="#cb5-146" aria-hidden="true" tabindex="-1"></a>    (<span class="st">"Community programme entries, strict autism code"</span>, <span class="dv">2021</span>, number(facts[<span class="st">"a0521n"</span>]), <span class="dv">2025</span>, number(facts[<span class="st">"a0525n"</span>])),</span>
+<span id="cb5-147"><a href="#cb5-147" aria-hidden="true" tabindex="-1"></a>    (<span class="st">"December follow-up stock, ages 0–19"</span>, <span class="dv">2021</span>, number(facts[<span class="st">"p221"</span>]), <span class="dv">2025</span>, number(facts[<span class="st">"p225"</span>])),</span>
+<span id="cb5-148"><a href="#cb5-148" aria-hidden="true" tabindex="-1"></a>    (<span class="st">"School integration programme enrolments with autism"</span>, <span class="dv">2019</span>, number(facts[<span class="st">"pie19"</span>]), <span class="dv">2025</span>, number(facts[<span class="st">"pie25"</span>])),</span>
+<span id="cb5-149"><a href="#cb5-149" aria-hidden="true" tabindex="-1"></a>    (<span class="st">"Eligible episodes with the code only in a secondary position, 2024 (%)"</span>, np.nan, <span class="st">"—"</span>, <span class="dv">2024</span>, number(facts[<span class="st">"secondary24pct"</span>], <span class="dv">1</span>)),</span>
+<span id="cb5-150"><a href="#cb5-150" aria-hidden="true" tabindex="-1"></a>    (<span class="st">"Average annual percent change of the hospital indicator, 2019–2024 (%)"</span>, np.nan, <span class="st">"—"</span>, <span class="dv">2024</span>, number(facts[<span class="st">"apcmain"</span>], <span class="dv">1</span>)),</span>
+<span id="cb5-151"><a href="#cb5-151" aria-hidden="true" tabindex="-1"></a>], columns<span class="op">=</span>[<span class="st">"Indicator"</span>, <span class="st">"Start year"</span>, <span class="st">"Start value"</span>, <span class="st">"End year"</span>, <span class="st">"End value"</span>])</span>
+<span id="cb5-152"><a href="#cb5-152" aria-hidden="true" tabindex="-1"></a>show_table(headline, <span class="st">"Headline figures of the study, read from the verified facts file"</span>)</span>
+<span id="cb5-153"><a href="#cb5-153" aria-hidden="true" tabindex="-1"></a><span class="in">```</span></span>
+<span id="cb5-154"><a href="#cb5-154" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb5-155"><a href="#cb5-155" aria-hidden="true" tabindex="-1"></a><span class="fu">## How this report was built</span></span>
+<span id="cb5-156"><a href="#cb5-156" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb5-157"><a href="#cb5-157" aria-hidden="true" tabindex="-1"></a>Every table and figure is recalculated when the report is rendered; none is pasted in. The chapters read</span>
+<span id="cb5-158"><a href="#cb5-158" aria-hidden="true" tabindex="-1"></a>the aggregated tables in <span class="in">`output_files/consolidacion/`</span> and <span class="in">`docs/study/data/`</span>, both versioned in git, so</span>
+<span id="cb5-159"><a href="#cb5-159" aria-hidden="true" tabindex="-1"></a>the whole report can be rebuilt from a clone without the source microdata. The extraction from the</span>
+<span id="cb5-160"><a href="#cb5-160" aria-hidden="true" tabindex="-1"></a>original microdata runs separately, through the scripts documented in</span>
+<span id="cb5-161"><a href="#cb5-161" aria-hidden="true" tabindex="-1"></a><span class="co">[</span><span class="ot">Reproducibility</span><span class="co">](reproducibility.qmd)</span>.</span>
+<span id="cb5-162"><a href="#cb5-162" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb5-163"><a href="#cb5-163" aria-hidden="true" tabindex="-1"></a>The study itself was written over several rounds of revision, which added results without ever changing</span>
+<span id="cb5-164"><a href="#cb5-164" aria-hidden="true" tabindex="-1"></a>one that had already been computed — a claim checked rather than asserted, by hashing every result table</span>
+<span id="cb5-165"><a href="#cb5-165" aria-hidden="true" tabindex="-1"></a>of every round and comparing them pairwise. This report presents the union of all of them as a single</span>
+<span id="cb5-166"><a href="#cb5-166" aria-hidden="true" tabindex="-1"></a>body of work. Where a result comes from a different observation window or an earlier case definition,</span>
+<span id="cb5-167"><a href="#cb5-167" aria-hidden="true" tabindex="-1"></a>the table says so on the spot.</span>
+<span id="cb5-168"><a href="#cb5-168" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb5-171"><a href="#cb5-171" aria-hidden="true" tabindex="-1"></a><span class="in">```{python}</span></span>
+<span id="cb5-172"><a href="#cb5-172" aria-hidden="true" tabindex="-1"></a><span class="co">#| label: tabla-organizacion</span></span>
+<span id="cb5-173"><a href="#cb5-173" aria-hidden="true" tabindex="-1"></a>organisation <span class="op">=</span> pd.DataFrame([</span>
+<span id="cb5-174"><a href="#cb5-174" aria-hidden="true" tabindex="-1"></a>    (<span class="st">"Hospital · universe"</span>, <span class="st">"Records read, F84 records kept, duplicates, exclusions and coding depth"</span>, <span class="st">"grd_epi_quality, grd_annual_positions"</span>),</span>
+<span id="cb5-175"><a href="#cb5-175" aria-hidden="true" tabindex="-1"></a>    (<span class="st">"Hospital · time"</span>, <span class="st">"Annual trend, crude and standardised rates, average annual percent change, seasonality"</span>, <span class="st">"grd_rates_national, grd_trends_apc, grd_epi_monthly"</span>),</span>
+<span id="cb5-176"><a href="#cb5-176" aria-hidden="true" tabindex="-1"></a>    (<span class="st">"Hospital · person"</span>, <span class="st">"Sex ratio, single year of age, age-specific rates"</span>, <span class="st">"grd_sex_ratio, grd_epi_age_single, grd_rates_age_specific"</span>),</span>
+<span id="cb5-177"><a href="#cb5-177" aria-hidden="true" tabindex="-1"></a>    (<span class="st">"Hospital · code"</span>, <span class="st">"F84 subcategories and diagnostic position"</span>, <span class="st">"grd_rates_subcodes, grd_epi_subcodes"</span>),</span>
+<span id="cb5-178"><a href="#cb5-178" aria-hidden="true" tabindex="-1"></a>    (<span class="st">"Hospital · episode"</span>, <span class="st">"Admission, activity, specialty, insurance, discharge, length of stay, severity, hospitals"</span>, <span class="st">"grd_epi_features, grd_epi_los_*, grd_epi_grd_weight"</span>),</span>
+<span id="cb5-179"><a href="#cb5-179" aria-hidden="true" tabindex="-1"></a>    (<span class="st">"Hospital · burden"</span>, <span class="st">"Readmission, multiplicity, co-diagnoses and principal diagnosis"</span>, <span class="st">"grd_epi_readmissions, grd_epi_multiplicity, grd_epi_codiagnoses"</span>),</span>
+<span id="cb5-180"><a href="#cb5-180" aria-hidden="true" tabindex="-1"></a>    (<span class="st">"Hospital · place"</span>, <span class="st">"Regions, communes, indirect standardisation, Moran and LISA"</span>, <span class="st">"grd_rates_regional, grd_rates_comunal, grd_spatial_*"</span>),</span>
+<span id="cb5-181"><a href="#cb5-181" aria-hidden="true" tabindex="-1"></a>    (<span class="st">"Hospital · trajectories"</span>, <span class="st">"Identifier continuity, first record, prior diagnoses, sequences, transitions"</span>, <span class="st">"grd_cohort_*, grd_first_*, grd_previous_*, grd_sequences"</span>),</span>
+<span id="cb5-182"><a href="#cb5-182" aria-hidden="true" tabindex="-1"></a>    (<span class="st">"Community"</span>, <span class="st">"Entries, rates, age and sex, subcategories, regions, communes, facility panel, screening, rehabilitation"</span>, <span class="st">"rem_*"</span>),</span>
+<span id="cb5-183"><a href="#cb5-183" aria-hidden="true" tabindex="-1"></a>    (<span class="st">"Results"</span>, <span class="st">"Panel figures and supplementary figures, drawn from the published tables"</span>, <span class="st">"docs/study/data/*.csv"</span>),</span>
+<span id="cb5-184"><a href="#cb5-184" aria-hidden="true" tabindex="-1"></a>], columns<span class="op">=</span>[<span class="st">"Section"</span>, <span class="st">"Content"</span>, <span class="st">"Inputs"</span>])</span>
+<span id="cb5-185"><a href="#cb5-185" aria-hidden="true" tabindex="-1"></a>show_table(organisation, <span class="st">"The report's sections and the tables that feed them"</span>)</span>
+<span id="cb5-186"><a href="#cb5-186" aria-hidden="true" tabindex="-1"></a><span class="in">```</span></span>
 </code></pre></div><button title="Copy to Clipboard" class="code-copy-button" data-in-quarto-modal=""><i class="bi"></i></button></div>
 </div></div></div></div></div>
 </div> <!-- /content -->

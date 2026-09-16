@@ -1,0 +1,1014 @@
+---
+title: "Population surveys: what people report about themselves and their children"
+subtitle: "ENDIDE 2022 and ENCAVI 2023–2024 · design-weighted estimates, their precision, and the boundary between an estimate and a record"
+---
+
+```{python}
+#| label: cargar-encuestas
+from pathlib import Path
+import sys
+import re
+import numpy as np
+import pandas as pd
+import matplotlib.pyplot as plt
+
+ROOT = Path.cwd().parent if Path.cwd().name == "docs" else Path.cwd()
+sys.path.insert(0, str(ROOT / "scripts"))
+from report_helpers import show_table, kpis, note, number, ci, share, plot_style, COLORS, SEX_COLORS
+
+# Tracked inputs. The tidy estimates live in docs/study/data/; the companion presentation tables of
+# the corpus, in docs/study/corpus/tables/. Nothing here reads a manuscript directory.
+TIDY = ROOT / "docs" / "study" / "data"
+CORPUS = ROOT / "docs" / "study" / "corpus" / "tables"
+
+
+def read_tidy(name):
+    return pd.read_csv(TIDY / name)
+
+
+def read_corpus(name):
+    # The corpus tables are presentation tables: every cell is read as text and parsed where used.
+    return pd.read_csv(CORPUS / name, encoding="utf-8-sig", dtype=str)
+
+
+estimates = read_tidy("survey_estimates.csv")
+verified = read_tidy("survey_estimates_verified.csv")
+enriched = read_tidy("survey_domains_enriched_verified.csv")
+headline_rows = read_tidy("fig3c_surveys.csv")
+dataflow = read_tidy("Figure_S1_dataflow_count_provenance.csv")
+items = read_corpus("ST5_survey_items.csv")
+e23 = read_corpus("E23_surveys_detail.csv")
+e75 = read_corpus("E75_survey_estimates_full.csv")
+sex_ratios = read_corpus("E26b_sex_ratio_multisource.csv")
+cross_source = read_corpus("E26_cross_source.csv")
+controls = read_corpus("T8_controls.csv")
+provenance = read_corpus("ST7_provenance.csv")
+source_sheet = read_corpus("T1_sources.csv")
+plot_style()
+
+# Display labels only: the tidy tables store domain, module and subgroup names in Spanish.
+DOMAIN_LABELS = {
+    "ENDIDE adultos 18+: autismo reportado": "ENDIDE 18+ · autism reported",
+    "ENDIDE NNA 2-17: autismo reportado": "ENDIDE 2–17 · autism reported",
+    "ENDIDE NNA 2-17: autismo reportado y confirmado por un médico": "ENDIDE 2–17 · reported and confirmed by a physician",
+    "ENDIDE NNA con autismo reportado: confirmado por un médico": "ENDIDE 2–17 · confirmed, among those reported",
+    "ENDIDE NNA con autismo reportado: confirmado por un médico (sensibilidad: No responde = no confirmado)":
+        "ENDIDE 2–17 · confirmed, among those reported (sensitivity: no answer = not confirmed)",
+    "ENDIDE NNA con autismo reportado: ha recibido medicamento": "ENDIDE 2–17 · received medication, among those reported",
+    "ENDIDE NNA con autismo reportado: ha recibido otro tratamiento": "ENDIDE 2–17 · received other treatment, among those reported",
+    "ENCAVI 15+: diagnóstico de trastorno del espectro autista": "ENCAVI 15+ · ASD diagnosis reported",
+    "ENCAVI 15+: diagnóstico de trastorno del espectro autista (sensibilidad: No sabe/No responde = no diagnosticado)":
+        "ENCAVI 15+ · ASD diagnosis (sensitivity: does not know / no answer = not diagnosed)",
+    "ENCAVI 15+ con diagnóstico de TEA: ha recibido o está en tratamiento médico":
+        "ENCAVI 15+ · in or has had medical treatment, among those diagnosed",
+}
+SHORT_LABELS = {
+    "ENDIDE adultos 18+: autismo reportado": "ENDIDE 18+\nreported",
+    "ENDIDE NNA 2-17: autismo reportado": "ENDIDE 2–17\nreported",
+    "ENDIDE NNA 2-17: autismo reportado y confirmado por un médico": "ENDIDE 2–17\nreported + confirmed",
+    "ENDIDE NNA con autismo reportado: confirmado por un médico": "ENDIDE 2–17\nconfirmed | reported",
+    "ENDIDE NNA con autismo reportado: confirmado por un médico (sensibilidad: No responde = no confirmado)":
+        "ENDIDE 2–17\nconfirmed | reported (sens.)",
+    "ENDIDE NNA con autismo reportado: ha recibido medicamento": "ENDIDE 2–17\nmedication | reported",
+    "ENDIDE NNA con autismo reportado: ha recibido otro tratamiento": "ENDIDE 2–17\nother treatment | reported",
+    "ENCAVI 15+: diagnóstico de trastorno del espectro autista": "ENCAVI 15+\ndiagnosed",
+    "ENCAVI 15+: diagnóstico de trastorno del espectro autista (sensibilidad: No sabe/No responde = no diagnosticado)":
+        "ENCAVI 15+\ndiagnosed (sens.)",
+    "ENCAVI 15+ con diagnóstico de TEA: ha recibido o está en tratamiento médico": "ENCAVI 15+\ntreatment | diagnosed",
+}
+MODULE_LABELS = {
+    "Adultos (18+)": "Adults aged 18 and over",
+    "NNA (2-17), responsable principal": "Children and adolescents aged 2–17, answered by the main caregiver",
+    "Personas 15+ (módulo 4, salud)": "Persons aged 15 and over (module 4, health)",
+}
+SUBGROUP_LABELS = {"total": "Domain total", "Hombre": "Males", "Mujer": "Females"}
+SURVEY_COLORS = {"ENDIDE 2022": COLORS[0], "ENCAVI 2023–2024": COLORS[1]}
+SEX_BAR_COLORS = {"Hombre": SEX_COLORS["HOMBRE"], "Mujer": SEX_COLORS["MUJER"]}
+ADEQUATE = "adequate"
+# The revised precision rule and its two thresholds are read from the tidy table and never retyped in this
+# chapter; the stored text lost the space before each threshold, which this substitution restores.
+RULE_TEXT = re.sub(r"than(\d)", r"than \1", enriched.precision_rule_revision.dropna().iloc[0])
+CASES_MIN, RSE_MAX = (int(value) for value in re.findall(r"than (\d+)", RULE_TEXT)[:2])
+
+
+def subgroup_label(row):
+    if row.subgroup_type == "age_group":
+        if row.subgroup.endswith("+"):
+            return row.subgroup[:-1] + " years and over"
+        return row.subgroup.replace("-", "–") + " years"
+    return SUBGROUP_LABELS.get(row.subgroup, row.subgroup)
+
+
+def band_start(label):
+    return int(re.match(r"(\d+)", str(label)).group(1))
+
+
+d = enriched.copy()
+d["survey"] = d.survey.str.replace("2023-2024", "2023–2024", regex=False)  # display dash only
+d["Domain"] = d.domain.map(DOMAIN_LABELS).fillna(d.domain)
+d["Short"] = d.domain.map(SHORT_LABELS).fillna(d.domain)
+d["Module"] = d.module.map(MODULE_LABELS).fillna(d.module)
+d["Subgroup"] = d.apply(subgroup_label, axis=1)
+d["pct"] = 100 * d.proportion
+d["pct_lo"] = 100 * d.lo
+d["pct_hi"] = 100 * d.hi
+d["rse_pct"] = 100 * d.rse
+d["persons_lo"] = d.lo * d.weighted_population
+d["persons_hi"] = d.hi * d.weighted_population
+d["n_eff"] = d.n / d.deff
+d["reliable"] = d.precision_flag.eq(ADEQUATE)
+d["reliable_revised"] = d.precision_flag_revision.eq(ADEQUATE)
+d["95% CI"] = [ci(lo, hi, 2) for lo, hi in zip(d.pct_lo, d.pct_hi)]
+totals = d.loc[d.subgroup_type == "total"].copy()
+
+# The four estimates the study puts forward as its survey headline, in the order fig3c_surveys gives.
+headline_order = {domain: i for i, domain in enumerate(headline_rows.sort_values("order").domain)}
+headline = d.loc[d.domain.isin(headline_order) & (d.subgroup_type == "total") & (d.estimate_type == "primary")].copy()
+headline["ord"] = headline.domain.map(headline_order)
+headline = headline.sort_values("ord")
+by_domain = {row.domain: row for row in d.loc[d.subgroup_type == "total"].itertuples()}
+
+endide_child = by_domain["ENDIDE NNA 2-17: autismo reportado"]
+endide_adult = by_domain["ENDIDE adultos 18+: autismo reportado"]
+encavi = by_domain["ENCAVI 15+: diagnóstico de trastorno del espectro autista"]
+
+kpis([
+    (number(len(d)), "Design-weighted estimates published by the two surveys"),
+    (number(endide_child.pct, 2) + "%", "ENDIDE 2022 · caregiver-reported autism, ages 2–17"),
+    (number(endide_adult.pct, 2) + "%", "ENDIDE 2022 · reported autism, adults 18 and over"),
+    (number(encavi.pct, 2) + "%", "ENCAVI 2023–2024 · reported ASD diagnosis, ages 15 and over"),
+    (number(share((~d.reliable).sum(), len(d)), 0) + "%", "Estimates the study marks as imprecise"),
+])
+```
+
+## What the surveys measure
+
+ENDIDE 2022 and ENCAVI 2023–2024 are the only sources in this report that **estimate something about a
+population** instead of counting administrative records. Every other chapter counts rows that a service
+produced: an episode, a programme entry, a stock under follow-up, a school enrolment. Here the unit is a
+**sampled person**, the numbers are **design-weighted estimates** carrying sampling error, and the domains
+are defined by the wording of a questionnaire item rather than by a diagnostic code.
+
+Three things follow, and they hold for every figure in this chapter. First, each estimate is the weighted
+proportion of a survey domain whose respondent **reported** autism or a received diagnosis; it measures
+reporting, not clinical ascertainment, and no item in either survey applies a diagnostic instrument. Second,
+every estimate has a confidence interval, and an estimate without its interval is not a result. Third, a
+survey estimate and an administrative count are **not the same quantity**: they are never joined into one
+series, and where both appear in a figure they sit on separate axes with the difference stated.
+
+```{python}
+#| label: tabla-encuestas-fuentes
+sheet = source_sheet.loc[source_sheet.Source.str.contains("ENDIDE|ENCAVI", na=False)]
+show_table(sheet[["Source", "Provider", "Unit of observation", "Period", "Population or coverage", "Geography"]],
+           "The two surveys as the study's source sheet describes them: provider, unit, period and coverage")
+show_table(sheet[["Source", "Stock or flow", "Possible denominator", "Definition and schema breaks", "Person-level linkage"]],
+           "The same two rows: what each survey may be divided by, what breaks its comparability and what linkage it permits")
+```
+
+### The sample design of each survey
+
+Both surveys are estimated with their published complex design: the expansion weight as the probability
+weight, the published stratum as the variance stratum and the published primary sampling unit as the
+variance cluster, with Taylor linearisation and logit intervals on a *t* distribution whose degrees of
+freedom are the clusters minus the strata.
+
+```{python}
+#| label: tabla-encuestas-diseno
+design = d.groupby(["survey", "survey_year"], as_index=False).agg(
+    modules=("Module", lambda s: len(set(s))),
+    domains=("domain", "nunique"),
+    rows=("domain", "size"),
+    respondents=("n", "max"),
+    population=("weighted_population", "max"),
+    weight=("weight_var", "first"), strata=("strata_var", "first"), psu=("psu_var", "first"),
+    n_psu=("n_psu", "first"), n_strata=("n_strata", "first"), df=("df", "first"),
+    deff_min=("deff", "min"), deff_max=("deff", "max"), method=("ci_method", "first"))
+design["DEFF range"] = [f"{number(lo, 2)} to {number(hi, 2)}" for lo, hi in zip(design.deff_min, design.deff_max)]
+design["df = PSU − strata"] = design.n_psu - design.n_strata
+show_table(design[["survey", "survey_year", "modules", "domains", "rows", "respondents", "population",
+                   "weight", "strata", "psu", "n_psu", "n_strata", "df", "df = PSU − strata", "DEFF range", "method"]].rename(columns={
+    "survey": "Survey", "survey_year": "Field period", "modules": "Modules used", "domains": "Estimation domains",
+    "rows": "Published estimates", "respondents": "Largest domain (respondents)", "population": "Largest weighted population (persons)",
+    "weight": "Weight variable", "strata": "Stratum variable", "psu": "Cluster variable", "n_psu": "PSUs",
+    "n_strata": "Strata", "df": "Degrees of freedom", "method": "Interval method"}),
+    "Sample design as the estimate table records it, with the degrees of freedom recomputed from the clusters and strata")
+endide_design = design.loc[design.survey == "ENDIDE 2022"].iloc[0]
+encavi_design = design.loc[design.survey == "ENCAVI 2023–2024"].iloc[0]
+note(f"Degrees of freedom equal clusters minus strata in {int((d.df == d.n_psu - d.n_strata).sum())} of {len(d)} rows. "
+     f"ENDIDE carries {number(endide_design.n_psu)} clusters in {number(endide_design.n_strata)} strata and ENCAVI "
+     f"{number(encavi_design.n_psu)} clusters in {number(encavi_design.n_strata)}; the design effects observed run "
+     f"{number(endide_design.deff_min, 2)} to {number(endide_design.deff_max, 2)} in ENDIDE and "
+     f"{number(encavi_design.deff_min, 2)} to {number(encavi_design.deff_max, 2)} in ENCAVI. The second fact is not explained by the first "
+     "and no explanation is offered here: a design effect depends on cluster size, on the correlation between persons of the same cluster "
+     "and on the variation of the weights, and none of those three is recorded in these tables. The two stratum counts are not the same "
+     "kind of object either — the item sheet records for ENDIDE: "
+     f"\"{items.loc[items.Variable == 'estrato', 'Treatment in the analysis'].iloc[0]}\" — so the "
+     f"{number(endide_design.n_strata)} and the {number(encavi_design.n_strata)} are not read against each other.")
+```
+
+```{python}
+#| label: tabla-encuestas-items
+item_rows = items.loc[~items.Module.eq("Design")]
+show_table(item_rows[["Survey", "Module", "Variable", "Role", "Variable label (verbatim Spanish)", "Respondent", "Universe"]].rename(columns={
+    "Variable label (verbatim Spanish)": "Item label (verbatim, as fielded)"}),
+    "The questionnaire items behind every estimate: variable, role, verbatim label, who answered and over which universe")
+show_table(item_rows[["Survey", "Variable", "Response codes", "Missing codes", "Treatment in the analysis", "Source document"]],
+           "The same items: response codes, missing codes and how each is treated in the estimation")
+note(items.loc[items.Variable == "estrato", "Treatment in the analysis"].iloc[0] + " — ENDIDE variance strata.")
+note(items.loc[items.Role == "note", "Treatment in the analysis"].iloc[0] + " — ENDIDE adults, professional confirmation.")
+```
+
+The wording is the definition, and it differs between the two surveys and between the two ENDIDE modules.
+ENDIDE asks a household informant about a **condition** from a battery of health conditions, for adults as
+self-report or by proxy and for children through the main caregiver, and then asks the caregiver — and only
+the caregiver — whether a physician said so. ENCAVI asks the selected person aged 15 or over, in a personal
+interview, whether they have **been diagnosed**, with an interviewer note that a traditional medical
+diagnosis is meant, and separately whether they have received treatment for it. A reported condition, a
+caregiver-reported physician confirmation and a self-reported diagnosis are three different quantities; the
+report keeps them apart and never averages them.
+
+## The estimates
+
+### The four headline domains
+
+```{python}
+#| label: tabla-encuestas-titulares
+table = headline[["Domain", "Module", "n", "cases", "pct", "95% CI", "weighted_total", "weighted_population", "deff", "rse_pct", "n_eff", "precision_flag"]].copy()
+table["95% CI in persons"] = [ci(lo, hi, 0) for lo, hi in zip(headline.persons_lo, headline.persons_hi)]
+show_table(table.rename(columns={
+    "n": "Respondents in the domain", "cases": "Unweighted positive responses", "pct": "Weighted %",
+    "weighted_total": "Weighted persons", "weighted_population": "Weighted population of the domain",
+    "deff": "DEFF", "rse_pct": "Relative SE (%)", "n_eff": "Effective sample (n / DEFF)", "precision_flag": "Precision flag"}),
+    "The four headline survey estimates, in the order the study presents them, with their design-based precision",
+    {"Weighted %": 2, "DEFF": 2, "Relative SE (%)": 1, "Effective sample (n / DEFF)": 0})
+```
+
+```{python}
+#| label: fig-encuestas-titulares
+#| fig-cap: "The four headline estimates on the two scales the estimate table records: the weighted percentage of each domain with its 95% interval (left) and the same estimate and interval expressed as persons of the weighted population of that domain (right). Open markers and hatching mark the estimates the study flags as imprecise."
+#| fig-width: 12
+#| fig-height: 4.4
+fig, axes = plt.subplots(1, 2, figsize=(12, 4.4), layout="constrained", gridspec_kw={"width_ratios": [1, 1]})
+y = np.arange(len(headline))[::-1]
+for i, row in enumerate(headline.itertuples()):
+    colour = SURVEY_COLORS[row.survey]
+    axes[0].errorbar(row.pct, y[i], xerr=[[row.pct - row.pct_lo], [row.pct_hi - row.pct]], fmt="o",
+                     color=colour, capsize=3, markersize=7, markerfacecolor=colour if row.reliable else "white", linewidth=1.6)
+    axes[0].annotate(f"{number(row.pct, 2)}% ({number(row.pct_lo, 2)}–{number(row.pct_hi, 2)}); {int(row.cases)} positive responses",
+                     (row.pct_hi, y[i]), fontsize=7, xytext=(6, 0), textcoords="offset points", va="center")
+axes[0].set_yticks(y)
+axes[0].set_yticklabels([s.replace("\n", " · ") for s in headline.Short], fontsize=8)
+axes[0].set(title="Weighted percentage of the domain", xlabel="% of the domain (design-weighted)", xlim=(0, float(headline.pct_hi.max()) * 2.6))
+axes[1].barh(y, headline.weighted_total, color=[SURVEY_COLORS[s] for s in headline.survey],
+             hatch=["" if r else "//" for r in headline.reliable], height=.68)
+axes[1].errorbar(headline.weighted_total, y, xerr=[headline.weighted_total - headline.persons_lo, headline.persons_hi - headline.weighted_total],
+                 fmt="none", ecolor="#333333", capsize=3, linewidth=1.2)
+axes[1].set_yticks(y)
+axes[1].set_yticklabels([])
+axes[1].set(title="The same estimate expressed in persons", xlabel="Persons of the weighted population of the domain")
+for i, row in enumerate(headline.itertuples()):
+    axes[1].annotate(f"{number(row.weighted_total)} of {number(row.weighted_population)}", (row.persons_hi, y[i]),
+                     fontsize=7, xytext=(6, 0), textcoords="offset points", va="center")
+axes[1].set_xlim(0, float(headline.persons_hi.max()) * 1.9)
+plt.show()
+note("The weighted persons are the same estimate multiplied by the weighted population of its own domain, which is not the same "
+     "population in every row: the ENDIDE adult domain expands to persons aged 18 and over, the ENDIDE child domain to persons aged 2 to 17 "
+     "and the ENCAVI domain to persons aged 15 and over. Rows are therefore not additive and never added.")
+```
+
+Caregiver-reported autism among children and adolescents aged 2 to 17 is an order of magnitude above reported
+autism among adults, and the reported-diagnosis estimate for persons aged 15 and over sits between them. Read
+across the three domains this is not a trend and not a cohort effect that these data can demonstrate: the
+respondent changes (caregiver, self or proxy), the item changes, the survey changes and the field period
+changes. What the three have in common is the direction: the younger the domain, the higher the reported
+recognition, the same direction the administrative chapters find and, here too, a statement about
+recognition rather than about the occurrence of autism.
+
+### Sensitivity domains: what happens to the non-answers
+
+```{python}
+#| label: tabla-encuestas-sensibilidad
+pairs = [("ENDIDE NNA con autismo reportado: confirmado por un médico",
+          "ENDIDE NNA con autismo reportado: confirmado por un médico (sensibilidad: No responde = no confirmado)"),
+         ("ENCAVI 15+: diagnóstico de trastorno del espectro autista",
+          "ENCAVI 15+: diagnóstico de trastorno del espectro autista (sensibilidad: No sabe/No responde = no diagnosticado)")]
+rows = []
+for primary_key, sensitivity_key in pairs:
+    primary, sensitivity = by_domain[primary_key], by_domain[sensitivity_key]
+    rows.append({"Domain": DOMAIN_LABELS[primary_key],
+                 "Primary domain (n)": primary.n, "Sensitivity domain (n)": sensitivity.n,
+                 "Non-answers moved into the domain": sensitivity.n - primary.n,
+                 "Non-answers as % of the sensitivity domain": share(sensitivity.n - primary.n, sensitivity.n),
+                 "Positive responses": primary.cases,
+                 "Primary %": primary.pct, "95% CI primary": ci(primary.pct_lo, primary.pct_hi, 2),
+                 "Sensitivity %": sensitivity.pct, "95% CI sensitivity": ci(sensitivity.pct_lo, sensitivity.pct_hi, 2),
+                 # Taken between the two values as printed, so the column cannot show a move the two columns
+                 # beside it do not show.
+                 "Sensitivity minus primary (percentage points)": round(sensitivity.pct, 2) - round(primary.pct, 2)})
+show_table(pd.DataFrame(rows), "Primary and sensitivity domains: the estimate when the non-answers are excluded and when they are counted as negative",
+           {"Primary %": 2, "Sensitivity %": 2, "Sensitivity minus primary (percentage points)": 2,
+            "Non-answers as % of the sensitivity domain": 1})
+flow_map = dataflow.set_index("key").value
+confirm_primary = by_domain["ENDIDE NNA con autismo reportado: confirmado por un médico"]
+confirm_sens = by_domain["ENDIDE NNA con autismo reportado: confirmado por un médico (sensibilidad: No responde = no confirmado)"]
+confirm_moved = int(confirm_sens.n - confirm_primary.n)
+note(f"ENCAVI fielded the item to {number(float(flow_map['encavi_total']))} persons; {number(float(flow_map['encavi_excluded']))} answered "
+     f"'does not know' or did not answer and are excluded from the primary domain of {number(float(flow_map['encavi_valid']))} valid answers "
+     f"({dataflow.loc[dataflow.key == 'encavi_excluded', 'source'].iloc[0]}). Because the excluded answers are few and the estimate is small, "
+     "moving them to the negative side leaves the estimate unchanged at the two decimals at which it is reported. In ENDIDE the same move "
+     f"matters much more: {number(confirm_moved)} caregivers did not answer the confirmation question — "
+     f"{number(share(confirm_moved, confirm_sens.n), 1)}% of the {number(confirm_sens.n)} who had reported autism in a child, "
+     f"{number(share(confirm_moved, confirm_primary.n), 1)}% of the {number(confirm_primary.n)} valid answers the primary domain keeps — "
+     f"and counting them as unconfirmed moves the estimate down by "
+     f"{number(round(confirm_primary.pct, 2) - round(confirm_sens.pct, 2), 2)} percentage points.")
+```
+
+The two surveys handle a missing answer differently because they code it differently, and a sensitivity domain
+was not estimated for every item that has non-answers. Every domain in this chapter states its own denominator;
+where a sensitivity domain exists it is reported next to the primary one rather than replacing it, and where it
+does not exist the table below says so, beside the item it belongs to.
+
+```{python}
+#| label: tabla-encuestas-noresponde
+def missing_count(cell):
+    # Every explicit no-answer code in the item sheet carries its case count in parentheses; the parentheses
+    # that hold a "not applicable" condition instead carry no digits and contribute nothing.
+    return sum(int(value) for value in re.findall(r"\((\d+)(?: cases)?\)", str(cell)))
+
+
+estimated_totals = d.loc[d.subgroup_type == "total"]
+valid_n = estimated_totals.loc[estimated_totals.estimate_type.isin(["primary", "secondary"])].groupby("item_variable").n.min()
+sensitivity_n = estimated_totals.loc[estimated_totals.estimate_type == "sensitivity"].set_index("item_variable").n
+non_answers = item_rows.loc[item_rows.Variable.isin(d.item_variable.dropna().unique())].copy()
+non_answers["No-answer responses (n)"] = [missing_count(cell) for cell in non_answers["Missing codes"]]
+non_answers["Domain of valid answers (n)"] = non_answers.Variable.map(valid_n)
+non_answers["Sensitivity domain (n)"] = non_answers.Variable.map(sensitivity_n)
+non_answers["Sensitivity domain estimated"] = np.where(non_answers.Variable.isin(sensitivity_n.index), "yes", "no")
+show_table(non_answers[["Survey", "Variable", "Role", "Missing codes", "No-answer responses (n)",
+                        "Domain of valid answers (n)", "Sensitivity domain (n)", "Sensitivity domain estimated"]],
+           "Every item a published estimate rests on: its explicit no-answer codes, how many respondents used them, and whether a sensitivity domain was estimated for it")
+uncovered = non_answers.loc[(non_answers["No-answer responses (n)"] > 0) & non_answers["Sensitivity domain estimated"].eq("no")]
+gaps = []
+for _, item in uncovered.iterrows():
+    moved = int(item["No-answer responses (n)"])
+    row = d.loc[(d.item_variable == item.Variable) & (d.subgroup_type == "total")].iloc[0]
+    gaps.append(f"{row.Domain} — {int(row.cases)} of {number(row.n)} valid answers ({number(share(row.cases, row.n), 1)}%) against "
+                f"{int(row.cases)} of {number(row.n + moved)} ({number(share(row.cases, row.n + moved), 1)}%) with the {moved} "
+                f"non-answer{'s' if moved != 1 else ''} counted as negative")
+note(f"{int((non_answers['No-answer responses (n)'] > 0).sum())} of the {len(non_answers)} items behind a published estimate carry an "
+     f"explicit no-answer code, and a sensitivity domain was estimated for {int(non_answers['Sensitivity domain estimated'].eq('yes').sum())} "
+     "of them. The two ENDIDE condition batteries have no missing code at all, but all three ENDIDE follow-up items do and so do both ENCAVI "
+     f"items. For the {len(uncovered)} treatment items no sensitivity domain exists, so their published estimates rest on the valid answers "
+     "alone and the reader cannot see what the non-answers would do to them. Unweighted — and these unweighted ratios are not the published "
+     "design-weighted estimates, they only size the gap the tables leave open — the move would be: " + "; ".join(gaps) + ".")
+```
+
+## Sex and age
+
+```{python}
+#| label: tabla-encuestas-sexo
+sex = d.loc[d.subgroup_type == "sex"].copy()
+show_table(sex[["Domain", "Subgroup", "n", "cases", "pct", "95% CI", "weighted_total", "deff", "rse_pct", "precision_flag", "precision_flag_revision"]].rename(columns={
+    "n": "Respondents", "cases": "Positive responses", "pct": "Weighted %", "weighted_total": "Weighted persons",
+    "deff": "DEFF", "rse_pct": "Relative SE (%)", "precision_flag": "Precision flag (as published)",
+    "precision_flag_revision": "Precision flag (revised rule)"}),
+    "Estimates by sex in every domain that reports them", {"Weighted %": 2, "DEFF": 2, "Relative SE (%)": 1})
+```
+
+```{python}
+#| label: tabla-encuestas-edad
+age = d.loc[d.subgroup_type == "age_group"].copy()
+age["start"] = age.subgroup.map(band_start)
+age = age.sort_values(["survey", "domain", "start"])
+show_table(age[["Domain", "Subgroup", "n", "cases", "pct", "95% CI", "weighted_total", "rse_pct", "precision_flag", "precision_flag_revision"]].rename(columns={
+    "n": "Respondents", "cases": "Positive responses", "pct": "Weighted %", "weighted_total": "Weighted persons",
+    "rse_pct": "Relative SE (%)", "precision_flag": "Precision flag (as published)",
+    "precision_flag_revision": "Precision flag (revised rule)"}),
+    "Estimates by age group, with the age bands each survey publishes", {"Weighted %": 2, "Relative SE (%)": 1})
+```
+
+```{python}
+#| label: fig-encuestas-sexo-edad
+#| fig-cap: "Design-weighted estimates by sex and by age group. (a) Males and females in the four domains that report both, with 95% intervals. (b) The two ENDIDE child domains by age band. (c) The adult domains of both surveys, ordered by the start of the age band; the bands are those of each instrument and are not aligned with each other. Open markers mark the estimates the study flags as imprecise."
+#| fig-width: 13
+#| fig-height: 5
+fig, axes = plt.subplots(1, 3, figsize=(13, 5), layout="constrained", gridspec_kw={"width_ratios": [1.15, 1, 1.05]})
+sex_domains = [row.domain for row in headline.itertuples()]
+x = np.arange(len(sex_domains))
+width = .36
+for offset, subgroup in zip([-width / 2, width / 2], ["Hombre", "Mujer"]):
+    frame = sex.loc[sex.subgroup == subgroup].set_index("domain").reindex(sex_domains)
+    axes[0].bar(x + offset, frame.pct, width=width, color=SEX_BAR_COLORS[subgroup],
+                hatch=["" if bool(r) else "//" for r in frame.reliable.fillna(False)],
+                label="Males" if subgroup == "Hombre" else "Females")
+    axes[0].errorbar(x + offset, frame.pct, yerr=[frame.pct - frame.pct_lo, frame.pct_hi - frame.pct],
+                     fmt="none", ecolor="#333333", capsize=3, linewidth=1.1)
+axes[0].set_xticks(x)
+axes[0].set_xticklabels([SHORT_LABELS[k].replace("reported + confirmed", "rep. + conf.") for k in sex_domains], fontsize=6.8)
+axes[0].set(title="By sex", ylabel="% of the domain (design-weighted)")
+axes[0].legend(title="Recorded sex", fontsize=8)
+
+child_domains = ["ENDIDE NNA 2-17: autismo reportado", "ENDIDE NNA 2-17: autismo reportado y confirmado por un médico"]
+child_rows = age.loc[age.domain.isin(child_domains)].sort_values(["start", "domain"])
+labels = []
+for i, row in enumerate(child_rows.itertuples()):
+    colour = COLORS[0] if row.domain == child_domains[0] else COLORS[4]
+    axes[1].errorbar(row.pct, i, xerr=[[row.pct - row.pct_lo], [row.pct_hi - row.pct]], fmt="o", color=colour,
+                     capsize=3, markersize=6, markerfacecolor=colour if row.reliable else "white", linewidth=1.5)
+    labels.append(f"{row.Subgroup} · {'reported' if row.domain == child_domains[0] else 'reported + confirmed'}")
+axes[1].set_yticks(range(len(child_rows)))
+axes[1].set_yticklabels(labels, fontsize=7.5)
+axes[1].invert_yaxis()
+axes[1].set(title="ENDIDE 2022, ages 2–17", xlabel="% of the age band (design-weighted)", xlim=(0, float(child_rows.pct_hi.max()) * 1.15))
+
+adult_domains = ["ENDIDE adultos 18+: autismo reportado", "ENCAVI 15+: diagnóstico de trastorno del espectro autista"]
+adult_rows = age.loc[age.domain.isin(adult_domains)].sort_values(["start", "survey"])
+for i, row in enumerate(adult_rows.itertuples()):
+    colour = SURVEY_COLORS[row.survey]
+    axes[2].errorbar(row.pct, i, xerr=[[row.pct - row.pct_lo], [row.pct_hi - row.pct]], fmt="o", color=colour,
+                     capsize=3, markersize=6, markerfacecolor=colour if row.reliable else "white", linewidth=1.5)
+axes[2].set_yticks(range(len(adult_rows)))
+axes[2].set_yticklabels([f"{row.Subgroup} · {'ENDIDE' if row.survey.startswith('ENDIDE') else 'ENCAVI'}" for row in adult_rows.itertuples()], fontsize=7.5)
+axes[2].invert_yaxis()
+axes[2].set(title="Adult domains of both surveys", xlabel="% of the age band (design-weighted)", xlim=(0, float(adult_rows.pct_hi.max()) * 1.15))
+plt.show()
+```
+
+```{python}
+#| label: nota-encuestas-sexo-edad
+#| output: asis
+def bands(domain, condition=None):
+    frame = age.loc[age.domain == domain].sort_values("start")
+    if condition is not None:
+        frame = frame.loc[condition(frame)]
+    return ", ".join(frame.subgroup.str.replace("-", "–", regex=False)) or "none"
+
+
+adult_endide = "ENDIDE adultos 18+: autismo reportado"
+adult_encavi = "ENCAVI 15+: diagnóstico de trastorno del espectro autista"
+sex_wide = sex.pivot_table(index="domain", columns="subgroup", values="pct")
+endide_bands = age.loc[age.domain == adult_endide].sort_values("start")
+encavi_bands = age.loc[age.domain == adult_encavi].sort_values("start")
+print(
+    f"Males are estimated above females in {int((sex_wide['Hombre'] > sex_wide['Mujer']).sum())} of the {len(sex_wide)} domains that report "
+    f"sex, and reported recognition falls with age in both adult series: from {number(endide_bands.pct.iloc[0], 2)}% to "
+    f"{number(endide_bands.pct.iloc[-1], 2)}% across the ENDIDE adult bands and from {number(encavi_bands.pct.iloc[0], 2)}% to "
+    f"{number(encavi_bands.pct.iloc[-1], 2)}% across the ENCAVI bands. Most of the cells that make those falls are flagged. In the ENDIDE "
+    f"adult domain {int((~endide_bands.reliable).sum())} of the {len(endide_bands)} bands are flagged imprecise as published "
+    f"({bands(adult_endide, lambda f: ~f.reliable)}), leaving {bands(adult_endide, lambda f: f.reliable)} as the only unflagged band. In "
+    f"ENCAVI {int((~encavi_bands.reliable).sum())} of the {len(encavi_bands)} bands are flagged as published "
+    f"({bands(adult_encavi, lambda f: ~f.reliable)}) and {int((~encavi_bands.reliable_revised).sum())} of {len(encavi_bands)} under the "
+    "revised rule — that is every age band ENCAVI publishes, so **no ENCAVI age-specific estimate is adequate under the revised rule** and "
+    "the ENCAVI gradient should be read as flagged end to end rather than as a measured slope.\n\n"
+    f"The bands themselves do not line up — ENDIDE publishes {bands(adult_endide)}, ENCAVI {bands(adult_encavi)} — so the two adult series "
+    "are shown on one axis as separate series and never interpolated onto each other."
+)
+```
+
+### Sex ratio: the one quantity that crosses sources
+
+```{python}
+#| label: tabla-encuestas-razon-sexo
+def parse_ratio(cell):
+    match = re.match(r"\s*([\d.]+)\s*\(\s*([\d.]+)\s*[–-]\s*([\d.]+)\s*\)", str(cell))
+    return (float(match.group(1)), float(match.group(2)), float(match.group(3))) if match else (np.nan, np.nan, np.nan)
+
+
+ratios = sex_ratios.copy()
+parsed = [parse_ratio(v) for v in ratios["Male-to-female ratio (95% CI)"]]
+ratios["ratio"] = [p[0] for p in parsed]
+ratios["ratio_lo"] = [p[1] for p in parsed]
+ratios["ratio_hi"] = [p[2] for p in parsed]
+survey_years = ["2022", "2024"]
+comparable = ratios.loc[ratios.Year.isin(survey_years) & ratios.Basis.isin(["counts", "proportions"]) & ratios.ratio.notna()].copy()
+comparable["is_survey"] = comparable.Source.str.contains("ENDIDE|ENCAVI")
+# Three kinds of source share this axis, and only a dimensionless ratio lets them: the two household
+# surveys, the school survey that also weights its answers, and the registers that count records.
+comparable["kind"] = np.where(comparable.is_survey, "Household survey · ratio of weighted proportions",
+                              np.where(comparable.Source.str.contains("JUNAEB"), "School survey · ratio of weighted proportions",
+                                       "Register · ratio of counts of records"))
+show_table(comparable.loc[comparable.is_survey][["Source", "Year", "Unit", "Males", "Females", "Male-to-female ratio (95% CI)", "Interval method", "Basis"]],
+           "Male-to-female ratio in the survey domains: the ratio is computed on the weighted proportions with complex-design standard errors, while the Males and Females columns are the unweighted positive responses behind them")
+```
+
+```{python}
+#| label: fig-encuestas-razon-sexo
+#| fig-cap: "Male-to-female ratio of autism recognition in 2022 and in 2024, in every source of the study that reports sex in those years. The household-survey and school-survey points are ratios of design-weighted proportions with complex-design intervals; the register points are ratios of counts of records with exact binomial intervals. A ratio is dimensionless, which is the only reason these sources can share an axis at all; their numerators count different things and are never compared as counts."
+#| fig-width: 11
+#| fig-height: 6
+order = comparable.sort_values(["Year", "is_survey", "ratio"], ascending=[True, False, True]).reset_index(drop=True)
+fig, ax = plt.subplots(figsize=(11, 6), layout="constrained")
+y = np.arange(len(order))[::-1]
+KIND_STYLE = {"Household survey · ratio of weighted proportions": (COLORS[4], "s"),
+              "School survey · ratio of weighted proportions": (COLORS[2], "D"),
+              "Register · ratio of counts of records": (COLORS[0], "o")}
+for i, row in enumerate(order.itertuples()):
+    colour, marker = KIND_STYLE[row.kind]
+    ax.errorbar(row.ratio, y[i], xerr=[[row.ratio - row.ratio_lo], [row.ratio_hi - row.ratio]], fmt=marker,
+                color=colour, capsize=3, markersize=6, linewidth=1.5)
+    ax.annotate(f"{row.Unit}", (row.ratio_hi, y[i]), fontsize=6.5, xytext=(5, 0), textcoords="offset points", va="center", color="#555555")
+ax.set_yticks(y)
+ax.set_yticklabels([f"{row.Source} · {row.Year}" for row in order.itertuples()], fontsize=7)
+ax.axvline(1, color="#999999", linestyle="--", linewidth=1)
+ax.set(title="Male-to-female ratio by source, survey years only", xlabel="Male-to-female ratio (95% CI)", xlim=(0, float(order.ratio_hi.max()) * 1.35))
+handles = [plt.Line2D([], [], color=colour, marker=marker, linestyle="", label=kind)
+           for kind, (colour, marker) in KIND_STYLE.items()]
+ax.legend(handles=handles, fontsize=7.5, loc="lower right")
+plt.show()
+survey_males = comparable.loc[comparable.is_survey, "Males"].str.replace(",", "").astype(int)
+other_males = comparable.loc[~comparable.is_survey, "Males"].str.replace(",", "").astype(int)
+note("The two household surveys are squares, the school survey diamonds and the registers circles. The household-survey intervals are the "
+     f"widest on the plot because they rest on {number(survey_males.min())} to {number(survey_males.max())} positive male responses, against "
+     f"{number(other_males.min())} to {number(other_males.max())} in the school-survey and register rows beside them. Overlap between a "
+     "survey interval and an administrative one is agreement about a ratio, not evidence that the two sources are measuring the same "
+     "population.")
+```
+
+```{python}
+#| label: nota-encuestas-razon-sexo
+#| output: asis
+survey_ratios = comparable.loc[comparable.is_survey].copy()
+register_ratios = comparable.loc[comparable.kind.str.startswith("Register")].copy()
+for frame in (survey_ratios, register_ratios):
+    frame["males_n"] = frame.Males.str.replace(",", "").astype(int)
+    frame["females_n"] = frame.Females.str.replace(",", "").astype(int)
+survey_ratios = survey_ratios.sort_values("males_n")
+widths = survey_ratios.ratio_hi - survey_ratios.ratio_lo
+print(
+    f"The ratios overlap, and that is the most that can be said. The {len(survey_ratios)} household-survey ratios rest on "
+    + ", ".join(number(value) for value in survey_ratios.males_n[:-1])
+    + f" and {number(survey_ratios.males_n.iloc[-1])} positive male responses, against {number(survey_ratios.females_n.min())} to "
+    f"{number(survey_ratios.females_n.max())} female ones, and their intervals are {number(widths.min(), 2)} to {number(widths.max(), 2)} "
+    f"wide on the ratio scale. The register ratios are narrow because they count {number(register_ratios.males_n.min())} to "
+    f"{number(register_ratios.males_n.max())} male records, not because they are closer to the truth about the population."
+)
+```
+
+## Confirmation and treatment
+
+ENDIDE asks the caregiver of a child with reported autism whether a physician said so, and whether the child
+has received medication or another treatment. ENCAVI asks the diagnosed adult whether they have received or
+are in medical treatment. These are **conditional** domains: their denominator is the small group that
+answered positively to the previous question, not the population, and their intervals are wide accordingly.
+
+```{python}
+#| label: tabla-encuestas-condicionales
+conditional = totals.loc[totals.domain.str.contains("con autismo reportado|con diagnóstico de TEA")].copy()
+show_table(conditional[["Domain", "estimate_type", "n", "cases", "pct", "95% CI", "weighted_total", "weighted_population", "deff", "rse_pct", "precision_flag"]].rename(columns={
+    "estimate_type": "Estimate type", "n": "Respondents in the conditional domain", "cases": "Positive responses",
+    "pct": "Weighted %", "weighted_total": "Weighted persons", "weighted_population": "Weighted denominator (persons)",
+    "deff": "DEFF", "rse_pct": "Relative SE (%)", "precision_flag": "Precision flag"}),
+    "Conditional domains: confirmation and treatment among those who already reported autism or a diagnosis",
+    {"Weighted %": 2, "DEFF": 2, "Relative SE (%)": 1})
+```
+
+```{python}
+#| label: fig-encuestas-confirmacion
+#| fig-cap: "Confirmation and treatment. (a) The ENDIDE child estimate under its two definitions — autism reported, and reported and confirmed by a physician — in the domain total and by sex, as a percentage of all children and adolescents aged 2 to 17. (b) The conditional domains, each as a percentage of its own small denominator, with the denominator printed at the end of the row. Open markers and hatching mark the estimates the study flags as imprecise."
+#| fig-width: 12
+#| fig-height: 4.6
+fig, axes = plt.subplots(1, 2, figsize=(12, 4.6), layout="constrained", gridspec_kw={"width_ratios": [1, 1.25]})
+groups = ["total", "Hombre", "Mujer"]
+group_labels = ["Domain total", "Males", "Females"]
+x = np.arange(len(groups))
+for offset, domain, colour, label in [(-.19, child_domains[0], COLORS[0], "Autism reported"),
+                                      (.19, child_domains[1], COLORS[4], "Reported and confirmed by a physician")]:
+    frame = d.loc[(d.domain == domain) & d.subgroup.isin(groups)].set_index("subgroup").reindex(groups)
+    axes[0].bar(x + offset, frame.pct, width=.38, color=colour, label=label,
+                hatch=["" if bool(r) else "//" for r in frame.reliable])
+    axes[0].errorbar(x + offset, frame.pct, yerr=[frame.pct - frame.pct_lo, frame.pct_hi - frame.pct],
+                     fmt="none", ecolor="#333333", capsize=3, linewidth=1.1)
+axes[0].set_xticks(x)
+axes[0].set_xticklabels(group_labels)
+axes[0].set(title="ENDIDE 2022, ages 2–17: two definitions", ylabel="% of all children and adolescents aged 2–17")
+axes[0].legend(fontsize=8)
+
+cond = conditional.sort_values("pct")
+y = np.arange(len(cond))
+axes[1].barh(y, cond.pct, color=[SURVEY_COLORS[s] for s in cond.survey], height=.66,
+             hatch=["" if r else "//" for r in cond.reliable])
+axes[1].errorbar(cond.pct, y, xerr=[cond.pct - cond.pct_lo, cond.pct_hi - cond.pct], fmt="none", ecolor="#333333", capsize=3, linewidth=1.2)
+axes[1].set_yticks(y)
+axes[1].set_yticklabels([s.replace("\n", " · ") for s in cond.Short], fontsize=7)
+for i, row in enumerate(cond.itertuples()):
+    axes[1].annotate(f"{number(row.pct, 1)}% · {int(row.cases)} of {int(row.n)}", (row.pct_hi, i), fontsize=7,
+                     xytext=(6, 0), textcoords="offset points", va="center")
+axes[1].set(title="Conditional domains, each over its own denominator", xlabel="% of the conditional domain", xlim=(0, float(cond.pct_hi.max()) * 1.45))
+plt.show()
+```
+
+```{python}
+#| label: nota-encuestas-condicionales
+#| output: asis
+medication_domain = by_domain["ENDIDE NNA con autismo reportado: ha recibido medicamento"]
+other_treatment_domain = by_domain["ENDIDE NNA con autismo reportado: ha recibido otro tratamiento"]
+encavi_treatment_domain = by_domain["ENCAVI 15+ con diagnóstico de TEA: ha recibido o está en tratamiento médico"]
+widest = conditional.loc[(conditional.pct_hi - conditional.pct_lo).idxmax()]
+print(
+    f"{number(confirm_primary.pct, 1)}% (95% CI {ci(confirm_primary.pct_lo, confirm_primary.pct_hi, 1)}) of the "
+    f"{number(confirm_primary.n)} caregivers who **answered the confirmation question** reported that a physician had said so. That "
+    f"denominator is not the {number(confirm_sens.n)} caregivers who reported autism: over all of them, with the {confirm_moved} "
+    f"non-answers counted as unconfirmed, the estimate is {number(confirm_sens.pct, 1)}% "
+    f"(95% CI {ci(confirm_sens.pct_lo, confirm_sens.pct_hi, 1)}). Both are printed above, each against the denominator it belongs to, and "
+    "the conditional figure is never quoted as a figure for the whole reporting group.\n\n"
+    f"{number(medication_domain.pct, 1)}% of the children with reported autism had received medication and "
+    f"{number(other_treatment_domain.pct, 1)}% another treatment — two overlapping items, not two exclusive categories, and neither is a "
+    f"measure of access to a service. Among adults with a reported ASD diagnosis in ENCAVI, {number(encavi_treatment_domain.pct, 1)}% "
+    f"reported having received or being in medical treatment, on the {number(encavi_treatment_domain.n)} valid answers of that conditional "
+    f"domain. Its interval is {number(widest.pct_hi - widest.pct_lo, 1)} percentage points wide, the widest in the chapter, and the number "
+    "should never be quoted without it. None of these three treatment items has a sensitivity domain, as the item table above records, so "
+    "each rests on its valid answers alone."
+)
+```
+
+There is no confirmation item for ENDIDE adults. The battery that asks about the condition has no "did a
+physician tell you" follow-up, so the adult estimate has no confirmed counterpart and none is constructed.
+
+## Precision
+
+```{python}
+#| label: nota-encuestas-regla
+#| output: asis
+print(
+    "Every estimate in this chapter is published with a precision flag. The flag as published marks a domain **imprecise when it rests on "
+    f"fewer than {CASES_MIN} unweighted positive responses**, and that case test alone reproduces the published flag in "
+    f"{int((d.reliable == (d.cases >= CASES_MIN)).sum())} of the {len(d)} rows. The tidy table also carries a revised rule, which adds a "
+    f"relative standard error above {RSE_MAX}% to the same test, and records both flags so the difference is visible rather than silent. "
+    "Both thresholds here are read from the rule text the tidy table stores, quoted in full below, and the same two values draw the "
+    "reference lines in panel (c)."
+)
+```
+
+```{python}
+#| label: tabla-encuestas-precision
+rule = RULE_TEXT  # parsed once in the setup chunk, together with the two thresholds drawn in panel (c)
+summary = d.groupby("survey").agg(estimates=("domain", "size"),
+                                  imprecise_published=("reliable", lambda s: int((~s).sum())),
+                                  imprecise_revised=("reliable_revised", lambda s: int((~s).sum())),
+                                  min_cases=("cases", "min"), max_rse=("rse_pct", "max"),
+                                  min_deff=("deff", "min"), max_deff=("deff", "max")).reset_index()
+summary["% imprecise (as published)"] = [share(a, b) for a, b in zip(summary.imprecise_published, summary.estimates)]
+show_table(summary.rename(columns={"survey": "Survey", "estimates": "Estimates", "imprecise_published": "Flagged imprecise (as published)",
+                                   "imprecise_revised": "Flagged imprecise (revised rule)", "min_cases": "Fewest positive responses",
+                                   "max_rse": "Largest relative SE (%)", "min_deff": "Smallest DEFF", "max_deff": "Largest DEFF"}),
+           "Precision by survey under the two rules the tidy table records",
+           {"Largest relative SE (%)": 1, "Smallest DEFF": 2, "Largest DEFF": 2, "% imprecise (as published)": 0})
+changed = d.loc[d.precision_flag != d.precision_flag_revision]
+show_table(changed[["Domain", "Subgroup", "n", "cases", "pct", "95% CI", "rse_pct", "precision_flag", "precision_flag_revision"]].rename(columns={
+    "n": "Respondents", "cases": "Positive responses", "pct": "Weighted %", "rse_pct": "Relative SE (%)",
+    "precision_flag": "Flag as published", "precision_flag_revision": "Flag under the revised rule"}),
+    "The estimates on which the two rules disagree", {"Weighted %": 2, "Relative SE (%)": 1})
+note(f"Revised rule, verbatim from the tidy table: {rule} Under it, {int((~d.reliable_revised).sum())} of {len(d)} estimates are flagged, "
+     f"against {int((~d.reliable).sum())} under the rule as published; the two rules disagree on {len(changed)} estimate.")
+```
+
+```{python}
+#| label: fig-encuestas-precision
+#| fig-cap: "Precision of the survey estimates. (a) Design effect of each estimation domain, against the DEFF = 1 reference of simple random sampling. (b) Respondents in each domain and the effective sample the design leaves, n divided by DEFF, on the same rows as panel (a). (c) Relative standard error against unweighted positive responses for all published estimates; the two dashed reference lines are the case and relative-error thresholds of the revised rule, read from the rule text stored in the tidy table, and points below and to the right of both pass it."
+#| fig-width: 13
+#| fig-height: 4.8
+fig, axes = plt.subplots(1, 3, figsize=(13, 4.8), layout="constrained", gridspec_kw={"width_ratios": [1.15, .95, 1]})
+deff_ax, sample_ax, error_ax = axes[0], axes[1], axes[2]
+domain_totals = totals.sort_values("deff")
+y = np.arange(len(domain_totals))
+deff_ax.barh(y, domain_totals.deff, color=[SURVEY_COLORS[s] for s in domain_totals.survey], height=.7)
+deff_ax.axvline(1, color="#333333", linestyle="--", linewidth=1)
+deff_ax.set_yticks(y)
+deff_ax.set_yticklabels([s.replace("\n", " · ") for s in domain_totals.Short], fontsize=6.5)
+deff_ax.set(title="Design effect by domain", xlabel="DEFF")
+for flag, colour, marker, label in [(True, COLORS[0], "o", "Passes the revised rule"), (False, COLORS[4], "^", "Flagged imprecise")]:
+    frame = d.loc[d.reliable_revised == flag]
+    error_ax.scatter(frame.cases, frame.rse_pct, color=colour, marker=marker, s=34, alpha=.85, edgecolor="white", linewidth=.4, label=label)
+error_ax.axvline(CASES_MIN, color="#c0392b", linestyle="--", linewidth=1.1)
+error_ax.axhline(RSE_MAX, color="#c0392b", linestyle="--", linewidth=1.1)
+error_ax.set_xscale("log")
+error_ax.set(title="Relative error against case count", xlabel="Unweighted positive responses (log scale)", ylabel="Relative standard error (%)")
+error_ax.legend(fontsize=7.5)
+y2 = np.arange(len(domain_totals))
+sample_ax.barh(y2 + .19, domain_totals.n, height=.36, color="#c8ccd2", label="Respondents in the domain")
+sample_ax.barh(y2 - .19, domain_totals.n_eff, height=.36, color=[SURVEY_COLORS[s] for s in domain_totals.survey], label="Effective sample (n / DEFF)")
+sample_ax.set_xscale("log")
+sample_ax.set_yticks(y2)
+sample_ax.set_yticklabels([])
+sample_ax.set(title="What the design costs in sample", xlabel="Respondents (log scale)")
+sample_ax.legend(fontsize=7.5, loc="lower right")
+plt.show()
+note(f"The ENCAVI design effect of {number(encavi.deff, 2)} on its main domain turns {number(encavi.n)} respondents into an effective sample of "
+     f"{number(encavi.n_eff, 0)}; the ENDIDE child domain, with a design effect of {number(endide_child.deff, 2)}, keeps "
+     f"{number(endide_child.n_eff, 0)} of {number(endide_child.n)}. A design effect above one is the price of clustering and weighting, "
+     "not an error: it is the reason an interval computed as if the sample were simple random would be too narrow.")
+```
+
+```{python}
+#| label: nota-encuestas-precision-patron
+#| output: asis
+smallest = d.loc[d.cases.idxmin()]
+flagged_rows = d.loc[~d.reliable_revised]
+flagged_bands = age.loc[~age.reliable_revised].sort_values("start")  # age carries the band start used to order them
+encavi_flagged = flagged_bands.loc[flagged_bands.domain == adult_encavi]
+endide_flagged = flagged_bands.loc[flagged_bands.domain == adult_endide]
+female_flagged = flagged_rows.loc[flagged_rows.subgroup == "Mujer"]
+encavi_band_labels = list(encavi_flagged.subgroup.str.replace("-", "–", regex=False))
+print(
+    "The pattern in panel (c) is the ordinary one for a rare item in a household survey: the relative error is governed by the number of "
+    f"positive answers. The smallest cell in the chapter is {smallest.Domain}, {smallest.Subgroup}, with {int(smallest.cases)} positive "
+    f"answers among {number(smallest.n)} respondents and a relative standard error of {number(smallest.rse_pct, 1)}%; no amount of sample "
+    f"in the denominator rescues it. {len(flagged_rows)} of the {len(d)} published estimates "
+    f"({number(share(len(flagged_rows), len(d)), 0)}%) fall on the wrong side of at least one threshold of the revised rule, and they are "
+    f"not the ends of each distribution. They are every one of the {len(encavi_flagged)} ENCAVI age bands, the interior "
+    f"{', '.join(encavi_band_labels[1:-1])} included; {len(endide_flagged)} of the "
+    f"{int((age.domain == adult_endide).sum())} ENDIDE adult bands, that is every band except the youngest "
+    f"{bands(adult_endide, lambda f: f.reliable_revised)}; and {len(female_flagged)} female subgroups — "
+    # Flagging tracks the number of positive cases, not the size of the domain: two domains of the
+    # same size sit on opposite sides of the rule, so 'the smaller domains' would be the wrong reason.
+
+    "precisely the cells a reader is most tempted to compare."
+)
+```
+
+## Why this is not a count, and cannot be read as one
+
+```{python}
+#| label: tabla-encuestas-vs-registros
+def leading_count(cell):
+    match = re.match(r"\s*([\d,]+)", str(cell))
+    return float(match.group(1).replace(",", "")) if match else np.nan
+
+
+admin = cross_source.copy()
+admin["Year"] = admin.Year.astype(int)
+series_columns = [c for c in admin.columns if c != "Year"]
+counts = admin.set_index("Year")[series_columns].map(leading_count)
+units = {c: re.sub(r"^[\d,]+\s*", "", str(admin.loc[admin.Year == 2024, c].iloc[0]).split(";")[0]) for c in series_columns}
+survey_side = headline[["Domain", "survey", "survey_year", "n", "cases", "weighted_total", "weighted_population"]].copy()
+survey_side["Unit"] = "persons of the weighted household population"
+survey_side["Matching administrative years"] = np.where(survey_side.survey == "ENDIDE 2022", "2022", "2023 and 2024")
+show_table(survey_side.rename(columns={"survey": "Survey", "survey_year": "Field period", "n": "Respondents",
+                                       "cases": "Unweighted positive responses", "weighted_total": "Weighted persons",
+                                       "weighted_population": "Weighted population of the domain"}),
+           "What a survey estimate counts: sampled respondents expanded to persons of a household population")
+admin_table = counts.loc[[2022, 2023, 2024]].reset_index()
+admin_table = admin_table.rename(columns={c: f"{c} ({units[c]})" for c in series_columns})
+show_table(admin_table, "What the administrative sources count in the same years: records of activity, each with its own unit")
+note("No ratio is computed between the two tables. The survey figure is an estimate of persons in a sampled population, with an interval; "
+     "the administrative figure is a count of the records that reached a central return, with no interval, no unique-person guarantee and "
+     "no claim to completeness. The reporting base is part of the number and it moves: the GRD panel runs "
+     f"{number(float(flow_map['hospitals_min']))} to {number(float(flow_map['hospitals_max']))} hospitals across the period, REM A05 was "
+     f"returned by {number(float(flow_map['a05_2021_reporting']))} establishments in 2021 and {number(float(flow_map['a05_2025_reporting']))} "
+     f"in 2025, and REM P2 by {number(float(flow_map['p2_2019_reporting']))} in 2019, {number(float(flow_map['p2_2021_reporting']))} in 2021 "
+     f"and {number(float(flow_map['p2_2025_reporting']))} in 2025 (Figure_S1_dataflow_count_provenance.csv). Dividing one table by the other "
+     "would produce a number with no denominator that means anything.")
+```
+
+```{python}
+#| label: fig-encuestas-vs-registros
+#| fig-cap: "Two quantities on two axes, deliberately not joined and deliberately not ordered against each other. Left: the weighted persons behind each survey estimate, with the 95% interval expressed in persons. Right: the administrative series of the study by year, on a logarithmic scale, each in its own unit; the red dashed line marks the 2021 REM code-set break and the grey marks are the field periods of the two surveys. Neither panel is a denominator for the other, the two are never plotted as one series, and their levels are not compared."
+#| fig-width: 12
+#| fig-height: 4.8
+fig, axes = plt.subplots(1, 2, figsize=(12, 4.8), layout="constrained")
+y = np.arange(len(headline))[::-1]
+axes[0].barh(y, headline.weighted_total, color=[SURVEY_COLORS[s] for s in headline.survey], height=.66)
+axes[0].errorbar(headline.weighted_total, y, xerr=[headline.weighted_total - headline.persons_lo, headline.persons_hi - headline.weighted_total],
+                 fmt="none", ecolor="#333333", capsize=3, linewidth=1.2)
+axes[0].set_yticks(y)
+axes[0].set_yticklabels([s.replace("\n", " · ") for s in headline.Short], fontsize=7.5)
+axes[0].set(title="Surveys: estimated persons (with 95% interval)", xlabel="Persons of the weighted population of the domain")
+for column, colour in zip(series_columns, COLORS):
+    series = counts[column].dropna()
+    axes[1].plot(series.index, series.values, "o-", color=colour, linewidth=1.7, label=f"{column}")
+# The REM dictionary changes at 2021 (M3_rem_code_sets.csv): the generic pervasive-developmental-disorder code
+# 06902600 leaves it and the strict autism code 05990022 enters, so the break is drawn, not left to the caption.
+axes[1].axvline(2021, color="#c0392b", linestyle="--", linewidth=1.4)
+axes[1].annotate("2021 · REM code-set break", xy=(2020.93, counts.min().min() * 1.04), fontsize=6.8, color="#c0392b",
+                 rotation=90, va="bottom", ha="right",
+                 bbox=dict(boxstyle="round,pad=0.15", facecolor="white", edgecolor="none", alpha=.85))
+for year, style in [(2022, "-"), (2023, ":"), (2024, ":")]:
+    axes[1].axvline(year, color="#999999", linestyle=style, linewidth=1)
+axes[1].set_yscale("log")
+axes[1].set(title="Administrative sources: records per year", xlabel="Year", ylabel="Records in the year (log scale)",
+            xticks=sorted(counts.index))
+axes[1].legend(fontsize=6.5, loc="upper left")
+plt.show()
+note("The red line is a definition break, not a data point: the REM A05 series exists only from 2021 because the code it counts was created "
+     "then, and no REM series in this panel crosses 2021 under a single definition. The rise on either side of it is also a rise in "
+     f"reporting — REM A05 was returned by {number(float(flow_map['a05_2021_reporting']))} establishments in 2021 and "
+     f"{number(float(flow_map['a05_2025_reporting']))} in 2025, REM P2 by {number(float(flow_map['p2_2019_reporting']))} in 2019 and "
+     f"{number(float(flow_map['p2_2025_reporting']))} in 2025, and the GRD panel by {number(float(flow_map['hospitals_min']))} to "
+     f"{number(float(flow_map['hospitals_max']))} hospitals — so none of these lines is a fixed-coverage series. The grey lines are the "
+     "field periods of the two surveys, drawn to locate them in time and for no other purpose.")
+```
+
+```{python}
+#| label: nota-encuestas-dos-paneles
+#| output: asis
+education_column = next(column for column in series_columns if column.startswith("Education"))
+p2_column = next(column for column in series_columns if column.startswith("REM P2"))
+admin_2024 = counts.loc[2024]
+print(
+    "The two panels are the whole argument of this chapter. On the left, an estimate of how many people in a sampled population said "
+    "something about themselves or their child, with an interval that states how uncertain the sample leaves it. On the right, counts of "
+    "the records that reporting establishments returned, exact as counts of what was returned and silent about everyone who never reached "
+    "a service.\n\n"
+    "**The levels of the two panels are not compared, and no comparison between them appears anywhere in this report.** The bar is not "
+    "higher or lower than the line, because the two are not measured on anything in common. They are in different units — persons of a "
+    "weighted household population against records of activity — and they do not describe the same people: the ENDIDE adult domain expands "
+    f"to {number(endide_adult.weighted_population)} persons aged 18 and over and the ENCAVI domain to "
+    f"{number(encavi.weighted_population)} persons aged 15 and over, while the administrative series beside them are overwhelmingly "
+    f"paediatric — in 2024 the education series counts {number(admin_2024[education_column])} school students and REM P2 "
+    f"{number(admin_2024[p2_column])} children and adolescents under control. There is no year, no age range and no unit on which the two "
+    "panels are the same quantity, so no ordering by magnitude and no shared explanation of one by the other is available, and none is "
+    "offered. Neither corrects the other, neither validates the other, and the distance between them is not a measure of under-recognition, "
+    "because no person in one table is known to be a person in the other: the sources are not linked, and this study never links them."
+)
+```
+
+## Quality and comparability
+
+```{python}
+#| label: tabla-encuestas-controles
+survey_controls = controls.loc[controls.Source.str.contains("ENDIDE|ENCAVI", na=False)]
+show_table(survey_controls[["Indicator", "Year / key", "Expected (protocol)", "Observed (pipeline)", "Difference", "Status"]],
+           "Reproduction controls on the survey extraction: the counts the protocol expects against the counts the pipeline produced")
+note(survey_controls["Explanation"].iloc[0])
+show_table(provenance.loc[provenance.Source.isin(["endide_2022", "encavi_2023_2024"])][
+    ["Source", "Role", "Provider", "File", "Size (MB)", "SHA-256 (first 12)", "Download/version date", "SHA-256 matches manifest"]],
+    "Provenance of the survey inputs: the microdata file and the documents that define its items and design")
+```
+
+```{python}
+#| label: tabla-encuestas-consistencia
+key = ["domain", "subgroup_type", "subgroup", "estimate_type"]
+left = estimates.set_index(key).sort_index()
+right = verified.set_index(key).sort_index()
+middle = enriched.set_index(key).sort_index()
+compared = ["proportion", "se", "lo", "hi", "n", "cases", "deff", "rse"]
+identical_pair = int(sum(np.allclose(left[c].values, right[c].values) for c in compared))
+identical_triple = int(sum(np.allclose(right[c].values, middle[c].values) for c in compared))
+headline_match = int(np.allclose(headline_rows.sort_values("order").proportion.values,
+                                 headline.sort_values("ord").proportion.values))
+
+e23_rse = e23["RSE"].str.rstrip("%").astype(float)
+e23_pct = e23["% (95% CI)"].str.extract(r"([\d.]+) \(([\d.]+)–([\d.]+)\)").astype(float)
+e75_fields = e75["DEFF; RSE; df; PSU; strata"].str.split(";", expand=True)
+e75_deff = e75_fields[0].astype(float)
+e75_rse = e75_fields[1].str.strip().str.rstrip("%").astype(float)
+# E75 prints its own criterion inside the flag text. The case count is taken from E75; the relative error is
+# taken from the tidy column because E75's own RSE column is a hundred times too small, as the note below says.
+e75_cases = e75["Domain n; cases"].str.split(";").str[1].str.replace(",", "").astype(int)
+e75_adequate = ~e75["Precision flag"].str.startswith("imprecise")
+e75_criterion_imprecise = (e75_cases < CASES_MIN) | (100 * enriched.rse.values > RSE_MAX)
+e75_flag_conflict = (e75_adequate & e75_criterion_imprecise).values
+checks = pd.DataFrame([
+    {"Check": "survey_estimates.csv against survey_estimates_verified.csv", "Columns compared": len(compared),
+     "Rows": len(estimates), "Result": f"{identical_pair} of {len(compared)} columns identical"},
+    {"Check": "survey_estimates_verified.csv against survey_domains_enriched_verified.csv", "Columns compared": len(compared),
+     "Rows": len(enriched), "Result": f"{identical_triple} of {len(compared)} columns identical; the enriched file only adds the precision columns"},
+    {"Check": "fig3c_surveys.csv against the four headline estimates", "Columns compared": 1, "Rows": len(headline_rows),
+     "Result": "identical" if headline_match else "differs"},
+    {"Check": "E23 companion table: weighted % and interval", "Columns compared": 3, "Rows": len(e23),
+     "Result": "matches the tidy table to the printed precision" if np.allclose(e23_pct[0].values, (100 * enriched.proportion).round(2).values) else "differs"},
+    {"Check": "E23 companion table: relative standard error", "Columns compared": 1, "Rows": len(e23),
+     "Result": "matches the tidy table, printed as a percentage" if np.allclose(e23_rse.values, (100 * enriched.rse).round(1).values) else "differs"},
+    {"Check": "E75 companion table: design effect", "Columns compared": 1, "Rows": len(e75),
+     "Result": "matches the tidy table" if np.allclose(e75_deff.values, enriched.deff.round(2).values) else "differs"},
+    {"Check": "E75 companion table: relative standard error", "Columns compared": 1, "Rows": len(e75),
+     "Result": "carries the tidy value as a fraction under a per-cent sign" if np.allclose(e75_rse.values, enriched.rse.round(1).values) else "differs"},
+    {"Check": "E75 companion table: precision flag against the criterion E75 prints beside it", "Columns compared": 2, "Rows": len(e75),
+     "Result": f"{int(e75_flag_conflict.sum())} row labelled adequate although that criterion marks it imprecise"
+               if e75_flag_conflict.any() else "every flag agrees with the printed criterion"},
+])
+show_table(checks, "Every published presentation of these estimates checked against the tidy table they come from")
+conflict = e75.loc[e75_flag_conflict]
+note(f"The relative standard error of the first estimate reads {number(e23_rse.iloc[0], 1)}% in the E23 companion table and "
+     f"{number(e75_rse.iloc[0], 1)}% in the E75 one; the tidy column holds {number(100 * enriched.rse.iloc[0], 1)}%. E75 prints the stored "
+     "fraction and appends a per-cent sign, so its precision column reads a hundred times too small throughout. The rse column of the "
+     f"tidy table is the value to quote, and this chapter computes every relative error from it. A second inconsistency sits in the same "
+     f"table and is not arithmetic: {conflict.Survey.iloc[0]}, {conflict.Subgroup.iloc[0]}, with "
+     f"{int(e75_cases[e75_flag_conflict].iloc[0])} positive responses and a relative standard error of "
+     f"{number((100 * enriched.rse.values)[e75_flag_conflict][0], 1)}%, is labelled adequate, although the criterion printed inside E75's "
+     f"own flag text — cases < {CASES_MIN} or RSE > {RSE_MAX}% — marks it imprecise. The revised rule of the tidy table applies that "
+     "criterion and flags the cell; the flag as published tests only the case count.")
+```
+
+Beyond arithmetic, four things limit what these estimates can be compared with.
+
+**The two surveys are not a series.** ENDIDE was fielded in 2022 and ENCAVI across 2023 and 2024, with
+different instruments, different respondents and different universes. The gap between an ENDIDE estimate and
+an ENCAVI estimate is not change over time and is never drawn as a line.
+
+**There is no territory in them.**
+
+```{python}
+#| label: tabla-encuestas-dominios-disponibles
+available = d.groupby(["survey", "subgroup_type"], as_index=False).agg(estimates=("domain", "size"),
+                                                                       subgroups=("subgroup", "nunique"))
+available["subgroup_type"] = available.subgroup_type.map({"total": "Domain total", "sex": "Sex", "age_group": "Age group"})
+show_table(available.rename(columns={"survey": "Survey", "subgroup_type": "Domain type", "estimates": "Estimates published",
+                                     "subgroups": "Distinct subgroups"}),
+           "Every domain type the survey tables contain: totals, sex and age group, and nothing else")
+geographies = sorted(set(sheet.Geography))
+note("No regional or communal estimate exists in these tables: every published domain is a national total, a sex split or an age band. The "
+     "study's source sheet records the geography of both surveys in the same words — "
+     f"'{geographies[0] if len(geographies) == 1 else '; '.join(geographies)}' — so a regional domain lies inside both designs. What this "
+     "chapter records is that none was estimated, not that none could be; the comuna is what the source sheet rules out, for both surveys. "
+     "The territorial chapters of this report therefore have no survey counterpart, and the maps drawn elsewhere have no survey layer.")
+```
+
+**The age ranges leave a hole exactly where the health system screens.** ENDIDE covers 2 to 17 and 18 and
+over, ENCAVI 15 and over. Nobody under 2 appears in any domain, and the ASD screening of the well-child
+check-up described in the [community chapter](community.html) happens at 18 months. The age at which the
+public network looks hardest for autism is the one age no survey in this study measures.
+
+**Neither survey separates the subcategories of the spectrum.**
+
+```{python}
+#| label: tabla-encuestas-variantes
+variants = d.groupby(["survey", "variant"], as_index=False).agg(estimates=("domain", "size"), note=("variant_note", "first"))
+show_table(variants.rename(columns={"survey": "Survey", "variant": "Case-definition variant", "estimates": "Estimates",
+                                    "note": "Variant note, verbatim from the estimate table"}),
+           "The survey estimates under the case-definition variants of the study")
+note("The report's two case-definition variants differ in whether Rett syndrome is included. The survey items name autism and the autism "
+     "spectrum without subcategories, so both variants return the same estimate and the variant column reads 'both' in every row. Where a "
+     "sensitivity analysis of the report moves between variants, the survey rows do not move.")
+```
+
+## What this source cannot support
+
+- **Prevalence or incidence.** The items ask what a person or a caregiver reports, not what a clinical
+  assessment finds. The estimate is of reported recognition in a household population; a study that wanted
+  prevalence would need an ascertainment instrument, and neither survey carries one.
+- **A trend.** One cross-section each, two instruments, two field periods. Nothing in this chapter is a rate
+  of change, and no year-on-year comparison is defensible from these two points.
+- **A regional, service or communal figure.** No domain below the national level is estimated, so nothing
+  here can enter the territorial analyses of the report.
+- **A cascade from report to service.** The confirmation and treatment items describe what respondents said,
+  not encounters that can be matched to the records in the other chapters. The sources are not person-linked
+  and no path from a survey respondent to an administrative record exists.
+- **A denominator for the administrative counts.** The weighted persons of a survey domain do not cover the
+  same population, the same period or the same definition as any register in this report, and the study
+  describes them as a benchmark of order of magnitude only.
+- **The small cells.** The estimates flagged imprecise — counted, named and marked above — are an editorial
+  caution rather than an exclusion: each is printed with its interval, hatched or left open on every figure that
+  carries it, and never quoted alone. Under the revised rule that caution covers every ENCAVI age band, so no
+  age-specific ENCAVI figure should be read as a measurement.
+
+# Synthesis
+
+```{python}
+#| label: sintesis-encuestas
+#| output: asis
+flagged = int((~d.reliable).sum())
+flagged_revised = int((~d.reliable_revised).sum())
+confirmed_ratio = by_domain["ENDIDE NNA con autismo reportado: confirmado por un médico"]
+confirmed_pop = by_domain["ENDIDE NNA 2-17: autismo reportado y confirmado por un médico"]
+medication = by_domain["ENDIDE NNA con autismo reportado: ha recibido medicamento"]
+treatment = by_domain["ENCAVI 15+ con diagnóstico de TEA: ha recibido o está en tratamiento médico"]
+lines = [
+    f"- In ENDIDE 2022, {number(endide_child.pct, 2)}% (95% CI {number(endide_child.pct_lo, 2)} to {number(endide_child.pct_hi, 2)}) of children "
+    f"and adolescents aged 2 to 17 had autism reported by their main caregiver, on {int(endide_child.cases)} positive answers among "
+    f"{number(endide_child.n)} respondents, which expands to {number(endide_child.weighted_total)} persons of that age range.",
+    f"- Reported autism among adults aged 18 and over was {number(endide_adult.pct, 2)}% (95% CI {number(endide_adult.pct_lo, 2)} to "
+    f"{number(endide_adult.pct_hi, 2)}), and a reported ASD diagnosis among persons aged 15 and over in ENCAVI 2023–2024 was "
+    f"{number(encavi.pct, 2)}% (95% CI {number(encavi.pct_lo, 2)} to {number(encavi.pct_hi, 2)}). The three domains differ in respondent, "
+    "item, universe and field period, so their differences are not a trend.",
+    "- Reported recognition falls with age in both surveys and is higher in males in every domain that reports sex; the male-to-female ratios "
+    f"of the surveys overlap the administrative ones but rest on {number(survey_males.min())} to {number(survey_males.max())} positive male "
+    f"answers, against {number(other_males.min())} to {number(other_males.max())} male records in the sources plotted beside them. Only the "
+    "ratio is shared: the counts themselves are never compared.",
+    f"- {number(confirmed_ratio.pct, 1)}% (95% CI {number(confirmed_ratio.pct_lo, 1)} to {number(confirmed_ratio.pct_hi, 1)}) of the "
+    f"{number(confirmed_ratio.n)} caregivers who answered the confirmation question reported a physician's confirmation — "
+    f"{number(confirm_sens.pct, 1)}% (95% CI {number(confirm_sens.pct_lo, 1)} to {number(confirm_sens.pct_hi, 1)}) over all "
+    f"{number(confirm_sens.n)} who reported autism, with the {confirm_moved} non-answers counted as unconfirmed — giving "
+    f"{number(confirmed_pop.pct, 2)}% of all children aged 2 to 17 with autism reported and confirmed; {number(medication.pct, 1)}% had "
+    f"received medication and {number(treatment.pct, 1)}% of adults with a reported diagnosis had received or were in medical treatment, "
+    "each over its own small denominator and none of the three with a sensitivity domain.",
+    f"- {flagged} of {len(d)} estimates are flagged imprecise under the rule as published and {flagged_revised} under the revised rule that "
+    f"also tests the relative standard error. Under the revised rule the flagged cells are every one of the {len(encavi_flagged)} ENCAVI age "
+    f"bands, {len(endide_flagged)} of the {int((age.domain == adult_endide).sum())} ENDIDE adult bands (all but "
+    f"{bands(adult_endide, lambda f: f.reliable_revised)}) and {len(female_flagged)} female subgroups — so no ENCAVI age-specific estimate "
+    "is adequate under that rule, and the interior bands are flagged as well as the extreme ones.",
+    "- A survey estimate and an administrative count are different quantities with different units, different coverage and different error. "
+    "They are shown here on separate axes, never divided by one another, and never joined into a series.",
+]
+print("\n".join(lines))
+```
+
+## Reproducibility
+
+The estimates are produced by `study/pipeline/04_surveys.py`, which reads the two microdata files whose
+SHA-256 digests are recorded above, applies each survey's published weight, stratum and cluster variables and
+writes `survey_estimates.csv`; `survey_estimates_verified.csv` is the same table after verification and
+`survey_domains_enriched_verified.csv` adds the two precision flags and the text of the revised rule.
+`fig3c_surveys.csv` selects the four headline domains and fixes their order. This chapter recomputes every
+table and figure from those files and from the corpus tables `ST5_survey_items.csv`, `E23_surveys_detail.csv`,
+`E75_survey_estimates_full.csv`, `E26_cross_source.csv`, `E26b_sex_ratio_multisource.csv`, `T1_sources.csv`,
+`T8_controls.csv` and `ST7_provenance.csv`. Every quantity in the tables, the figures and the running text —
+the two precision thresholds, the age-band lists, the counts of flagged cells and the reporting bases of the
+administrative panel included — is computed from those files at render time. A handful of fixed labels are
+written out: the year of the code-set break marked on the comparison figure, the field periods of the two
+surveys and the age at which the network screens. Every quantity is read from a table,
+and where the text rounds a computed value into words the computed value is printed beside it. The microdata
+themselves are not redistributed: only the estimate tables are versioned.
+
+::: {.report-nav}
+:::

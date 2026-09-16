@@ -81,6 +81,85 @@ The denominators are the **INE population estimates and projections based on the
 
 The commune cartography corresponds to the political-administrative division with 346 communes (unique territorial code, CUT) and the regional cartography to 16 regions, both in the EPSG:3857 projection. GRD records are assigned to the reported commune of **residence**; REM is assigned to the commune and region of the reporting **facility**. Non-continental communes (Easter Island, Juan Fernández, Antarctica and Cabo de Hornos) are kept in the tables but excluded from the contiguity statistics.
 
+### Education records
+
+Three education sources are read, and they do not count the same thing. The **school integration
+programme** (PIE) records enrolments receiving support, by the category under which the support was
+granted. The **special schools** register counts pupils enrolled in schools for autism. The
+**applications register** (SINACES) counts applicants rather than enrolments. Each is an
+administrative count of a service, not a census of autistic pupils: a child receiving no support
+appears in none of them.
+
+Two definitions of the programme series are reported side by side because the categories changed
+within the period. The **strict** series counts only the autism category; the **harmonised** series
+adds the Asperger category, which existed as a separate option for part of the period and was later
+folded in. Reporting only one of them would show a break that is administrative rather than real.
+
+```{python}
+#| label: tabla-fuentes-educacion
+import pandas as pd
+education = pd.read_csv(ROOT / "docs" / "study" / "data" / "education_summary_year.csv")
+show_table(education[["year", "pie_tea_strict_n", "pie_tea_asperger_n", "pie_harmonised_n",
+                      "special_schools_autism_n", "pie_total_applicants_sinaces_n"]].rename(columns={
+    "year": "Year", "pie_tea_strict_n": "Programme, strict definition",
+    "pie_tea_asperger_n": "Asperger category", "pie_harmonised_n": "Programme, harmonised",
+    "special_schools_autism_n": "Special schools", "pie_total_applicants_sinaces_n": "Applicants register"}),
+    "Education records by year and by the definition each series uses")
+```
+
+Provenance is kept at the level of the individual figure: `docs/study/data/pie_source_provenance.csv`
+records, for every value, the source file with its SHA-256, the page of the published document it was
+read from, the caption of the table or figure that carried it, and the definition that document gave.
+A figure whose provenance could not be established that way is not in the series.
+
+The **school-feeding survey** (JUNAEB) is read only as a denominator audit, not as a source of
+counts. Its records carry sampling weights that are missing for part of the file, and
+`junaeb_denominator_audit.csv` reports, per year and school level, how many rows carry a positive
+weight and how many do not. Any estimate drawn from it has to be read against that audit.
+
+### Population surveys
+
+Two household surveys estimate something about a population rather than counting administrative
+records: **ENDIDE 2022** for children and adolescents aged 2 to 17, and **ENCAVI 2023–2024** for
+people aged 15 and over. They are the only sources in the study of that kind, and they answer a
+different question from every other chapter: not how many records exist, but what share of a sampled
+population reported a condition.
+
+Their domains are defined by the instrument, not by a diagnostic code, and the wording matters. ENDIDE
+distinguishes autism *reported* by the respondent from autism *reported and confirmed by a physician*;
+ENCAVI asks about a diagnosis received and, separately, about treatment. A sensitivity domain treats
+"does not know / does not answer" as not diagnosed. Each of these is a distinct quantity and the
+report keeps them distinct.
+
+Estimates are design-weighted and carry sampling error. `survey_estimates_verified.csv` records each
+estimate with its precision, and the report marks as imprecise those the producers' own criteria flag
+as such. A survey estimate and an administrative count are **not the same quantity** and are never
+plotted as one series: where both appear in a figure, they sit on separate axes with the difference
+stated.
+
+### Coverage layers
+
+Rates in this report divide by one of several layers, and which layer is used changes what the rate
+means. `coverage_layers_year.csv` holds them year by year: the INE projections on both the 2017 and
+the 2024 bases, public-insurance beneficiaries, primary-care enrolment in December, private-insurance
+beneficiaries, and the number of primary-care centres.
+
+```{python}
+#| label: tabla-capas-cobertura
+layers = pd.read_csv(ROOT / "docs" / "study" / "data" / "coverage_layers_year.csv")
+show_table(layers[["year", "ine_population_base2017_30jun", "fonasa_beneficiaries_dec",
+                   "aps_enrolled_dec", "aps_centres"]].rename(columns={
+    "year": "Year", "ine_population_base2017_30jun": "INE population (2017 base)",
+    "fonasa_beneficiaries_dec": "Public insurance beneficiaries",
+    "aps_enrolled_dec": "Primary-care enrolment", "aps_centres": "Primary-care centres"}),
+    "The coverage layers a rate can divide by, and how each one moved over the period")
+```
+
+Two cautions apply throughout. The **population base changed** between the 2017 and 2024 projections,
+so a rate computed across that break mixes two denominators; where both are available the report says
+which it used. And insurance and primary-care figures are counts of **enrolment, not of need**: a rise
+in enrolment lowers a rate without anything changing in the numerator.
+
 ## Case definitions
 
 ### ICD-10 codes in GRD

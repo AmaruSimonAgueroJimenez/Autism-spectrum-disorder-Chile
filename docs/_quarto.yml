@@ -21,6 +21,9 @@ book:
       chapters:
         - hospital.qmd
         - community.qmd
+        - education.qmd
+        - surveys.qmd
+        - denominators.qmd
     - part: "Extended material"
       chapters:
         - tables.qmd
